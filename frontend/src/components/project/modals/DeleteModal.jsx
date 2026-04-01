@@ -10,48 +10,46 @@ export default function DeleteModal({ isOpen, onClose, onDelete, projectName, de
         onClose();
         setDeleteConfirmation('');
       }}
-      title="Purge Protocol"
+      title="Delete Project"
     >
-      <div className="space-y-8">
-        <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl flex gap-5 relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-1 h-full bg-red-500/30"></div>
-          <AlertTriangle className="h-6 w-6 text-red-500 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-red-400 uppercase tracking-wider leading-relaxed italic">
-            Caution: This action initializes the IRREVERSIBLE destruction of all telemetry datasets associated with cluster <span className="text-white underline">{projectName}</span>. 
+      <div className="space-y-6">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex gap-3">
+          <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
+          <p className="text-sm text-red-400">
+            Warning: This action will permanently delete all data and analytics associated with <span className="text-white font-medium">{projectName}</span>. This cannot be undone.
           </p>
         </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 italic">Confirm Cluster ID</label>
-            <span className="text-[9px] font-black text-red-950 uppercase italic opacity-40 select-none">Authorization Required</span>
-          </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-300">
+            Please type <span className="text-white font-mono bg-slate-800 px-1 rounded">{projectName}</span> to confirm
+          </label>
           <input
             type="text"
             value={deleteConfirmation}
             onChange={(e) => setDeleteConfirmation(e.target.value)}
-            className="w-full bg-[#06080F] border border-[#1E293B] rounded-2xl px-6 py-4 text-white font-bold italic focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 transition-all placeholder:text-slate-800"
+            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-red-500 transition-colors placeholder:text-slate-600"
             placeholder={projectName}
           />
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#1E293B]/30">
+
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-slate-800">
           <button
             onClick={() => {
               onClose();
               setDeleteConfirmation('');
             }}
-            className="flex-1 px-8 py-4 bg-[#0B0D16] text-slate-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all italic border border-[#1E293B]"
+            className="px-4 py-2 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg text-sm font-medium transition-colors"
           >
-            Abort
+            Cancel
           </button>
           <button
             onClick={() => onDelete(deleteConfirmation)}
             disabled={deleteConfirmation !== projectName || deleting}
-            className="flex-[1.5] px-8 py-4 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_15px_40px_rgba(220,38,38,0.3)] transition-all disabled:opacity-20 disabled:grayscale flex items-center justify-center gap-3 italic"
+            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-            Confirm Destruction
+            Delete Project
           </button>
         </div>
       </div>

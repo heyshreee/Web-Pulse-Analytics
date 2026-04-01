@@ -383,11 +383,23 @@ exports.getDashboardStats = async (req, res) => {
                 site = v.page_url || 'Unknown';
             }
 
+            let lat = null;
+            let lng = null;
+            if (visitor.ip_address) {
+                const geo = geoip.lookup(visitor.ip_address);
+                if (geo && geo.ll) {
+                    lat = geo.ll[0];
+                    lng = geo.ll[1];
+                }
+            }
+
             return {
                 id: v.id,
                 type: 'view',
                 location,
                 ip: visitor.ip_address,
+                lat,
+                lng,
                 site,
                 path,
                 title: v.title,
@@ -875,7 +887,18 @@ exports.getProjectDetailedStats = async (req, res) => {
             const location = [visitor.city, visitor.country].filter(c => c && c !== 'Unknown').join(', ') || 'Unknown Location';
             let path = '/';
             try { path = new URL(v.page_url).pathname; } catch (e) { path = v.page_url || '/'; }
-            return { id: v.id, type: 'view', location, ip: visitor.ip_address, path, title: v.title, timestamp: v.created_at, device: visitor.device_type };
+
+            let lat = null;
+            let lng = null;
+            if (visitor.ip_address) {
+                const geo = geoip.lookup(visitor.ip_address);
+                if (geo && geo.ll) {
+                    lat = geo.ll[0];
+                    lng = geo.ll[1];
+                }
+            }
+
+            return { id: v.id, type: 'view', location, ip: visitor.ip_address, lat, lng, path, title: v.title, timestamp: v.created_at, device: visitor.device_type };
         }) || [];
 
         const { data: sources } = await supabase

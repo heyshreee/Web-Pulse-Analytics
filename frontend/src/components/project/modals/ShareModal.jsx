@@ -10,49 +10,49 @@ export default function ShareModal({ isOpen, onClose, shareToken, onDisableShari
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Public Report Dispatch"
+      title="Share Project"
     >
-      <div className="space-y-8">
-        <div className="flex items-start gap-5 p-1">
-          <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500 border border-blue-500/10">
+      <div className="space-y-6">
+        <div className="flex items-start gap-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <div className="p-2 bg-blue-500/20 rounded-md text-blue-400">
             <Share2 className="h-5 w-5" />
           </div>
-          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed italic">
-            Initializing external read-only telemetry link. Authorized entities may monitor this cluster's magnitude without protocol access.
+          <p className="text-sm text-blue-400/90 leading-relaxed">
+            Create a public, read-only link to share this project's dashboard. Anyone with the link can view your analytics.
           </p>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 px-1">
-            <ExternalLink className="h-3.5 w-3.5 text-slate-700" />
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 italic">Dispatched URL</label>
-          </div>
-          <div className="flex gap-4 p-2 bg-[#06080F] border border-[#1E293B] rounded-2xl group/input">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
+            <ExternalLink className="h-4 w-4" />
+            Share Link
+          </label>
+          <div className="flex gap-3 p-1 bg-slate-950 border border-slate-800 rounded-lg">
             <input
               type="text"
               readOnly
-              value={shareToken ? shareUrl : 'PROTOCOL LINK NOT DISPATCHED'}
-              className="flex-1 bg-transparent px-4 py-2 text-blue-400 font-bold text-xs focus:outline-none selection:bg-blue-500/20 italic"
+              value={shareToken ? shareUrl : 'Link not generated yet.'}
+              className="flex-1 bg-transparent px-3 py-2 text-slate-300 font-medium text-sm focus:outline-none"
             />
             {shareToken && <CopyButton text={shareUrl} size="sm" />}
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-[#1E293B]/30">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-800">
           {shareToken ? (
             <button
               onClick={onDisableSharing}
-              className="px-6 py-3 bg-red-950/10 hover:bg-red-900/20 text-red-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all italic border border-red-900/10 flex items-center gap-2"
+              className="px-4 py-2 border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 w-full sm:w-auto justify-center"
             >
-              <X className="h-4 w-4" /> Terminate Link
+              <X className="h-4 w-4" /> Disable Link
             </button>
           ) : <div />}
-          
+
           <button
             onClick={onGenerateLink}
-            className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/30 transition-all flex items-center justify-center gap-3 italic"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
           >
-            <RefreshCw className="h-4 w-4" /> {shareToken ? 'Regenerate Dispatch' : 'Initialize Dispatch'}
+            <RefreshCw className="h-4 w-4" /> {shareToken ? 'Regenerate Link' : 'Generate Link'}
           </button>
         </div>
       </div>

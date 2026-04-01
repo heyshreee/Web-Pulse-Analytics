@@ -7,34 +7,33 @@ export default function DisableModal({ isOpen, onClose, onToggleActive, projectN
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Halt Protocol"
+      title="Disable Project"
     >
-      <div className="space-y-8">
-        <div className="p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl flex gap-5 relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500/30"></div>
-          <AlertTriangle className="h-6 w-6 text-yellow-500 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-yellow-500/80 uppercase tracking-wider leading-relaxed italic">
-            Initialing temporary suspension for cluster <span className="text-white underline">{projectName}</span>. New telemetry ingress will be HEAVILY filtered.
+      <div className="space-y-6">
+        <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex gap-3">
+          <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
+          <p className="text-sm text-yellow-500/80">
+            You are about to temporarily disable <span className="text-white font-medium">{projectName}</span>. New traffic data will no longer be collected.
           </p>
         </div>
-        
-        <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest italic leading-relaxed px-1">
-          Historical resonance data will remain accessible in the archives. You may re-initialize the dispatch service at any temporal coordinate.
+
+        <p className="text-sm text-slate-400">
+          Historical data will remain available. You can re-enable tracking at any time from your project settings.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#1E293B]/30">
+        <div className="flex justify-end gap-3 pt-6 border-t border-slate-800">
           <button
             onClick={onClose}
-            className="flex-1 px-8 py-4 bg-[#0B0D16] text-slate-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all italic border border-[#1E293B]"
+            className="px-4 py-2 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg text-sm font-medium transition-colors"
           >
-            Abort
+            Cancel
           </button>
           <button
             onClick={onToggleActive}
-            className="flex-1 px-8 py-4 bg-yellow-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_15px_40px_rgba(202,138,4,0.3)] transition-all flex items-center justify-center gap-3 italic"
+            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
             <ShieldOff className="h-4 w-4" />
-            Halt Cluster
+            Disable Project
           </button>
         </div>
       </div>
