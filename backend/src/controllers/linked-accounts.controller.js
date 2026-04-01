@@ -20,7 +20,7 @@ exports.getLinkedAccounts = async (req, res) => {
 
 exports.linkTelegram = async (req, res) => {
     try {
-        const { chat_id, username } = req.body;
+        const { chat_id, username, bot_token } = req.body;
 
         if (!chat_id) {
             return res.status(400).json({ error: 'Chat ID is required' });
@@ -52,6 +52,7 @@ exports.linkTelegram = async (req, res) => {
             telegram: {
                 chat_id,
                 username,
+                bot_token: bot_token || null, // Store custom token if provided
                 linked_at: new Date().toISOString()
             }
         };
@@ -63,7 +64,11 @@ exports.linkTelegram = async (req, res) => {
 
         if (error) throw error;
 
-        await TelegramService.send(chat_id, 'Welcome to OBS Tracker! Your Telegram account has been successfully linked.');
+        await TelegramService.send(
+            chat_id,
+            'Welcome to OBS Tracker! Your Telegram account has been successfully linked.',
+            bot_token
+        );
 
         res.json({ success: true, linked_accounts: newData });
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import {
     Search, Download, Filter, ChevronLeft, ChevronRight,
     Key, Shield, AlertTriangle, Settings, Lock, Activity,
@@ -11,6 +11,7 @@ import Spinner from '../components/Spinner';
 
 export default function ProjectActivity() {
     const { idOrName } = useParams();
+    const navigate = useNavigate();
     // const { project } = useOutletContext(); // This might fail if not in Layout context correctly or if context is different.
     // ProjectActivity is rendered inside Layout -> PrivateRoute.
     // But wait, App.jsx renders it as:
@@ -78,7 +79,10 @@ export default function ProjectActivity() {
             // 1. Get Project ID if we only have name
             let projectId = project?.id;
             if (idOrName && !projectId) {
-                const p = await apiRequest(`/projects/${idOrName}`);
+                const p = await apiRequest(`/projects/${encodeURIComponent(idOrName)}`);
+                if (idOrName === p.id) {
+                    navigate(`/dashboard/projects/${encodeURIComponent(p.name)}/activity`, { replace: true });
+                }
                 setProject(p);
                 projectId = p.id;
             }

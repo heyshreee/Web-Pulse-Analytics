@@ -83,10 +83,10 @@ export default function APIKeys() {
 
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <code className="flex-1 sm:flex-none bg-slate-900 px-3 py-1.5 rounded border border-slate-800 text-slate-300 font-mono text-xs">
-                                    {project.id}
+                                    {project.tracking_id}
                                 </code>
                                 <button
-                                    onClick={() => copyToClipboard(project.id)}
+                                    onClick={() => copyToClipboard(project.tracking_id)}
                                     className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
                                     title="Copy ID"
                                 >
