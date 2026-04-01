@@ -951,6 +951,7 @@ function LinkedAccountsSection({ user, showToast }) {
     const [loading, setLoading] = useState(true);
     const [telegramChatId, setTelegramChatId] = useState('');
     const [telegramUsername, setTelegramUsername] = useState('');
+    const [botToken, setBotToken] = useState('');
     const [isPro, setIsPro] = useState(false);
 
     // Get usage stats from context
@@ -972,6 +973,7 @@ function LinkedAccountsSection({ user, showToast }) {
             if (data.telegram) {
                 setTelegramChatId(data.telegram.chat_id);
                 setTelegramUsername(data.telegram.username);
+                // We don't load the token back for security reasons, or we could if needed
             }
         } catch (err) {
             console.error(err);
@@ -986,7 +988,11 @@ function LinkedAccountsSection({ user, showToast }) {
         try {
             await apiRequest('/user/linked-accounts/telegram', {
                 method: 'POST',
-                body: JSON.stringify({ chat_id: telegramChatId, username: telegramUsername })
+                body: JSON.stringify({
+                    chat_id: telegramChatId,
+                    username: telegramUsername,
+                    bot_token: botToken
+                })
             });
             showToast('Telegram linked successfully', 'success');
             loadLinkedAccounts();
@@ -1005,7 +1011,11 @@ function LinkedAccountsSection({ user, showToast }) {
                 delete newAcc[platform];
                 return newAcc;
             });
-            if (platform === 'telegram') { setTelegramChatId(''); setTelegramUsername(''); }
+            if (platform === 'telegram') {
+                setTelegramChatId('');
+                setTelegramUsername('');
+                setBotToken('');
+            }
         } catch (err) {
             showToast(err.message, 'error');
         }
@@ -1052,20 +1062,30 @@ function LinkedAccountsSection({ user, showToast }) {
                         <div>
                             <div className="font-bold text-white">{accounts.telegram.username}</div>
                             <div className="text-xs text-slate-500 font-mono">ID: {accounts.telegram.chat_id}</div>
+                            {accounts.telegram.bot_token && (
+                                <div className="text-xs text-green-500 mt-1 flex items-center gap-1">
+                                    <Check className="h-3 w-3" /> Custom Bot Token Active
+                                </div>
+                            )}
                         </div>
                         <button onClick={() => unlink('telegram')} className="text-red-400 hover:text-red-300 text-sm font-medium">Unlink</button>
                     </div>
                 ) : (
                     <form onSubmit={linkTelegram} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input
-                                type="text"
-                                placeholder="Chat ID"
-                                value={telegramChatId}
-                                onChange={e => setTelegramChatId(e.target.value)}
-                                className="bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                required
-                            />
+                            <div className="flex flex-col gap-1">
+                                <input
+                                    type="text"
+                                    placeholder="Chat ID"
+                                    value={telegramChatId}
+                                    onChange={e => setTelegramChatId(e.target.value)}
+                                    className="bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    required
+                                />
+                                <p className="text-[10px] text-slate-500 ml-1">
+                                    Don't know your ID? Open <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">@userinfobot</a>
+                                </p>
+                            </div>
                             <input
                                 type="text"
                                 placeholder="Username (Optional)"
@@ -1073,6 +1093,17 @@ function LinkedAccountsSection({ user, showToast }) {
                                 onChange={e => setTelegramUsername(e.target.value)}
                                 className="bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                             />
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-medium text-slate-400 mb-1 ml-1">Custom Bot Token (Optional)</label>
+                                <input
+                                    type="text"
+                                    placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+                                    value={botToken}
+                                    onChange={e => setBotToken(e.target.value)}
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                />
+                                <p className="text-[10px] text-slate-500 mt-1 ml-1">Leave blank to use the default system bot. Provide your own if you want notifications to come from your specific bot.</p>
+                            </div>
                         </div>
                         <div className="flex justify-end">
                             <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold">

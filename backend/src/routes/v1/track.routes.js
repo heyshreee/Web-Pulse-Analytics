@@ -8,5 +8,6 @@ const trackingCors = require('../../middleware/trackingCors');
 router.use('/:trackingId', trackingCors);
 router.post('/:trackingId', rateLimiter, visitorController.trackVisitorPublic);
 router.get('/:trackingId', visitorController.getVisitorCountPublic);
+router.get('/:trackingId/script.js', visitorController.getTrackerScript);
 
 module.exports = router;

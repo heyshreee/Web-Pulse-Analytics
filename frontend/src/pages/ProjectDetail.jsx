@@ -118,6 +118,11 @@ export default function ProjectDetail() {
         apiRequest(`/analytics/projects/${idOrName}/overview`),
         apiRequest(`/analytics/projects/${idOrName}/traffic?range=${timeRange}&timezone=${encodeURIComponent(timezone)}`).catch(() => null)
       ]);
+
+      if (projectData && idOrName === projectData.id) {
+        navigate(`/dashboard/projects/${encodeURIComponent(projectData.name)}/${activeTab}`, { replace: true });
+      }
+
       setProject(projectData);
       setProjectName(projectData.name);
       setAllowedOrigins(projectData.allowed_origins ? projectData.allowed_origins.split(',').map(o => o.trim()) : []);
@@ -161,7 +166,7 @@ export default function ProjectDetail() {
 
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
-    navigate(`/dashboard/projects/${idOrName}/${newTab}`);
+    navigate(`/dashboard/projects/${encodeURIComponent(project?.name || idOrName)}/${newTab}`);
   };
 
   const handleDelete = async () => {
@@ -469,7 +474,7 @@ export default function Tracker() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
                 <div className="flex items-center gap-3">
-                  <Link to={`/dashboard/projects/${project?.id}/activity`} target="_blank" className="text-xs text-blue-400 hover:text-blue-300 font-medium">View All</Link>
+                  <Link to={`/dashboard/projects/${encodeURIComponent(project?.name || idOrName)}/activity`} target="_blank" className="text-xs text-blue-400 hover:text-blue-300 font-medium">View All</Link>
                   <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded uppercase">LIVE FEED</span>
                 </div>
               </div>
@@ -1192,7 +1197,7 @@ export default function Tracker() {
               <button
                 onClick={async () => {
                   try {
-                    await apiRequest(`/projects/${project.id}/share-token`, { method: 'DELETE' });
+                    await apiRequest(`/projects/${encodeURIComponent(project.name)}/share-token`, { method: 'DELETE' });
                     setShareToken(null);
                     showToast('Sharing disabled', 'success');
                   } catch (err) {
@@ -1207,7 +1212,7 @@ export default function Tracker() {
             <button
               onClick={async () => {
                 try {
-                  const data = await apiRequest(`/projects/${project.id}/share-token`, { method: 'POST' });
+                  const data = await apiRequest(`/projects/${encodeURIComponent(project.name)}/share-token`, { method: 'POST' });
                   setShareToken(data.share_token);
                   showToast('New link generated', 'success');
                 } catch (err) {

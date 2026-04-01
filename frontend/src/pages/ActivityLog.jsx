@@ -254,8 +254,8 @@ export default function ActivityLog() {
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <div className="font-mono text-[10px] text-slate-400 truncate w-24" title={log.project_id}>
-                                                P: {log.project_id?.substring(0, 8)}...
+                                            <div className="font-mono text-[10px] text-slate-400 truncate w-24" title={log.project?.name || 'Project'}>
+                                                P: {log.project?.name || 'Unknown'}
                                             </div>
                                             <div className="font-mono text-[10px] text-slate-500 truncate w-24" title={log.user_id}>
                                                 U: {log.user_id?.substring(0, 8)}...

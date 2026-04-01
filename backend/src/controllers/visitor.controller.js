@@ -960,3 +960,62 @@ exports.getProjectDetailedStats = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch project stats' });
     }
 };
+
+/**
+ * Serves a dynamic, pre-configured tracking script for a specific project.
+ */
+exports.getTrackerScript = async (req, res) => {
+    try {
+        const { trackingId } = req.params;
+        
+        // Use Host header to determine the full API URL
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+        const host = req.headers['x-forwarded-host'] || req.get('host');
+        const apiUrl = `${protocol}://${host}/api/v1/track/${trackingId}`;
+
+        const scriptText = `(function() {
+    const TRACKING_ID = "${trackingId}";
+    const ENDPOINT = "${apiUrl}";
+    const IGNORE_LOCAL = false;
+
+    function track() {
+        if (IGNORE_LOCAL && (location.hostname === "localhost" || location.hostname === "127.0.0.1")) return;
+        
+        const data = {
+            pageUrl: location.href,
+            referrer: document.referrer || null,
+            title: document.title,
+            screen: {
+                width: screen.width,
+                height: screen.height
+            }
+        };
+
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(ENDPOINT, JSON.stringify(data));
+        } else {
+            fetch(ENDPOINT, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+                keepalive: true
+            }).catch(() => {});
+        }
+    }
+
+    track();
+    
+    // Performance navigation timing (optional)
+    window.addEventListener('load', () => {
+        setTimeout(track, 100); 
+    });
+})();`;
+
+        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        res.send(scriptText);
+    } catch (error) {
+        console.error('Script generation error:', error);
+        res.status(500).send('console.error("Tracking script failed to load");');
+    }
+};
