@@ -6,6 +6,75 @@ const { getPlanLimits } = require('../services/usage.service');
 const EmailService = require('../services/email.service');
 const ReceiptService = require('../services/receipt.service');
 
+exports.getPlans = async (req, res) => {
+    try {
+        const plans = [
+            {
+                id: 'free',
+                name: 'Free',
+                price: 0,
+                interval: 'month',
+                features: [
+                    '1,000 monthly views',
+                    '5 projects',
+                    '1GB storage',
+                    'Real-time dashboard',
+                    'Basic telemetry'
+                ],
+                buttonText: 'Get Started',
+                limits: {
+                    monthlyViews: 1000,
+                    projectLimit: 5
+                }
+            },
+            {
+                id: 'pro',
+                name: 'Pro',
+                price: 29,
+                interval: 'month',
+                features: [
+                    '100,000 monthly views',
+                    '10 projects',
+                    '10GB storage',
+                    'Live logs access',
+                    'Email integrity checks',
+                    'Shared reports (up to 100)'
+                ],
+                buttonText: 'Upgrade to Pro',
+                popular: true,
+                limits: {
+                    monthlyViews: 100000,
+                    projectLimit: 10
+                }
+            },
+            {
+                id: 'enterprise',
+                name: 'Enterprise',
+                price: 'Custom',
+                interval: 'year',
+                features: [
+                    'Unlimited monthly views',
+                    '100 projects',
+                    '100GB storage',
+                    'Custom domain support',
+                    'Dedicated support',
+                    'SLA guarantee'
+                ],
+                buttonText: 'Contact Sales',
+                limits: {
+                    monthlyViews: 1000000000,
+                    projectLimit: 100
+                }
+            }
+        ];
+
+        res.json(plans);
+    } catch (error) {
+        console.error('Get plans error:', error);
+        res.status(500).json({ error: 'Failed to fetch plans' });
+    }
+};
+
 exports.createOrder = async (req, res) => {
     try {
         const { planId } = req.body;
@@ -303,28 +372,6 @@ exports.emailReceipt = async (req, res) => {
 
             res.json({ success: true, message: 'Receipt sent to email' });
         });
-
-        // Generate content (Reuse logic or refactor ReceiptService to accept doc)
-        // For now, we'll duplicate the generation logic slightly or better, update ReceiptService to return doc or accept stream
-        // Let's modify ReceiptService to be more flexible, but for now, let's just use a temporary stream approach or refactor ReceiptService.
-        // Actually, ReceiptService.generateReceipt takes a res (stream). We can pass a PassThrough stream or just use the doc events as above.
-        // But ReceiptService creates its own doc. Let's refactor ReceiptService slightly to accept a doc or return one.
-        // Wait, ReceiptService.generateReceipt creates a NEW doc.
-        // Let's just update ReceiptService to allow passing a stream/doc or just copy the logic here for simplicity to avoid breaking existing code, 
-        // OR better: Update ReceiptService to accept a stream.
-
-        // Let's try to use ReceiptService.generateReceipt but pass a mock stream that collects data?
-        // No, ReceiptService creates the doc. 
-        // Let's update ReceiptService first to be more reusable.
-
-        // Actually, I'll just implement the generation here using the same logic for now to avoid breaking the other endpoint, 
-        // or I can modify ReceiptService in the next step to be reusable. 
-        // Let's modify ReceiptService in the next step. For now, I'll put a placeholder here and then update ReceiptService.
-
-        // Wait, I can't leave broken code.
-        // I will update ReceiptService FIRST in the next step, then come back here.
-        // But I'm already in this tool call.
-        // I will write the controller assuming ReceiptService.generatePDFBuffer exists, and then implement it.
 
         const pdfBuffer = await ReceiptService.generatePDFBuffer(payment, user);
 

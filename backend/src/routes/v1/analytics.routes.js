@@ -4,6 +4,9 @@ const projectController = require('../../controllers/project.controller');
 const visitorController = require('../../controllers/visitor.controller');
 const auth = require('../../middleware/auth');
 
+// Public Analytics (Standard SaaS API)
+router.get('/count', visitorController.getEventCount);
+
 router.use(auth);
 
 // Global Analytics

@@ -1,7 +1,7 @@
-import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Code2, Database, ExternalLink, Shield, AlertTriangle, Settings, Plus, Trash2,
-  CheckCircle, Loader2, Hash, Globe, ChevronRight, Binary, Cpu
+  CheckCircle, Loader2, Hash, Globe, ChevronRight, Binary, Cpu, BookOpen
 } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -17,16 +17,25 @@ export default function IntegrationTab({
     <div className="space-y-6 pb-20">
       {/* Integration Panel */}
       <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-1">Integration Snippets</h2>
-          <p className="text-sm text-slate-400">Choose your platform and copy the tracking code to your website.</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-lg font-semibold text-white mb-1">Integration Snippets</h2>
+            <p className="text-sm text-slate-400">Choose your platform and copy the tracking code to your website.</p>
+          </div>
+          <Link 
+            to="/api" 
+            className="flex items-center gap-2 text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors px-4 py-2 rounded-lg bg-blue-500/5 border border-blue-500/10 shrink-0"
+          >
+            <BookOpen className="h-4 w-4" />
+            Full API Reference
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {[
             { id: 'frontend', type: 'vanilla', icon: <Globe className="h-5 w-5" />, title: 'Frontend', desc: 'React, Vue, SPAs & Static', activeTypes: ['vanilla', 'vanilla-count', 'react', 'react-footer', 'vue'] },
             { id: 'backend', type: 'node', icon: <Binary className="h-5 w-5" />, title: 'Backend', desc: 'Server-side API hit-tracking', activeTypes: ['node', 'php', 'python'] },
-            { id: 'url', type: 'url', icon: <Cpu className="h-5 w-5" />, title: 'Direct Endpoints', desc: 'Headless & raw API calls', activeTypes: ['url'] }
+            { id: 'curl', type: 'curl', icon: <Cpu className="h-5 w-5" />, title: 'Direct Endpoints', desc: 'Headless & raw API calls', activeTypes: ['curl'] }
           ].map((platform) => (
             <button
               key={platform.id}
@@ -45,19 +54,26 @@ export default function IntegrationTab({
         </div>
 
         {/* Endpoint Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 pt-8 border-t border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-8 border-t border-slate-800">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Tracking API Endpoint</label>
+            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Tracking API (POST)</label>
             <div className="flex items-center justify-between gap-4 p-3 bg-slate-950 border border-slate-800 rounded-lg">
-              <code className="text-xs text-blue-400 font-mono truncate text-left">{trackingUrl}</code>
-              <CopyButton text={trackingUrl} size="sm" />
+              <code className="text-xs text-emerald-400 font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^\/]+$/, '/track/events')}</code>
+              <CopyButton text={trackingUrl.replace(/\/track\/[^\/]+$/, '/track/events')} size="sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Tracking Script URL</label>
+            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Analytics API (GET)</label>
             <div className="flex items-center justify-between gap-4 p-3 bg-slate-950 border border-slate-800 rounded-lg">
-              <code className="text-xs text-blue-400 font-mono truncate text-left">{scriptUrl}</code>
-              <CopyButton text={scriptUrl} size="sm" />
+              <code className="text-xs text-blue-400 font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^\/]+$/, '/analytics/count')}</code>
+              <CopyButton text={trackingUrl.replace(/\/track\/[^\/]+$/, '/analytics/count')} size="sm" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Standard Script URL</label>
+            <div className="flex items-center justify-between gap-4 p-3 bg-slate-950 border border-slate-800 rounded-lg">
+              <code className="text-xs text-amber-400 font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^\/]+$/, '/track/script.js')}</code>
+              <CopyButton text={trackingUrl.replace(/\/track\/[^\/]+$/, '/track/script.js')} size="sm" />
             </div>
           </div>
         </div>
