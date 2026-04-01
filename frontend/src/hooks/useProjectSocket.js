@@ -20,7 +20,7 @@ export default function useProjectSocket(projectId, onUpdate) {
 
       socket.on('visitor_update', (data) => {
         if (data.project_id && data.project_id !== projectId) return;
-        onUpdate(projectId);
+        onUpdate(projectId, data);
       });
     }
 

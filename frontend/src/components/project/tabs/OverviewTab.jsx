@@ -6,34 +6,58 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity, onSh
   return (
     <div className="space-y-6 pb-20">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-[#0B0D16] border border-[#1E293B] rounded-xl p-6 shadow-xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="bg-[#0B0D16] border border-[#1E293B] rounded-xl p-6 shadow-xl relative overflow-hidden group">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-slate-400">Total Views</h3>
             <Eye className="h-4 w-4 text-blue-500" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-white">{stats?.total_views?.toLocaleString() || 0}</span>
-            <span className="text-xs font-medium text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">+12%</span>
+            <span className="text-3xl font-bold text-white tracking-tight">{stats?.total_views?.toLocaleString() || 0}</span>
+            <span className="text-xs font-medium text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Activity className="h-2 w-2" /> Live
+            </span>
+          </div>
+          <div className="absolute bottom-0 left-0 h-1 bg-blue-500/20 w-full">
+             <div className="h-full bg-blue-500 w-1/3 animate-pulse"></div>
           </div>
         </div>
+
         <div className="bg-[#0B0D16] border border-[#1E293B] rounded-xl p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-slate-400">Unique Visitors</h3>
             <Users className="h-4 w-4 text-purple-500" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-white">{overviewStats.uniqueVisitors?.toLocaleString() || 0}</span>
-            <span className="text-xs font-medium text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">+8%</span>
+            <span className="text-3xl font-bold text-white tracking-tight">{overviewStats.uniqueVisitors?.toLocaleString() || 0}</span>
+            <span className="text-xs font-medium text-slate-500">last 30d</span>
           </div>
         </div>
+
+        <div className="bg-[#0B0D16] border border-[#3B82F6]/30 rounded-xl p-6 shadow-xl relative overflow-hidden ring-1 ring-blue-500/20 shadow-blue-500/5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-blue-400 font-bold">Active Now</h3>
+            <div className="flex h-2 w-2 relative">
+                <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></div>
+                <div className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></div>
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-black text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                {overviewStats.realTimeVisitors || 0}
+            </span>
+            <span className="text-xs font-bold text-slate-400 tracking-wider">VISITORS</span>
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2 font-medium">Tracking live across all pages</p>
+        </div>
+
         <div className="bg-[#0B0D16] border border-[#1E293B] rounded-xl p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-slate-400">Storage Used</h3>
+            <h3 className="text-sm font-medium text-slate-400">Data Storage</h3>
             <Database className="h-4 w-4 text-green-500" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-white">
+            <span className="text-3xl font-bold text-white tracking-tight">
               {stats?.storageUsed < 1024 * 1024
                 ? `${(stats?.storageUsed / 1024).toFixed(1)} KB`
                 : stats?.storageUsed < 1024 * 1024 * 1024
@@ -41,49 +65,67 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity, onSh
                   : `${(stats?.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
               }
             </span>
+            <span className="text-[10px] text-slate-500">used</span>
           </div>
         </div>
       </div>
 
       {/* Full-width Map Grid Row */}
-      <div className="w-full bg-[#202530] border border-[#2D333D] rounded-xl shadow-xl overflow-hidden flex flex-col">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 pb-2 gap-4">
-          <h3 className="text-sm font-bold text-white tracking-wide">Global Interaction Map</h3>
-          <div className="flex gap-4">
-            <button className="text-[10px] uppercase font-bold text-slate-400 hover:text-white transition-colors tracking-widest">
-              Export Report
+      <div className="w-full bg-[#0F111A] border border-[#1E293B] rounded-2xl shadow-2xl overflow-hidden flex flex-col group/map">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-8 pb-4 gap-4">
+          <div className="flex items-center gap-4">
+             <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Activity className="h-5 w-5 text-blue-500" />
+             </div>
+             <div>
+                <h3 className="text-lg font-bold text-white">Global Traffic Live</h3>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Real-time visitor geographic distribution</p>
+             </div>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-[#1E293B]/50 hover:bg-[#1E293B] rounded-lg text-[10px] uppercase font-bold text-slate-300 transition-all tracking-widest border border-[#1E293B]">
+              Settings
             </button>
-            <button className="text-[10px] uppercase font-bold text-blue-500 hover:text-blue-400 transition-colors tracking-widest">
-              View Heatmap Detail
+            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] uppercase font-bold transition-all tracking-widest shadow-lg shadow-blue-600/20">
+              Refresh Map
             </button>
           </div>
         </div>
         
-        <div className="flex flex-col flex-1 p-6 pt-2 gap-6">
-          <div className="flex-1 relative rounded-lg overflow-hidden border border-[#2D333D]/50 bg-[#0B0D16] min-h-[450px]">
+        <div className="flex flex-col flex-1 p-8 pt-4 gap-6">
+          <div className="flex-1 relative rounded-2xl overflow-hidden border border-[#1E293B] bg-[#06080F] min-h-[500px] shadow-inner">
             <WorldMap activityData={overviewStats.recentActivity || overviewStats.activityList || []} />
           </div>
 
           <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-6 shrink-0 mt-4">
-            <div className="flex flex-col">
-               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-4 tracking-widest border-b border-[#2D333D] pb-2">Top Origin 1</h4>
+            <div className="flex flex-col p-4 bg-[#0B0D16]/50 rounded-xl border border-[#1E293B]/50 hover:border-blue-500/30 transition-colors">
+               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest flex items-center justify-between">
+                  Top Origin 
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+               </h4>
                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 truncate pr-2">google.com</span>
-                  <span className="text-white font-bold">45%</span>
+                  <span className="text-slate-300 truncate pr-2 font-medium">Google Ads</span>
+                  <span className="text-white font-bold bg-blue-500/10 px-2 py-0.5 rounded text-[10px]">45%</span>
                 </div>
             </div>
-            <div className="flex flex-col">
-               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-4 tracking-widest border-b border-[#2D333D] pb-2">Top Origin 2</h4>
+            <div className="flex flex-col p-4 bg-[#0B0D16]/50 rounded-xl border border-[#1E293B]/50 hover:border-purple-500/30 transition-colors">
+               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest flex items-center justify-between">
+                  Secondary
+                  <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
+               </h4>
                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 truncate pr-2">github.com</span>
-                  <span className="text-white font-bold">22%</span>
+                  <span className="text-slate-300 truncate pr-2 font-medium">Direct Traffic</span>
+                  <span className="text-white font-bold bg-purple-500/10 px-2 py-0.5 rounded text-[10px]">22%</span>
                 </div>
             </div>
-            <div className="flex flex-col">
-               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-4 tracking-widest border-b border-[#2D333D] pb-2">Top Origin 3</h4>
+            <div className="flex flex-col p-4 bg-[#0B0D16]/50 rounded-xl border border-[#1E293B]/50 hover:border-green-500/30 transition-colors">
+               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest flex items-center justify-between">
+                  Social
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+               </h4>
                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 truncate pr-2">twitter.com</span>
-                  <span className="text-white font-bold">18%</span>
+                  <span className="text-slate-300 truncate pr-2 font-medium">Twitter / X</span>
+                  <span className="text-white font-bold bg-green-500/10 px-2 py-0.5 rounded text-[10px]">18%</span>
                 </div>
             </div>
           </div>

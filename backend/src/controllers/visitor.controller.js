@@ -214,7 +214,13 @@ exports.trackVisitor = async (req, res) => {
             });
 
             if (global.io) {
-                global.io.to(`user_${project.user_id}`).emit('visitor_update', { ...visitor, project_id: project.id });
+                const latLong = geo && geo.ll ? { lat: geo.ll[0], lng: geo.ll[1] } : { lat: null, lng: null };
+                global.io.to(`user_${project.user_id}`).emit('visitor_update', { 
+                    ...visitor, 
+                    ...latLong,
+                    project_id: project.id,
+                    title: title || 'Unknown Page'
+                });
                 const updatedUsage = await usageService.calculateUsage(project.user_id);
                 global.io.to(`user_${project.user_id}`).emit('usage_update', updatedUsage);
             }
@@ -705,7 +711,13 @@ exports.trackVisitorPublic = async (req, res) => {
             });
 
             if (global.io) {
-                global.io.to(`user_${project.user_id}`).emit('visitor_update', { ...visitor, project_id: project.id });
+                const latLong = geo && geo.ll ? { lat: geo.ll[0], lng: geo.ll[1] } : { lat: null, lng: null };
+                global.io.to(`user_${project.user_id}`).emit('visitor_update', { 
+                    ...visitor, 
+                    ...latLong,
+                    project_id: project.id,
+                    title: title || 'Unknown Page'
+                });
                 const updatedUsage = await usageService.calculateUsage(project.user_id);
                 global.io.to(`user_${project.user_id}`).emit('usage_update', updatedUsage);
             }

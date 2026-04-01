@@ -54,6 +54,48 @@ export default function useProjectData(idOrName, timeRange) {
       if (showLoading) setLoadingChart(false);
     }
   }, [timeRange, timezone]);
+  
+  const handleLiveUpdate = useCallback((projectId, data) => {
+    if (!data) {
+      loadStats(projectId);
+      return;
+    }
+
+    setOverviewStats(prev => {
+      // Avoid duplicate activity entries if possible (match id or timestamp)
+      const isDuplicate = prev.recentActivity.some(a => a.id === data.id);
+      if (isDuplicate) return prev;
+
+      // Format location
+      const city = data.city === 'Unknown' ? '' : data.city;
+      const country = data.country === 'Unknown' ? '' : data.country;
+      const location = [city, country].filter(Boolean).join(', ') || 'Unknown Location';
+
+      const newActivity = {
+        id: data.id,
+        type: 'view',
+        location,
+        ip: data.ip_address,
+        lat: data.lat,
+        lng: data.lng,
+        path: data.page_url ? new URL(data.page_url).pathname : '/',
+        title: data.title || 'Unknown Page',
+        timestamp: data.created_at || new Date().toISOString(),
+        device: data.device_type
+      };
+
+      return {
+        ...prev,
+        realTimeVisitors: (prev.realTimeVisitors || 0) + 1,
+        recentActivity: [newActivity, ...prev.recentActivity].slice(0, 50)
+      };
+    });
+
+    setStats(prev => ({
+      ...prev,
+      total_views: (prev?.total_views || 0) + 1
+    }));
+  }, [loadStats]);
 
   const loadData = useCallback(async () => {
     try {
@@ -160,6 +202,6 @@ export default function useProjectData(idOrName, timeRange) {
     projectName, setProjectName, allowedOrigins, setAllowedOrigins, 
     targetUrl, setTargetUrl, isActive, setIsActive, timezone, setTimezone,
     notifications, setNotifications, shareToken, setShareToken,
-    loadData, loadStats, handleSaveSettings, handleDelete
+    loadData, loadStats, handleSaveSettings, handleDelete, handleLiveUpdate
   };
 }

@@ -47,11 +47,11 @@ export default function ProjectDetail() {
     projectName, setProjectName, allowedOrigins, setAllowedOrigins,
     targetUrl, setTargetUrl, isActive, setIsActive, timezone, setTimezone,
     notifications, setNotifications, shareToken, setShareToken,
-    loadData, loadStats, handleSaveSettings, handleDelete
+    loadData, loadStats, handleSaveSettings, handleDelete, handleLiveUpdate
   } = useProjectData(idOrName, timeRange);
 
   // WebSocket Hook
-  useProjectSocket(project?.id, loadStats);
+  useProjectSocket(project?.id, handleLiveUpdate);
 
   // Modal Visibility States
   const [showDeleteModal, setShowDeleteModal] = useState(false);
