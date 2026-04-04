@@ -5,32 +5,42 @@ const PLAN_LIMITS = {
     free: {
         monthlyViews: 1000,
         storageLimit: 1 * 1024 * 1024 * 1024, // 1GB
-        projectLimit: 5,
+        projectLimit: 1,
         liveLogs: false,
         emailIntegrity: false,
         allowedOriginsLimit: 1,
-        share_report: 5,
+        share_report: 0,
         amount: 0
     },
+    basic: {
+        monthlyViews: 50000,
+        storageLimit: 5 * 1024 * 1024 * 1024, // 5GB
+        projectLimit: 5,
+        liveLogs: false,
+        emailIntegrity: false,
+        allowedOriginsLimit: 3,
+        share_report: 0,
+        amount: 299
+    },
     pro: {
-        monthlyViews: 100000,
-        storageLimit: 10 * 1024 * 1024 * 1024, // 10GB
-        projectLimit: 10,
+        monthlyViews: 500000,
+        storageLimit: 15 * 1024 * 1024 * 1024, // 15GB
+        projectLimit: 15,
         liveLogs: true,
         emailIntegrity: true,
         allowedOriginsLimit: 10,
-        share_report: 100,
-        amount: 29
+        share_report: 5,
+        amount: 999
     },
-    enterprise: {
-        monthlyViews: 1000000000, // Effectively unlimited
+    business: {
+        monthlyViews: 5000000,
         storageLimit: 100 * 1024 * 1024 * 1024, // 100GB
         projectLimit: 100,
         liveLogs: true,
         emailIntegrity: true,
-        allowedOriginsLimit: 999,
-        share_report: Infinity,
-        amount: 'custom'
+        allowedOriginsLimit: 100,
+        share_report: 100,
+        amount: 2999
     }
 };
 
