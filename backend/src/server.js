@@ -34,7 +34,15 @@ const cookieParser = require('cookie-parser');
 
 // ...
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "img-src": ["'self'", "data:", "blob:", "https://*.basemaps.cartocdn.com", "https://*.tile.openstreetmap.org", "https://grainy-gradients.vercel.app"],
+      "connect-src": ["'self'", "ws:", "http://localhost:*", "https://*.basemaps.cartocdn.com", "https://*.tile.openstreetmap.org", "https://*.vercel.app", "https://accounts.google.com", "https://*.googleapis.com", "https://api.ipify.org", "http://ip-api.com"],
+    },
+  },
+}));
 app.use(cookieParser());
 // Custom CORS wrapper to exclude tracking endpoint
 app.use(cors({

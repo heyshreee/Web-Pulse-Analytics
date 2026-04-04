@@ -84,9 +84,9 @@ export default function IntegrationTab({
             <>
               {[
                 { id: 'vanilla', label: 'Vanilla JS' },
-                { id: 'vanilla-count', label: 'Vanilla + Sync' },
+                { id: 'vanilla-count', label: 'Live Counter' },
                 { id: 'react', label: 'React Hooks' },
-                { id: 'react-footer', label: 'React Badge' },
+                { id: 'react-footer', label: 'Counter Footer' },
                 { id: 'vue', label: 'Vue.js' }
               ].map(opt => (
                 <button

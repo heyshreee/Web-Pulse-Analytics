@@ -1,6 +1,4 @@
-import React from 'react';
 import { Eye, Users, Database, Activity, Smartphone, Tablet, Monitor, ChevronRight } from 'lucide-react';
-import WorldMap from './WorldMap';
 
 export default function OverviewTab({ stats, overviewStats, onShowActivity, onShowPages, onRefresh }) {
   return (
@@ -70,67 +68,6 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity, onSh
         </div>
       </div>
 
-      {/* Full-width Map Grid Row */}
-      <div className="w-full bg-[#0F111A] border border-[#1E293B] rounded-2xl shadow-2xl overflow-hidden flex flex-col group/map">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-8 pb-4 gap-4">
-          <div className="flex items-center gap-4">
-             <div className="p-2 bg-blue-500/10 rounded-lg">
-                <Activity className="h-5 w-5 text-blue-500" />
-             </div>
-             <div>
-                <h3 className="text-lg font-bold text-white">Global Traffic Live</h3>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Real-time visitor geographic distribution</p>
-             </div>
-          </div>
-          <div className="flex gap-3">
-            <button className="px-4 py-2 bg-[#1E293B]/50 hover:bg-[#1E293B] rounded-lg text-[10px] uppercase font-bold text-slate-300 transition-all tracking-widest border border-[#1E293B]">
-              Settings
-            </button>
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-[10px] uppercase font-bold transition-all tracking-widest shadow-lg shadow-blue-600/20">
-              Refresh Map
-            </button>
-          </div>
-        </div>
-        
-        <div className="flex flex-col flex-1 p-8 pt-4 gap-6">
-          <div className="flex-1 relative rounded-2xl overflow-hidden border border-[#1E293B] bg-[#06080F] min-h-[500px] shadow-inner">
-            <WorldMap activityData={overviewStats.recentActivity || overviewStats.activityList || []} />
-          </div>
-
-          <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-6 shrink-0 mt-4">
-            <div className="flex flex-col p-4 bg-[#0B0D16]/50 rounded-xl border border-[#1E293B]/50 hover:border-blue-500/30 transition-colors">
-               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest flex items-center justify-between">
-                  Top Origin 
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
-               </h4>
-               <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 truncate pr-2 font-medium">Google Ads</span>
-                  <span className="text-white font-bold bg-blue-500/10 px-2 py-0.5 rounded text-[10px]">45%</span>
-                </div>
-            </div>
-            <div className="flex flex-col p-4 bg-[#0B0D16]/50 rounded-xl border border-[#1E293B]/50 hover:border-purple-500/30 transition-colors">
-               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest flex items-center justify-between">
-                  Secondary
-                  <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
-               </h4>
-               <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 truncate pr-2 font-medium">Direct Traffic</span>
-                  <span className="text-white font-bold bg-purple-500/10 px-2 py-0.5 rounded text-[10px]">22%</span>
-                </div>
-            </div>
-            <div className="flex flex-col p-4 bg-[#0B0D16]/50 rounded-xl border border-[#1E293B]/50 hover:border-green-500/30 transition-colors">
-               <h4 className="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest flex items-center justify-between">
-                  Social
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-               </h4>
-               <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 truncate pr-2 font-medium">Twitter / X</span>
-                  <span className="text-white font-bold bg-green-500/10 px-2 py-0.5 rounded text-[10px]">18%</span>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}

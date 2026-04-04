@@ -279,7 +279,7 @@ export default function API() {
                                     <CodeBlock 
                                         language="html" 
                                         title="SDK Snippet"
-                                        code={`<script src="http://localhost:3000/api/v1/track/script.js"></script>\n<script>\n  tracker('init', 'trk_your_id_here');\n  tracker('track', 'page_view');\n</script>`} 
+                                        code={`<script src="${(import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')}/v1/track/script.js"></script>\n<script>\n  tracker('init', 'trk_your_id_here');\n  tracker('track', 'page_view');\n</script>`} 
                                     />
                                 </div>
                             </div>
@@ -331,7 +331,7 @@ export default function API() {
                                 <CodeBlock 
                                     language="bash"
                                     title="Endpoint"
-                                    code={`POST http://localhost:3000/api/v1/track/events`}
+                                    code={`POST ${(import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')}/v1/track/events`}
                                 />
                                 <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
                                     <h5 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Payload Template</h5>
@@ -370,7 +370,7 @@ export default function API() {
                                 <CodeBlock 
                                     language="bash"
                                     title="Endpoint"
-                                    code={`GET http://localhost:3000/api/v1/analytics/count?url=/pricing`}
+                                    code={`GET ${(import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')}/v1/analytics/count?url=/pricing`}
                                 />
                                 <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5">
                                      <h5 className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Response Sample</h5>

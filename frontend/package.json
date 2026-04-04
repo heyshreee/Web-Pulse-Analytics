@@ -12,16 +12,19 @@
   "dependencies": {
     "@react-oauth/google": "^0.13.4",
     "framer-motion": "^12.26.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-globe.gl": "^2.37.0",
     "react-is": "^19.2.4",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.12.0",
-    "react-simple-maps": "^3.0.0",
     "react-syntax-highlighter": "^16.1.0",
     "recharts": "^3.6.0",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "three": "^0.183.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

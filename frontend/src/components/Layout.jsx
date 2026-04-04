@@ -19,7 +19,7 @@ import { useToast } from '../context/ToastContext';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 
-const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3000')).replace(/\/$/, '');
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 const SOCKET_URL = API_URL.replace(/\/api$/, '').replace(/\/v1$/, '');
 
 export default function Layout() {

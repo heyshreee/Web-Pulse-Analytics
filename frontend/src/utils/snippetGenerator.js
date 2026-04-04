@@ -14,22 +14,23 @@ export const getSnippets = ({ trackingId, trackingUrl, user, project }) => {
   tracker('track', 'page_view');
 </script>`;
 
-  const vanillaCountSnippet = `<div id="view-count">Loading...</div>
-
+  const vanillaCountSnippet = `<div id="visitor-count">Loading...</div>
 <script>
-async function loadCount() {
-  const res = await fetch("${countUrl}", {
-    headers: {
-      "x-api-key": "${trackingId}"
-    }
+async function trackAndCount() {
+  const res = await fetch("${trackingUrl}", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pageUrl: window.location.href,
+      title: document.title
+    })
   });
-
   const data = await res.json();
-  document.getElementById("view-count").innerText = data.count + " Views";
+  if (data.count !== undefined) {
+    document.getElementById("visitor-count").innerText = data.count + " Visits";
+  }
 }
-
-loadCount();
-setInterval(loadCount, 5000);
+trackAndCount();
 </script>`;
 
   const reactFragmentSnippet = `// 🧩 Tracker Script (SDK) Usage in React
@@ -57,57 +58,62 @@ export default function AnalyticsProvider({ children }) {
  * Modern Visitor Counter Footer
  * Implementation for: ${project.name}
  */
-export default function Footer() {
+export default function VisitorCounter() {
   const [visits, setVisits] = useState("Loading...");
 
   useEffect(() => {
-    async function loadCount() {
+    async function trackAndLoad() {
       try {
-        const res = await fetch("${countUrl}", {
-          headers: { "x-api-key": "${trackingId}" }
+        // Unified Call: Records visit AND returns updated count
+        const res = await fetch("${trackingUrl}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pageUrl: window.location.href,
+            title: document.title,
+            referrer: document.referrer
+          })
         });
+        
         const data = await res.json();
-        setVisits(\`\${data.count} Visits\`);
+        if (data.count !== undefined) {
+          setVisits(\`\${data.count} Visits\`);
+        }
       } catch (e) {
         setVisits("0 Visits");
       }
     }
 
-    loadCount();
-    const interval = setInterval(loadCount, 10000);
+    trackAndLoad();
+    const interval = setInterval(trackAndLoad, 30000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <footer className="py-12 border-t border-slate-800 text-center">
-      <div className="flex justify-center items-center gap-2 text-xs text-slate-400">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-        </span>
-        <span>{visits}</span>
-      </div>
-    </footer>
+    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+      </span>
+      <span>{visits}</span>
+    </div>
   );
 }`;
 
   const nodeSnippet = `const axios = require('axios');
 
-// 1. Track Events
-async function trackEvent(eventName, pageUrl) {
-  await axios.post("${eventsUrl}", {
-    event: eventName,
-    url: pageUrl,
-    referrer: "server-side"
-  }, {
-    headers: { "x-api-key": "${trackingId}" }
+// 🚀 Track & Get Live Count (Unified)
+async function trackVisit() {
+  const res = await axios.post("${trackingUrl}", {
+    pageUrl: "https://example.com",
+    title: "Home Page"
   });
+  return res.data.count; // The updated count is in the response!
 }
 
-// 2. Get Event Count
-async function getCount(url = null) {
-  const endpoint = url ? \`${countUrl}?url=\${url}\` : "${countUrl}";
-  const res = await axios.get(endpoint, {
+// Analytics Only (Read-only)
+async function getCount() {
+  const res = await axios.get("${countUrl}", {
     headers: { "x-api-key": "${trackingId}" }
   });
   return res.data.count;
@@ -156,17 +162,19 @@ requests.post("${eventsUrl}", json={
 res = requests.get("${countUrl}", headers=headers)
 print(res.json()["count"])`;
 
-  const curlGuide = `# 1. Track Event (Windows PowerShell)
+  const curlGuide = `# 1. Track Visit & Get Count (Unified)
+curl.exe -X POST ${trackingUrl} \`
+  -H "Content-Type: application/json" \`
+  -d '{"pageUrl": "https://example.com", "title": "Home Page"}'
+
+# 2. Get Count Only (Read-only)
+curl.exe ${countUrl} -H "x-api-key: ${trackingId}"
+
+# 3. Track Custom Event
 curl.exe -X POST ${eventsUrl} \`
   -H "x-api-key: ${trackingId}" \`
   -H "Content-Type: application/json" \`
-  -d '{\"event\": \"page_view\", \"url\": \"https://example.com\"}'
-
-# 2. Get Total Count
-curl.exe ${countUrl} -H "x-api-key: ${trackingId}"
-
-# 3. Get Count by Page
-curl.exe "${countUrl}?url=/pricing" -H "x-api-key: ${trackingId}"`;
+  -d '{"event": "button_click", "url": "https://example.com"}'`;
 
   const vueSnippet = `<template>
   <div class="visitor-count">
