@@ -1,22 +1,29 @@
 export const getApiUrl = () => {
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl) {
-    return envUrl.endsWith('/v1') ? envUrl : `${envUrl.replace(/\/$/, '')}/v1`;
+    // If the URL ends with /v1, use it as is, otherwise append /v1
+    const base = envUrl.replace(/\/$/, '');
+    return base.endsWith('/v1') ? base : `${base}/v1`;
   }
-  // return import.meta.env.PROD ? 'https://api-obs-iota.vercel.app/api/v1' : 'https://api-9ne7dgt9v-sris-projects-8ff08b1b.vercel.app/api/v1';
+  // Fallback for development with Vite proxy
   return '/api/v1';
 };
+
+import { getToken } from './auth';
 
 const API_URL = getApiUrl();
 
 export async function apiRequest(endpoint, options = {}) {
   // Token is now handled via HttpOnly cookie
+  const token = getToken();
+
   const headers = {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'Pragma': 'no-cache',
     'Expires': '0',
     'X-Requested-With': 'XMLHttpRequest', // CSRF Protection
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...options.headers,
   };
 

@@ -5,6 +5,7 @@ import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
 import { useToast } from '../context/ToastContext';
+import GlobalGlobe from '../components/dashboard/GlobalGlobe';
 import {
   AreaChart,
   Area,
@@ -141,56 +142,63 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Insight Overview</h1>
-          <p className="text-slate-400">Welcome back, {user?.name || 'Administrator'}</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Global Insights</h1>
+          <p className="text-slate-400 mt-1">Real-time visitor activity from across all your tracked domains.</p>
         </div>
       </div>
 
-      {/* Top Row: Real-time & Traffic Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 1. Real-time Visitors */}
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden h-full min-h-[300px]">
-          <div className="flex justify-between items-start z-10">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Real-time Visitors</h3>
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="flex items-center gap-1.5 text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                  </span>
-                  LIVE TRACKER
-                </span>
-              </div>
-            </div>
-            <Activity className="h-5 w-5 text-blue-500" />
-          </div>
-
-          <div className="mt-8 z-10">
-            <div className="flex items-baseline gap-3">
-              <span className="text-6xl font-bold text-white tracking-tighter">{realTimeVisitors.toLocaleString()}</span>
-              {/* <span className="text-green-400 font-medium text-sm">~12%</span> */}
-            </div>
-          </div>
-
-          {/* Sparkline */}
-          <div className="h-16 mt-auto -mx-2 -mb-2">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-              <BarChart data={sparkline || []}>
-                <Bar dataKey="value" radius={[2, 2, 0, 0]}>
-                  {(sparkline || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === (sparkline?.length - 1) ? '#10B981' : '#1E293B'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+      {/* Hero Section: 3D Global View */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 bg-[#0B0F1A]/80 backdrop-blur-2xl border border-slate-800/50 rounded-3xl overflow-hidden min-h-[500px] relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
+          <div className="relative h-full flex items-center justify-center">
+            <GlobalGlobe activityData={liveActivity} />
           </div>
         </div>
 
-        {/* 2. Traffic Trends */}
-        <div className="lg:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 h-full min-h-[300px] flex flex-col">
+        {/* Real-time stats sidebar */}
+        <div className="space-y-6">
+          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 flex flex-col justify-between h-[240px]">
+             <div className="flex justify-between items-start">
+               <div>
+                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Live Visitors</h3>
+                 <div className="flex items-center gap-2 mt-2">
+                   <span className="flex items-center gap-1.5 text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest">
+                     <span className="relative flex h-2 w-2">
+                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                       <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                     </span>
+                     Active Now
+                   </span>
+                 </div>
+               </div>
+               <Activity className="h-5 w-5 text-blue-500" />
+             </div>
+             <div className="mt-4">
+               <span className="text-7xl font-bold text-white tracking-tighter">{realTimeVisitors.toLocaleString()}</span>
+             </div>
+          </div>
+
+          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 h-[240px] flex flex-col">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Traffic Momentum</h3>
+            <div className="flex-1 w-full min-h-0">
+               <ResponsiveContainer width="100%" height="100%">
+                 <BarChart data={sparkline || []}>
+                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                     {(sparkline || []).map((entry, index) => (
+                       <Cell key={`cell-${index}`} fill={index === (sparkline?.length - 1) ? '#10B981' : '#1E293B'} />
+                     ))}
+                   </Bar>
+                 </BarChart>
+               </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Traffic Trends - Full Width */}
+      <div className="grid grid-cols-1 gap-6">
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 h-full min-h-[400px] flex flex-col">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="text-lg font-bold text-white">Traffic Trends</h3>

@@ -58,8 +58,8 @@ export default function Pricing() {
     useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-                const res = await fetch(`${API_URL}/api/plans`);
+                const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+                const res = await fetch(`${API_URL}/v1/payment/plans`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.length > 0) {

@@ -8,6 +8,57 @@ const crypto = require('crypto');
 const NotificationService = require('../services/notification.service');
 const ActivityLogService = require('../services/activity.service');
 
+/**
+ * Fallback coordinates for local testing (localhost / 127.0.0.1)
+ * This ensures markers appear on the map during development.
+ */
+/**
+ * High-accuracy Geolocation Retrieval.
+ * Performs real-time lookup via ip-api.com for better accuracy.
+ * Handles localhost by discovering the public IP first.
+ */
+const getHighAccuracyGeo = async (ip) => {
+    let targetIp = ip;
+    
+    try {
+        // 1. Localhost Auto-Discovery
+        if (!ip || ip === '::1' || ip === '127.0.0.1' || ip.includes('127.0.0.1')) {
+            const ipifyResponse = await fetch('https://api.ipify.org?format=json');
+            const ipifyData = await ipifyResponse.json();
+            targetIp = ipifyData.ip;
+            console.log(`[GeoIP] Localhost detected. Discovered Public IP: ${targetIp}`);
+        }
+
+        // 2. High Accuracy Lookup (ip-api.com)
+        const response = await fetch(`http://ip-api.com/json/${targetIp}?fields=status,message,country,city,lat,lon`);
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            return {
+                country: data.country,
+                city: data.city,
+                lat: data.lat,
+                lng: data.lon // lon in ip-api, lng in our system
+            };
+        }
+    } catch (err) {
+        console.error('[GeoIP] External API lookup failed:', err.message);
+    }
+
+    // 3. Last Resort Fallback (geoip-lite - offline)
+    const geo = geoip.lookup(targetIp);
+    if (geo) {
+        return {
+            country: geo.country || 'Unknown',
+            city: geo.city || 'Unknown',
+            lat: geo.ll ? geo.ll[0] : null,
+            lng: geo.ll ? geo.ll[1] : null
+        };
+    }
+
+    return { country: 'Unknown', city: 'Unknown', lat: null, lng: null };
+};
+
 // Simple in-memory cache for deduplication (rolling TTL)
 const requestCache = new Map();
 
@@ -120,20 +171,14 @@ exports.trackVisitor = async (req, res) => {
             });
         }
 
-        const geo = geoip.lookup(ip);
+        const geo = await getHighAccuracyGeo(ip);
         const parser = new UAParser(userAgent);
         const uaResult = parser.getResult();
-
-        let country = 'Unknown';
-        let city = 'Unknown';
-
-        if (geo) {
-            country = geo.country || 'Unknown';
-            city = geo.city || 'Unknown';
-        } else if (ip === '::1' || ip === '127.0.0.1' || ip.includes('127.0.0.1')) {
-            country = 'Localhost';
-            city = 'Local Machine';
-        }
+        
+        const country = geo.country || 'Unknown';
+        const city = geo.city || 'Unknown';
+        const lat = geo.lat;
+        const lng = geo.lng;
 
         // 5. Update Counters
         const { error: counterError } = await supabase.rpc('increment_project_counter', {
@@ -214,10 +259,10 @@ exports.trackVisitor = async (req, res) => {
             });
 
             if (global.io) {
-                const latLong = geo && geo.ll ? { lat: geo.ll[0], lng: geo.ll[1] } : { lat: null, lng: null };
                 global.io.to(`user_${project.user_id}`).emit('visitor_update', { 
                     ...visitor, 
-                    ...latLong,
+                    lat,
+                    lng,
                     project_id: project.id,
                     title: title || 'Unknown Page'
                 });
@@ -373,7 +418,7 @@ exports.getDashboardStats = async (req, res) => {
             .order('created_at', { ascending: false })
             .limit(5);
 
-        const liveActivity = recentActivity?.map(v => {
+        const liveActivity = await Promise.all((recentActivity || []).map(async v => {
             const visitor = v.visitors || {};
             const city = visitor.city === 'Unknown' ? '' : visitor.city;
             const country = visitor.country === 'Unknown' ? '' : visitor.country;
@@ -392,11 +437,9 @@ exports.getDashboardStats = async (req, res) => {
             let lat = null;
             let lng = null;
             if (visitor.ip_address) {
-                const geo = geoip.lookup(visitor.ip_address);
-                if (geo && geo.ll) {
-                    lat = geo.ll[0];
-                    lng = geo.ll[1];
-                }
+                const geo = await getHighAccuracyGeo(visitor.ip_address);
+                lat = geo.lat;
+                lng = geo.lng;
             }
 
             return {
@@ -412,7 +455,7 @@ exports.getDashboardStats = async (req, res) => {
                 device: visitor.device_type,
                 timestamp: v.created_at
             };
-        }) || [];
+        }));
 
         const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
         const { data: recentViews } = await supabase
@@ -617,20 +660,14 @@ exports.trackVisitorPublic = async (req, res) => {
         }
         requestCache.set(hitHash, now);
 
-        const geo = geoip.lookup(ip);
+        const geo = await getHighAccuracyGeo(ip);
         const parser = new UAParser(userAgent);
         const uaResult = parser.getResult();
-
-        let country = 'Unknown';
-        let city = 'Unknown';
-
-        if (geo) {
-            country = geo.country || 'Unknown';
-            city = geo.city || 'Unknown';
-        } else if (ip === '::1' || ip === '127.0.0.1' || ip.includes('127.0.0.1')) {
-            country = 'Localhost';
-            city = 'Local Machine';
-        }
+        
+        const country = geo.country || 'Unknown';
+        const city = geo.city || 'Unknown';
+        const lat = geo.lat;
+        const lng = geo.lng;
 
         // 5. Update Counters
         const { error: counterError } = await supabase.rpc('increment_project_counter', {
@@ -711,10 +748,10 @@ exports.trackVisitorPublic = async (req, res) => {
             });
 
             if (global.io) {
-                const latLong = geo && geo.ll ? { lat: geo.ll[0], lng: geo.ll[1] } : { lat: null, lng: null };
                 global.io.to(`user_${project.user_id}`).emit('visitor_update', { 
                     ...visitor, 
-                    ...latLong,
+                    lat,
+                    lng,
                     project_id: project.id,
                     title: title || 'Unknown Page'
                 });
@@ -894,7 +931,7 @@ exports.getProjectDetailedStats = async (req, res) => {
             .order('created_at', { ascending: false })
             .limit(parseInt(req.query.limit) || 5);
 
-        const activityList = recentActivity?.map(v => {
+        const activityList = await Promise.all((recentActivity || []).map(async v => {
             const visitor = v.visitors || {};
             const location = [visitor.city, visitor.country].filter(c => c && c !== 'Unknown').join(', ') || 'Unknown Location';
             let path = '/';
@@ -903,15 +940,13 @@ exports.getProjectDetailedStats = async (req, res) => {
             let lat = null;
             let lng = null;
             if (visitor.ip_address) {
-                const geo = geoip.lookup(visitor.ip_address);
-                if (geo && geo.ll) {
-                    lat = geo.ll[0];
-                    lng = geo.ll[1];
-                }
+                const geo = await getHighAccuracyGeo(visitor.ip_address);
+                lat = geo.lat;
+                lng = geo.lng;
             }
 
             return { id: v.id, type: 'view', location, ip: visitor.ip_address, lat, lng, path, title: v.title, timestamp: v.created_at, device: visitor.device_type };
-        }) || [];
+        }));
 
         const { data: sources } = await supabase
             .from('visitors')
@@ -1118,12 +1153,14 @@ exports.trackEvent = async (req, res) => {
         }
         requestCache.set(hitHash, now);
 
-        const geo = geoip.lookup(ip);
+        const geo = await getHighAccuracyGeo(ip);
         const parser = new UAParser(userAgent);
         const uaResult = parser.getResult();
 
-        let country = 'Unknown', city = 'Unknown';
-        if (geo) { country = geo.country || 'Unknown'; city = geo.city || 'Unknown'; }
+        const country = geo.country || 'Unknown';
+        const city = geo.city || 'Unknown';
+        const lat = geo.lat;
+        const lng = geo.lng;
 
         // Update Counters & Usage
         await supabase.rpc('increment_project_counter', { p_id: project.id });
@@ -1164,8 +1201,13 @@ exports.trackEvent = async (req, res) => {
             });
 
             if (global.io) {
-                const latLong = geo && geo.ll ? { lat: geo.ll[0], lng: geo.ll[1] } : { lat: null, lng: null };
-                global.io.to(`user_${project.user_id}`).emit('visitor_update', { ...visitor, ...latLong, project_id: project.id, title: title || 'API Event' });
+                global.io.to(`user_${project.user_id}`).emit('visitor_update', { 
+                    ...visitor, 
+                    lat,
+                    lng,
+                    project_id: project.id,
+                    title: title || 'API Event'
+                });
                 const updatedUsage = await usageService.calculateUsage(project.user_id);
                 global.io.to(`user_${project.user_id}`).emit('usage_update', updatedUsage);
             }
