@@ -17,24 +17,24 @@ export default function PagesModal({ isOpen, onClose, loading, pagesData }) {
             <p className="text-sm font-medium text-slate-500">Loading pages data...</p>
           </div>
         ) : (
-          <table className="w-full text-left">
-            <thead className="sticky top-0 bg-slate-950 z-20">
-              <tr className="border-b border-slate-800 text-xs font-medium text-slate-400">
-                <th className="pb-4 pl-2">Page Details</th>
-                <th className="pb-4 text-right pr-2">Views</th>
+          <table className="w-full text-left border-separate border-spacing-y-2">
+            <thead className="sticky top-0 bg-white dark:bg-slate-950 z-20">
+              <tr className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <th className="pb-4 pl-4">Page Details</th>
+                <th className="pb-4 text-right pr-4">Views</th>
               </tr>
             </thead>
             <tbody className="text-sm">
               {pagesData?.map((page, i) => (
-                <tr key={i} className="border-b border-slate-800/50 hover:bg-slate-900/50 transition-colors">
-                  <td className="py-4 pl-2">
+                <tr key={i} className="group bg-slate-50/50 dark:bg-slate-900/20 hover:bg-white dark:hover:bg-slate-900/50 transition-all border-b border-slate-100 dark:border-slate-800/50 shadow-sm hover:shadow-md">
+                  <td className="py-4 pl-4 rounded-l-2xl">
                     <div className="flex flex-col gap-1">
-                      <span className="font-medium text-slate-200 truncate max-w-[350px]" title={page.title}>{page.title || 'Unknown Page'}</span>
-                      <span className="text-xs text-slate-500 truncate max-w-[350px]">{page.url}</span>
+                      <span className="font-black text-slate-900 dark:text-slate-200 truncate max-w-[350px] tracking-tight" title={page.title}>{page.title || 'Unknown Page'}</span>
+                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate max-w-[350px] font-mono opacity-60 group-hover:opacity-100 transition-opacity">{page.url}</span>
                     </div>
                   </td>
-                  <td className="py-4 text-right pr-2">
-                    <span className="font-medium text-slate-200">{page.views?.toLocaleString()}</span>
+                  <td className="py-4 text-right pr-4 rounded-r-2xl">
+                    <span className="font-black text-blue-600 dark:text-blue-400 tabular-nums">{page.views?.toLocaleString()}</span>
                   </td>
                 </tr>
               ))}

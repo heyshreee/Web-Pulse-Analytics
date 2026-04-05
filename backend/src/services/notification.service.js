@@ -126,7 +126,12 @@ class NotificationService {
             console.log('Cleaned up old notifications');
             return true;
         } catch (error) {
-            console.error('Error cleaning up notifications:', error.message);
+            const isTimeout = error.message?.includes('fetch failed') || error.code === 'UND_ERR_CONNECT_TIMEOUT';
+            if (isTimeout) {
+                console.warn('[NotificationService] Cleanup task timed out. Will retry on next cycle.');
+            } else {
+                console.error('Error cleaning up notifications:', error.message);
+            }
             return false;
         }
     }

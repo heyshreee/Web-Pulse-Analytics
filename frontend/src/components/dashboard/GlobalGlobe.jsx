@@ -104,13 +104,13 @@ const GlobalGlobe = ({ activityData = [] }) => {
       />
       
       {/* Attribution/Overlay */}
-      <div className="absolute bottom-4 left-4 z-10 pointer-events-none">
-        <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-full shadow-lg">
-          <div className="relative flex h-2 w-2">
+      <div className="absolute bottom-6 left-6 z-10 pointer-events-none appearance-none">
+        <div className="flex items-center gap-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 px-5 py-2.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-blue-900/10 transition-all duration-300">
+          <div className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
           </div>
-          <span className="text-[10px] uppercase font-bold text-slate-300 tracking-widest">Global Live View</span>
+          <span className="text-[10px] uppercase font-black text-slate-900 dark:text-white tracking-[0.2em]">Global Real-time Pulse Feed</span>
         </div>
       </div>
     </div>

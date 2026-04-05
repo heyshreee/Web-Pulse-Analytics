@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowLeft, RefreshCw, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import Loader from '../components/Loader';
@@ -110,18 +110,19 @@ export default function VerifyEmail() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-[#151921] border border-white/5 rounded-2xl p-8 shadow-2xl">
-                <div className="text-center mb-8">
-                    <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <Mail className="h-6 w-6 text-blue-500" />
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-500">
+            <div className="w-full max-w-md bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-2xl">
+                <Link to="/" className="flex items-center gap-3 group mb-8">
+                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
+                        <BarChart2 className="h-6 w-6 text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-2">Verify your email</h1>
-                    <p className="text-slate-400 text-sm">
-                        We sent a code to your email address.<br />
-                        Please enter the 6-digit code below to continue.
-                    </p>
-                </div>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
+                </Link>
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h1>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
+                    We sent a code to your email address.<br />
+                    Please enter the 6-digit code below to continue.
+                </p>
 
                 <form onSubmit={handleVerify} className="space-y-6">
                     <div className="flex justify-center gap-2">
@@ -135,7 +136,7 @@ export default function VerifyEmail() {
                                 onChange={(e) => handleChange(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 onPaste={handlePaste}
-                                className="w-12 h-14 bg-[#0B0E14] border border-white/10 rounded-xl text-center text-xl font-bold text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                                className="w-12 h-14 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-center text-xl font-black text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-500 transition-all shadow-inner"
                             />
                         ))}
                     </div>
@@ -143,21 +144,22 @@ export default function VerifyEmail() {
                     <button
                         type="submit"
                         disabled={loading || otp.join('').length !== 6}
-                        className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center active:scale-[0.98]"
                     >
+                        {loading ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : null}
                         {loading ? 'Verifying...' : 'Verify Account'}
                     </button>
                 </form>
 
-                <div className="mt-6 text-center space-y-4">
-                    <p className="text-sm text-slate-400">
+                <div className="mt-8 text-center space-y-6">
+                    <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                         Didn't receive the code?{' '}
-                        <button onClick={handleResend} className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                        <button onClick={handleResend} className="text-blue-600 hover:text-blue-500 font-black transition-colors underline decoration-blue-500/30 underline-offset-4">
                             Resend code
                         </button>
                     </p>
 
-                    <Link to="/login" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                    <Link to="/login" className="inline-flex items-center gap-2 text-sm font-black text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors uppercase tracking-widest text-[10px]">
                         <ArrowLeft className="h-4 w-4" />
                         Back to login
                     </Link>

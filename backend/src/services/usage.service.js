@@ -107,12 +107,22 @@ exports.calculateUsage = async (userId) => {
         })
         .eq('id', userId)
         .then(({ error }) => {
-            if (error) console.error('Failed to update storage stats in supabase:', error);
+            if (error) {
+                // Determine if it is a transient connection error
+                const isTimeout = error.message?.includes('fetch failed') || error.code === 'UND_ERR_CONNECT_TIMEOUT';
+                if (isTimeout) {
+                    console.warn(`[UsageService] Background updated for userId ${userId} timed out. Will retry next session.`);
+                } else {
+                    console.error('Failed to update storage stats in supabase:', error);
+                }
+            }
         })
         .catch(err => {
-            // Suppress timeout errors in background tasks
-            if (err.code !== 'UND_ERR_CONNECT_TIMEOUT') {
-                console.error('Failed to update storage stats in supabase:', err);
+            const isTimeout = err.message?.includes('fetch failed') || err.code === 'UND_ERR_CONNECT_TIMEOUT';
+            if (!isTimeout) {
+                console.error(`[UsageService] Unexpected error updating stats for userId ${userId}:`, err.message);
+            } else {
+                console.warn(`[UsageService] Connectivity timeout updating stats for userId ${userId}`);
             }
         });
     // 4. Calculate Share Reports (Projects with share_token)

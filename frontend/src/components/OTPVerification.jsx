@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowLeft, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -110,12 +110,12 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
     return (
         <div className="w-full">
             <div className="text-center mb-8">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Mail className="h-6 w-6 text-blue-500" />
+                <div className="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-600/20 inline-flex items-center justify-center mb-6">
+                    <BarChart2 className="h-6 w-6 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Verify your email</h1>
-                <p className="text-slate-400 text-sm">
-                    We sent a code to <span className="text-white">{email}</span>.<br />
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h1>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                    We sent a code to <span className="text-blue-600 dark:text-blue-400 font-bold">{email}</span>.<br />
                     Please enter the 6-digit code below to continue.
                 </p>
             </div>
@@ -132,7 +132,7 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             onPaste={handlePaste}
-                            className="w-12 h-14 bg-[#0B0E14] border border-white/10 rounded-xl text-center text-xl font-bold text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                            className="w-12 h-14 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-center text-xl font-black text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-500 transition-all shadow-inner"
                         />
                     ))}
                 </div>
@@ -140,7 +140,7 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <button
                     type="submit"
                     disabled={loading || otp.join('').length !== 6}
-                    className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center active:scale-[0.98]"
                 >
                     {loading ? 'Verifying...' : 'Verify Account'}
                 </button>

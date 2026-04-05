@@ -202,8 +202,8 @@ export default function Billing() {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: order.amount,
                 currency: order.currency,
-                name: "OBS Tracker",
-                description: `Upgrade to ${planId} Plan`,
+                name: "WebPulse",
+                description: "Subscription payment for WebPulse analytics services",
                 image: "https://example.com/your_logo",
                 order_id: order.id,
                 handler: async function (response) {
@@ -296,25 +296,25 @@ export default function Billing() {
     return (
         <div className="max-w-7xl mx-auto">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold text-white">Billing & Subscription</h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Billing & Subscription</h1>
                 <div className="flex items-center gap-4">
                     {/* Currency Switcher */}
-                    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 p-1 rounded-xl flex items-center">
+                    <div className="bg-slate-100 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 p-1 rounded-xl flex items-center shadow-sm">
                         <button
                             onClick={() => setCurrency('INR')}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currency === 'INR' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currency === 'INR' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                             INR (₹)
                         </button>
                         <button
                             onClick={() => setCurrency('USD')}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currency === 'USD' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currency === 'USD' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                             USD ($)
                         </button>
                     </div>
 
-                    <button className="p-2 text-slate-400 hover:text-white transition-colors">
+                    <button className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                         <Clock className="h-5 w-5" />
                     </button>
                 </div>
@@ -323,15 +323,15 @@ export default function Billing() {
             {/* Top Section: Current Plan & Usage */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
                 {/* Current Plan Card */}
-                <div className="lg:col-span-2 bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 relative overflow-hidden group shadow-sm dark:shadow-xl">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 dark:bg-blue-600/5 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
 
                     <div className="flex justify-between items-start mb-12 relative z-10">
                         <div>
-                            <p className="text-sm font-medium text-slate-400 mb-1">Current Plan</p>
+                            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Current Plan</p>
                             <div className="flex items-center gap-3">
-                                <h2 className="text-4xl font-bold text-white capitalize">{usageStats.plan} Plan</h2>
-                                <span className="px-2.5 py-0.5 bg-slate-800 text-slate-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-slate-700">Current</span>
+                                <h2 className="text-4xl font-black text-slate-900 dark:text-white capitalize">{usageStats.plan} Plan</h2>
+                                <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-slate-200 dark:border-slate-700">Current</span>
                             </div>
                         </div>
                         <button
@@ -343,33 +343,35 @@ export default function Billing() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        <div className="bg-slate-950/40 border border-slate-800/50 rounded-2xl p-5">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Monthly Limit</p>
-                            <p className="text-xl font-bold text-white">{viewLimit.toLocaleString()} views</p>
+                        <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/50 rounded-2xl p-6 shadow-inner">
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Monthly Limit</p>
+                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{viewLimit.toLocaleString()} <span className="text-sm text-slate-500 ml-1">views</span></p>
                         </div>
-                        <div className="bg-slate-950/40 border border-slate-800/50 rounded-2xl p-5">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Next Reset</p>
-                            <p className="text-xl font-bold text-white">{getNextResetDate()}</p>
+                        <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/50 rounded-2xl p-6 shadow-inner">
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Next Reset</p>
+                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{getNextResetDate()}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Usage Card */}
-                <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 flex flex-col">
-                    <div className="flex items-center gap-2 mb-8">
-                        <Zap className="h-5 w-5 text-blue-400 fill-blue-400/20" />
-                        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Usage This Month</h3>
+                <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 flex flex-col shadow-sm dark:shadow-xl transition-all">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+                            <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 fill-blue-600/10 dark:fill-blue-400/20" />
+                        </div>
+                        <h3 className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">Usage This Month</h3>
                     </div>
 
                     <div className="space-y-8 flex-1">
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-medium text-slate-400">Project Views</p>
-                                <p className="text-sm font-bold text-white">
-                                    {totalViewsUsed.toLocaleString()} <span className="text-slate-500">/ {viewLimit.toLocaleString()}</span>
+                                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Project Views</p>
+                                <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
+                                    {totalViewsUsed.toLocaleString()} <span className="text-slate-400 dark:text-slate-500 font-medium">/ {viewLimit.toLocaleString()}</span>
                                 </p>
                             </div>
-                            <div className="h-2 bg-slate-800/50 rounded-full overflow-hidden">
+                            <div className="h-2 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${viewPercentage}%` }}
@@ -380,12 +382,12 @@ export default function Billing() {
 
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-medium text-slate-400">Active Projects</p>
-                                <p className="text-sm font-bold text-white">
-                                    {projectsCount} <span className="text-slate-500">/ {projectLimit}</span>
+                                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Active Projects</p>
+                                <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
+                                    {projectsCount} <span className="text-slate-400 dark:text-slate-500 font-medium">/ {projectLimit}</span>
                                 </p>
                             </div>
-                            <div className="h-2 bg-slate-800/50 rounded-full overflow-hidden">
+                            <div className="h-2 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${projectPercentage}%` }}
@@ -403,8 +405,8 @@ export default function Billing() {
 
             {/* Plan Comparison Section */}
             <div className="mb-16">
-                <h2 className="text-2xl font-bold text-white mb-2">Choose your plan</h2>
-                <p className="text-slate-400 text-sm mb-10">Pick the best plan that fits your growth needs.</p>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Choose your plan</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mb-10">Pick the best plan that fits your growth needs.</p>
 
                 {loading ? (
                     <div className="flex justify-center py-20">
@@ -426,12 +428,12 @@ export default function Billing() {
 
                             return (
                                 <div key={plan.id} className={`
-                                    backdrop-blur-xl border rounded-3xl p-6 flex flex-col h-full transition-all group relative
+                                    backdrop-blur-xl border rounded-3xl p-6 flex flex-col h-full transition-all group relative shadow-sm hover:shadow-xl
                                     ${isCurrentPlan
-                                        ? 'bg-blue-500/10 border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.1)]'
+                                        ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/50 shadow-[0_0_30px_rgba(59,130,246,0.1)]'
                                         : isPro
-                                            ? 'bg-gradient-to-b from-blue-900/20 to-slate-900/40 border-blue-500/30 hover:border-blue-500/50'
-                                            : 'bg-slate-900/40 border-slate-800/50 hover:border-slate-700/50'}
+                                            ? 'bg-white dark:bg-gradient-to-b dark:from-blue-900/20 dark:to-slate-900/40 border-blue-200 dark:border-blue-500/30 hover:border-blue-400 dark:hover:border-blue-500/50'
+                                            : 'bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700/50'}
                                 `}>
                                     {isPro && (
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -440,51 +442,51 @@ export default function Billing() {
                                     )}
 
                                     <div className="mb-6">
-                                        <h3 className={`text-lg font-bold mb-1 ${isFree ? 'text-white' :
-                                            isBasic ? 'text-blue-400' :
-                                                isPro ? 'text-white' : // Changed from blue-300 to white for Pro
-                                                    'text-purple-400'
+                                        <h3 className={`text-lg font-black mb-1 ${isFree ? 'text-slate-900 dark:text-white' :
+                                            isBasic ? 'text-blue-600 dark:text-blue-400' :
+                                                isPro ? 'text-blue-600 dark:text-white' :
+                                                    'text-purple-600 dark:text-purple-400'
                                             }`}>{plan.name}</h3>
-                                        <p className="text-xs text-slate-400">
+                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                             {plan.description}
                                         </p>
                                     </div>
 
                                     <div className="mb-6">
                                         <div className="flex items-baseline gap-1">
-                                            <span className="text-3xl font-bold text-white">
+                                            <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                                                 {priceDisplay}
                                             </span>
-                                            <span className="text-slate-500 font-medium text-xs">/mo</span>
+                                            <span className="text-slate-500 font-bold text-xs">/mo</span>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3 mb-8 flex-1">
-                                        <ul className="space-y-3">
+                                    <div className="space-y-4 mb-8 flex-1">
+                                        <ul className="space-y-4">
                                             {plan.features && plan.features.length > 0 ? (
                                                 plan.features.map((feature, idx) => (
-                                                    <li key={idx} className="flex items-center gap-2 text-xs text-slate-300">
-                                                        <Check className={`h-3.5 w-3.5 shrink-0 ${isFree || isBasic ? 'text-blue-500' :
-                                                            isPro ? 'text-green-500' : // Changed from blue-400 to green-500 for Pro
-                                                                'text-purple-500'
+                                                    <li key={idx} className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        <Check className={`h-4 w-4 shrink-0 p-0.5 rounded-full ${isFree || isBasic ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' :
+                                                            isPro ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10' :
+                                                                'text-purple-600 bg-purple-50 dark:bg-purple-500/10'
                                                             }`} />
                                                         {feature.text || feature}
                                                     </li>
                                                 ))
                                             ) : (
                                                 <>
-                                                    <li className="flex items-center gap-2 text-xs text-slate-300">
-                                                        <Check className="h-3.5 w-3.5 text-blue-500 shrink-0" /> {plan.max_projects === 100 ? 'Unlimited' : plan.max_projects} Projects
+                                                    <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> {plan.max_projects === 100 ? 'Unlimited' : plan.max_projects} Projects
                                                     </li>
-                                                    <li className="flex items-center gap-2 text-xs text-slate-300">
-                                                        <Check className="h-3.5 w-3.5 text-blue-500 shrink-0" /> {plan.allowed_origins} Allowed Origin{plan.allowed_origins > 1 ? 's' : ''}
+                                                    <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> {plan.allowed_origins} Allowed Origin{plan.allowed_origins > 1 ? 's' : ''}
                                                     </li>
-                                                    <li className="flex items-center gap-2 text-xs text-slate-300">
-                                                        <Check className="h-3.5 w-3.5 text-blue-500 shrink-0" /> {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events)} events/mo
+                                                    <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                        <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events)} events/mo
                                                     </li>
                                                     {plan.live_logs && (
-                                                        <li className="flex items-center gap-2 text-xs text-slate-300">
-                                                            <Check className="h-3.5 w-3.5 text-blue-500 shrink-0" /> Live Activity Logs
+                                                        <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                            <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> Live Activity Logs
                                                         </li>
                                                     )}
                                                 </>
@@ -501,14 +503,14 @@ export default function Billing() {
                                         }}
                                         disabled={isCurrentPlan || (isFree && usageStats.plan === 'free') || (plan.id === 'business')} // Disable business button
                                         className={`
-                                            w-full py-3 rounded-xl font-bold text-sm transition-all
+                                            w-full py-4 rounded-2xl font-black text-sm transition-all shadow-sm
                                             ${isCurrentPlan
-                                                ? 'bg-blue-500/20 text-blue-400 cursor-default border border-blue-500/50'
+                                                ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 cursor-default border border-blue-200 dark:border-blue-500/50'
                                                 : isFree
-                                                    ? 'border border-slate-800 text-slate-400 hover:bg-slate-800/50'
+                                                    ? 'bg-slate-50 dark:bg-transparent border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
                                                     : isBusiness
-                                                        ? 'border border-slate-800 text-slate-400 hover:bg-slate-800/50 active:scale-[0.98]' // Style for Contact Sales
-                                                        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-900/20 active:scale-[0.98]'}
+                                                        ? 'bg-slate-50 dark:bg-transparent border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 active:scale-[0.98]' // Style for Contact Sales
+                                                        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-[0.98]'}
                                             disabled:opacity-50 disabled:cursor-not-allowed
                                         `}
                                     >

@@ -33,19 +33,19 @@ export default function Settings() {
             <div className="flex flex-col md:flex-row gap-8 items-start">
                 {/* Sidebar */}
                 <div className="w-full md:w-64 flex-shrink-0">
-                    <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-4 sticky top-24">
-                        <h2 className="text-lg font-bold text-white mb-4 px-4">Settings</h2>
+                    <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-4 sticky top-24 shadow-sm dark:shadow-xl transition-all">
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 px-4 tracking-tight">Settings</h2>
                         <nav className="space-y-1">
                             {tabs.map((t) => (
                                 <button
                                     key={t.id}
                                     onClick={() => navigate(`/dashboard/settings/${t.id}`)}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === t.id
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === t.id
                                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:px-5'
                                         }`}
                                 >
-                                    <t.icon className="h-4 w-4" />
+                                    <t.icon className={`h-4 w-4 ${activeTab === t.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
                                     {t.label}
                                 </button>
                             ))}
@@ -157,16 +157,16 @@ function ProfileSection({ user, loadUser, showToast }) {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
                 <div className="flex justify-between items-start mb-8">
                     <div>
-                        <h3 className="text-xl font-bold text-white">Profile Information</h3>
-                        <p className="text-sm text-slate-500 mt-1">Update your profile basics.</p>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Profile Information</h3>
+                        <p className="text-sm font-medium text-slate-500 mt-1">Update your profile basics.</p>
                     </div>
                     <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${isEditing
-                            ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                        className={`px-4 py-2 text-sm font-bold rounded-xl border transition-all flex items-center gap-2 shadow-sm ${isEditing
+                            ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white border-slate-200 dark:border-slate-700'
                             : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent'
                             }`}
                     >
@@ -182,7 +182,7 @@ function ProfileSection({ user, loadUser, showToast }) {
                 </div>
 
                 <div className="flex items-center gap-6 mb-8">
-                    <div className="h-24 w-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-bold text-white shadow-xl shadow-blue-600/20">
+                    <div className="h-24 w-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-black text-white shadow-xl shadow-blue-600/30 ring-4 ring-white dark:ring-slate-900">
                         {user?.avatar_url ? (
                             <img src={user.avatar_url} alt={user.name} className="h-full w-full rounded-full object-cover" />
                         ) : (
@@ -190,8 +190,8 @@ function ProfileSection({ user, loadUser, showToast }) {
                         )}
                     </div>
                     <div>
-                        <h4 className="text-lg font-bold text-white mb-1">Profile Picture</h4>
-                        <p className="text-sm text-slate-400 mb-4">JPG, GIF or PNG. Max size 5MB</p>
+                        <h4 className="text-lg font-black text-slate-900 dark:text-white mb-1">Profile Picture</h4>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">JPG, GIF or PNG. Max size 5MB</p>
                         <div className="flex gap-3">
                             <input
                                 type="file"
@@ -203,14 +203,14 @@ function ProfileSection({ user, loadUser, showToast }) {
                             <button
                                 disabled={!isEditing || uploading}
                                 onClick={() => fileInputRef.current?.click()}
-                                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-6 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-sm font-bold rounded-xl transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                             >
                                 {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                 {uploading ? 'Uploading...' : 'Upload New'}
                             </button>
                             <button
                                 disabled={!isEditing}
-                                className="px-4 py-2 bg-slate-800/50 hover:bg-red-500/10 text-slate-400 hover:text-red-500 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800/50 hover:bg-red-500 dark:hover:bg-red-500/10 text-slate-500 dark:text-slate-400 hover:text-white dark:hover:text-red-500 text-sm font-bold rounded-xl transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                             >
                                 <Trash2 className="h-4 w-4" />
                                 Remove
@@ -222,57 +222,57 @@ function ProfileSection({ user, loadUser, showToast }) {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Full Name</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Full Name</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     disabled={!isEditing}
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all pr-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all pr-12 disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
                                 />
-                                {isEditing && <Edit2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 pointer-events-none" />}
+                                {isEditing && <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Job Title</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Job Title</label>
                             <div className="relative">
                                 <input
                                     type="text"
                                     disabled={!isEditing}
                                     value={formData.job_title}
                                     onChange={e => setFormData({ ...formData, job_title: e.target.value })}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all pr-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all pr-12 disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
                                     placeholder="e.g. Senior Developer"
                                 />
-                                {isEditing && <Edit2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600 pointer-events-none" />}
+                                {isEditing && <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />}
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Bio</label>
+                        <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Bio</label>
                         <div className="relative">
                             <textarea
                                 value={formData.bio}
                                 disabled={!isEditing}
                                 onChange={e => setFormData({ ...formData, bio: e.target.value })}
                                 rows={4}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none pr-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all resize-none pr-12 disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
                                 placeholder="Tell us a little about yourself..."
                             />
-                            {isEditing && <Edit2 className="absolute right-3 top-4 h-4 w-4 text-slate-600 pointer-events-none" />}
+                            {isEditing && <Edit2 className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Language</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Language</label>
                             <select
                                 value={formData.language}
                                 disabled={!isEditing}
                                 onChange={e => setFormData({ ...formData, language: e.target.value })}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-inner appearance-none"
                             >
                                 <option value="en-US">English (US)</option>
                                 <option value="es">Spanish</option>
@@ -281,12 +281,12 @@ function ProfileSection({ user, loadUser, showToast }) {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Timezone</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Timezone</label>
                             <select
                                 value={formData.timezone}
                                 disabled={!isEditing}
                                 onChange={e => setFormData({ ...formData, timezone: e.target.value })}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-inner appearance-none"
                             >
                                 <option value="UTC">UTC</option>
                                 <option value="EST">Eastern Standard Time (EST)</option>
@@ -297,11 +297,11 @@ function ProfileSection({ user, loadUser, showToast }) {
                     </div>
 
                     {isEditing && (
-                        <div className="flex justify-end pt-4 border-t border-slate-800/50">
+                        <div className="flex justify-end pt-8 border-t border-slate-100 dark:border-slate-800/50">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-500/30 active:scale-95 disabled:opacity-50 flex items-center gap-2"
                             >
                                 {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                                 Save Changes
@@ -365,13 +365,13 @@ function SecuritySection({ user, showToast }) {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
                 <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-xl font-bold text-white">Change Password</h3>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Change Password</h3>
                     <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${isEditing
-                            ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                        className={`px-4 py-2 text-sm font-bold rounded-xl border transition-all flex items-center gap-2 shadow-sm ${isEditing
+                            ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white border-slate-200 dark:border-slate-700'
                             : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent'
                             }`}
                     >
@@ -385,43 +385,43 @@ function SecuritySection({ user, showToast }) {
                 </div>
                 <form onSubmit={handlePasswordUpdate} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Current Password</label>
+                        <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Current Password</label>
                         <input
                             type="password"
                             disabled={!isEditing}
                             value={passwords.current}
                             onChange={e => setPasswords({ ...passwords, current: e.target.value })}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
                         />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">New Password</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">New Password</label>
                             <input
                                 type="password"
                                 disabled={!isEditing}
                                 value={passwords.new}
                                 onChange={e => setPasswords({ ...passwords, new: e.target.value })}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Confirm New Password</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-400 mb-2">Confirm New Password</label>
                             <input
                                 type="password"
                                 disabled={!isEditing}
                                 value={passwords.confirm}
                                 onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
                             />
                         </div>
                     </div>
                     {isEditing && (
-                        <div className="flex justify-end">
+                        <div className="flex justify-end pt-8 border-t border-slate-100 dark:border-slate-800/50">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-500/30 active:scale-95 disabled:opacity-50 flex items-center gap-2"
                             >
                                 {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                                 Update Password
@@ -431,17 +431,17 @@ function SecuritySection({ user, showToast }) {
                 </form>
             </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
-                <h3 className="text-xl font-bold text-white mb-6">Active Sessions</h3>
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-6">Active Sessions</h3>
                 <div className="space-y-4">
                     {sessions.map((session, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
+                        <div key={index} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl group transition-all hover:border-blue-400 dark:hover:border-slate-600 shadow-sm">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-slate-900 rounded-lg text-slate-400">
+                                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl text-slate-500 dark:text-slate-400 shadow-sm border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-all">
                                     {session.device?.includes('Mobile') ? <Smartphone className="h-6 w-6" /> : <Monitor className="h-6 w-6" />}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-bold text-white">{session.device || 'Unknown Device'}</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{session.device || 'Unknown Device'}</p>
                                     <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                                         <span>{session.location}</span>
                                         <span>•</span>
@@ -491,13 +491,13 @@ function NotificationsSection({ user, showToast }) {
     };
 
     return (
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
             <div className="flex justify-between items-start mb-6">
-                <h3 className="text-xl font-bold text-white">Notification Preferences</h3>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Notification Preferences</h3>
                 <button
                     onClick={() => setIsEditing(!isEditing)}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors flex items-center gap-2 ${isEditing
-                        ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                    className={`px-4 py-2 text-sm font-bold rounded-xl border transition-all flex items-center gap-2 shadow-sm ${isEditing
+                        ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white border-slate-200 dark:border-slate-700'
                         : 'bg-blue-600 hover:bg-blue-500 text-white border-transparent'
                         }`}
                 >
@@ -509,7 +509,7 @@ function NotificationsSection({ user, showToast }) {
                     )}
                 </button>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4">
                 {[
                     { id: 'email', label: 'Email Notifications', desc: 'Receive daily summaries and critical alerts via email.' },
                     { id: 'email_reports', label: 'Email Reports', desc: 'Receive weekly performance reports for your projects.' },
@@ -517,10 +517,10 @@ function NotificationsSection({ user, showToast }) {
                     { id: 'security', label: 'Security Alerts', desc: 'Get notified about new logins and password changes.' },
                     { id: 'marketing', label: 'Product Updates', desc: 'Receive news about new features and improvements.' }
                 ].map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
+                    <div key={item.id} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl transition-all hover:border-blue-400 dark:hover:border-slate-700 shadow-sm">
                         <div>
-                            <p className="text-sm font-bold text-white">{item.label}</p>
-                            <p className="text-xs text-slate-500 mt-1">{item.desc}</p>
+                            <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{item.label}</p>
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">{item.desc}</p>
                         </div>
                         <button
                             onClick={() => handleToggle(item.id)}
@@ -552,24 +552,24 @@ function UsageSection() {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
                 <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-bold text-white">Usage & Quota</h3>
-                    <span className="px-3 py-1 bg-blue-500/10 text-blue-400 text-xs font-bold rounded-full uppercase tracking-wider border border-blue-500/20">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Usage & Quota</h3>
+                    <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-blue-100 dark:border-blue-500/20 shadow-sm">
                         {usageStats.plan} Plan
                     </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-6">
+                    <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-400">Monthly Views</p>
-                                <p className="text-2xl font-bold text-white mt-1">{usageStats.totalViews.toLocaleString()}</p>
+                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Monthly Views</p>
+                                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-tight">{usageStats.totalViews.toLocaleString()}</p>
                             </div>
-                            <p className="text-xs text-slate-500">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
                         </div>
-                        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-blue-500 rounded-full transition-all duration-500"
                                 style={{ width: `${getPercentage(usageStats.totalViews, usageStats.monthlyLimit)}%` }}
@@ -577,11 +577,11 @@ function UsageSection() {
                         </div>
                     </div>
 
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-6">
+                    <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-400">Storage Used</p>
-                                <p className="text-2xl font-bold text-white mt-1">
+                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Storage Used</p>
+                                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-tight">
                                     {usageStats.storageUsed < 1024 * 1024
                                         ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
                                         : usageStats.storageUsed < 1024 * 1024 * 1024
@@ -590,9 +590,9 @@ function UsageSection() {
                                     }
                                 </p>
                             </div>
-                            <p className="text-xs text-slate-500">Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</p>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</p>
                         </div>
-                        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-purple-500 rounded-full transition-all duration-500"
                                 style={{ width: `${getPercentage(usageStats.storageUsed, usageStats.storageLimit)}%` }}
@@ -600,15 +600,15 @@ function UsageSection() {
                         </div>
                     </div>
 
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-6">
+                    <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-400">Total Projects</p>
-                                <p className="text-2xl font-bold text-white mt-1">{usageStats.projectCount}</p>
+                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Projects</p>
+                                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-tight">{usageStats.projectCount}</p>
                             </div>
-                            <p className="text-xs text-slate-500">Limit: {usageStats.projectLimit}</p>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">Limit: {usageStats.projectLimit}</p>
                         </div>
-                        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-orange-500 rounded-full transition-all duration-500"
                                 style={{ width: `${getPercentage(usageStats.projectCount, usageStats.projectLimit)}%` }}
@@ -616,15 +616,15 @@ function UsageSection() {
                         </div>
                     </div>
 
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-6">
+                    <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-400">Shared Reports</p>
-                                <p className="text-2xl font-bold text-white mt-1">{usageStats.share_report?.used || 0}</p>
+                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Shared Reports</p>
+                                <p className="text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-tight">{usageStats.share_report?.used || 0}</p>
                             </div>
-                            <p className="text-xs text-slate-500">Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}</p>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500">Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}</p>
                         </div>
-                        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-green-500 rounded-full transition-all duration-500"
                                 style={{ width: `${getPercentage(usageStats.share_report?.used || 0, usageStats.share_report?.limit || 1)}%` }}
@@ -688,24 +688,24 @@ function ProjectsSection({ user }) {
     if (loading) return <Spinner />;
 
     return (
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
             <div className="flex justify-between items-start mb-6">
                 <div>
-                    <h3 className="text-xl font-bold text-white">Projects & Teams</h3>
-                    <p className="text-sm text-slate-500 mt-1">Manage your projects and team members.</p>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Projects & Teams</h3>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Manage your projects and team members.</p>
                 </div>
             </div>
 
             <div className="space-y-4">
                 {projects.length === 0 ? (
-                    <div className="text-center py-12 text-slate-500">
+                    <div className="text-center py-12 text-slate-500 font-bold uppercase tracking-widest text-xs">
                         No projects found. Create one to get started.
                     </div>
                 ) : (
                     projects.map((project) => (
-                        <div key={project.id} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-xl group hover:border-slate-700 transition-colors">
+                        <div key={project.id} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl group transition-all hover:border-blue-400 dark:hover:border-slate-600 shadow-sm">
                             <div className="flex items-center gap-4 flex-1">
-                                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-slate-400 font-bold border border-slate-700">
+                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center text-slate-600 dark:text-slate-400 font-black border border-slate-200 dark:border-slate-700 shadow-sm group-hover:scale-110 transition-all">
                                     {project.name[0].toUpperCase()}
                                 </div>
                                 {editingId === project.id ? (
@@ -714,21 +714,21 @@ function ProjectsSection({ user }) {
                                             type="text"
                                             value={editForm.name}
                                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                            className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500"
+                                            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-inner"
                                             placeholder="Project Name"
                                         />
                                         <input
                                             type="text"
                                             value={editForm.allowedOrigins}
                                             onChange={(e) => setEditForm({ ...editForm, allowedOrigins: e.target.value })}
-                                            className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+                                            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-inner"
                                             placeholder="Allowed Origins (comma separated)"
                                         />
                                     </div>
                                 ) : (
                                     <div>
-                                        <p className="text-sm font-bold text-white">{project.name}</p>
-                                        <p className="text-xs text-slate-500">{project.allowed_origins || 'All origins allowed'}</p>
+                                        <p className="text-base font-black text-slate-900 dark:text-white tracking-tight">{project.name}</p>
+                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{project.allowed_origins || 'All origins allowed'}</p>
                                     </div>
                                 )}
                             </div>
@@ -737,25 +737,25 @@ function ProjectsSection({ user }) {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleSave(project.id)}
-                                            className="p-2 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors"
+                                            className="p-2.5 bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-500 hover:bg-green-100 dark:hover:bg-green-500/20 rounded-xl transition-all shadow-sm"
                                         >
-                                            <Check className="h-4 w-4" />
+                                            <Check className="h-5 w-5" />
                                         </button>
                                         <button
                                             onClick={cancelEditing}
-                                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-xl transition-all shadow-sm"
                                         >
-                                            <LogOut className="h-4 w-4 rotate-180" />
+                                            <X className="h-5 w-5" />
                                         </button>
                                     </div>
                                 ) : (
                                     <>
-                                        <span className="px-2 py-1 bg-slate-800 text-slate-400 text-xs font-bold rounded uppercase tracking-wider">
+                                        <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-slate-200 dark:border-slate-700 shadow-sm">
                                             Owner
                                         </span>
                                         <button
                                             onClick={() => startEditing(project)}
-                                            className="p-2 text-slate-400 hover:text-white transition-colors"
+                                            className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
                                         >
                                             <Edit2 className="h-4 w-4" />
                                         </button>
@@ -837,56 +837,56 @@ function BillingSection({ user }) {
 
     return (
         <div className="space-y-6">
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 shadow-sm dark:shadow-xl transition-all">
                 <div className="flex justify-between items-start mb-8">
                     <div>
-                        <h3 className="text-xl font-bold text-white">Subscription Summary</h3>
-                        <p className="text-sm text-slate-500 mt-1">Manage your plan and billing details.</p>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Subscription Summary</h3>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Manage your plan and billing details.</p>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-6">
-                        <p className="text-sm font-medium text-slate-400 mb-2">Current Plan</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner transition-all hover:shadow-md">
+                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Current Plan</p>
                         <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-white capitalize">{user?.plan || 'Free'}</span>
-                            <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-bold rounded-full uppercase tracking-wider border border-blue-500/20">Active</span>
+                            <span className="text-2xl font-black text-slate-900 dark:text-white capitalize tracking-tight">{user?.plan || 'Free'}</span>
+                            <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-blue-100 dark:border-blue-500/20 shadow-sm">Active</span>
                         </div>
                     </div>
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 blur-[50px] -mr-16 -mt-16 rounded-full"></div>
-                        <p className="text-sm font-medium text-slate-400 mb-2">Next Payment Date</p>
-                        <p className="text-2xl font-bold text-white relative z-10">
+                    <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 relative overflow-hidden group shadow-inner transition-all hover:shadow-md">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 dark:bg-blue-600/10 blur-[50px] -mr-16 -mt-16 rounded-full transition-all group-hover:scale-150"></div>
+                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Next Payment Date</p>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white relative z-10 tracking-tight">
                             {user?.next_billing_date
                                 ? new Date(user.next_billing_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
                                 : 'N/A'}
                         </p>
                         {user?.next_billing_date && (
-                            <p className="text-xs text-slate-500 mt-1 relative z-10">Auto-renewal scheduled</p>
+                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 relative z-10 uppercase tracking-widest">Auto-renewal scheduled</p>
                         )}
                     </div>
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-6">
-                        <p className="text-sm font-medium text-slate-400 mb-2">Payment Method</p>
+                    <div className="bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner transition-all hover:shadow-md">
+                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Payment Method</p>
                         <div className="flex items-center gap-2">
-                            <CreditCard className="h-5 w-5 text-slate-300" />
-                            <span className="text-lg font-bold text-white">•••• 4242</span>
+                            <CreditCard className="h-5 w-5 text-slate-500 dark:text-slate-300" />
+                            <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">•••• 4242</span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1"> via Stripe/Razorpay</p>
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest"> via Stripe/Razorpay</p>
                     </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-8">Payment History</h3>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-6">Payment History</h3>
 
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-800/50">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Invoice ID</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Amount</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                            <tr className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Invoice ID</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Date</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Description</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Amount</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/30">
@@ -905,30 +905,30 @@ function BillingSection({ user }) {
                                 </tr>
                             ) : (
                                 paymentHistory.map((payment) => (
-                                    <tr key={payment.id} className="group hover:bg-slate-800/20 transition-colors">
-                                        <td className="px-6 py-6 text-sm text-slate-300 font-medium">{payment.id && (payment.id.substring(0, 8) + '...')}</td>
-                                        <td className="px-6 py-6 text-sm text-slate-300 font-medium">
+                                    <tr key={payment.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-all border-b border-slate-50 dark:border-slate-900">
+                                        <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-400 font-bold font-mono tracking-tighter">{payment.id && (payment.id.substring(0, 8) + '...')}</td>
+                                        <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-400 font-black">
                                             {new Date(payment.date).toLocaleDateString()}
                                         </td>
-                                        <td className="px-6 py-6 text-sm text-white font-bold">{payment.description || 'Subscription'}</td>
-                                        <td className="px-6 py-6 text-sm text-slate-300">${payment.amount}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-black tracking-tight">{payment.description || 'Subscription'}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-black tracking-tight">${payment.amount}</td>
                                         <td className="px-6 py-6">
                                             <span className="px-2.5 py-1 bg-green-500/10 text-green-500 text-[10px] font-bold rounded-md uppercase tracking-wider border border-green-500/20">
                                                 {payment.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-6 text-right">
-                                            <div className="flex items-center justify-end gap-3">
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => handleDownloadReceipt(payment.id)}
-                                                    className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+                                                    className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm rounded-xl"
                                                     title="Download Receipt"
                                                 >
                                                     <Download className="h-4 w-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleEmailReceipt(payment.id)}
-                                                    className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+                                                    className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm rounded-xl"
                                                     title="Email Receipt"
                                                 >
                                                     <Bell className="h-4 w-4" />
@@ -1026,87 +1026,91 @@ function LinkedAccountsSection({ user, showToast }) {
     return (
         <div className="space-y-6">
             {/* Telegram Card */}
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8 relative overflow-hidden">
+            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-2xl p-8 relative overflow-hidden shadow-sm dark:shadow-xl transition-all">
                 {!isPro && (
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
-                        <div className="text-center p-6 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-w-sm">
-                            <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Lock className="h-6 w-6 text-blue-400" />
+                    <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+                        <div className="text-center p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-sm transition-all hover:scale-105">
+                            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-blue-100 dark:border-blue-500/20">
+                                <Lock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                             </div>
-                            <h4 className="text-lg font-bold text-white mb-2">Pro Feature</h4>
-                            <p className="text-slate-400 text-sm mb-4">Telegram integration is available on Pro plan and above.</p>
-                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold text-sm">Upgrade to Pro</button>
+                            <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Pro Feature</h4>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-6 leading-relaxed">Telegram integration is available on Pro plan and above.</p>
+                            <button className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm transition-all shadow-xl shadow-blue-500/30 active:scale-95">Upgrade to Pro</button>
                         </div>
                     </div>
                 )}
 
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex justify-between items-start mb-8">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-blue-500/10 rounded-xl">
-                            <Send className="h-6 w-6 text-blue-500" />
+                        <div className="p-3.5 bg-blue-50 dark:bg-blue-500/10 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-500/20">
+                            <Send className="h-6 w-6 text-blue-600 dark:text-blue-500" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-white">Telegram Integration</h3>
-                            <p className="text-sm text-slate-500">Receive notifications via Telegram Bot.</p>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Telegram Integration</h3>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Receive notifications via Telegram Bot.</p>
                         </div>
                     </div>
                     {accounts.telegram && (
-                        <span className="px-3 py-1 bg-blue-500/10 text-blue-500 text-xs font-bold rounded-full border border-blue-500/20">
+                        <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-blue-100 dark:border-blue-500/20 shadow-sm">
                             Linked
                         </span>
                     )}
                 </div>
 
                 {accounts.telegram ? (
-                    <div className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
+                    <div className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-2xl group hover:border-blue-400 dark:hover:border-slate-600 transition-all shadow-inner">
                         <div>
-                            <div className="font-bold text-white">{accounts.telegram.username}</div>
-                            <div className="text-xs text-slate-500 font-mono">ID: {accounts.telegram.chat_id}</div>
+                            <div className="font-black text-slate-900 dark:text-white text-lg tracking-tight">{accounts.telegram.username}</div>
+                            <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 font-mono uppercase tracking-widest mt-1">ID: {accounts.telegram.chat_id}</div>
                             {accounts.telegram.bot_token && (
-                                <div className="text-xs text-green-500 mt-1 flex items-center gap-1">
+                                <div className="text-[10px] font-black text-emerald-600 dark:text-green-500 mt-2 flex items-center gap-1 uppercase tracking-widest">
                                     <Check className="h-3 w-3" /> Custom Bot Token Active
                                 </div>
                             )}
                         </div>
-                        <button onClick={() => unlink('telegram')} className="text-red-400 hover:text-red-300 text-sm font-medium">Unlink</button>
+                        <button onClick={() => unlink('telegram')} className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 text-xs font-black rounded-xl transition-all shadow-sm">Unlink</button>
                     </div>
                 ) : (
-                    <form onSubmit={linkTelegram} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1">
+                    <form onSubmit={linkTelegram} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-2">
+                                <label className="block text-xs font-black text-slate-700 dark:text-slate-400 uppercase tracking-widest ml-1">Chat ID</label>
                                 <input
                                     type="text"
-                                    placeholder="Chat ID"
+                                    placeholder="Enter Chat ID"
                                     value={telegramChatId}
                                     onChange={e => setTelegramChatId(e.target.value)}
-                                    className="bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all shadow-inner"
                                     required
                                 />
-                                <p className="text-[10px] text-slate-500 ml-1">
-                                    Don't know your ID? Open <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">@userinfobot</a>
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 ml-1 uppercase tracking-widest">
+                                    Don't know your ID? Open <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">@userinfobot</a>
                                 </p>
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Username (Optional)"
-                                value={telegramUsername}
-                                onChange={e => setTelegramUsername(e.target.value)}
-                                className="bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                            />
-                            <div className="md:col-span-2">
-                                <label className="block text-xs font-medium text-slate-400 mb-1 ml-1">Custom Bot Token (Optional)</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="block text-xs font-black text-slate-700 dark:text-slate-400 uppercase tracking-widest ml-1">Username (Optional)</label>
                                 <input
                                     type="text"
+                                    placeholder="Username"
+                                    value={telegramUsername}
+                                    onChange={e => setTelegramUsername(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all shadow-inner"
+                                />
+                            </div>
+                            <div className="md:col-span-2 flex flex-col gap-2">
+                                <label className="block text-xs font-black text-slate-700 dark:text-slate-400 uppercase tracking-widest ml-1">Custom Bot Token (Optional)</label>
+                                <input
+                                    type="password"
                                     placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
                                     value={botToken}
                                     onChange={e => setBotToken(e.target.value)}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all shadow-inner"
                                 />
-                                <p className="text-[10px] text-slate-500 mt-1 ml-1">Leave blank to use the default system bot. Provide your own if you want notifications to come from your specific bot.</p>
+                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 ml-1 uppercase tracking-widest leading-relaxed">Leave blank to use the default system bot. Provide your own if you want notifications to come from your specific bot.</p>
                             </div>
                         </div>
-                        <div className="flex justify-end">
-                            <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold">
+                        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                            <button type="submit" className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-500/30 active:scale-95">
                                 Link Telegram
                             </button>
                         </div>

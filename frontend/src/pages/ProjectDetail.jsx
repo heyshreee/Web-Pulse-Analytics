@@ -186,7 +186,7 @@ export default function ProjectDetail() {
     </div>
   );
   if (!project) return (
-    <div className="flex h-screen items-center justify-center text-red-400 font-bold bg-slate-950">
+    <div className="flex h-screen items-center justify-center text-red-600 dark:text-red-400 font-bold bg-slate-50 dark:bg-slate-950 px-6 text-center">
       Project not found or access denied.
     </div>
   );

@@ -36,10 +36,10 @@ export default function Features() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#0B0E14] text-white font-sans selection:bg-blue-500/30">
-            <header className="fixed top-0 w-full z-50 bg-[#0B0E14]/80 backdrop-blur-xl border-b border-white/5">
+        <div className="min-h-screen bg-white dark:bg-[#0B0E14] text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
+            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                         <ArrowLeft className="h-5 w-5" />
                         <span className="font-medium">Back to Home</span>
                     </Link>
@@ -49,20 +49,20 @@ export default function Features() {
             <main className="pt-32 pb-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Powerful Features for Modern Creators</h1>
-                        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">Powerful Features for Modern Creators</h1>
+                        <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
                             Everything you need to understand your audience and grow your stream.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {features.map((feature, i) => (
-                            <div key={i} className="p-8 rounded-3xl bg-[#151921] border border-white/5 hover:border-white/10 transition-colors">
-                                <div className="mb-6 bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <div key={i} className="p-8 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl shadow-sm">
+                                <div className="mb-6 bg-slate-200/50 dark:bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center">
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                                <p className="text-slate-400 leading-relaxed">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">{feature.title}</h3>
+                                <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                                     {feature.description}
                                 </p>
                             </div>
@@ -71,8 +71,8 @@ export default function Features() {
                 </div>
             </main>
 
-            <footer className="border-t border-white/5 py-12 bg-[#0B0E14] text-center">
-                <p className="text-slate-600 text-sm">© 2026 OBS Tracker Inc. All rights reserved.</p>
+            <footer className="border-t border-slate-200 dark:border-white/5 py-12 bg-white dark:bg-[#0B0E14] text-center">
+                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );

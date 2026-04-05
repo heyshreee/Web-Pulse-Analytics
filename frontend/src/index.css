@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
-  background-color: #020617; /* Slate 950 */
-  color: #f8fafc; /* Slate 50 */
+  @apply bg-white text-slate-900 antialiased transition-colors duration-300;
+}
+
+.dark body {
+  @apply bg-slate-950 text-slate-50;
 }
 
 /* Custom Scrollbar */
@@ -13,8 +15,8 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-slate-900;
+  @apply bg-slate-100 dark:bg-slate-900;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-700 rounded-full hover:bg-slate-600;
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600;
 }

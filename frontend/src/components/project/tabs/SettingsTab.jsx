@@ -17,16 +17,16 @@ export default function SettingsTab({
   return (
     <div className="space-y-6 pb-20">
       {/* Project Information */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+      <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-8">
           <div>
-            <h2 className="text-lg font-semibold text-white mb-1">Project Information</h2>
-            <p className="text-sm text-slate-400">Update your project basics.</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Project Information</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Update your project basics.</p>
           </div>
           {!editing && (
             <button
                onClick={() => setEditing(true)}
-              className="px-4 py-2 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-white dark:bg-transparent border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-sm"
             >
               <Settings className="h-4 w-4" />
               Edit
@@ -37,27 +37,27 @@ export default function SettingsTab({
         <div className="space-y-6 mb-8">
           {/* Project Name */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Project Name</label>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Project Name</label>
             <input
               type="text"
               value={projectName}
               disabled={!editing}
               onChange={(e) => setProjectName(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
-               className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 disabled:opacity-60 transition-colors"
+               className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:opacity-60 transition-all"
               placeholder="my-project"
             />
-             <p className="text-xs text-slate-500 mt-2">Only letters, numbers, hyphens, and underscores allowed.</p>
+             <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mt-2">Only letters, numbers, hyphens, and underscores allowed.</p>
            </div>
 
           {/* Time Zone */}
           <div>
-             <label className="block text-sm font-medium text-slate-300 mb-2">Time Zone</label>
+             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Time Zone</label>
             <div className="relative">
                <select
                 value={timezone}
                 disabled={!editing}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none disabled:opacity-60 transition-colors"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none disabled:opacity-60 transition-all cursor-pointer"
               >
                 <option value="Asia/Kolkata">(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
                 <option value="UTC">(GMT+00:00) UTC</option>
@@ -72,22 +72,22 @@ export default function SettingsTab({
            
            {/* Tracking ID */}
            <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Tracking ID</label>
-             <div className="flex items-center justify-between gap-4 p-4 bg-slate-950 border border-slate-800 rounded-lg">
-                <code className="text-sm font-mono text-slate-300">{project.tracking_id}</code>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Tracking ID</label>
+             <div className="flex items-center justify-between gap-4 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-inner">
+                <code className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">{project.tracking_id}</code>
                 <CopyButton text={project.tracking_id} />
              </div>
            </div>
         </div>
 
         {editing && (
-          <div className="flex items-center gap-3 pt-6 border-t border-slate-800">
+          <div className="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
              <button
               onClick={onSave}
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-500/20"
             >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save Changes
             </button>
              <button
@@ -98,19 +98,20 @@ export default function SettingsTab({
                 setTimezone(project.timezone || '(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi');
               }}
               disabled={saving}
-              className="px-4 py-2 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 bg-white dark:bg-transparent border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white rounded-xl text-sm font-bold transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm"
             >
+              <X className="h-4 w-4" />
               Cancel
             </button>
           </div>
         )}
       </div>
 
-       {/* Notification Preferences */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+        {/* Notification Preferences */}
+      <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-xl">
          <div className="mb-6">
-          <h2 className="text-lg font-semibold text-white mb-1">Notification Preferences</h2>
-          <p className="text-sm text-slate-400">Stay updated on your website's traffic performance.</p>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Notification Preferences</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Stay updated on your website's traffic performance.</p>
         </div>
 
         <div className="space-y-6">
@@ -128,14 +129,14 @@ export default function SettingsTab({
           ].map((item) => (
             <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
               <div>
-                <h3 className="text-sm font-medium text-white mb-1">{item.title}</h3>
-                <p className="text-xs text-slate-400">{item.desc}</p>
+                <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-1">{item.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
               </div>
                <button
                 onClick={() => setNotifications(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
-                className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${notifications[item.id] ? 'bg-blue-600' : 'bg-slate-700'}`}
+                className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${notifications[item.id] ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'}`}
               >
-                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${notifications[item.id] ? 'left-6' : 'left-1'}`} />
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${notifications[item.id] ? 'left-6' : 'left-1'}`} />
               </button>
             </div>
           ))}
@@ -143,36 +144,36 @@ export default function SettingsTab({
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-slate-900/50 border border-red-900/30 rounded-xl overflow-hidden">
-        <div className="p-6 bg-red-950/10 border-b border-red-900/20 flex items-center gap-3">
-          <AlertTriangle className="h-5 w-5 text-red-500" />
-           <h2 className="text-lg font-semibold text-red-500">Danger Zone</h2>
+      <div className="bg-white dark:bg-slate-900/50 border border-red-100 dark:border-red-900/30 rounded-xl overflow-hidden shadow-sm dark:shadow-xl shadow-red-500/5">
+        <div className="p-6 bg-red-500/5 dark:bg-red-950/10 border-b border-red-100 dark:border-red-900/20 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-500" />
+           <h2 className="text-lg font-bold text-red-600 dark:text-red-500">Danger Zone</h2>
         </div>
 
         <div className="p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-medium text-white mb-1">{isActive ? 'Disable Project' : 'Enable Project'}</h4>
-              <p className="text-xs text-slate-400">Temporarily stop tracking traffic for this project.</p>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">{isActive ? 'Disable Project' : 'Enable Project'}</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Temporarily stop tracking traffic for this project.</p>
             </div>
             <button
                onClick={onToggleActive}
-              className="px-4 py-2 border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+              className="px-6 py-2.5 bg-white dark:bg-transparent border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white rounded-xl text-sm font-bold transition-all whitespace-nowrap shadow-sm"
             >
                {isActive ? 'Disable Project' : 'Enable Project'}
             </button>
           </div>
 
-          <div className="h-px bg-slate-800" />
+          <div className="h-px bg-slate-100 dark:bg-slate-800" />
 
            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-medium text-red-400 mb-1">Delete Project</h4>
-              <p className="text-xs text-slate-400">Permanently delete this project and all of its analytics data.</p>
+              <h4 className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">Delete Project</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Permanently delete this project and all of its analytics data.</p>
             </div>
              <button
               onClick={onDelete}
-              className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+              className="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-600 dark:text-red-500 rounded-xl text-sm font-bold transition-all whitespace-nowrap shadow-sm"
             >
               Delete Project
             </button>

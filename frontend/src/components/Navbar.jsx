@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, LayoutDashboard } from 'lucide-react';
+import { LogOut, LayoutDashboard, BarChart2 } from 'lucide-react';
 import { removeToken } from '../utils/auth';
 
 export default function Navbar() {
@@ -15,13 +15,11 @@ export default function Navbar() {
     <nav className="bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-              O
+          <div className="flex items-center gap-3 group">
+            <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
+              <BarChart2 className="h-5 w-5 text-white" />
             </div>
-            <Link to="/dashboard" className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-              OBS Tracker
-            </Link>
+            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse Analytics</span>
           </div>
 
           <div className="flex items-center gap-4">

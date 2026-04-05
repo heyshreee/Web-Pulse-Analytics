@@ -113,16 +113,16 @@ export default function Pricing() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#0B0E14] text-white font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-white dark:bg-[#0B0E14] text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
             {/* Header */}
-            <header className="fixed top-0 w-full z-50 bg-[#0B0E14]/80 backdrop-blur-xl border-b border-white/5">
+            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                         <ArrowLeft className="h-5 w-5" />
                         <span className="font-medium">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-4">
-                        <Link to="/login" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">
+                        <Link to="/login" className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                             Log In
                         </Link>
                         <Link
@@ -138,8 +138,8 @@ export default function Pricing() {
             <main className="pt-32 pb-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Simple, Transparent Pricing</h1>
-                        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">Simple, Transparent Pricing</h1>
+                        <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
                             Choose the plan that fits your growth stage. No hidden fees, cancel anytime.
                         </p>
                     </div>
@@ -147,31 +147,31 @@ export default function Pricing() {
                     {/* Pricing Cards */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-32">
                         {/* Free */}
-                        <div className="p-6 rounded-3xl bg-[#151921] border border-white/5 flex flex-col hover:border-white/10 transition-all">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Free</h3>
+                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 flex flex-col hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl">
+                            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2">Free</h3>
                             <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-white">₹0</span>
-                                <span className="text-slate-500">/mo</span>
+                                <span className="text-3xl font-bold text-slate-900 dark:text-white">₹0</span>
+                                <span className="text-slate-500 dark:text-slate-500">/mo</span>
                             </div>
-                            <div className="text-xs text-slate-500 mb-6">$0 / month</div>
-                            <p className="text-sm text-slate-400 mb-6 min-h-[40px]">Trying WebPulse</p>
+                            <div className="text-xs text-slate-400 dark:text-slate-500 mb-6 font-medium font-mono">$0 / month</div>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px] font-medium">Trying WebPulse</p>
 
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl border border-white/10 text-white text-center text-sm font-medium hover:bg-white/5 transition-colors">
+                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-center text-sm font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
                                 Get Started
                             </Link>
                         </div>
 
                         {/* Basic */}
-                        <div className="p-6 rounded-3xl bg-[#151921] border border-white/5 flex flex-col hover:border-white/10 transition-all">
-                            <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-2">Basic</h3>
+                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 flex flex-col hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl">
+                            <h3 className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">Basic</h3>
                             <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-white">₹299</span>
-                                <span className="text-slate-500">/mo</span>
+                                <span className="text-3xl font-bold text-slate-900 dark:text-white">₹299</span>
+                                <span className="text-slate-500 dark:text-slate-500">/mo</span>
                             </div>
-                            <div className="text-xs text-slate-500 mb-6">$4 / month</div>
-                            <p className="text-sm text-slate-400 mb-6 min-h-[40px]">Students & solo devs</p>
+                            <div className="text-xs text-slate-400 dark:text-slate-500 mb-6 font-medium font-mono">$4 / month</div>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px] font-medium">Students & solo devs</p>
 
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/50 text-center text-sm font-medium hover:bg-blue-600/20 transition-colors">
+                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-center text-sm font-black uppercase tracking-widest hover:bg-blue-600/20 transition-all">
                                 Choose Basic
                             </Link>
                         </div>
@@ -193,16 +193,15 @@ export default function Pricing() {
                         </div>
 
                         {/* Business */}
-                        <div className="p-6 rounded-3xl bg-[#151921] border border-white/5 flex flex-col hover:border-white/10 transition-all">
-                            <h3 className="text-sm font-bold text-purple-400 uppercase tracking-wider mb-2">Business</h3>
+                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 flex flex-col hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl">
+                            <h3 className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Business</h3>
                             <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-white">₹2,999</span>
-                                <span className="text-slate-500">/mo</span>
+                                <span className="text-3xl font-bold text-slate-900 dark:text-white">₹2,999</span>
+                                <span className="text-slate-500 dark:text-slate-500">/mo</span>
                             </div>
-                            <div className="text-xs text-slate-500 mb-6">$39 / month</div>
-                            <p className="text-sm text-slate-400 mb-6 min-h-[40px]">Teams & high traffic</p>
-
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl border border-white/10 text-white text-center text-sm font-medium hover:bg-white/5 transition-colors">
+                            <div className="text-xs text-slate-400 dark:text-slate-500 mb-6 font-medium font-mono">$39 / month</div>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px] font-medium">Teams & high traffic</p>
+                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-center text-sm font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
                                 Contact Sales
                             </Link>
                         </div>
@@ -210,32 +209,32 @@ export default function Pricing() {
 
                     {/* Feature Comparison Table */}
                     <div className="max-w-7xl mx-auto mb-32 overflow-x-auto">
-                        <h2 className="text-3xl font-bold text-white mb-12 text-center">Compare Plans</h2>
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-12 text-center tracking-tight uppercase tracking-[0.1em]">Compare Plans</h2>
                         {loading ? (
                             <div className="flex justify-center py-10">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 dark:border-white"></div>
                             </div>
                         ) : (
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-white/10">
-                                        <th className="py-6 px-4 text-sm font-semibold text-slate-400">Feature</th>
+                                    <tr className="border-b border-slate-200 dark:border-white/10">
+                                        <th className="py-6 px-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Feature</th>
                                         {displayPlans.map((plan) => (
                                             <th key={plan.id} className={`py-6 px-4 text-left`}>
-                                                <div className="text-xl font-bold text-white mb-1">{plan.name}</div>
-                                                <div className={`text-sm text-${plan.color}-400`}>{plan.price}</div>
+                                                <div className="text-xl font-black text-slate-900 dark:text-white mb-1 tracking-tight">{plan.name}</div>
+                                                <div className={`text-xs font-black uppercase tracking-widest text-${plan.color}-600 dark:text-${plan.color}-400`}>{plan.price}</div>
                                             </th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-white/5">
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                     {featureRows.map((row, index) => (
-                                        <tr key={index} className="hover:bg-white/[0.02] transition-colors">
-                                            <td className="py-4 px-4 text-sm font-medium text-slate-300">{row.feature}</td>
-                                            <td className="py-4 px-4 text-sm text-slate-400">{row.free}</td>
-                                            <td className="py-4 px-4 text-sm text-slate-400">{row.basic}</td>
-                                            <td className="py-4 px-4 text-sm text-white font-medium">{row.pro}</td>
-                                            <td className="py-4 px-4 text-sm text-white font-medium">{row.business}</td>
+                                        <tr key={index} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                                            <td className="py-4 px-4 text-sm font-medium text-slate-600 dark:text-slate-300">{row.feature}</td>
+                                            <td className="py-4 px-4 text-sm text-slate-500 dark:text-slate-400 font-medium font-mono">{row.free}</td>
+                                            <td className="py-4 px-4 text-sm text-slate-500 dark:text-slate-400 font-medium font-mono">{row.basic}</td>
+                                            <td className="py-4 px-4 text-sm text-slate-900 dark:text-white font-black font-mono">{row.pro}</td>
+                                            <td className="py-4 px-4 text-sm text-slate-900 dark:text-white font-black font-mono">{row.business}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -245,7 +244,7 @@ export default function Pricing() {
 
                     {/* FAQ */}
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-3xl font-bold text-white mb-12 text-center">Frequently Asked Questions</h2>
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-12 text-center tracking-tight uppercase tracking-[0.1em]">Frequently Asked Questions</h2>
                         <div className="space-y-8">
                             {[
                                 {
@@ -261,12 +260,12 @@ export default function Pricing() {
                                     a: "Yes! Contact our sales team with proof of your non-profit status for a 50% discount on all plans."
                                 }
                             ].map((faq, i) => (
-                                <div key={i} className="p-6 rounded-2xl bg-[#151921] border border-white/5">
-                                    <h3 className="text-lg font-bold text-white mb-2 flex items-start gap-3">
+                                <div key={i} className="p-6 rounded-2xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 shadow-sm transition-all hover:border-blue-500/20">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-start gap-3">
                                         <HelpCircle className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
                                         {faq.q}
                                     </h3>
-                                    <p className="text-slate-400 ml-8 leading-relaxed">
+                                    <p className="text-slate-500 dark:text-slate-400 ml-8 leading-relaxed font-medium">
                                         {faq.a}
                                     </p>
                                 </div>
@@ -276,8 +275,8 @@ export default function Pricing() {
                 </div>
             </main>
 
-            <footer className="border-t border-white/5 py-12 bg-[#0B0E14] text-center">
-                <p className="text-slate-600 text-sm">© 2026 OBS Tracker Inc. All rights reserved.</p>
+            <footer className="border-t border-slate-200 dark:border-white/5 py-12 bg-white dark:bg-[#0B0E14] text-center">
+                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );
