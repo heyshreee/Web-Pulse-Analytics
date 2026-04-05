@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, RefreshCw, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 
@@ -64,19 +64,19 @@ export default function ResetPassword() {
 
     if (success) {
         return (
-            <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center p-4 font-sans">
-                <div className="w-full max-w-md bg-[#151921] border border-white/5 rounded-2xl p-8 shadow-2xl text-center">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 font-sans transition-colors duration-500">
+                <div className="w-full max-w-md bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-2xl text-center">
                     <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="h-8 w-8 text-green-500" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-2">Password Updated</h1>
-                    <p className="text-slate-400 mb-8">
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Password Updated</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
                         Your password has been successfully reset.<br />
                         You can now login with your new password.
                     </p>
                     <Link
                         to="/login"
-                        className="inline-flex items-center justify-center w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20"
+                        className="inline-flex items-center justify-center w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98]"
                     >
                         Back to Login
                     </Link>
@@ -86,37 +86,38 @@ export default function ResetPassword() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center p-4 font-sans">
-            <div className="w-full max-w-md bg-[#151921] border border-white/5 rounded-2xl p-8 shadow-2xl">
-                <div className="text-center mb-8">
-                    <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <Lock className="h-6 w-6 text-blue-500" />
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 font-sans transition-colors duration-500">
+            <div className="w-full max-w-md bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-2xl">
+                <Link to="/" className="flex items-center gap-3 group mb-8">
+                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
+                        <BarChart2 className="h-6 w-6 text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-2">Create New Password</h1>
-                    <p className="text-slate-400 text-sm">
+                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
+                </Link>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Create New Password</h1>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
                         Choose a strong password to secure your account.
                     </p>
-                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* New Password */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">New Password</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-slate-500" />
+                    <div className="space-y-2">
+                        <label className="block text-xs font-black text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-widest ml-1">New Password</label>
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                             </div>
                             <input
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-10 pr-10 py-3 bg-[#0B0E14] border border-white/10 rounded-xl text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                                className="w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all shadow-inner"
                                 placeholder="••••••••"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white transition-colors"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
                             >
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </button>
@@ -124,35 +125,37 @@ export default function ResetPassword() {
 
                         {/* Strength Indicator */}
                         {password && (
-                            <div className="mt-2">
-                                <div className="flex gap-1 h-1 mb-1">
-                                    <div className={`flex-1 rounded-full ${strength.score >= 1 ? strength.color : 'bg-slate-800'}`}></div>
-                                    <div className={`flex-1 rounded-full ${strength.score >= 2 ? strength.color : 'bg-slate-800'}`}></div>
-                                    <div className={`flex-1 rounded-full ${strength.score >= 3 ? strength.color : 'bg-slate-800'}`}></div>
+                            <div className="px-1 pt-1">
+                                <div className="flex gap-1.5 h-1 mb-2">
+                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 1 ? strength.color : 'bg-slate-200 dark:bg-slate-800'}`}></div>
+                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 2 ? strength.color : 'bg-slate-200 dark:bg-slate-800'}`}></div>
+                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 3 ? strength.color : 'bg-slate-200 dark:bg-slate-800'}`}></div>
                                 </div>
-                                <p className="text-xs text-slate-500">Password strength: <span className={strength.color.replace('bg-', 'text-')}>{strength.label}</span></p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    Strength: <span className={strength.color.replace('bg-', 'text-')}>{strength.label}</span>
+                                </p>
                             </div>
                         )}
                     </div>
 
                     {/* Confirm Password */}
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Confirm New Password</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-slate-500" />
+                    <div className="space-y-2">
+                        <label className="block text-xs font-black text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-widest ml-1">Confirm Password</label>
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                             </div>
                             <input
                                 type={showConfirmPassword ? "text" : "password"}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full pl-10 pr-10 py-3 bg-[#0B0E14] border border-white/10 rounded-xl text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                                className="w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all shadow-inner"
                                 placeholder="••••••••"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white transition-colors"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
                             >
                                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </button>
@@ -162,14 +165,15 @@ export default function ResetPassword() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center active:scale-[0.98] mt-4"
                     >
+                        {loading ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : null}
                         {loading ? 'Updating...' : 'Update Password'}
                     </button>
                 </form>
 
-                <div className="mt-6 text-center">
-                    <Link to="/login" className="inline-flex items-center gap-2 text-sm text-blue-500 hover:text-blue-400 transition-colors">
+                <div className="mt-8 text-center">
+                    <Link to="/login" className="inline-flex items-center gap-2 text-sm font-black text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors uppercase tracking-widest text-[10px]">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Login
                     </Link>

@@ -13,56 +13,60 @@ exports.getPlans = async (req, res) => {
                 id: 'free',
                 name: 'Free',
                 price: 0,
+                price_usd: 0,
+                price_inr: 0,
                 interval: 'month',
-                features: [
-                    '1,000 monthly views',
-                    '5 projects',
-                    '1GB storage',
-                    'Real-time dashboard',
-                    'Basic telemetry'
-                ],
+                description: 'Trying WebPulse',
+                features: ['1 Project', '1 Allowed Origin', '1,000 events/mo', '60 sec refresh'],
                 buttonText: 'Get Started',
                 limits: {
                     monthlyViews: 1000,
+                    projectLimit: 1
+                }
+            },
+            {
+                id: 'basic',
+                name: 'Basic',
+                price: 299,
+                price_usd: 4,
+                price_inr: 299,
+                interval: 'month',
+                description: 'Students & solo devs',
+                features: ['5 Projects', '3 Allowed Origins', 'Live Device Stats', '50,000 events/mo', '10 sec refresh'],
+                buttonText: 'Choose Basic',
+                limits: {
+                    monthlyViews: 50000,
                     projectLimit: 5
                 }
             },
             {
                 id: 'pro',
                 name: 'Pro',
-                price: 29,
+                price: 999,
+                price_usd: 12,
+                price_inr: 999,
                 interval: 'month',
-                features: [
-                    '100,000 monthly views',
-                    '10 projects',
-                    '10GB storage',
-                    'Live logs access',
-                    'Email integrity checks',
-                    'Shared reports (up to 100)'
-                ],
-                buttonText: 'Upgrade to Pro',
+                description: 'Streamers & growing apps',
+                features: ['15 Projects', '10 Allowed Origins', 'Live Activity Logs', '500,000 events/mo', '1 sec refresh'],
+                buttonText: 'Choose Pro',
                 popular: true,
                 limits: {
-                    monthlyViews: 100000,
-                    projectLimit: 10
+                    monthlyViews: 500000,
+                    projectLimit: 15
                 }
             },
             {
-                id: 'enterprise',
-                name: 'Enterprise',
-                price: 'Custom',
-                interval: 'year',
-                features: [
-                    'Unlimited monthly views',
-                    '100 projects',
-                    '100GB storage',
-                    'Custom domain support',
-                    'Dedicated support',
-                    'SLA guarantee'
-                ],
+                id: 'business',
+                name: 'Business',
+                price: 2999,
+                price_usd: 39,
+                price_inr: 2999,
+                interval: 'month',
+                description: 'Teams & high traffic',
+                features: ['Unlimited Projects', '100 Allowed Origins', '5,000,000 events/mo', 'Real-time / SLA', 'Team access'],
                 buttonText: 'Contact Sales',
                 limits: {
-                    monthlyViews: 1000000000,
+                    monthlyViews: 5000000,
                     projectLimit: 100
                 }
             }

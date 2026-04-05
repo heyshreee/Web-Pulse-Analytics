@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Loader2, Moon } from 'lucide-react';
+import { Mail, Lock, Loader2, Moon, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { setToken } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
 import OTPVerification from '../components/OTPVerification';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -78,18 +79,18 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
-                <Link to="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
-                        O
+                <Link to="/" className="flex items-center gap-3 group">
+                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
+                        <BarChart2 className="h-6 w-6 text-white" />
                     </div>
-                    <span className="text-xl font-bold text-white">OBS Tracker</span>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
                 </Link>
-                <button className="p-2 rounded-full hover:bg-slate-800 transition-colors text-slate-400 hover:text-white">
-                    <Moon size={20} />
-                </button>
+                <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <ThemeToggle />
+                </div>
             </header>
 
             {/* Main Content */}
@@ -97,11 +98,11 @@ export default function Login() {
                 <div className="w-full max-w-md">
                     {/* Tabs */}
                     {!showVerification && (
-                        <div className="flex w-full bg-slate-900/50 p-1 rounded-xl mb-6 border border-slate-800">
-                            <button className="flex-1 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm transition-all">
+                        <div className="flex w-full bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl mb-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
+                            <button className="flex-1 py-2.5 text-sm font-black text-white bg-blue-600 rounded-xl shadow-xl shadow-blue-600/20 transition-all">
                                 Login
                             </button>
-                            <Link to="/register" className="flex-1 py-2 text-sm font-medium text-slate-400 hover:text-white text-center transition-all">
+                            <Link to="/register" className="flex-1 py-2.5 text-sm font-black text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white text-center transition-all">
                                 Register
                             </Link>
                         </div>
@@ -110,7 +111,7 @@ export default function Login() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl"
+                        className="bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-10 shadow-2xl transition-all"
                     >
                         {showVerification ? (
                             <OTPVerification
@@ -120,42 +121,42 @@ export default function Login() {
                             />
                         ) : (
                             <>
-                                <div className="mb-8">
-                                    <h2 className="text-2xl font-bold text-white mb-2">
+                                <div className="mb-10">
+                                    <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">
                                         Welcome Back
                                     </h2>
-                                    <p className="text-slate-400 text-sm">Please enter your details to access your dashboard.</p>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">Please enter your details to access your dashboard.</p>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-5">
-                                    <div className="space-y-4">
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="space-y-5">
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-500" />
+                                            <label className="block text-xs font-black text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-widest ml-1">Email Address</label>
+                                            <div className="relative group">
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                                 <input
                                                     type="email"
                                                     required
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
-                                                    className="w-full bg-slate-950/50 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-12 pr-4 py-3.5 text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all shadow-inner"
                                                     placeholder="name@company.com"
                                                 />
                                             </div>
                                         </div>
                                         <div>
-                                            <div className="flex justify-between items-center mb-1.5">
-                                                <label className="block text-sm font-medium text-slate-300">Password</label>
-                                                <Link to="/forgot-password" className="text-xs text-blue-500 hover:text-blue-400 transition-colors">Forgot password?</Link>
+                                            <div className="flex justify-between items-center mb-2 ml-1">
+                                                <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Password</label>
+                                                <Link to="/forgot-password" className="text-[10px] font-black text-blue-600 hover:text-blue-500 uppercase tracking-tighter transition-colors">Forgot password?</Link>
                                             </div>
-                                            <div className="relative">
-                                                <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-500" />
+                                            <div className="relative group">
+                                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                                 <input
                                                     type="password"
                                                     required
                                                     value={password}
                                                     onChange={(e) => setPassword(e.target.value)}
-                                                    className="w-full bg-slate-950/50 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-12 pr-4 py-3.5 text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all shadow-inner"
                                                     placeholder="••••••••"
                                                 />
                                             </div>
@@ -165,7 +166,7 @@ export default function Login() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+                                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-600/25 active:scale-[0.98]"
                                     >
                                         {loading ? (
                                             <Loader2 className="h-5 w-5 animate-spin" />
@@ -174,19 +175,19 @@ export default function Login() {
                                         )}
                                     </button>
 
-                                    <div className="relative">
+                                    <div className="relative py-4">
                                         <div className="absolute inset-0 flex items-center">
-                                            <div className="w-full border-t border-slate-800"></div>
+                                            <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
                                         </div>
-                                        <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-slate-900 px-2 text-slate-500">Or continue with</span>
+                                        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
+                                            <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 dark:text-slate-600">Or continue with</span>
                                         </div>
                                     </div>
 
                                     <button
                                         type="button"
                                         onClick={handleGoogleLogin}
-                                        className="w-full bg-slate-950/50 hover:bg-slate-900 border border-slate-800 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all"
+                                        className="w-full bg-white dark:bg-slate-950/50 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-sm"
                                     >
                                         <svg className="h-5 w-5" viewBox="0 0 24 24">
                                             <path
@@ -220,7 +221,7 @@ export default function Login() {
                 <p className="mb-2">
                     By continuing, you agree to our <Link to="/terms" className="text-blue-500 hover:text-blue-400">Terms of Service</Link> and <Link to="/privacy" className="text-blue-500 hover:text-blue-400">Privacy Policy</Link>.
                 </p>
-                <p>© 2024 OBS Tracker. All rights reserved.</p>
+                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );

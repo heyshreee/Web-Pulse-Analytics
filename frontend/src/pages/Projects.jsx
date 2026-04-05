@@ -129,34 +129,36 @@ export default function Projects() {
     );
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-10 pb-20 transition-colors duration-500">
             {(deletingId || creating) && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-950/80 backdrop-blur-md">
                     <Spinner fullScreen={false} />
                 </div>
             )}
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-white mb-1">Projects</h1>
-                    <p className="text-slate-400 text-sm">Manage and monitor your tracking projects</p>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Your Projects</h1>
+                    <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl italic opacity-80">
+                        Manage and monitor your connected domains and tracking infrastructure.
+                    </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-medium rounded-full border border-slate-700">
-                        {user?.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) : 'Free'} Plan
-                    </span>
+                <div className="flex items-center gap-4">
+                    <div className="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-black rounded-2xl border border-blue-100 dark:border-blue-500/20 shadow-sm uppercase tracking-widest">
+                        {user?.plan ? user.plan : 'Free'} Tier
+                    </div>
                     <div className="relative group/btn">
                         <button
                             onClick={() => setShowModal(true)}
                             disabled={projectsUsed >= projectLimit}
-                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+                            className="inline-flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3.5 rounded-2xl text-sm font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-black/10 dark:shadow-white/5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 uppercase tracking-widest border border-slate-900 dark:border-white"
                         >
-                            <Plus className="h-4 w-4" />
-                            Create New Project
+                            <Plus className="h-5 w-5" />
+                            Launch Project
                         </button>
                         {projectsUsed >= projectLimit && (
-                            <div className="absolute top-full right-0 mt-2 w-48 p-2 bg-slate-900 border border-slate-700 rounded-lg shadow-xl text-xs text-slate-300 hidden group-hover/btn:block z-50">
+                            <div className="absolute top-full right-0 mt-2 w-48 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl text-xs text-slate-600 dark:text-slate-300 hidden group-hover/btn:block z-50">
                                 Project limit reached. Please upgrade to Pro to create more projects.
                             </div>
                         )}
@@ -165,60 +167,62 @@ export default function Projects() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 relative overflow-hidden group">
-                    <div className="flex justify-between items-start mb-4">
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Projects</span>
-                        <Folder className="h-5 w-5 text-blue-500" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-[2rem] p-8 relative overflow-hidden group shadow-sm transition-all hover:shadow-md">
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Project Capacity</span>
+                        <Folder className="h-6 w-6 text-blue-500" />
                     </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-white">{projectsUsed}</span>
-                        <span className="text-sm text-slate-500">/ {projectLimit}</span>
+                    <div className="flex items-baseline gap-3 relative z-10">
+                        <span className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">{projectsUsed}</span>
+                        <span className="text-lg font-black text-slate-400 dark:text-slate-500 uppercase">/ {projectLimit}</span>
                     </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-800">
+                    <div className="absolute bottom-0 left-0 w-full h-1.5 bg-slate-100 dark:bg-slate-800/50">
                         <div
-                            className="h-full bg-blue-500 transition-all duration-500"
+                            className="h-full bg-blue-600 transition-all duration-700 ease-out"
                             style={{ width: `${(projectsUsed / projectLimit) * 100}%` }}
                         />
                     </div>
                 </div>
 
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 relative overflow-hidden group">
-                    <div className="flex justify-between items-start mb-4">
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Monthly Views</span>
-                        <Zap className="h-5 w-5 text-yellow-500" />
+                <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-[2rem] p-8 relative overflow-hidden group shadow-sm transition-all hover:shadow-md">
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Monthly Pulse</span>
+                        <Zap className="h-6 w-6 text-amber-500" />
                     </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-white">{totalMonthlyViews.toLocaleString()}</span>
-                        <span className="text-sm text-slate-500">/ {viewLimit.toLocaleString()}</span>
+                    <div className="flex items-baseline gap-3 relative z-10">
+                        <span className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">{totalMonthlyViews > 1000 ? (totalMonthlyViews / 1000).toFixed(1) + 'K' : totalMonthlyViews}</span>
+                        <span className="text-lg font-black text-slate-400 dark:text-slate-500 uppercase">/ {viewLimit >= 1000 ? (viewLimit / 1000).toFixed(0) + 'K' : viewLimit}</span>
                     </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-800">
+                    <div className="absolute bottom-0 left-0 w-full h-1.5 bg-slate-100 dark:bg-slate-800/50">
                         <div
-                            className="h-full bg-yellow-500 transition-all duration-500"
+                            className="h-full bg-amber-500 transition-all duration-700 ease-out"
                             style={{ width: `${Math.min((totalMonthlyViews / viewLimit) * 100, 100)}%` }}
                         />
                     </div>
                 </div>
 
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 relative overflow-hidden group">
-                    <div className="flex justify-between items-start mb-4">
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Storage Used</span>
-                        <Database className="h-5 w-5 text-green-500" />
+                <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-[2rem] p-8 relative overflow-hidden group shadow-sm transition-all hover:shadow-md">
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Storage Load</span>
+                        <Database className="h-6 w-6 text-emerald-500" />
                     </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-white">
+                    <div className="flex items-baseline gap-3 relative z-10">
+                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
                             {usageStats?.storageUsed < 1024 * 1024
-                                ? `${(usageStats?.storageUsed / 1024).toFixed(2)} KB`
+                                ? `${(usageStats?.storageUsed / 1024).toFixed(1)} KB`
                                 : usageStats?.storageUsed < 1024 * 1024 * 1024
-                                    ? `${(usageStats?.storageUsed / (1024 * 1024)).toFixed(2)} MB`
-                                    : `${(usageStats?.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
+                                    ? `${(usageStats?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
+                                    : `${(usageStats?.storageUsed / (1024 * 1024 * 1024)).toFixed(1)} GB`
                             }
                         </span>
-                        <span className="text-sm text-slate-500">/ {usageStats?.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats?.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats?.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</span>
+                        <span className="text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest opacity-60">
+                            of {usageStats?.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats?.storageLimit / (1024 * 1024)).toFixed(0)}MB` : `${(usageStats?.storageLimit / (1024 * 1024 * 1024)).toFixed(0)}GB`}
+                        </span>
                     </div>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-800">
+                    <div className="absolute bottom-0 left-0 w-full h-1.5 bg-slate-100 dark:bg-slate-800/50">
                         <div
-                            className="h-full bg-green-500 transition-all duration-500"
+                            className="h-full bg-emerald-500 transition-all duration-700 ease-out"
                             style={{ width: `${Math.min((usageStats?.storageUsed / usageStats?.storageLimit) * 100, 100)}%` }}
                         />
                     </div>
@@ -226,30 +230,34 @@ export default function Projects() {
             </div>
 
             {/* Controls */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/30 p-2 rounded-xl border border-slate-800/50">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <div className="flex flex-col md:flex-row gap-6 justify-between items-center bg-white dark:bg-slate-900/40 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-220 dark:border-slate-800/50 shadow-sm transition-all focus-within:shadow-md">
+                <div className="relative w-full md:w-md group/search">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within/search:text-blue-500 transition-colors" />
                     <input
                         type="text"
-                        placeholder="Search projects..."
+                        placeholder="Search projects by name..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-12 pr-6 py-3.5 text-sm font-black text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner"
                     />
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center bg-slate-950 rounded-lg border border-slate-800 p-1">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-1.5 shadow-inner">
                         <button
                             onClick={() => setViewMode('grid')}
-                            className={`p-1.5 rounded transition-colors ${viewMode === 'grid' ? 'text-blue-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+                            className={`p-2.5 rounded-xl transition-all duration-300 ${viewMode === 'grid' 
+                                ? 'text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-800 shadow-md ring-1 ring-black/5 dark:ring-white/5' 
+                                : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
-                            <Grid className="h-4 w-4" />
+                            <Grid className="h-5 w-5" />
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
-                            className={`p-1.5 rounded transition-colors ${viewMode === 'list' ? 'text-blue-400 bg-slate-800/50' : 'text-slate-400 hover:text-white'}`}
+                            className={`p-2.5 rounded-xl transition-all duration-300 ${viewMode === 'list' 
+                                ? 'text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-800 shadow-md ring-1 ring-black/5 dark:ring-white/5' 
+                                : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
-                            <List className="h-4 w-4" />
+                            <List className="h-5 w-5" />
                         </button>
                     </div>
                 </div>
@@ -262,41 +270,42 @@ export default function Projects() {
                         <div
                             key={project.id}
                             onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
-                            className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 hover:border-blue-500/30 transition-all group relative flex flex-col cursor-pointer"
+                            className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-[2rem] p-8 hover:border-blue-500/30 dark:hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/5 transition-all group relative flex flex-col cursor-pointer shadow-sm group/card"
                         >
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="p-3 bg-blue-500/10 rounded-lg">
-                                    <Layout className="h-6 w-6 text-blue-500" />
+                            <div className="flex justify-between items-start mb-8">
+                                <div className="p-4 bg-blue-600 shadow-lg shadow-blue-600/20 rounded-2xl group-hover/card:rotate-12 transition-transform">
+                                    <Layout className="h-6 w-6 text-white" />
+                                </div>
+                                <div className="flex gap-2">
+                                     <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-emerald-500/20">Active</span>
                                 </div>
                             </div>
 
-                            <div className="mb-6 flex-1">
-                                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors truncate" title={project.name}>
-                                    {project.name}
-                                </h3>
-                                <p className="text-slate-400 text-sm line-clamp-2">
-                                    Real-time visitor tracking dashboard for {project.name}. Monitor traffic and analytics.
-                                </p>
+                            <div className="mb-10 flex-1">
+                                <h3 className="font-black text-slate-900 dark:text-white text-2xl tracking-tighter group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400 transition-colors mb-1">{project.name}</h3>
+                                <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                                    <Database className="h-3 w-3" />
+                                    {project.tracking_id}
+                                </div>
                             </div>
 
-                            <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2 text-sm text-slate-300">
-                                        <Eye className="h-4 w-4 text-slate-500" />
-                                        <span>{stats[project.id]?.total_views?.toLocaleString() || 0} views</span>
+                            <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800/50">
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400 font-bold uppercase tracking-tight">
+                                        <Eye className="h-4 w-4 text-slate-400" />
+                                        <span>{stats[project.id]?.total_views?.toLocaleString() || 0} Pulses</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm text-slate-300">
-                                        <Users className="h-4 w-4 text-slate-500" />
-                                        <span>{stats[project.id]?.sessionCount?.toLocaleString() || 0} sessions</span>
+                                    <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400 font-bold uppercase tracking-tight">
+                                        <Users className="h-4 w-4 text-slate-400" />
+                                        <span>{stats[project.id]?.sessionCount?.toLocaleString() || 0} Sessions</span>
                                     </div>
                                 </div>
                                 <Link
                                     to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 font-medium group/link"
+                                    className="p-3 bg-slate-900 dark:bg-white/5 text-white dark:text-white rounded-2xl group/link hover:bg-blue-600 transition-all active:scale-90"
                                 >
-                                    View Analytics
-                                    <ArrowRight className="h-4 w-4 group-hover/link:translate-x-0.5 transition-transform" />
+                                    <ArrowRight className="h-5 w-5 rotate-[-45deg] group-hover/link:rotate-0 transition-transform" />
                                 </Link>
                             </div>
                         </div>
@@ -306,13 +315,13 @@ export default function Projects() {
                     <button
                         onClick={() => setShowModal(true)}
                         disabled={projectsUsed >= projectLimit}
-                        className="border border-dashed border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group min-h-[250px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-800 disabled:hover:bg-transparent"
+                        className="bg-white dark:bg-transparent border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group min-h-[250px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-800 disabled:hover:bg-transparent"
                     >
-                        <div className="p-4 bg-slate-900 rounded-full group-hover:scale-110 transition-transform">
-                            <Plus className="h-6 w-6 text-slate-400 group-hover:text-blue-400" />
+                        <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-full group-hover:scale-110 transition-transform">
+                            <Plus className="h-6 w-6 text-slate-400 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
                         </div>
                         <div className="text-center">
-                            <h3 className="text-white font-medium mb-1">New Project</h3>
+                            <h3 className="text-slate-900 dark:text-white font-bold mb-1">New Project</h3>
                             <p className="text-slate-500 text-sm">
                                 {projectsUsed >= projectLimit ? 'Project limit reached' : 'Create a new tracking project'}
                             </p>
@@ -321,65 +330,64 @@ export default function Projects() {
                 </div>
             ) : (
                 <div className="space-y-3">
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b border-slate-800 text-xs font-medium text-slate-400 uppercase tracking-wider">
-                                    <th className="px-6 py-4">Project Name</th>
-                                    <th className="px-6 py-4">Total Views</th>
-                                    <th className="px-6 py-4">Sessions</th>
-                                    <th className="px-6 py-4">Storage</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
+                                <tr className="bg-slate-50/80 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">
+                                    <th className="px-8 py-5">Project Name</th>
+                                    <th className="px-8 py-5">Total Views</th>
+                                    <th className="px-8 py-5">Sessions</th>
+                                    <th className="px-8 py-5">Storage</th>
+                                    <th className="px-8 py-5">Status</th>
+                                    <th className="px-8 py-5 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/50">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
                                 {filteredProjects.map((project) => (
-                                    <tr
+                                <tr
                                         key={project.id}
                                         onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
-                                        className="hover:bg-slate-800/30 transition-colors cursor-pointer group"
+                                        className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group shadow-sm border-b border-slate-100 dark:border-slate-800/50 last:border-0"
                                     >
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-blue-500/10 rounded-lg">
-                                                    <Layout className="h-4 w-4 text-blue-500" />
+                                        <td className="px-8 py-6 whitespace-nowrap">
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-3 bg-blue-600 shadow-lg shadow-blue-600/10 rounded-2xl group-hover:rotate-12 transition-transform">
+                                                    <Layout className="h-5 w-5 text-white" />
                                                 </div>
-                                                <span className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors truncate max-w-[200px]" title={project.name}>{project.name}</span>
+                                                <span className="text-base font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-[200px] tracking-tight" title={project.name}>{project.name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                                        <td className="px-8 py-6 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 font-black tabular-nums tracking-tight">
                                             {stats[project.id]?.total_views?.toLocaleString() || 0}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                                        <td className="px-8 py-6 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 font-black tabular-nums tracking-tight">
                                             {stats[project.id]?.sessionCount?.toLocaleString() || 0}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                                        <td className="px-8 py-6 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 font-black tabular-nums tracking-tight">
                                             {stats[project.id]?.storageUsed < 1024 * 1024
                                                 ? `${(stats[project.id]?.storageUsed / 1024).toFixed(1)} KB`
                                                 : `${(stats[project.id]?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
                                             }
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 text-green-400 text-xs font-medium rounded-full border border-green-500/20">
-                                                <div className="w-1 h-1 rounded-full bg-green-500" />
-                                                Active
+                                        <td className="px-8 py-6 whitespace-nowrap">
+                                            <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black rounded-full border border-emerald-500/20 uppercase tracking-widest shadow-sm">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                                Operational
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate(`/dashboard/projects/${encodeURIComponent(project.name)}/settings`);
-                                                        }}
-                                                        className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-                                                    >
-                                                        <Settings className="h-4 w-4" />
-                                                    </button>
-                                                </div>
-                                            </td>
+                                        <td className="px-8 py-6 whitespace-nowrap text-right">
+                                            <div className="flex justify-end gap-3">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/dashboard/projects/${encodeURIComponent(project.name)}/settings`);
+                                                    }}
+                                                    className="p-2.5 rounded-xl bg-slate-900 dark:bg-white/5 text-white dark:text-white hover:bg-blue-600 transition-all active:scale-90 shadow-md"
+                                                    title="Project Settings"
+                                                >
+                                                    <Settings className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -389,10 +397,10 @@ export default function Projects() {
                     <button
                         onClick={() => setShowModal(true)}
                         disabled={projectsUsed >= projectLimit}
-                        className="w-full py-4 border border-dashed border-slate-800 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-800 disabled:hover:bg-transparent"
+                        className="w-full py-4 bg-white dark:bg-transparent border border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-blue-500/50 hover:bg-slate-50 dark:hover:bg-blue-500/5 transition-all group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-800 disabled:hover:bg-transparent"
                     >
                         <Plus className="h-4 w-4" />
-                        <span className="text-sm font-medium">
+                        <span className="text-sm font-bold">
                             {projectsUsed >= projectLimit ? 'Project Limit Reached' : 'Create New Project'}
                         </span>
                     </button>
@@ -409,8 +417,8 @@ export default function Projects() {
                 title="Create New Project"
             >
                 <form onSubmit={handleCreateProject}>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <div className="mb-6">
+                        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                             Project Name
                         </label>
                         <input
@@ -418,23 +426,23 @@ export default function Projects() {
                             required
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                             placeholder="my-portfolio"
                         />
-                        <p className="text-xs text-slate-500 mt-1">Only letters, numbers, hyphens, and underscores allowed.</p>
+                        <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mt-2">Only letters, numbers, hyphens, and underscores allowed.</p>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <div className="mb-8">
+                        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                             Allowed Origins (optional)
                         </label>
                         <input
                             type="text"
                             value={allowedOrigins}
                             onChange={(e) => setAllowedOrigins(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                             placeholder={`https://example.com, ${(import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')}`}
                         />
-                        <p className="text-xs text-slate-500 mt-1">Comma separated list of domains allowed to track.</p>
+                        <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mt-2">Comma separated list of domains allowed to track.</p>
                     </div>
                     <div className="flex justify-end gap-2">
                         <button
@@ -442,9 +450,9 @@ export default function Projects() {
                             onClick={() => {
                                 setShowModal(false);
                                 setProjectName('');
-                                setAllowwedOrigins('');
+                                setAllowedOrigins('');
                             }}
-                            className="px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            className="px-6 py-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all font-bold text-sm"
                         >
                             Cancel
                         </button>
