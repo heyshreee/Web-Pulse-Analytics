@@ -129,9 +129,16 @@ export default function ActivityLog() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Activity Log</h1>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium italic opacity-80">Monitor all events and security changes across your project. <span className="text-blue-600 dark:text-blue-400 text-[10px] ml-2 font-black uppercase tracking-[0.2em]">(Logs are retained for 30 days)</span></p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+                <div className="flex items-center gap-5">
+                    <div className="p-4 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-500">
+                        <Activity className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Activity Log</h1>
+                        <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic opacity-80">Monitor all events and security changes across your project. <span className="text-blue-600 dark:text-blue-400 text-[10px] ml-2 font-black uppercase tracking-[0.2em]">(Logs are retained for 30 days)</span></p>
+                    </div>
+                </div>
             </div>
 
             {/* Controls */}

@@ -12,8 +12,8 @@ export default function ProjectHeader({ project, onShowShare }) {
           <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-2">
             Infrastructure / <span className="text-blue-600 dark:text-blue-400">{project.name}</span>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mb-3 mt-1">
-            <h1 className="text-4xl font-black text-slate-900 dark:text-white pr-2 tracking-tighter">{project.name}</h1>
+          <div className="flex flex-col sm:flex-row sm:items-end gap-3 md:gap-4 mb-3 mt-1">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white pr-2 tracking-tighter leading-none">{project.name}</h1>
             <div className="flex items-center">
               <span className={`px-4 py-1.5 rounded-full text-[10px] font-black flex items-center gap-2 uppercase tracking-widest ${project.is_active !== false
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-sm'

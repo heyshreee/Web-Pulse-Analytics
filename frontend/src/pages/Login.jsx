@@ -82,11 +82,11 @@ export default function Login() {
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
-                <Link to="/" className="flex items-center gap-3 group">
-                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
+                <Link to="/" className="flex items-center gap-3 group/logo">
+                    <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
                         <BarChart2 className="h-6 w-6 text-white" />
                     </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
+                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover/logo:text-blue-600 transition-colors">WebPulse <span className="text-blue-600">Analytics</span></span>
                 </Link>
                 <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                     <ThemeToggle />

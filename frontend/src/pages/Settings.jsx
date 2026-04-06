@@ -30,6 +30,17 @@ export default function Settings() {
 
     return (
         <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+                <div className="flex items-center gap-5">
+                    <div className="p-4 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-500">
+                        <SettingsIcon className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Account Settings</h1>
+                        <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic opacity-80">Manage your profile, security, and project preferences.</p>
+                    </div>
+                </div>
+            </div>
             <div className="flex flex-col md:flex-row gap-8 items-start">
                 {/* Sidebar */}
                 <div className="w-full md:w-64 flex-shrink-0">

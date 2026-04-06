@@ -97,14 +97,14 @@ export default function Landing() {
             {/* Header */}
             <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-blue-600 p-1.5 rounded-lg">
+                    <Link to="/" className="flex items-center gap-3 group/logo">
+                        <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
                             <BarChart2 className="h-5 w-5 text-white" />
                         </div>
-                        <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">
-                            WebPulse Analytics
+                        <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
+                            WebPulse <span className="text-blue-600">Analytics</span>
                         </span>
-                    </div>
+                    </Link>
 
                     <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
                         <Link to="/" className="hover:text-blue-600 dark:hover:text-white transition-colors">Home</Link>
@@ -539,12 +539,12 @@ export default function Landing() {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid md:grid-cols-4 gap-12 mb-12">
                             <div className="col-span-1 md:col-span-1">
-                                <div className="flex items-center gap-2 mb-6">
-                                    <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20">
+                                <Link to="/" className="flex items-center gap-3 group/logo mb-6">
+                                    <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
                                         <BarChart2 className="h-5 w-5 text-white" />
                                     </div>
-                                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse Analytics</span>
-                                </div>
+                                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
+                                </Link>
                                 <p className="text-slate-500 dark:text-slate-500 text-sm leading-relaxed">
                                     The advanced analytics platform for modern content creators. Track, analyze, and grow.
                                 </p>

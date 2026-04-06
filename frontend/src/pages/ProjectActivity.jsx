@@ -155,12 +155,17 @@ export default function ProjectActivity() {
 
     return (
         <div className="space-y-8 pb-20 transition-colors duration-500">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Activity Log</h1>
-                    <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
-                        {idOrName ? `Monitor important events and security logs for ${project?.name || 'your project'}` : 'Monitor all management events across all your connected projects'}
-                    </p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div className="flex items-center gap-5">
+                    <div className="p-4 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-500">
+                        <Activity className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Activity Log</h1>
+                        <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
+                            {idOrName ? `Monitor important events and security logs for ${project?.name || 'your project'}` : 'Monitor all management events across all your connected projects'}
+                        </p>
+                    </div>
                 </div>
                 <button
                     onClick={() => {
