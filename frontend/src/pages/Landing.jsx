@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
 import {
     Activity,
@@ -18,13 +19,35 @@ import {
     Play,
     Layout,
     Bell,
-    Star
+    Star,
+    Database,
+    ShieldCheck,
+    Cpu,
+    Terminal
 } from 'lucide-react';
 
 export default function Landing() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isVideoOpen, setIsVideoOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('react');
+    const [isAutoCycling, setIsAutoCycling] = useState(true);
+
+    // Automatic tab cycling
+    useEffect(() => {
+        if (!isAutoCycling) return;
+
+        const tabs = ['react', 'vue', 'node'];
+        const interval = setInterval(() => {
+            setActiveTab((current) => {
+                const currentIndex = tabs.indexOf(current);
+                const nextIndex = (currentIndex + 1) % tabs.length;
+                return tabs[nextIndex];
+            });
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [isAutoCycling]);
     const [plans, setPlans] = useState([
         {
             id: 'free',
@@ -244,8 +267,11 @@ export default function Landing() {
 
                 {/* Features */}
                 <section id="features" className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Supercharge Your Stream</h2>
+                    <div className="text-center mb-20 max-w-3xl mx-auto">
+                        <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">
+                            Precision Analytics <br className="hidden md:block" />
+                            for <span className="text-blue-600">Streamers</span>
+                        </h2>
                         <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Everything you need to take your content to the next level.</p>
                     </div>
 
@@ -312,27 +338,150 @@ export default function Landing() {
                     </div>
 
                     {/* Technical Highlights */}
-                    <div className="max-w-4xl mx-auto rounded-3xl bg-slate-50 dark:bg-[#0B0E14] border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-sm">
-                        <div className="text-center mb-10">
-                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Technical Highlights</h3>
-                            <p className="text-slate-500 dark:text-slate-400">Built with performance and scalability in mind.</p>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
-                            {[
-                                "WebSocket-based real-time updates",
-                                "REST APIs for integration",
-                                "Lightweight tracking script",
-                                "Optimized for low CPU and memory usage",
-                                "Works with React, Node.js, Express, and MongoDB",
-                                "OBS overlay and dashboard friendly",
-                                "No hardware. No plugins. No complex configuration."
-                            ].map((tech, i) => (
-                                <div key={i} className="flex items-center gap-3">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
-                                    <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">{tech}</span>
+                    <div className="grid lg:grid-cols-2 gap-20 items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0B0E14] transition-colors duration-500 py-32 border-y border-slate-200 dark:border-white/5">
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                            className="text-left"
+                        >
+                            <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-tight">
+                                Technical <br />
+                                <span className="text-blue-600">Highlights</span>
+                            </h2>
+                            <p className="text-xl font-medium text-slate-500 dark:text-slate-400 mb-12 leading-relaxed max-w-lg">
+                                Built for speed and scale. Our edge-optimized stack tracks millions of events in real-time, delivering insights directly to your dashboard and OBS overlays.
+                            </p>
+
+                            <div className="space-y-10">
+                                {[
+                                    {
+                                        icon: <Zap className="h-6 w-6 text-amber-400" />,
+                                        bg: "bg-amber-500/10",
+                                        title: "Real-Time WebSockets",
+                                        desc: "Sub-100ms latency for all visitor events. Your OBS overlay and dashboard stay perfectly in sync."
+                                    },
+                                    {
+                                        icon: <Globe className="h-6 w-6 text-emerald-400" />,
+                                        bg: "bg-emerald-500/10",
+                                        title: "Edge Optimized",
+                                        desc: "Global tracking network ensures minimal impact on your site's performance and SEO."
+                                    },
+                                    {
+                                        icon: <Layers className="h-6 w-6 text-blue-400" />,
+                                        bg: "bg-blue-500/10",
+                                        title: "OBS Native",
+                                        desc: "Seamlessly integrate your live stats into OBS Browser Sources with customizable templates."
+                                    }
+                                ].map((feature, i) => (
+                                    <div key={i} className="flex items-start gap-6 group">
+                                        <div className={`p-4 rounded-2xl ${feature.bg} border border-white/5 shadow-xl group-hover:scale-110 transition-transform`}>
+                                            {feature.icon}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">{feature.title}</h3>
+                                            <p className="text-slate-500 dark:text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="relative group"
+                        >
+                            {/* Glow Effect */}
+                            <div className="absolute -inset-4 bg-blue-500/10 blur-[100px] rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+
+                            <div className="relative bg-[#0F1218] rounded-[2.5rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl transition-all duration-500">
+                                {/* Header */}
+                                <div className="h-10 bg-white/[0.03] border-b border-white/5 flex items-center px-6 gap-2">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/40 border border-red-500/20"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40 border border-yellow-500/20"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/40 border border-green-500/20"></div>
+                                    </div>
+                                    <div className="ml-4 flex gap-4">
+                                        {['react', 'vue', 'node'].map((tab) => (
+                                            <button
+                                                key={tab}
+                                                onClick={() => {
+                                                    setActiveTab(tab);
+                                                    setIsAutoCycling(false);
+                                                }}
+                                                className={`text-[10px] uppercase tracking-widest font-black transition-colors ${activeTab === tab
+                                                    ? 'text-blue-400'
+                                                    : 'text-slate-500 hover:text-slate-400'
+                                                    }`}
+                                            >
+                                                {tab}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="ml-auto text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] hidden sm:block">SDK v2.0</div>
                                 </div>
-                            ))}
-                        </div>
+                                {/* Code content */}
+                                <div className="p-8 sm:p-10 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto whitespace-pre min-h-[360px] relative">
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key={activeTab}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            {activeTab === 'react' && (
+                                                <div className="space-y-1">
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">01</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">useEffect</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'react'</span>;</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">02</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">WebPulse</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'@webpulse/sdk'</span>;</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">03</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">04</span><span><span className="text-purple-400">const</span> <span className="text-indigo-100">tracker</span> = <span className="text-purple-400">new</span> <span className="text-blue-300">WebPulse</span>(<span className="text-emerald-300">'wp_live_7x92k...'</span>);</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none: 05"> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">06</span><span><span className="text-purple-400">const</span> <span className="text-indigo-100">App</span> = () ={'>'} {'{'}</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">07</span><span>    <span className="text-blue-300">useEffect</span>(() ={'>'} {'{'}</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">08</span><span>        <span className="text-indigo-100">tracker</span>.<span className="text-blue-300">init</span>({'{'} realtime: <span className="text-orange-300">true</span> {'}'});</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">09</span><span>    {'}'}, []);</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">10</span><span>{'}'};</span></div>
+                                                </div>
+                                            )}
+                                            {activeTab === 'vue' && (
+                                                <div className="space-y-1">
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">01</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">onMounted</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'vue'</span>;</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">02</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">WebPulse</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'@webpulse/sdk'</span>;</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">03</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">04</span><span><span className="text-blue-300">onMounted</span>(() ={'>'} {'{'}</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">05</span><span>    <span className="text-purple-400">const</span> <span className="text-indigo-100">tracker</span> = <span className="text-purple-400">new</span> <span className="text-blue-300">WebPulse</span>(<span className="text-emerald-300">'wp_live_7k2...'</span>);</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">06</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">07</span><span>    <span className="text-indigo-100">tracker</span>.<span className="text-blue-300">on</span>(<span className="text-emerald-300">'visitor'</span>, (<span className="text-indigo-100">event</span>) ={'>'} {'{'}</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">08</span><span>        <span className="text-slate-400">console</span>.<span className="text-blue-300">log</span>(<span className="text-emerald-300">`Live: ${'{'}event.city{'}'}`</span>);</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">09</span><span>    {'}'});</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">10</span><span>{'}'});</span></div>
+                                                </div>
+                                            )}
+                                            {activeTab === 'node' && (
+                                                <div className="space-y-1">
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">01</span><span><span className="text-purple-400">const</span> {'{'} <span className="text-blue-300">WebPulse</span> {'}'} = <span className="text-blue-300">require</span>(<span className="text-emerald-300">'@webpulse/sdk'</span>);</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">02</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">03</span><span><span className="text-purple-400">const</span> <span className="text-indigo-100">tracker</span> = <span className="text-purple-400">new</span> <span className="text-blue-300">WebPulse</span>({'{'}</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">04</span><span>    apiKey: <span className="text-emerald-300">'wp_live_7x92k...'</span>,</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">05</span><span>    env: <span className="text-emerald-300">'production'</span>,</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">06</span><span>    bufferSize: <span className="text-orange-300">10</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">07</span><span>{'}'});</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">08</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">09</span><span><span className="text-slate-500">// Track server-side events</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">10</span><span><span className="text-indigo-100">tracker</span>.<span className="text-blue-300">capture</span>(<span className="text-emerald-300">'api_call'</span>, {'{'} userId: <span className="text-orange-300">123</span> {'}'});</span></div>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
+                            </div>
+                        </motion.div>
                     </div>
                 </section>
 
@@ -341,10 +490,11 @@ export default function Landing() {
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div>
-                                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
-                                    Trusted by over 5,000+ top-tier creators.
+                                <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-tight">
+                                    Trusted by over <br />
+                                    <span className="text-blue-600">5,000+ creators</span>
                                 </h2>
-                                <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                                <p className="text-xl font-medium text-slate-500 dark:text-slate-400 mb-8 leading-relaxed max-w-lg">
                                     "WebPulse Analytics is the only analytics tool that gives me the granularity I need to understand my audience retention. It's completely changed how I plan my content schedule."
                                 </p>
                                 <div className="flex items-center gap-4">
@@ -377,8 +527,8 @@ export default function Landing() {
                 {/* Pricing */}
                 <section id="pricing" className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Transparent Pricing</h2>
-                        <p className="text-slate-500 dark:text-slate-400">The perfect plan for every stage of your journey.</p>
+                        <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Transparent <span className="text-blue-600">Pricing</span></h2>
+                        <p className="text-xl font-medium text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">The perfect plan for every stage of your journey.</p>
                     </div>
 
                     {loading ? (
@@ -514,7 +664,7 @@ export default function Landing() {
                     <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-r from-blue-600 to-purple-600 p-12 text-center relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.svg')] opacity-20 transform scale-[3] pointer-events-none mix-blend-overlay"></div>
                         <div className="relative z-10">
-                            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter leading-tight">Your growth starts with <br/> better data.</h2>
+                            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter leading-tight">Your growth starts with <br /> better data.</h2>
                             <p className="text-blue-100 text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">Join thousands of creators who are using WebPulse Analytics to build their audience.</p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                 <Link
@@ -577,7 +727,7 @@ export default function Landing() {
                             </div>
                         </div>
                         <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-                             <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                            <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
                             <div className="flex gap-6 text-slate-500">
                                 <a href="#" className="hover:text-blue-600 dark:hover:text-white transition-colors">Twitter</a>
                                 <a href="#" className="hover:text-blue-600 dark:hover:text-white transition-colors">GitHub</a>

@@ -13,24 +13,28 @@ const ActivityLogService = require('../services/activity.service');
  * This ensures markers appear on the map during development.
  */
 /**
- * High-accuracy Geolocation Retrieval.
- * Performs real-time lookup via ip-api.com for better accuracy.
- * Handles localhost by discovering the public IP first.
+ * Enhanced High Accuracy Geo Lookup with timeout and fallback.
  */
 const getHighAccuracyGeo = async (ip) => {
     let targetIp = ip;
-    
     try {
-        // 1. Localhost Auto-Discovery
-        if (!ip || ip === '::1' || ip === '127.0.0.1' || ip.includes('127.0.0.1')) {
-            const ipifyResponse = await fetch('https://api.ipify.org?format=json');
+        // 1. Resolve Localhost (Development environment helper)
+        if (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const ipifyResponse = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+            clearTimeout(timeoutId);
             const ipifyData = await ipifyResponse.json();
             targetIp = ipifyData.ip;
-            console.log(`[GeoIP] Localhost detected. Discovered Public IP: ${targetIp}`);
         }
 
-        // 2. High Accuracy Lookup (ip-api.com)
-        const response = await fetch(`http://ip-api.com/json/${targetIp}?fields=status,message,country,city,lat,lon`);
+        // 2. High Accuracy Lookup (ip-api.com) with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const response = await fetch(`http://ip-api.com/json/${targetIp}?fields=status,message,country,city,lat,lon`, { 
+            signal: controller.signal 
+        });
+        clearTimeout(timeoutId);
         const data = await response.json();
 
         if (data.status === 'success') {
@@ -38,22 +42,31 @@ const getHighAccuracyGeo = async (ip) => {
                 country: data.country,
                 city: data.city,
                 lat: data.lat,
-                lng: data.lon // lon in ip-api, lng in our system
+                lng: data.lon
             };
         }
     } catch (err) {
-        console.error('[GeoIP] External API lookup failed:', err.message);
+        // Silent fail, falls through to local lookup
+        if (err.name === 'AbortError') {
+            console.warn(`[GeoIP] Timeout for IP: ${targetIp}`);
+        } else {
+            console.error('[GeoIP] Lookup failed:', err.message);
+        }
     }
 
-    // 3. Last Resort Fallback (geoip-lite - offline)
-    const geo = geoip.lookup(targetIp);
-    if (geo) {
-        return {
-            country: geo.country || 'Unknown',
-            city: geo.city || 'Unknown',
-            lat: geo.ll ? geo.ll[0] : null,
-            lng: geo.ll ? geo.ll[1] : null
-        };
+    // 3. Fallback (geoip-lite - offline local DB)
+    try {
+        const geo = geoip.lookup(targetIp);
+        if (geo) {
+            return {
+                country: geo.country || 'Unknown',
+                city: geo.city || 'Unknown',
+                lat: geo.ll ? geo.ll[0] : null,
+                lng: geo.ll ? geo.ll[1] : null
+            };
+        }
+    } catch (fallbackErr) {
+        console.error('[GeoIP] Fallback failed:', fallbackErr.message);
     }
 
     return { country: 'Unknown', city: 'Unknown', lat: null, lng: null };
@@ -133,12 +146,15 @@ exports.trackVisitor = async (req, res) => {
             }
         }
 
-        // 4. Get project by tracking ID
-        const { data: project } = await supabase
+        const { data: project, error: projectError } = await supabase
             .from('projects')
             .select('id, user_id, plan, is_active')
             .eq('tracking_id', trackingCode)
-            .single();
+            .maybeSingle();
+
+        if (projectError || !project) {
+            return res.status(404).json({ error: 'INVALID_TRACKING_ID', message: 'Project not found' });
+        }
 
         if (project.is_active === false) {
             if (project.user_id) {

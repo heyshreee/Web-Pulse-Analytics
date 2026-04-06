@@ -93,11 +93,13 @@ class ActivityLogService {
      * Enforce the 1000 log limit for a project
      */
     static async enforceLimit(projectId) {
+        if (!projectId) return;
+        
         try {
             // Get count
             const { count, error } = await supabase
                 .from('activity_logs')
-                .select('*', { count: 'exact', head: true })
+                .select('id', { count: 'exact', head: true })
                 .eq('project_id', projectId);
 
             if (error) throw error;
@@ -106,23 +108,27 @@ class ActivityLogService {
                 const logsToDelete = count - 1000;
 
                 // Find the IDs to delete (oldest)
-                const { data: oldLogs } = await supabase
+                const { data: oldLogs, error: fetchError } = await supabase
                     .from('activity_logs')
                     .select('id')
                     .eq('project_id', projectId)
                     .order('created_at', { ascending: true })
                     .limit(logsToDelete);
 
+                if (fetchError) throw fetchError;
+
                 if (oldLogs && oldLogs.length > 0) {
                     const idsToDelete = oldLogs.map(l => l.id);
-                    await supabase
+                    const { error: deleteError } = await supabase
                         .from('activity_logs')
                         .delete()
                         .in('id', idsToDelete);
+                    
+                    if (deleteError) throw deleteError;
                 }
             }
         } catch (error) {
-            console.error('Error enforcing log limit:', error.message);
+            console.error(`[ActivityLog] Error enforcing log limit for project ${projectId}:`, error.message);
         }
     }
 
