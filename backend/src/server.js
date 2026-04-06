@@ -82,7 +82,7 @@ app.use('/api/track', require('./routes/v1/track.routes'));
 setupVisitorSocket(io);
 
 app.get('/', (req, res) => {
-  res.send('OBS View Tracker API is running');
+  res.send('Web Pluse Analytics API is running...');
 });
 
 const PORT = process.env.PORT || 5000;
