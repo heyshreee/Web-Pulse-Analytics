@@ -161,7 +161,7 @@ export default function ProjectActivity() {
                         <Activity className="h-8 w-8 text-white" />
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Activity Log</h1>
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Activity Log</h2>
                         <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
                             {idOrName ? `Monitor important events and security logs for ${project?.name || 'your project'}` : 'Monitor all management events across all your connected projects'}
                         </p>

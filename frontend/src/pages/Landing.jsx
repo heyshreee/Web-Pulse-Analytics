@@ -129,34 +129,36 @@ export default function Landing() {
                         </span>
                     </Link>
 
-                    <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
-                        <Link to="/" className="hover:text-blue-600 dark:hover:text-white transition-colors">Home</Link>
-                        <Link to="/features" className="hover:text-blue-600 dark:hover:text-white transition-colors">Features</Link>
-                        <Link to="/pricing" className="hover:text-blue-600 dark:hover:text-white transition-colors">Pricing</Link>
-                        <Link to="/blog" className="hover:text-blue-600 dark:hover:text-white transition-colors">Blog</Link>
-                    </nav>
-
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-4">
+                            <nav className="flex items-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400 mr-4">
+                                <Link to="/" className="hover:text-blue-600 dark:hover:text-white transition-colors">Home</Link>
+                                <Link to="/features" className="hover:text-blue-600 dark:hover:text-white transition-colors">Features</Link>
+                                <Link to="/pricing" className="hover:text-blue-600 dark:hover:text-white transition-colors">Pricing</Link>
+                                <Link to="/blog" className="hover:text-blue-600 dark:hover:text-white transition-colors">Blog</Link>
+                            </nav>
+                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                            <Link to="/login" className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
+                                Log In
+                            </Link>
+                            <Link
+                                to="/register"
+                                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all hover:shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]"
+                            >
+                                Start Tracking
+                            </Link>
+                        </div>
+                        
                         <ThemeToggle />
-                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-                        <Link to="/login" className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-                            Log In
-                        </Link>
-                        <Link
-                            to="/register"
-                            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all hover:shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]"
-                        >
-                            Start Tracking
-                        </Link>
-                    </div>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        className="md:hidden text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                    </button>
+                        {/* Mobile Menu Button */}
+                        <button
+                            className="md:hidden text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        >
+                            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
@@ -188,7 +190,7 @@ export default function Landing() {
                         WEBPULSE ANALYTICS SOLUTIONS
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
                         Track Every <span className="text-blue-500">Frame</span>.
                         <br />
                         Know Every <span className="text-purple-500">Viewer</span>.

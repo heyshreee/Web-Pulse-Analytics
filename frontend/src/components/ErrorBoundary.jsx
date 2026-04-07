@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
                         <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                             <span className="text-3xl">⚠️</span>
                         </div>
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Something went wrong</h1>
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Something went wrong</h2>
                         <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">
                             An unexpected error occurred. We've been notified and are looking into it. Please try refreshing.
                         </p>

@@ -139,7 +139,7 @@ export default function Projects() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Your Projects</h1>
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Your Projects</h2>
                     <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl italic opacity-80">
                         Manage and monitor your connected domains and tracking infrastructure.
                     </p>

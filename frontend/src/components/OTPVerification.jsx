@@ -113,7 +113,7 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <div className="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-600/20 inline-flex items-center justify-center mb-6">
                     <BarChart2 className="h-6 w-6 text-white" />
                 </div>
-                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h1>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
                     We sent a code to <span className="text-blue-600 dark:text-blue-400 font-bold">{email}</span>.<br />
                     Please enter the 6-digit code below to continue.

@@ -15,7 +15,7 @@ export default function HelpCenter() {
 
             <main className="pt-32 pb-20">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">How can we help?</h1>
+                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">How can we help?</h2>
 
                     <div className="relative max-w-xl mx-auto mb-16">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500" />

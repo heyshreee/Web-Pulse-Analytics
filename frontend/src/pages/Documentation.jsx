@@ -40,7 +40,7 @@ export default function Documentation() {
             <main className="pt-32 pb-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">Documentation</h1>
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">Documentation</h2>
                         <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
                             Learn how to get the most out of WebPulse Analytics.
                         </p>
