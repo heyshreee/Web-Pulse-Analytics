@@ -48,9 +48,9 @@ export default function NotFound() {
 
                 {/* Text Content */}
                 <div className="max-w-2xl mx-auto space-y-6">
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight font-serif italic">
-                        You've reached a silent shore.
-                    </h1>
+                    <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight font-serif italic">
+                        404: Lost in Space
+                    </h2>
                     <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium leading-relaxed max-w-lg mx-auto opacity-80">
                         The tracking data you're looking for has drifted beyond the horizon. Let's get you back to the stream.
                     </p>

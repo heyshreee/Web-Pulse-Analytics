@@ -36,7 +36,7 @@ export default function Settings() {
                         <SettingsIcon className="h-8 w-8 text-white" />
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Account Settings</h1>
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Account Settings</h2>
                         <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic opacity-80">Manage your profile, security, and project preferences.</p>
                     </div>
                 </div>

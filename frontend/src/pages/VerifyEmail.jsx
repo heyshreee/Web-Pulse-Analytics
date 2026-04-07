@@ -118,7 +118,7 @@ export default function VerifyEmail() {
                     </div>
                     <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
                 </Link>
-                <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h1>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
                     We sent a code to your email address.<br />
                     Please enter the 6-digit code below to continue.

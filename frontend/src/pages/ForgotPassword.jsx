@@ -41,7 +41,7 @@ export default function ForgotPassword() {
                     <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Mail className="h-8 w-8 text-green-500" />
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Check your email</h1>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Check your email</h2>
                     <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
                         We have sent a password reset link to<br />
                         <span className="text-blue-600 dark:text-white font-black">{email}</span>
@@ -67,7 +67,7 @@ export default function ForgotPassword() {
                     <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
                 </Link>
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Reset Password</h1>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Reset Password</h2>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
                         Enter your email address and we will send you a<br />
                         link to reset your password.

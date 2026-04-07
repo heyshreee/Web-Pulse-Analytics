@@ -63,7 +63,7 @@ export default function Legal({ type }) {
             <main className="pt-32 pb-20">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-12">
-                        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">{data.title}</h1>
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter text-center">{data.title}</h2>
                         <p className="text-slate-500">Last updated: {data.lastUpdated}</p>
                     </div>
 

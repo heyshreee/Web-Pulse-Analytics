@@ -69,7 +69,7 @@ export default function ResetPassword() {
                     <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="h-8 w-8 text-green-500" />
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Password Updated</h1>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Password Updated</h2>
                     <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
                         Your password has been successfully reset.<br />
                         You can now login with your new password.
@@ -94,7 +94,7 @@ export default function ResetPassword() {
                     </div>
                     <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
                 </Link>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Create New Password</h1>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Create New Password</h2>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
                         Choose a strong password to secure your account.
                     </p>

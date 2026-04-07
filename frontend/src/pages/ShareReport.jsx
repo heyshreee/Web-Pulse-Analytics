@@ -49,7 +49,7 @@ export default function ShareReport() {
                     <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <Activity className="h-10 w-10 text-red-600 dark:text-red-500" />
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Report Not Found</h1>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Report Not Found</h2>
                     <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">{error}</p>
                     <button onClick={() => window.location.reload()} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-500/30 active:scale-95">Retry Loading</button>
                 </div>
@@ -74,7 +74,7 @@ export default function ShareReport() {
                                 <span>/</span>
                                 <span>{new Date(project.created_at).getFullYear()}</span>
                             </div>
-                            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{project.name}</h1>
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{project.name}</h2>
                         </div>
                     </div>
                     <div className="flex items-center gap-6">

@@ -138,7 +138,7 @@ export default function Pricing() {
             <main className="pt-32 pb-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">Simple, Transparent Pricing</h1>
+                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter text-center">Simple, Transparent Pricing</h2>
                         <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
                             Choose the plan that fits your growth stage. No hidden fees, cancel anytime.
                         </p>
