@@ -180,17 +180,17 @@ export default function Layout() {
             {/* Sidebar */}
             {!isSettingsPage && (
                 <aside className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800/50 transform transition-transform duration-500 ease-in-out flex flex-col shadow-2xl
+            fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800/50 transform transition-transform duration-500 ease-in-out flex flex-col shadow-2xl
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
                     {/* Logo */}
-                    <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center gap-3 mb-10 px-2 group/logo flex-shrink-0 cursor-pointer">
-                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20 group-hover/logo:rotate-12 transition-transform duration-300">
-                        <BarChart2 className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover/logo:text-blue-600 transition-colors">WebPulse Analytics</span>
-                </div>
+                    <div className="h-16 flex items-center px-8 border-b border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center gap-4 group/logo flex-shrink-0 cursor-pointer">
+                            <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
+                                <BarChart2 className="h-6 w-6 text-white" />
+                            </div>
+                            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover/logo:text-blue-600 transition-colors">WebPulse <span className="text-blue-600">Analytics</span></span>
+                        </div>
                     </div>
 
 
@@ -312,12 +312,12 @@ export default function Layout() {
                             </button>
                         )}
                         {isSettingsPage && (
-                            <Link to="/dashboard" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20">
+                            <Link to="/dashboard" className="transition-all hover:opacity-80">
+                                <div className="flex items-center gap-3 group/logo">
+                                    <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
                                         <BarChart2 className="h-5 w-5 text-white" />
                                     </div>
-                                    <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse Analytics</span>
+                                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
                                 </div>
                             </Link>
                         )}

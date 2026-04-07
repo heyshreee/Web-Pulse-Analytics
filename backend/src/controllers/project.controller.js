@@ -162,7 +162,7 @@ exports.getProject = async (req, res) => {
             query = query.eq('name', id);
         }
 
-        const { data: project, error } = await query.single();
+        const { data: project, error } = await query.maybeSingle();
 
         if (error) throw error;
         if (!project) return res.status(404).json({ error: 'Project not found' });

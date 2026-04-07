@@ -144,11 +144,11 @@ export default function API() {
                         >
                             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </button>
-                        <Link to="/" className="flex items-center gap-3 group">
-                            <div className="p-2 rounded-2xl bg-blue-600 shadow-xl shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                        <Link to="/" className="flex items-center gap-3 group/logo">
+                            <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
                                 <Activity className="h-5 w-5 text-white" />
                             </div>
-                            <span className="font-black text-2xl text-slate-900 dark:text-white tracking-tighter hidden sm:inline">WebPulse <span className="text-blue-500">Docs</span></span>
+                            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
                         </Link>
                     </div>
 

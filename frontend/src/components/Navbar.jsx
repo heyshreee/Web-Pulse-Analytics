@@ -15,12 +15,12 @@ export default function Navbar() {
     <nav className="bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center gap-3 group">
-            <div className="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
+          <Link to="/" className="flex items-center gap-3 group/logo">
+            <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
               <BarChart2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse Analytics</span>
-          </div>
+            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
+          </Link>
 
           <div className="flex items-center gap-4">
             {token ? (
