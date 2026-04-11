@@ -130,20 +130,20 @@ export default function Landing() {
                     </Link>
 
                     <div className="flex items-center gap-4">
-                        <div className="hidden md:flex items-center gap-4">
-                            <nav className="flex items-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400 mr-4">
+                        <div className="hidden md:flex items-center gap-2 lg:gap-4">
+                            <nav className="flex items-center gap-4 lg:gap-8 text-sm font-medium text-slate-500 dark:text-slate-400 mr-2 lg:mr-4">
                                 <Link to="/" className="hover:text-blue-600 dark:hover:text-white transition-colors">Home</Link>
                                 <Link to="/features" className="hover:text-blue-600 dark:hover:text-white transition-colors">Features</Link>
                                 <Link to="/pricing" className="hover:text-blue-600 dark:hover:text-white transition-colors">Pricing</Link>
                                 <Link to="/blog" className="hover:text-blue-600 dark:hover:text-white transition-colors">Blog</Link>
                             </nav>
-                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1 lg:mx-2"></div>
                             <Link to="/login" className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                                 Log In
                             </Link>
                             <Link
                                 to="/register"
-                                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all hover:shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]"
+                                className="px-4 lg:px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all hover:shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]"
                             >
                                 Start Tracking
                             </Link>
@@ -183,9 +183,9 @@ export default function Landing() {
                 )}
             </header>
 
-            <main className="pt-32">
+            <main className="pt-24 sm:pt-32">
                 {/* Hero Section */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-20">
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16 sm:mb-20">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-900/20 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black tracking-widest uppercase mb-8 shadow-xl shadow-blue-500/5">
                         WEBPULSE ANALYTICS SOLUTIONS
                     </div>
@@ -201,24 +201,24 @@ export default function Landing() {
                         Understand your audience, optimize your content, and grow your channel.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 sm:mb-20">
                         <Link
                             to="/register"
-                            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-[0_0_30px_-5px_rgba(37,99,235,0.5)] min-w-[180px]"
+                            className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-[0_0_30px_-5px_rgba(37,99,235,0.5)] min-w-[180px] text-center"
                         >
                             Start Tracking Now
                         </Link>
                         <button
                             onClick={() => setIsVideoOpen(true)}
-                            className="px-8 py-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white font-semibold rounded-full border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 min-w-[180px] justify-center"
+                            className="w-full sm:w-auto px-8 py-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white font-semibold rounded-full border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 min-w-[180px] justify-center"
                         >
                             <Play className="h-4 w-4 fill-current" /> Watch Demo
                         </button>
                     </div>
 
                     {/* Mockup */}
-                    <div className="relative max-w-5xl mx-auto rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151921] p-2 shadow-2xl shadow-blue-500/5">
-                        <div className="bg-white dark:bg-[#0B0E14] rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 aspect-[16/9] relative group">
+                    <div className="relative max-w-5xl mx-auto rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151921] p-1 sm:p-2 shadow-2xl shadow-blue-500/5">
+                        <div className="bg-white dark:bg-[#0B0E14] rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 aspect-[4/3] sm:aspect-[16/9] relative group">
                             {/* Fake UI Header */}
                             <div className="h-10 border-b border-white/5 bg-[#151921] flex items-center px-4 gap-2">
                                 <div className="flex gap-1.5">
@@ -229,8 +229,8 @@ export default function Landing() {
                                 <div className="ml-4 text-[10px] text-slate-500 font-black uppercase tracking-widest">WebPulse Analytics Dashboard</div>
                             </div>
                             {/* Fake UI Content */}
-                            <div className="p-6 grid grid-cols-4 gap-6 h-full">
-                                <div className="col-span-1 border-r border-slate-200 dark:border-white/5 pr-6 space-y-4">
+                            <div className="p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 h-full">
+                                <div className="hidden sm:block col-span-1 border-r border-slate-200 dark:border-white/5 pr-6 space-y-4">
                                     <div className="h-8 w-3/4 bg-slate-100 dark:bg-white/5 rounded"></div>
                                     <div className="h-4 w-1/2 bg-slate-100 dark:bg-white/5 rounded"></div>
                                     <div className="h-4 w-2/3 bg-slate-100 dark:bg-white/5 rounded"></div>
@@ -340,7 +340,7 @@ export default function Landing() {
                     </div>
 
                     {/* Technical Highlights */}
-                    <div className="grid lg:grid-cols-2 gap-20 items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0B0E14] transition-colors duration-500 py-32 border-y border-slate-200 dark:border-white/5">
+                    <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0B0E14] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.05),transparent_70%)] transition-colors duration-500 py-20 sm:py-32 border-y border-slate-200 dark:border-white/5">
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             whileInView={{ opacity: 1, x: 0 }}
@@ -398,9 +398,9 @@ export default function Landing() {
                             className="relative group"
                         >
                             {/* Glow Effect */}
-                            <div className="absolute -inset-4 bg-blue-500/10 blur-[100px] rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                            <div className="absolute -inset-8 bg-blue-500/10 blur-[120px] rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
 
-                            <div className="relative bg-[#0F1218] rounded-[2.5rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl transition-all duration-500">
+                            <div className="relative bg-[#090B10] rounded-[2.5rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl transition-all duration-500 backdrop-blur-sm">
                                 {/* Header */}
                                 <div className="h-10 bg-white/[0.03] border-b border-white/5 flex items-center px-6 gap-2">
                                     <div className="flex gap-1.5">
@@ -416,8 +416,8 @@ export default function Landing() {
                                                     setActiveTab(tab);
                                                     setIsAutoCycling(false);
                                                 }}
-                                                className={`text-[10px] uppercase tracking-widest font-black transition-colors ${activeTab === tab
-                                                    ? 'text-blue-400'
+                                                className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-black transition-all ${activeTab === tab
+                                                    ? 'text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
                                                     : 'text-slate-500 hover:text-slate-400'
                                                     }`}
                                             >
@@ -425,7 +425,7 @@ export default function Landing() {
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="ml-auto text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] hidden sm:block">SDK v2.0</div>
+                                    <div className="ml-auto text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] hidden sm:block">SDK v2.0</div>
                                 </div>
                                 {/* Code content */}
                                 <div className="p-8 sm:p-10 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto whitespace-pre min-h-[360px] relative">
@@ -439,44 +439,44 @@ export default function Landing() {
                                         >
                                             {activeTab === 'react' && (
                                                 <div className="space-y-1">
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">01</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">useEffect</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'react'</span>;</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">02</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">WebPulse</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'@webpulse/sdk'</span>;</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">03</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">04</span><span><span className="text-purple-400">const</span> <span className="text-indigo-100">tracker</span> = <span className="text-purple-400">new</span> <span className="text-blue-300">WebPulse</span>(<span className="text-emerald-300">'wp_live_7x92k...'</span>);</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none: 05"> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">06</span><span><span className="text-purple-400">const</span> <span className="text-indigo-100">App</span> = () ={'>'} {'{'}</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">07</span><span>    <span className="text-blue-300">useEffect</span>(() ={'>'} {'{'}</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">08</span><span>        <span className="text-indigo-100">tracker</span>.<span className="text-blue-300">init</span>({'{'} realtime: <span className="text-orange-300">true</span> {'}'});</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">09</span><span>    {'}'}, []);</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">10</span><span>{'}'};</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">useEffect</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'react'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">03</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">04</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">05</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">06</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">App</span> <span className="text-slate-400">=</span> <span className="text-slate-400">()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">07</span><span>    <span className="text-cyan-400">useEffect</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">08</span><span>        <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">init</span><span className="text-slate-400">({'{'}</span> <span className="text-slate-200">realtime</span><span className="text-slate-400">:</span> <span className="text-amber-400">true</span> <span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">09</span><span>    <span className="text-slate-400">{'}'}, []);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">10</span><span><span className="text-slate-400">{'}'};</span></span></div>
                                                 </div>
                                             )}
                                             {activeTab === 'vue' && (
                                                 <div className="space-y-1">
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">01</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">onMounted</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'vue'</span>;</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">02</span><span><span className="text-purple-400">import</span> {'{'} <span className="text-blue-300">WebPulse</span> {'}'} <span className="text-purple-400">from</span> <span className="text-emerald-300">'@webpulse/sdk'</span>;</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">03</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">04</span><span><span className="text-blue-300">onMounted</span>(() ={'>'} {'{'}</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">05</span><span>    <span className="text-purple-400">const</span> <span className="text-indigo-100">tracker</span> = <span className="text-purple-400">new</span> <span className="text-blue-300">WebPulse</span>(<span className="text-emerald-300">'wp_live_7k2...'</span>);</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">06</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">07</span><span>    <span className="text-indigo-100">tracker</span>.<span className="text-blue-300">on</span>(<span className="text-emerald-300">'visitor'</span>, (<span className="text-indigo-100">event</span>) ={'>'} {'{'}</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">08</span><span>        <span className="text-slate-400">console</span>.<span className="text-blue-300">log</span>(<span className="text-emerald-300">`Live: ${'{'}event.city{'}'}`</span>);</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">09</span><span>    {'}'});</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">10</span><span>{'}'});</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">onMounted</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'vue'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">03</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">04</span><span><span className="text-cyan-400">onMounted</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">05</span><span>    <span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7k2...'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">06</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">07</span><span>    <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">on</span><span className="text-slate-400">(</span><span className="text-emerald-400">'visitor'</span><span className="text-slate-400">, (</span><span className="text-indigo-100">event</span><span className="text-slate-400">)</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">08</span><span>        <span className="text-slate-400">console</span><span className="text-slate-400">.</span><span className="text-cyan-400">log</span><span className="text-slate-400">(</span><span className="text-emerald-400">`Live: ${'{'}event.city{'}'}`</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">09</span><span>    <span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">10</span><span><span className="text-slate-400">{'}'});</span></span></div>
                                                 </div>
                                             )}
                                             {activeTab === 'node' && (
                                                 <div className="space-y-1">
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">01</span><span><span className="text-purple-400">const</span> {'{'} <span className="text-blue-300">WebPulse</span> {'}'} = <span className="text-blue-300">require</span>(<span className="text-emerald-300">'@webpulse/sdk'</span>);</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">02</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">03</span><span><span className="text-purple-400">const</span> <span className="text-indigo-100">tracker</span> = <span className="text-purple-400">new</span> <span className="text-blue-300">WebPulse</span>({'{'}</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">04</span><span>    apiKey: <span className="text-emerald-300">'wp_live_7x92k...'</span>,</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">05</span><span>    env: <span className="text-emerald-300">'production'</span>,</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">06</span><span>    bufferSize: <span className="text-orange-300">10</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">07</span><span>{'}'});</span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">08</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">09</span><span><span className="text-slate-500">// Track server-side events</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-700 select-none">10</span><span><span className="text-indigo-100">tracker</span>.<span className="text-blue-300">capture</span>(<span className="text-emerald-300">'api_call'</span>, {'{'} userId: <span className="text-orange-300">123</span> {'}'});</span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">01</span><span><span className="text-fuchsia-400">const</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-slate-400">=</span> <span className="text-cyan-400">require</span><span className="text-slate-400">(</span><span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">02</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">03</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">({'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">04</span><span>    <span className="text-indigo-100">apiKey</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">,</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">05</span><span>    <span className="text-indigo-100">env</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'production'</span><span className="text-slate-400">,</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">06</span><span>    <span className="text-indigo-100">bufferSize</span><span className="text-slate-400">:</span> <span className="text-amber-400">10</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">07</span><span><span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">08</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">09</span><span><span className="text-slate-500">// Track server-side events</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">10</span><span><span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">capture</span><span className="text-slate-400">(</span><span className="text-emerald-400">'api_call'</span><span className="text-slate-400">, {'{'}</span> <span className="text-indigo-100">userId</span><span className="text-slate-400">:</span> <span className="text-amber-400">123</span> <span className="text-slate-400">{'}'});</span></span></div>
                                                 </div>
                                             )}
                                         </motion.div>
@@ -527,10 +527,10 @@ export default function Landing() {
                 </section>
 
                 {/* Pricing */}
-                <section id="pricing" className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Transparent <span className="text-blue-600">Pricing</span></h2>
-                        <p className="text-xl font-medium text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">The perfect plan for every stage of your journey.</p>
+                <section id="pricing" className="py-20 sm:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16 sm:mb-20">
+                        <h2 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Transparent <span className="text-blue-600">Pricing</span></h2>
+                        <p className="text-lg sm:text-xl font-medium text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">The perfect plan for every stage of your journey.</p>
                     </div>
 
                     {loading ? (
