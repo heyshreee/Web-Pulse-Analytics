@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, ArrowLeft, BarChart2 } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -110,12 +110,12 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
     return (
         <div className="w-full">
             <div className="text-center mb-8">
-                <div className="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-600/20 inline-flex items-center justify-center mb-6">
-                    <BarChart2 className="h-6 w-6 text-white" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-500/10 mx-auto mb-5">
+                    <Mail className="h-6 w-6 text-violet-500" />
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Verify your email</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
-                    We sent a code to <span className="text-blue-600 dark:text-blue-400 font-bold">{email}</span>.<br />
+                <h2 className="page-title !text-2xl mb-2">Verify your email</h2>
+                <p className="page-sub">
+                    We sent a code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>.<br />
                     Please enter the 6-digit code below to continue.
                 </p>
             </div>
@@ -132,7 +132,7 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             onPaste={handlePaste}
-                            className="w-12 h-14 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-center text-xl font-black text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-500 transition-all shadow-inner"
+                            className="w-12 h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-xl font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
                         />
                     ))}
                 </div>
@@ -140,22 +140,23 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <button
                     type="submit"
                     disabled={loading || otp.join('').length !== 6}
-                    className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center active:scale-[0.98]"
+                    className="btn-primary btn-lg w-full"
                 >
-                    {loading ? 'Verifying...' : 'Verify Account'}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {loading ? 'Verifying...' : 'Verify account'}
                 </button>
             </form>
 
             <div className="mt-6 text-center space-y-4">
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                     Didn't receive the code?{' '}
-                    <button onClick={handleResend} className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                    <button onClick={handleResend} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline underline-offset-4 transition-colors">
                         Resend code
                     </button>
                 </p>
 
                 {onBack && (
-                    <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                    <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
                         <ArrowLeft className="h-4 w-4" />
                         Back to login
                     </button>
