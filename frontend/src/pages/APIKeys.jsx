@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
-import { Copy, Key, Shield, Loader2 } from 'lucide-react';
+import { Copy, Key, Shield } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 export default function APIKeys() {
@@ -30,71 +31,70 @@ export default function APIKeys() {
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[400px]">
-            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent" />
         </div>
     );
 
     return (
-        <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-                <div className="flex items-center gap-5">
-                    <div className="p-4 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-500">
-                        <Key className="h-8 w-8 text-white" />
+        <div className="space-y-8 animate-fade-up">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
+                <div className="flex items-center gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                        <Key className="h-5 w-5 text-violet-500" />
                     </div>
-                    <div className="flex flex-col">
-                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">API Keys & Tracking IDs</h2>
-                        <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic opacity-80">Manage your access keys and project tracking identifiers.</p>
+                    <div>
+                        <h1 className="page-title">API Keys & Tracking IDs</h1>
+                        <p className="page-sub">Manage your access keys and project tracking identifiers.</p>
                     </div>
                 </div>
             </div>
 
             {/* Personal Access Token Section (Placeholder) */}
-            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 mb-8 shadow-sm dark:shadow-xl">
-                <div className="flex items-start justify-between mb-6">
+            <div className="card card-pad">
+                <div className="flex items-start justify-between gap-4 mb-6">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Personal Access Token</h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Use this key to authenticate with the API programmatically.</p>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Personal Access Token</h2>
+                        <p className="prose-quiet">Use this key to authenticate with the API programmatically.</p>
                     </div>
-                    <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-blue-100 dark:border-blue-500/20 shadow-sm">
-                        Coming Soon
-                    </span>
+                    <span className="badge-violet shrink-0">Coming Soon</span>
                 </div>
 
-                <div className="relative">
+                <div>
                     <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 dark:text-slate-500 font-bold font-mono text-xs shadow-inner uppercase tracking-widest">
                         <Key className="h-4 w-4" />
                         <span>obs_sk_................................</span>
                     </div>
-                    <button disabled className="mt-4 px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl text-sm font-bold cursor-not-allowed border border-slate-200 dark:border-slate-700 shadow-sm transition-all grayscale">
+                    <button disabled className="mt-4 btn-secondary btn-md">
                         Generate New Token
                     </button>
                 </div>
             </div>
 
             {/* Project Tracking IDs */}
-            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-xl">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Project Tracking IDs</h2>
+            <div className="card card-pad">
+                <h2 className="page-title !text-xl mb-6">Project Tracking IDs</h2>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {projects.map(project => (
-                        <div key={project.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl group hover:border-blue-400 dark:hover:border-slate-700 transition-all shadow-sm hover:shadow-lg hover:scale-[1.005]">
+                        <div key={project.id} className="card card-pad card-hover flex flex-col sm:flex-row sm:items-center justify-between gap-4 !p-4">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-100 dark:bg-blue-500/10 rounded-xl transition-all group-hover:scale-110 shadow-sm">
-                                    <Shield className="h-6 w-6 text-blue-600 dark:text-blue-500" />
+                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                                    <Shield className="h-5 w-5 text-violet-500" />
                                 </div>
                                 <div>
                                     <div className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">{project.name}</div>
-                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Created {new Date(project.created_at).toLocaleDateString()}</div>
+                                    <div className="eyebrow mt-0.5">Created {new Date(project.created_at).toLocaleDateString()}</div>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-3 w-full sm:w-auto">
-                                <code className="flex-1 sm:flex-none bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold font-mono text-xs shadow-inner">
+                                <code className="flex-1 sm:flex-none bg-slate-50 dark:bg-slate-950 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold font-mono text-xs shadow-inner">
                                     {project.tracking_id}
                                 </code>
                                 <button
                                     onClick={() => copyToClipboard(project.tracking_id)}
-                                    className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
+                                    className="btn-secondary btn-sm"
                                     title="Copy ID"
                                 >
                                     <Copy className="h-4 w-4" />
@@ -104,8 +104,14 @@ export default function APIKeys() {
                     ))}
 
                     {projects.length === 0 && (
-                        <div className="text-center py-8 text-slate-500">
-                            No projects found. Create a project to get a tracking ID.
+                        <div className="card card-pad py-14 text-center">
+                            <Key className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-5">
+                                No projects found. Create a project to get a tracking ID.
+                            </p>
+                            <Link to="/dashboard/projects" className="btn-primary btn-sm">
+                                Create a Project
+                            </Link>
                         </div>
                     )}
                 </div>
