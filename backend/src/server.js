@@ -1,91 +1,33 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const http = require('http');
-const { Server } = require('socket.io');
-require('dotenv').config();
+import http from 'node:http';
+import { Server } from 'socket.io';
 
-const authRoutes = require('./routes/auth.routes');
-const visitorRoutes = require('./routes/visitor.routes');
-// const analyticsRoutes = require('./routes/analytics.routes');
-// const paymentRoutes = require('./routes/payment.routes');
-const setupVisitorSocket = require('./socket/visitorSocket');
-const NotificationService = require('./services/notification.service');
+import createApp from './app.js';
+import setupVisitorSocket from './socket/visitorSocket.js';
+import NotificationService from './services/notification.service.js';
+import { env } from './config/env.js';
 
-const app = express();
-app.set('trust proxy', 1); // Trust first proxy (Vercel)
+const app = createApp();
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: [
       'http://localhost:5173',
       'https://obs-tracker.netlify.app/',
-      process.env.FRONTEND_URL
+      env.frontendUrl,
     ].filter(Boolean),
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
-// Make io accessible globally
+// Expose io globally so controllers/services can push real-time updates
 global.io = io;
 
-const cookieParser = require('cookie-parser');
-
-// ...
-
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "img-src": ["'self'", "data:", "blob:", "https://*.basemaps.cartocdn.com", "https://*.tile.openstreetmap.org", "https://grainy-gradients.vercel.app"],
-      "connect-src": ["'self'", "ws:", "http://localhost:*", "https://*.basemaps.cartocdn.com", "https://*.tile.openstreetmap.org", "https://*.vercel.app", "https://accounts.google.com", "https://*.googleapis.com", "https://api.ipify.org", "http://ip-api.com"],
-    },
-  },
-}));
-app.use(cookieParser());
-// Custom CORS wrapper to exclude tracking endpoint
-app.use(cors({
-  origin: (origin, callback) => {
-    // For v1 routes, we handle CORS in the router/middleware
-    // For other routes (like root or legacy), we use this simple check
-    const dashboardOrigins = [
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-      'https://obs-tracker.netlify.app/',
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-
-
-    // Allow tracking routes to pass through global CORS
-    // They will be handled by trackingCors middleware in the router
-    if (!origin || dashboardOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // We'll allow the origin here but the trackingCors middleware will do the final check
-      // This is necessary because Express middleware order means global CORS runs first
-      callback(null, true);
-    }
-  },
-  credentials: true
-}));
-app.use(express.json());
-
-// Routes
-app.use('/api/v1', require('./routes/v1'));
-
-// Legacy routes (optional: keep for backward compatibility or remove)
-// For now, I'll remove them as requested by the "Clean Architecture" section
-app.use('/api/track', require('./routes/v1/track.routes'));
-
-// Socket.io setup
+// Socket.io real-time visitor updates
 setupVisitorSocket(io);
 
-app.get('/', (req, res) => {
-  res.send('Web Pluse Analytics API is running...');
-});
-
-const PORT = process.env.PORT || 5000;
+const PORT = env.port;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 
