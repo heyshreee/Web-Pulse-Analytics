@@ -13,22 +13,22 @@ export default function DeleteModal({ isOpen, onClose, onDelete, projectName, de
       title="Delete Project"
     >
       <div className="space-y-6">
-        <div className="p-5 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-2xl flex gap-4 shadow-sm">
-          <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-500 flex-shrink-0" />
+        <div className="p-5 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl flex gap-4">
+          <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" />
           <p className="text-sm font-medium text-red-800/80 dark:text-red-400 leading-relaxed">
-            Warning: This action will permanently delete all data and analytics associated with <span className="text-slate-900 dark:text-white font-black tracking-tight">{projectName}</span>. This cannot be undone.
+            Warning: This action will permanently delete all data and analytics associated with <span className="text-slate-900 dark:text-white font-semibold">{projectName}</span>. This cannot be undone.
           </p>
         </div>
 
-        <div className="space-y-3 px-1">
-          <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-            Please type <span className="text-red-600 dark:text-white font-mono bg-red-50 dark:bg-slate-800 px-2 py-0.5 rounded-lg border border-red-200 dark:border-slate-700">{projectName}</span> to confirm
+        <div className="space-y-2">
+          <label className="label">
+            Please type <span className="text-red-600 dark:text-white font-mono bg-red-50 dark:bg-slate-800 px-1.5 py-0.5 rounded-md border border-red-200 dark:border-slate-700">{projectName}</span> to confirm
           </label>
           <input
             type="text"
             value={deleteConfirmation}
             onChange={(e) => setDeleteConfirmation(e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 text-slate-900 dark:text-slate-200 font-bold focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner"
+            className="input"
             placeholder={projectName}
           />
         </div>
@@ -39,14 +39,14 @@ export default function DeleteModal({ isOpen, onClose, onDelete, projectName, de
               onClose();
               setDeleteConfirmation('');
             }}
-            className="px-6 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white rounded-xl text-sm font-black transition-all shadow-sm"
+            className="btn-secondary btn-md"
           >
             Cancel
           </button>
           <button
             onClick={() => onDelete(deleteConfirmation)}
             disabled={deleteConfirmation !== projectName || deleting}
-            className="px-8 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-black tracking-tight transition-all shadow-xl shadow-red-500/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="btn-danger btn-md"
           >
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete Project

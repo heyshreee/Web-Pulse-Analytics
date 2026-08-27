@@ -16,7 +16,7 @@ export default function ProjectTabs({ activeTab, onTabChange }) {
           onClick={() => onTabChange(tab.id)}
           className={`py-2 text-sm font-medium transition-all border-b-2 -mb-[1px] ${
             activeTab === tab.id
-              ? 'text-blue-600 dark:text-white border-blue-500'
+              ? 'text-violet-600 dark:text-white border-violet-500'
               : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700'
           }`}
         >
