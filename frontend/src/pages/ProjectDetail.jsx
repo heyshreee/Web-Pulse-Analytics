@@ -186,13 +186,13 @@ export default function ProjectDetail() {
     </div>
   );
   if (!project) return (
-    <div className="flex h-screen items-center justify-center text-red-600 dark:text-red-400 font-bold bg-slate-50 dark:bg-slate-950 px-6 text-center">
+    <div className="flex h-screen items-center justify-center px-6 text-center text-red-600 dark:text-red-400 font-bold">
       Project not found or access denied.
     </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-32">
+    <div className="container-page py-8 pb-32">
       <ProjectHeader 
         project={project} 
         onShowShare={() => setShowShareModal(true)} 

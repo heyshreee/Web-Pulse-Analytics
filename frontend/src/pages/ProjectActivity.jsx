@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import {
-    Search, Download, Filter, ChevronLeft, ChevronRight,
+    Search, Download, ChevronLeft, ChevronRight,
     Key, Shield, AlertTriangle, Settings, Lock, Activity,
-    CheckCircle, XCircle, AlertCircle, RefreshCw, Zap
+    RefreshCw, Zap
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
@@ -76,7 +76,6 @@ export default function ProjectActivity() {
         setLoading(true);
         try {
             // 1. Get Project ID if we only have name
-            // 1. Get Project ID if we only have name
             let projectId = project?.id;
             if (idOrName && !projectId) {
                 const p = await apiRequest(`/projects/${encodeURIComponent(idOrName)}`);
@@ -119,13 +118,13 @@ export default function ProjectActivity() {
 
     const getStatusBadge = (status) => {
         const styles = {
-            success: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20',
-            warning: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-500 border-yellow-100 dark:border-yellow-500/20',
-            failure: 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-500/20',
+            success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+            failure: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
         };
 
         return (
-            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border shadow-sm ${styles[status] || styles.success}`}>
+            <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize border ${styles[status] || styles.success}`}>
                 {status}
             </span>
         );
@@ -154,15 +153,16 @@ export default function ProjectActivity() {
     };
 
     return (
-        <div className="space-y-8 pb-20 transition-colors duration-500">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                <div className="flex items-center gap-5">
-                    <div className="p-4 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-500">
-                        <Activity className="h-8 w-8 text-white" />
+        <div className="space-y-8 animate-fade-up">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                        <Activity className="h-5 w-5 text-violet-500" />
                     </div>
                     <div className="flex flex-col">
-                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Activity Log</h2>
-                        <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl">
+                        <h2 className="page-title">Activity Log</h2>
+                        <p className="page-sub">
                             {idOrName ? `Monitor important events and security logs for ${project?.name || 'your project'}` : 'Monitor all management events across all your connected projects'}
                         </p>
                     </div>
@@ -176,28 +176,28 @@ export default function ProjectActivity() {
                             showToast('Live logs are available on Pro plan', 'info');
                         }
                     }}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm tracking-tight transition-all border shadow-lg ${isLive
-                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20 shadow-emerald-500/20'
-                        : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-black/10'
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all border ${isLive
+                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
+                        : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
                         }`}
                     title={user?.plan === 'pro' ? 'Toggle Live Mode' : 'Upgrade to Pro for Live Mode'}
                 >
                     <Zap className={`h-4 w-4 ${isLive ? 'fill-current' : ''}`} />
                     <span>{isLive ? 'Live Tracking' : 'Go Live'}</span>
-                    {user?.plan !== 'pro' && <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-md ml-1 font-black">PRO</span>}
+                    {user?.plan !== 'pro' && <span className="text-[10px] bg-violet-500 text-white px-2 py-0.5 rounded-md ml-1 font-bold">PRO</span>}
                 </button>
             </div>
 
             {/* Controls */}
-            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-900/40 backdrop-blur-xl p-5 rounded-3xl border border-slate-200 dark:border-slate-800/50 shadow-sm transition-all focus-within:shadow-md">
+            <div className="card card-pad flex flex-col lg:flex-row gap-4 items-center justify-between !p-4">
                 <div className="relative flex-1 w-full lg:max-w-md">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
                         type="text"
                         placeholder="Search by action, details, user..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl pl-11 pr-4 py-3 text-slate-900 dark:text-white font-black text-sm focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500/50 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner"
+                        className="input pl-10"
                     />
                 </div>
 
@@ -206,7 +206,7 @@ export default function ProjectActivity() {
                         <select
                             value={eventType}
                             onChange={(e) => setEventType(e.target.value)}
-                            className="w-full sm:w-auto bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-slate-900 dark:text-white font-black text-xs uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-blue-600/5 transition-all shadow-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900"
+                            className="input w-full sm:w-auto cursor-pointer"
                         >
                             <option value="all">All Events</option>
                             <option value="success">Success</option>
@@ -219,7 +219,7 @@ export default function ProjectActivity() {
                         <select
                             value={timeRange}
                             onChange={(e) => setTimeRange(e.target.value)}
-                            className="w-full sm:w-auto bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3 text-slate-900 dark:text-white font-black text-xs uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-blue-600/5 transition-all shadow-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-900"
+                            className="input w-full sm:w-auto cursor-pointer"
                         >
                             <option value="24h">Last 24h</option>
                             <option value="7d">Last 7 Days</option>
@@ -231,7 +231,7 @@ export default function ProjectActivity() {
                     <div className="flex gap-2 w-full sm:w-auto items-center">
                         <button
                             onClick={handleExport}
-                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95"
+                            className="btn-secondary btn-sm flex-1 sm:flex-none"
                         >
                             <Download className="h-4 w-4" />
                             <span>Export CSV</span>
@@ -239,7 +239,7 @@ export default function ProjectActivity() {
 
                         <button
                             onClick={() => loadData()}
-                            className="p-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white rounded-2xl transition-all border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95"
+                            className="btn-secondary btn-sm"
                             title="Refresh Logs"
                         >
                             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -249,77 +249,80 @@ export default function ProjectActivity() {
             </div>
 
             {/* Table */}
-            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl overflow-hidden shadow-sm dark:shadow-xl transition-all">
+            <div className="card overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-separate border-spacing-0">
+                    <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/80 dark:bg-slate-950/50 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
-                                <th className="px-8 py-5 border-b border-slate-200 dark:border-slate-800">Timestamp</th>
-                                {!idOrName && <th className="px-8 py-5 border-b border-slate-200 dark:border-slate-800">Project</th>}
-                                <th className="px-8 py-5 border-b border-slate-200 dark:border-slate-800">Event Type</th>
-                                <th className="px-8 py-5 border-b border-slate-200 dark:border-slate-800">User</th>
-                                <th className="px-8 py-5 border-b border-slate-200 dark:border-slate-800">Details</th>
-                                <th className="px-8 py-5 border-b border-slate-200 dark:border-slate-800 text-right pr-12">Status</th>
+                            <tr className="bg-slate-50 dark:bg-slate-800/40 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                <th className="px-4 py-3">Timestamp</th>
+                                {!idOrName && <th className="px-4 py-3">Project</th>}
+                                <th className="px-4 py-3">Event Type</th>
+                                <th className="px-4 py-3">User</th>
+                                <th className="px-4 py-3">Details</th>
+                                <th className="px-4 py-3 text-right">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                        <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-12 text-center">
+                                    <td colSpan={idOrName ? 5 : 6} className="px-4 py-12 text-center">
                                         <div className="flex justify-center">
-                                            <Spinner />
+                                            <Spinner fullScreen={false} />
                                         </div>
                                     </td>
                                 </tr>
                             ) : logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
-                                        No activity logs found matching your criteria.
+                                    <td colSpan={idOrName ? 5 : 6} className="px-4 py-12 text-center">
+                                        <div className="card card-pad py-14 text-center !shadow-none !border-0">
+                                            <Activity className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                                            <p className="text-slate-500 dark:text-slate-400">No activity logs found matching your criteria.</p>
+                                        </div>
                                     </td>
                                 </tr>
                             ) : (
                                 logs.map((log) => (
-                                    <tr key={log.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all cursor-default relative">
-                                        <td className="px-8 py-6 whitespace-nowrap">
-                                            <div className="text-sm text-slate-900 dark:text-white font-black tracking-tight">
+                                    <tr key={log.id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td className="px-4 py-3 whitespace-nowrap">
+                                            <div className="text-sm text-slate-900 dark:text-white font-semibold">
                                                 {new Date(log.created_at).toLocaleDateString()}
                                             </div>
-                                            <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
+                                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                                                 {new Date(log.created_at).toLocaleTimeString()}
                                             </div>
                                         </td>
                                         {!idOrName && (
-                                            <td className="px-8 py-6">
-                                                <div className="text-sm text-slate-900 dark:text-slate-300 font-black tracking-tighter group-hover:text-blue-600 transition-colors">
+                                            <td className="px-4 py-3">
+                                                <span className="text-sm text-slate-900 dark:text-slate-300 font-medium">
                                                     {log.project?.name || 'Unknown'}
-                                                </div>
+                                                </span>
                                             </td>
                                         )}
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm group-hover:scale-110 transition-all group-hover:rotate-6 group-hover:border-blue-500/30">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
                                                     {getIcon(log.action)}
                                                 </div>
-                                                <span className="text-sm text-slate-900 dark:text-white font-black tracking-tight">{log.action}</span>
+                                                <span className="text-sm text-slate-900 dark:text-white font-medium">{log.action}</span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-4 py-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-[10px] font-black text-white shadow-xl shadow-blue-600/20 group-hover:rotate-12 transition-all">
+                                                <div className="w-9 h-9 rounded-full bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center text-xs font-bold text-violet-600 dark:text-violet-400">
                                                     {(log.user?.email || 'S').charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="text-sm font-black text-slate-600 dark:text-slate-400 tracking-tight">{log.user?.email || 'System'}</span>
+                                                <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">{log.user?.email || 'System'}</span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-xs truncate leading-relaxed" title={log.details}>
+                                        <td className="px-4 py-3">
+                                            <div className="text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate" title={log.details}>
                                                 {log.details}
                                             </div>
                                             {log.ip_address && (
-                                                <div className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-2 font-mono bg-slate-50 dark:bg-slate-950 inline-block px-2 py-0.5 rounded-lg border border-slate-100 dark:border-slate-800">IP: {log.ip_address}</div>
+                                                <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-1.5 font-mono badge-slate">IP: {log.ip_address}</div>
                                             )}
                                         </td>
-                                        <td className="px-8 py-6 text-right pr-12">
+                                        <td className="px-4 py-3 text-right">
                                             {getStatusBadge(log.status)}
                                         </td>
                                     </tr>
@@ -330,15 +333,15 @@ export default function ProjectActivity() {
                 </div>
 
                 {/* Pagination */}
-                <div className="px-8 py-5 border-t border-slate-100 dark:border-slate-800/50 bg-slate-50/30 dark:bg-slate-950/30 flex items-center justify-between">
-                    <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                        Showing <span className="text-slate-900 dark:text-white">{logs.length > 0 ? (page - 1) * 10 + 1 : 0}</span> to <span className="text-slate-900 dark:text-white">{Math.min(page * 10, totalLogs)}</span> of <span className="text-slate-900 dark:text-white">{totalLogs}</span> entries
+                <div className="px-4 py-5 border-t border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Showing <span className="text-slate-900 dark:text-white font-semibold">{logs.length > 0 ? (page - 1) * 10 + 1 : 0}</span> to <span className="text-slate-900 dark:text-white font-semibold">{Math.min(page * 10, totalLogs)}</span> of <span className="text-slate-900 dark:text-white font-semibold">{totalLogs}</span> entries
                     </p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="p-3 rounded-xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
+                            className="p-2 rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
                         >
                             <ChevronLeft className="h-4 w-4" />
                         </button>
@@ -349,8 +352,8 @@ export default function ProjectActivity() {
                                     <button
                                         key={p}
                                         onClick={() => setPage(p)}
-                                        className={`w-10 h-10 rounded-xl text-sm font-black transition-all shadow-sm ${page === p
-                                            ? 'bg-blue-600 text-white shadow-blue-600/30 ring-2 ring-blue-600/20'
+                                        className={`w-9 h-9 rounded-lg text-sm font-semibold transition-all ${page === p
+                                            ? 'bg-slate-900 dark:bg-violet-500 text-white shadow-sm'
                                             : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700'
                                             }`}
                                     >
@@ -358,12 +361,12 @@ export default function ProjectActivity() {
                                     </button>
                                 );
                             })}
-                            {totalPages > 5 && <span className="text-slate-400 dark:text-slate-600 px-2 font-black">...</span>}
+                            {totalPages > 5 && <span className="text-slate-400 dark:text-slate-600 px-2 font-semibold">...</span>}
                         </div>
                         <button
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
-                            className="p-3 rounded-xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
+                            className="p-2 rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
                         >
                             <ChevronRight className="h-4 w-4" />
                         </button>

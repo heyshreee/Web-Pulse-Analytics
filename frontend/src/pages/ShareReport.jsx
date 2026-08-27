@@ -44,14 +44,14 @@ export default function ShareReport() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center p-6">
-                <div className="text-center p-12 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl max-w-md">
-                    <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <Activity className="h-10 w-10 text-red-600 dark:text-red-500" />
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300 flex items-center justify-center p-6">
+                <div className="card card-pad text-center p-10 sm:p-12 max-w-md">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-500/10 mx-auto mb-6">
+                        <Activity className="h-8 w-8 text-red-600 dark:text-red-500" />
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Report Not Found</h2>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">{error}</p>
-                    <button onClick={() => window.location.reload()} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-500/30 active:scale-95">Retry Loading</button>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Report Not Found</h2>
+                    <p className="prose-quiet mb-8">{error}</p>
+                    <button onClick={() => window.location.reload()} className="btn-primary btn-md">Retry Loading</button>
                 </div>
             </div>
         );
@@ -60,29 +60,29 @@ export default function ShareReport() {
     const { project, stats } = data;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white p-6 md:p-12 transition-colors duration-500">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300 p-6 md:p-12">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-8">
                     <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/30">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft">
                             <Activity className="h-8 w-8" />
                         </div>
                         <div>
-                            <div className="flex items-center gap-2 text-xs font-black text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">
+                            <div className="eyebrow flex items-center gap-2 mb-1">
                                 <span>Public Report</span>
                                 <span>/</span>
                                 <span>{new Date(project.created_at).getFullYear()}</span>
                             </div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{project.name}</h2>
+                            <h2 className="page-title">{project.name}</h2>
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
                         <div className="text-right hidden sm:block">
-                            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Timezone</p>
-                            <p className="font-bold text-slate-700 dark:text-white tracking-tight">{project.timezone}</p>
+                            <p className="eyebrow">Timezone</p>
+                            <p className="font-semibold text-slate-700 dark:text-slate-200 tracking-tight">{project.timezone}</p>
                         </div>
-                        <div className="p-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                        <div className="card p-2">
                             <ThemeToggle />
                         </div>
                     </div>
@@ -90,57 +90,51 @@ export default function ShareReport() {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-all hover:shadow-md">
+                    <div className="card card-pad">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Views</h3>
-                            <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg text-blue-600 dark:text-blue-400">
-                                <Eye className="h-5 w-5" />
+                            <h3 className="eyebrow">Total Views</h3>
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                                <Eye className="h-5 w-5 text-violet-500" />
                             </div>
                         </div>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.total_views.toLocaleString()}</span>
-                        </div>
+                        <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{stats.total_views.toLocaleString()}</span>
                     </div>
-                    <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-all hover:shadow-md">
+                    <div className="card card-pad">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Unique Visitors</h3>
-                            <div className="p-2 bg-purple-50 dark:bg-purple-500/10 rounded-lg text-purple-600 dark:text-purple-400">
-                                <Users className="h-5 w-5" />
+                            <h3 className="eyebrow">Unique Visitors</h3>
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                                <Users className="h-5 w-5 text-violet-500" />
                             </div>
                         </div>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.uniqueVisitors.toLocaleString()}</span>
-                        </div>
+                        <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{stats.uniqueVisitors.toLocaleString()}</span>
                     </div>
-                    <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-all hover:shadow-md">
+                    <div className="card card-pad">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Current Month</h3>
-                            <div className="p-2 bg-green-50 dark:bg-green-500/10 rounded-lg text-green-600 dark:text-green-500">
-                                <Calendar className="h-5 w-5" />
+                            <h3 className="eyebrow">Current Month</h3>
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                                <Calendar className="h-5 w-5 text-violet-500" />
                             </div>
                         </div>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.current_month_views.toLocaleString()}</span>
-                        </div>
+                        <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{stats.current_month_views.toLocaleString()}</span>
                     </div>
                 </div>
 
                 {/* Traffic Trends */}
-                <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-all">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Traffic Trends</h3>
-                        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                <div className="card card-pad">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-semibold text-slate-900 dark:text-white tracking-tight">Traffic Trends</h3>
+                        <span className="badge-slate">
                             <Activity className="h-3 w-3" />
                             Live Insights
-                        </div>
+                        </span>
                     </div>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <AreaChart data={stats.trafficData}>
                                 <defs>
                                     <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.25} />
+                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1e293b" : "#e2e8f0"} vertical={false} />
@@ -148,7 +142,6 @@ export default function ShareReport() {
                                     dataKey="name"
                                     stroke={isDark ? "#64748b" : "#94a3b8"}
                                     fontSize={10}
-                                    fontWeight={900}
                                     tickLine={false}
                                     axisLine={false}
                                     padding={{ left: 10, right: 10 }}
@@ -156,7 +149,6 @@ export default function ShareReport() {
                                 <YAxis
                                     stroke={isDark ? "#64748b" : "#94a3b8"}
                                     fontSize={10}
-                                    fontWeight={900}
                                     tickLine={false}
                                     axisLine={false}
                                     tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value}
@@ -169,17 +161,16 @@ export default function ShareReport() {
                                         borderRadius: '16px',
                                         borderWidth: '1px',
                                         boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                                        fontWeight: '900',
                                         fontSize: '12px'
                                     }}
                                     itemStyle={{ color: isDark ? '#f8fafc' : '#0f172a' }}
-                                    cursor={{ stroke: '#3B82F6', strokeWidth: 2, strokeDasharray: '5 5' }}
+                                    cursor={{ stroke: '#8b5cf6', strokeWidth: 2, strokeDasharray: '5 5' }}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="views"
-                                    stroke="#3B82F6"
-                                    strokeWidth={4}
+                                    stroke="#8b5cf6"
+                                    strokeWidth={3}
                                     fillOpacity={1}
                                     fill="url(#colorViews)"
                                 />
