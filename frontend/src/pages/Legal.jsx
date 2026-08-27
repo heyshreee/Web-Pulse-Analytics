@@ -1,5 +1,7 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BarChart2 } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Legal({ type }) {
     const content = {
@@ -49,32 +51,46 @@ export default function Legal({ type }) {
     const data = content[type] || content.privacy;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0B0E14] text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
-            {/* Header */}
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-5 w-5" />
-                        <span className="font-medium">Back to Home</span>
+        <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
+                        <ArrowLeft className="h-4 w-4" />
+                        <span className="font-medium text-sm">Back to Home</span>
                     </Link>
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
+                    </div>
                 </div>
             </header>
 
-            <main className="pt-32 pb-20">
+            <main className="pt-28 pb-20">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="mb-12">
-                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter text-center">{data.title}</h2>
-                        <p className="text-slate-500">Last updated: {data.lastUpdated}</p>
+                    <div className="text-center mb-12">
+                        <p className="eyebrow mb-3">Legal</p>
+                        <h2 className="page-title !text-3xl mb-2">{data.title}</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Last updated: {data.lastUpdated}</p>
                     </div>
 
-                    <div className="prose dark:prose-invert prose-blue max-w-none prose-slate">
-                        {data.body}
+                    <div className="card card-pad space-y-6">
+                        {React.Children.map(data.body, (child, idx) => (
+                            child.type === 'h3'
+                                ? <h3 key={idx} className="text-lg font-semibold text-slate-900 dark:text-white pt-2 border-t border-slate-100 dark:border-slate-800 first:border-t-0 first:pt-0">{child.props.children}</h3>
+                                : <p key={idx} className="prose-quiet">{child.props.children}</p>
+                        ))}
                     </div>
                 </div>
             </main>
 
-            <footer className="border-t border-slate-200 dark:border-white/5 py-12 bg-white dark:bg-[#0B0E14] text-center">
-                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+            <footer className="border-t border-slate-200 dark:border-slate-800 py-10 bg-white dark:bg-slate-950 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
+                        <BarChart2 className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse Analytics</span>
+                </div>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );
