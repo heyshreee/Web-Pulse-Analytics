@@ -1,113 +1,101 @@
-const supabase = require('../config/supabase');
-const usageService = require('../services/usage.service');
-const TelegramService = require('../services/telegram.service');
+import supabase from '../config/supabase.js';
+import usageService from '../services/usage.service.js';
+import TelegramService from '../services/telegram.service.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import AppError from '../errors/AppError.js';
 
-exports.getLinkedAccounts = async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('users')
-            .select('linked_accounts')
-            .eq('id', req.user.id)
-            .single();
+export const getLinkedAccounts = asyncHandler(async (req, res) => {
+    const { data, error } = await supabase
+        .from('users')
+        .select('linked_accounts')
+        .eq('id', req.user.id)
+        .single();
 
-        if (error) throw error;
-        res.json(data.linked_accounts || {});
-    } catch (error) {
-        console.error('Get linked accounts error:', error);
-        res.status(500).json({ error: error.message });
+    if (error) throw error;
+    res.json(data.linked_accounts || {});
+});
+
+export const linkTelegram = asyncHandler(async (req, res) => {
+    const { chat_id, username, bot_token } = req.body;
+
+    if (!chat_id) {
+        throw AppError.badRequest('Chat ID is required');
     }
-};
 
-exports.linkTelegram = async (req, res) => {
-    try {
-        const { chat_id, username, bot_token } = req.body;
+    // Check Plan - Telegram is Pro only
+    const usage = await usageService.calculateUsage(req.user.id);
+    const PLAN_LEVELS = { free: 0, basic: 1, pro: 2, business: 3 };
+    const currentLevel = PLAN_LEVELS[usage.plan] || 0;
 
-        if (!chat_id) {
-            return res.status(400).json({ error: 'Chat ID is required' });
+    if (currentLevel < PLAN_LEVELS.pro) {
+        return res.status(403).json({
+            error: 'Telegram integration is available on Pro plan and above.',
+            required_plan: 'pro'
+        });
+    }
+
+    // Fetch existing
+    const { data: user } = await supabase
+        .from('users')
+        .select('linked_accounts')
+        .eq('id', req.user.id)
+        .single();
+
+    const existing = user?.linked_accounts || {};
+
+    const newData = {
+        ...existing,
+        telegram: {
+            chat_id,
+            username,
+            bot_token: bot_token || null, // Store custom token if provided
+            linked_at: new Date().toISOString()
         }
+    };
 
-        // Check Plan - Telegram is Pro only
-        const usage = await usageService.calculateUsage(req.user.id);
-        const PLAN_LEVELS = { free: 0, basic: 1, pro: 2, business: 3 };
-        const currentLevel = PLAN_LEVELS[usage.plan] || 0;
+    const { error } = await supabase
+        .from('users')
+        .update({ linked_accounts: newData })
+        .eq('id', req.user.id);
 
-        if (currentLevel < PLAN_LEVELS.pro) {
-            return res.status(403).json({
-                error: 'Telegram integration is available on Pro plan and above.',
-                required_plan: 'pro'
-            });
-        }
+    if (error) throw error;
 
-        // Fetch existing
-        const { data: user } = await supabase
-            .from('users')
-            .select('linked_accounts')
-            .eq('id', req.user.id)
-            .single();
+    await TelegramService.send(
+        chat_id,
+        'Welcome to OBS Tracker! Your Telegram account has been successfully linked.',
+        bot_token
+    );
 
-        const existing = user?.linked_accounts || {};
+    res.json({ success: true, linked_accounts: newData });
+});
 
-        const newData = {
-            ...existing,
-            telegram: {
-                chat_id,
-                username,
-                bot_token: bot_token || null, // Store custom token if provided
-                linked_at: new Date().toISOString()
-            }
-        };
+export const unlinkAccount = asyncHandler(async (req, res) => {
+    const { platform } = req.params; // telegram
+
+    if (!['telegram'].includes(platform)) {
+        throw AppError.badRequest('Invalid platform');
+    }
+
+    const { data: user } = await supabase
+        .from('users')
+        .select('linked_accounts')
+        .eq('id', req.user.id)
+        .single();
+
+    const existing = user?.linked_accounts || {};
+
+    if (existing[platform]) {
+        delete existing[platform];
 
         const { error } = await supabase
             .from('users')
-            .update({ linked_accounts: newData })
+            .update({ linked_accounts: existing })
             .eq('id', req.user.id);
 
         if (error) throw error;
-
-        await TelegramService.send(
-            chat_id,
-            'Welcome to OBS Tracker! Your Telegram account has been successfully linked.',
-            bot_token
-        );
-
-        res.json({ success: true, linked_accounts: newData });
-
-    } catch (error) {
-        console.error('Link Telegram error:', error);
-        res.status(500).json({ error: error.message });
     }
-};
 
-exports.unlinkAccount = async (req, res) => {
-    try {
-        const { platform } = req.params; // telegram
+    res.json({ success: true, linked_accounts: existing });
+});
 
-        if (!['telegram'].includes(platform)) {
-            return res.status(400).json({ error: 'Invalid platform' });
-        }
-
-        const { data: user } = await supabase
-            .from('users')
-            .select('linked_accounts')
-            .eq('id', req.user.id)
-            .single();
-
-        const existing = user?.linked_accounts || {};
-
-        if (existing[platform]) {
-            delete existing[platform];
-
-            const { error } = await supabase
-                .from('users')
-                .update({ linked_accounts: existing })
-                .eq('id', req.user.id);
-
-            if (error) throw error;
-        }
-
-        res.json({ success: true, linked_accounts: existing });
-    } catch (error) {
-        console.error('Unlink account error:', error);
-        res.status(500).json({ error: error.message });
-    }
-};
+export default { getLinkedAccounts, linkTelegram, unlinkAccount };

@@ -1,8 +1,8 @@
-const { verifyToken } = require('../utils/jwt');
+import { verifyToken } from '../utils/jwt.js';
 
-const cookie = require('cookie');
+import cookie from 'cookie';
 
-module.exports = (io) => {
+export default (io) => {
     io.use((socket, next) => {
         try {
             const cookies = cookie.parse(socket.request.headers.cookie || '');

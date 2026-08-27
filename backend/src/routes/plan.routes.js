@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const planController = require('../controllers/plan.controller');
+import planController from '../controllers/plan.controller.js';
 
 // Public route to get all plans
 router.get('/', planController.getPlans);
 
-module.exports = router;
+export default router;

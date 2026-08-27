@@ -1,5 +1,6 @@
-const { Resend } = require('resend');
-require('dotenv').config();
+import { Resend } from 'resend';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
@@ -406,4 +407,16 @@ class EmailService {
     }
 }
 
-module.exports = EmailService;
+export default EmailService;
+export const getBaseTemplate = EmailService.getBaseTemplate;
+export const getButton = EmailService.getButton;
+export const sendVerificationEmail = EmailService.sendVerificationEmail;
+export const sendPasswordResetEmail = EmailService.sendPasswordResetEmail;
+export const sendPaymentSuccessEmail = EmailService.sendPaymentSuccessEmail;
+export const sendPaymentFailedEmail = EmailService.sendPaymentFailedEmail;
+export const sendNewLoginEmail = EmailService.sendNewLoginEmail;
+export const sendPasswordChangedEmail = EmailService.sendPasswordChangedEmail;
+export const sendReportReadyEmail = EmailService.sendReportReadyEmail;
+export const sendPlanDowngradedEmail = EmailService.sendPlanDowngradedEmail;
+export const sendReceiptEmail = EmailService.sendReceiptEmail;
+export const sendWelcomeEmail = EmailService.sendWelcomeEmail;

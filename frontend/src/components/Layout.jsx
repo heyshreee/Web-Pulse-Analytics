@@ -12,11 +12,10 @@ import {
     Activity,
     BarChart2,
     Key,
-    ChevronDown,
-    Globe
+    LifeBuoy,
+    Zap
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { useToast } from '../context/ToastContext';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 import ThemeToggle from './ThemeToggle';
@@ -42,7 +41,6 @@ export default function Layout() {
     });
     const location = useLocation();
     const navigate = useNavigate();
-    const { showToast } = useToast();
 
     const [socket, setSocket] = useState(null);
     const socketRef = useRef(null);
@@ -158,12 +156,19 @@ export default function Layout() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-                <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+                <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
             </div>
         );
     }
 
     const usagePercentage = Math.min((usageStats.totalViews / usageStats.monthlyLimit) * 100, 100);
+    const storagePct = Math.min((usageStats.storageUsed / usageStats.storageLimit) * 100, 100);
+
+    const formatBytes = (bytes) => {
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+    };
 
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
 
@@ -172,7 +177,7 @@ export default function Layout() {
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && !isSettingsPage && (
                 <div
-                    className="fixed inset-0 bg-slate-950/80 z-40 lg:hidden"
+                    className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -180,120 +185,117 @@ export default function Layout() {
             {/* Sidebar */}
             {!isSettingsPage && (
                 <aside className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800/50 transform transition-transform duration-500 ease-in-out flex flex-col shadow-2xl
+            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out flex flex-col
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
                     {/* Logo */}
-                    <div className="h-16 flex items-center px-8 border-b border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center gap-4 group/logo flex-shrink-0 cursor-pointer">
-                            <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
-                                <BarChart2 className="h-6 w-6 text-white" />
+                    <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/80">
+                        <Link to="/dashboard" className="flex items-center gap-3 group/logo flex-shrink-0">
+                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
+                                <BarChart2 className="h-5 w-5" />
                             </div>
-                            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover/logo:text-blue-600 transition-colors">WebPulse <span className="text-blue-600">Analytics</span></span>
-                        </div>
+                            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                                WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                            </span>
+                        </Link>
                     </div>
-
-
 
                     {/* Main Navigation */}
-                    <div className="px-4 py-2">
-                        <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 px-2">Main Menu</h3>
-                        <nav className="space-y-0.5">
-                            {navItems.map((item) => {
-                                const Icon = item.icon;
-                                const isActive = location.pathname === item.path;
-                                return (
-                                    <Link
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={() => setSidebarOpen(false)}
-                                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${isActive
-                                            ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50'
-                                            }`}
-                                    >
-                                        <Icon className="h-4 w-4" />
-                                        <span className="text-sm font-medium">{item.label}</span>
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
-
-                    {/* Pinned Projects */}
-                    <div className="px-4 py-4 flex-1">
-                        <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 px-2">Pinned Projects</h3>
-                        <div className="space-y-0.5">
-                            {pinnedProjects.length > 0 ? (
-                                pinnedProjects.map((project) => (
-                                    <Link
-                                        key={project.id}
-                                        to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
-                                        className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 cursor-pointer group transition-colors"
-                                    >
-                                        <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors truncate">{project.name}</span>
-                                        <span className={`w-2 h-2 rounded-full bg-green-500`}></span>
-                                    </Link>
-                                ))
-                            ) : (
-                                <p className="text-xs text-slate-400 dark:text-slate-600 px-3 py-2">No pinned projects</p>
-                            )}
+                    <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+                        <div>
+                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Menu</h3>
+                            <div className="space-y-1">
+                                {navItems.map((item) => {
+                                    const Icon = item.icon;
+                                    const isActive = location.pathname === item.path ||
+                                        (item.path === '/dashboard/projects' && location.pathname.startsWith('/dashboard/projects'));
+                                    return (
+                                        <Link
+                                            key={item.path}
+                                            to={item.path}
+                                            onClick={() => setSidebarOpen(false)}
+                                            className={`group flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
+                                                ? 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
+                                                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                                                }`}
+                                        >
+                                            <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-violet-600 dark:text-violet-300' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300'}`} />
+                                            <span>{item.label}</span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Bottom Widget: Events Tracked */}
-                    <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-transparent">
-                        <div className="bg-white dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700/50">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Events Tracked</span>
-                                <span className="text-xs font-bold text-slate-900 dark:text-white">{Math.round(usagePercentage)}%</span>
+                        {/* Pinned Projects */}
+                        <div>
+                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Pinned Projects</h3>
+                            <div className="space-y-0.5">
+                                {pinnedProjects.length > 0 ? (
+                                    pinnedProjects.map((project) => (
+                                        <Link
+                                            key={project.id}
+                                            to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
+                                            className="group flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                                        >
+                                            <span className="flex items-center gap-2.5">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white truncate">{project.name}</span>
+                                            </span>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <p className="px-3 py-2 text-xs text-slate-400 dark:text-slate-600">No pinned projects yet</p>
+                                )}
                             </div>
-                            <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
-                                <div
-                                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
-                                    style={{ width: `${usagePercentage}%` }}
-                                ></div>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-500 mb-3">
-                                <span>{usageStats.totalViews.toLocaleString()} / {usageStats.monthlyLimit.toLocaleString()} <span className="hidden sm:inline">limit</span></span>
-                            </div>
+                        </div>
 
-                            {/* Storage Usage */}
-                            <div className="mb-3 pt-3 border-t border-slate-100 dark:border-slate-700/30">
-                                <div className="flex justify-between items-center mb-1.5">
-                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Storage Used ({usageStats.plan})</span>
-                                    <span className="text-[10px] font-bold text-slate-900 dark:text-white">
-                                        {usageStats.storageUsed < 1024 * 1024
-                                            ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
-                                            : usageStats.storageUsed < 1024 * 1024 * 1024
-                                                ? `${(usageStats.storageUsed / (1024 * 1024)).toFixed(2)} MB`
-                                                : `${(usageStats.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
-                                        } <span className="text-slate-400 dark:text-slate-500 font-normal">/ {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</span>
-                                    </span>
+                        {/* Usage widget */}
+                        <div>
+                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Usage</h3>
+                            <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40 space-y-4">
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Events tracked</span>
+                                        <span className="text-xs font-semibold text-slate-900 dark:text-white">{Math.round(usagePercentage)}%</span>
+                                    </div>
+                                    <div className="h-1.5 rounded-full bg-slate-200/70 dark:bg-slate-700/60 overflow-hidden">
+                                        <div className="h-full rounded-full bg-violet-500 transition-all duration-500" style={{ width: `${usagePercentage}%` }} />
+                                    </div>
+                                    <p className="mt-1.5 text-[11px] text-slate-400 dark:text-slate-500">
+                                        {usageStats.totalViews.toLocaleString()} / {usageStats.monthlyLimit.toLocaleString()} views
+                                    </p>
                                 </div>
-                                <div className="h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-green-500 rounded-full transition-all duration-500"
-                                        style={{ width: `${Math.min((usageStats.storageUsed / usageStats.storageLimit) * 100, 100)}%` }}
-                                    ></div>
+
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage</span>
+                                        <span className="text-xs font-semibold text-slate-900 dark:text-white">
+                                            {formatBytes(usageStats.storageUsed)} <span className="font-normal text-slate-400">/ {formatBytes(usageStats.storageLimit)}</span>
+                                        </span>
+                                    </div>
+                                    <div className="h-1.5 rounded-full bg-slate-200/70 dark:bg-slate-700/60 overflow-hidden">
+                                        <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${storagePct}%` }} />
+                                    </div>
                                 </div>
+
+                                <Link to="/dashboard/billing" className="btn-primary btn-sm w-full">
+                                    <Zap className="h-3.5 w-3.5" />
+                                    Upgrade plan
+                                </Link>
                             </div>
-
-                            <Link to="/dashboard/billing" className="block w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors shadow-lg shadow-blue-500/20 text-center">
-                                Upgrade Plan
-                            </Link>
                         </div>
+                    </nav>
 
-                        <div className="mt-4 flex items-center justify-between px-2">
-                            <Link to="/help" className="text-xs text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-1">
-                                <div className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold">?</div>
-                                Help & Docs
-                            </Link>
-                            <button className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
-                                <span className="sr-only">Collapse</span>
-                                <ChevronDown className="h-4 w-4 rotate-90" />
-                            </button>
-                        </div>
+                    {/* Footer */}
+                    <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800/80">
+                        <Link
+                            to="/help"
+                            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-colors"
+                        >
+                            <LifeBuoy className="h-[18px] w-[18px] text-slate-400 dark:text-slate-500" />
+                            Help & Docs
+                        </Link>
                     </div>
                 </aside>
             )}
@@ -301,70 +303,68 @@ export default function Layout() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Topbar */}
-                <header className="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30 transition-colors duration-300">
-                    <div className="flex items-center gap-4">
+                <header className="h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-colors duration-300">
+                    <div className="flex items-center gap-3">
                         {!isSettingsPage && (
                             <button
-                                className="lg:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                                className="lg:hidden p-2 -ml-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 onClick={() => setSidebarOpen(true)}
                             >
-                                <Menu className="h-6 w-6" />
+                                <Menu className="h-5 w-5" />
                             </button>
                         )}
                         {isSettingsPage && (
-                            <Link to="/dashboard" className="transition-all hover:opacity-80">
-                                <div className="flex items-center gap-3 group/logo">
-                                    <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
-                                        <BarChart2 className="h-5 w-5 text-white" />
-                                    </div>
-                                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
+                            <Link to="/dashboard" className="flex items-center gap-2.5 group/logo">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
+                                    <BarChart2 className="h-4 w-4" />
                                 </div>
+                                <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
+                                    WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                                </span>
                             </Link>
                         )}
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 sm:gap-3">
                         <ThemeToggle />
 
-                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+                        <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />
 
-
-
-                        {/* Notifications */}
                         <Notifications />
 
-                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+                        <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />
 
                         {user && (
-                            <div className="flex items-center gap-3 pl-2">
-                                <div className="text-right hidden sm:block leading-tight">
-                                    <div className="text-sm font-bold text-slate-900 dark:text-white">{user.email}</div>
-                                    <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
-                                        {user.plan ? `${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} Plan` : 'Free Plan'}
+                            <div className="flex items-center gap-3 pl-1">
+                                <div className="text-right hidden md:block leading-tight">
+                                    <div className="text-sm font-medium text-slate-900 dark:text-white">{user.email}</div>
+                                    <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                                        <span className="inline-flex items-center gap-1">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                            {user.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) : 'Free'} Plan
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="relative group">
-                                    <button className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 border border-slate-300 dark:border-slate-500 flex items-center justify-center text-slate-600 dark:text-white font-bold overflow-hidden transition-colors">
+                                    <button className="h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-white overflow-hidden hover:ring-2 hover:ring-violet-500/30 transition-all">
                                         {user.avatar_url ? (
                                             <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
                                         ) : (
-                                            <User className="h-5 w-5" />
+                                            <User className="h-4 w-4" />
                                         )}
                                     </button>
 
                                     {/* Dropdown Menu */}
-                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
-                                        <div className="py-1">
-                                            <Link to="/dashboard/settings" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">Profile Settings</Link>
-                                            <Link to="/dashboard/billing" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">Billing</Link>
-                                            <div className="border-t border-slate-200 dark:border-slate-800 my-1"></div>
-                                            <button
-                                                onClick={handleLogout}
-                                                className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-red-600 dark:hover:text-red-400"
-                                            >
-                                                Sign out
-                                            </button>
-                                        </div>
+                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lift py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all origin-top-right z-50">
+                                        <Link to="/dashboard/settings" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Profile Settings</Link>
+                                        <Link to="/dashboard/billing" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Billing</Link>
+                                        <div className="my-1 border-t border-slate-100 dark:border-slate-800"></div>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
+                                        >
+                                            Sign out
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -373,10 +373,12 @@ export default function Layout() {
                 </header>
 
                 {/* Page Content */}
-                < main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8" >
-                    <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
-                </main >
-            </div >
-        </div >
+                <main className="flex-1 overflow-auto layout-scroll-content">
+                    <div className="container-app py-6 sm:py-8">
+                        <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
+                    </div>
+                </main>
+            </div>
+        </div>
     );
 }

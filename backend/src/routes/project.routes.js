@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const projectController = require('../controllers/project.controller');
-const visitorController = require('../controllers/visitor.controller');
-const auth = require('../middleware/auth');
+import projectController from '../controllers/project.controller.js';
+import visitorController from '../controllers/visitor.controller.js';
+import auth from '../middleware/auth.js';
 
 router.use(auth); // Protect all project routes
 
@@ -19,4 +19,4 @@ router.put('/:id/pin', projectController.togglePin);
 router.post('/:id/share-token', projectController.regenerateShareToken);
 router.delete('/:id/share-token', projectController.revokeShareToken);
 
-module.exports = router;
+export default router;

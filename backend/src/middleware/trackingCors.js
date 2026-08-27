@@ -1,6 +1,6 @@
-const ActivityLogService = require('../services/activity.service');
-const supabase = require('../config/supabase');
-const { getClientIp } = require('../utils/ip');
+import ActivityLogService from '../services/activity.service.js';
+import supabase from '../config/supabase.js';
+import { getClientIp } from '../utils/ip.js';
 
 const trackingCors = async (req, res, next) => {
     try {
@@ -152,4 +152,4 @@ const trackingCors = async (req, res, next) => {
     }
 };
 
-module.exports = trackingCors;
+export default trackingCors;

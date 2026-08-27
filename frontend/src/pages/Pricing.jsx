@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, HelpCircle, ArrowLeft } from 'lucide-react';
+import { Check, HelpCircle, ArrowLeft, BarChart2 } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Pricing() {
     const [loading, setLoading] = useState(true);
@@ -112,140 +113,158 @@ export default function Pricing() {
         { id: 'business', name: "Business", price: getPlanAttr('business', 'price', '$39'), color: "purple" }
     ];
 
+    const cards = [
+        {
+            id: 'free',
+            name: 'Free',
+            inr: '₹0',
+            usd: '$0 / month',
+            desc: 'Trying WebPulse',
+            cta: 'Get Started',
+            kind: 'secondary'
+        },
+        {
+            id: 'basic',
+            name: 'Basic',
+            inr: '₹299',
+            usd: '$4 / month',
+            desc: 'Students & solo devs',
+            cta: 'Choose Basic',
+            kind: 'secondary'
+        },
+        {
+            id: 'pro',
+            name: 'Pro',
+            inr: '₹999',
+            usd: '$12 / month',
+            desc: 'Streamers & growing apps',
+            cta: 'Start Free Trial',
+            kind: 'primary'
+        },
+        {
+            id: 'business',
+            name: 'Business',
+            inr: '₹2,999',
+            usd: '$39 / month',
+            desc: 'Teams & high traffic',
+            cta: 'Contact Sales',
+            kind: 'secondary'
+        },
+    ];
+
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0B0E14] text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
+        <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-5 w-5" />
-                        <span className="font-medium">Back to Home</span>
+            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
+                        <ArrowLeft className="h-4 w-4" />
+                        <span className="font-medium text-sm">Back to Home</span>
                     </Link>
-                    <div className="flex items-center gap-4">
-                        <Link to="/login" className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-                            Log In
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        <Link to="/login" className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                            Log in
                         </Link>
-                        <Link
-                            to="/register"
-                            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all hover:shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]"
-                        >
-                            Get Started
-                        </Link>
+                        <Link to="/register" className="btn-primary btn-md">Get Started</Link>
                     </div>
                 </div>
             </header>
 
-            <main className="pt-32 pb-20">
+            <main className="pt-24 pb-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter text-center">Simple, Transparent Pricing</h2>
-                        <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
+                    <div className="text-center mb-16">
+                        <p className="eyebrow mb-3">Pricing</p>
+                        <h2 className="page-title !text-4xl">Simple, transparent pricing</h2>
+                        <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
                             Choose the plan that fits your growth stage. No hidden fees, cancel anytime.
                         </p>
                     </div>
 
                     {/* Pricing Cards */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-32">
-                        {/* Free */}
-                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 flex flex-col hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl">
-                            <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2">Free</h3>
-                            <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-slate-900 dark:text-white">₹0</span>
-                                <span className="text-slate-500 dark:text-slate-500">/mo</span>
-                            </div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 mb-6 font-medium font-mono">$0 / month</div>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px] font-medium">Trying WebPulse</p>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-24">
+                        {cards.map((c) => {
+                            const isPrimary = c.kind === 'primary';
+                            return (
+                                <div key={c.id} className={`card card-pad flex flex-col relative ${isPrimary
+                                    ? 'bg-slate-900 border-slate-900 dark:bg-violet-500 dark:border-violet-500 transform lg:-translate-y-2'
+                                    : 'card-hover'
+                                    }`}>
+                                    {isPrimary && (
+                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-violet-600 rounded-full text-[10px] font-semibold text-white tracking-wide shadow-soft">
+                                            MOST POPULAR
+                                        </div>
+                                    )}
+                                    <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isPrimary ? 'text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{c.name}</h3>
+                                    <div className="flex items-baseline gap-1 mb-1">
+                                        <span className={`text-3xl font-bold ${isPrimary ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{c.inr}</span>
+                                        <span className={isPrimary ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}>/mo</span>
+                                    </div>
+                                    <div className={`text-xs mb-5 font-mono ${isPrimary ? 'text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{c.usd}</div>
+                                    <p className={`text-sm mb-8 min-h-[40px] ${isPrimary ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}>{c.desc}</p>
 
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-center text-sm font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
-                                Get Started
-                            </Link>
-                        </div>
+                                    {/* feature summary */}
+                                    <ul className="space-y-2.5 mb-8 flex-1">
+                                        {(plans.find(p => p.id === c.id)?.features || []).slice(0, 4).map((f, i) => (
+                                            <li key={i} className={`flex items-center gap-2 text-sm ${isPrimary ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                <Check className={`h-4 w-4 shrink-0 ${isPrimary ? 'text-emerald-400' : 'text-emerald-500'}`} />
+                                                {f}
+                                            </li>
+                                        ))}
+                                    </ul>
 
-                        {/* Basic */}
-                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 flex flex-col hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl">
-                            <h3 className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">Basic</h3>
-                            <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-slate-900 dark:text-white">₹299</span>
-                                <span className="text-slate-500 dark:text-slate-500">/mo</span>
-                            </div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 mb-6 font-medium font-mono">$4 / month</div>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px] font-medium">Students & solo devs</p>
-
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-center text-sm font-black uppercase tracking-widest hover:bg-blue-600/20 transition-all">
-                                Choose Basic
-                            </Link>
-                        </div>
-
-                        {/* Pro */}
-                        <div className="p-6 rounded-3xl bg-blue-600 border border-blue-500 shadow-2xl shadow-blue-900/20 flex flex-col relative transform lg:-translate-y-4">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-blue-500 rounded-full text-[10px] font-bold text-white border border-blue-400 tracking-wide">MOST POPULAR</div>
-                            <h3 className="text-sm font-bold text-blue-100 uppercase tracking-wider mb-2">Pro</h3>
-                            <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-white">₹999</span>
-                                <span className="text-blue-200">/mo</span>
-                            </div>
-                            <div className="text-xs text-blue-200 mb-6">$12 / month</div>
-                            <p className="text-sm text-blue-100 mb-6 min-h-[40px]">Streamers & growing apps</p>
-
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl bg-white text-blue-600 text-center text-sm font-bold hover:bg-blue-50 transition-colors">
-                                Start Free Trial
-                            </Link>
-                        </div>
-
-                        {/* Business */}
-                        <div className="p-6 rounded-3xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 flex flex-col hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-xl">
-                            <h3 className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Business</h3>
-                            <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-slate-900 dark:text-white">₹2,999</span>
-                                <span className="text-slate-500 dark:text-slate-500">/mo</span>
-                            </div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 mb-6 font-medium font-mono">$39 / month</div>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 min-h-[40px] font-medium">Teams & high traffic</p>
-                            <Link to="/register" className="block w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-center text-sm font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
-                                Contact Sales
-                            </Link>
-                        </div>
+                                    <Link
+                                        to="/register"
+                                        className={isPrimary ? 'btn-md inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold px-4 py-2.5 w-full bg-white !text-slate-900 dark:!bg-white dark:!text-slate-900 hover:!bg-slate-100 transition-all' : 'btn-secondary btn-md w-full'}
+                                    >
+                                        {c.cta}
+                                    </Link>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     {/* Feature Comparison Table */}
-                    <div className="max-w-7xl mx-auto mb-32 overflow-x-auto">
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-12 text-center tracking-tight uppercase tracking-[0.1em]">Compare Plans</h2>
+                    <div className="max-w-7xl mx-auto mb-24">
+                        <h2 className="page-title !text-3xl text-center mb-10">Compare plans</h2>
                         {loading ? (
                             <div className="flex justify-center py-10">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 dark:border-white"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
                             </div>
                         ) : (
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-slate-200 dark:border-white/10">
-                                        <th className="py-6 px-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Feature</th>
-                                        {displayPlans.map((plan) => (
-                                            <th key={plan.id} className={`py-6 px-4 text-left`}>
-                                                <div className="text-xl font-black text-slate-900 dark:text-white mb-1 tracking-tight">{plan.name}</div>
-                                                <div className={`text-xs font-black uppercase tracking-widest text-${plan.color}-600 dark:text-${plan.color}-400`}>{plan.price}</div>
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                                    {featureRows.map((row, index) => (
-                                        <tr key={index} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
-                                            <td className="py-4 px-4 text-sm font-medium text-slate-600 dark:text-slate-300">{row.feature}</td>
-                                            <td className="py-4 px-4 text-sm text-slate-500 dark:text-slate-400 font-medium font-mono">{row.free}</td>
-                                            <td className="py-4 px-4 text-sm text-slate-500 dark:text-slate-400 font-medium font-mono">{row.basic}</td>
-                                            <td className="py-4 px-4 text-sm text-slate-900 dark:text-white font-black font-mono">{row.pro}</td>
-                                            <td className="py-4 px-4 text-sm text-slate-900 dark:text-white font-black font-mono">{row.business}</td>
+                            <div className="card overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[640px]">
+                                    <thead>
+                                        <tr className="border-b border-slate-200 dark:border-slate-800">
+                                            <th className="py-5 px-6 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.14em]">Feature</th>
+                                            {displayPlans.map((plan) => (
+                                                <th key={plan.id} className="py-5 px-6 text-left">
+                                                    <div className="font-semibold text-slate-900 dark:text-white mb-0.5">{plan.name}</div>
+                                                    <div className="text-xs text-slate-500 dark:text-slate-400">{plan.price}</div>
+                                                </th>
+                                            ))}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                        {featureRows.map((row, index) => (
+                                            <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                                <td className="py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">{row.feature}</td>
+                                                <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">{row.free}</td>
+                                                <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">{row.basic}</td>
+                                                <td className="py-4 px-6 text-sm font-semibold text-slate-900 dark:text-white">{row.pro}</td>
+                                                <td className="py-4 px-6 text-sm font-semibold text-slate-900 dark:text-white">{row.business}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
 
                     {/* FAQ */}
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-12 text-center tracking-tight uppercase tracking-[0.1em]">Frequently Asked Questions</h2>
-                        <div className="space-y-8">
+                        <h2 className="page-title !text-3xl text-center mb-10">Frequently asked questions</h2>
+                        <div className="space-y-4">
                             {[
                                 {
                                     q: "Can I upgrade or downgrade anytime?",
@@ -260,14 +279,12 @@ export default function Pricing() {
                                     a: "Yes! Contact our sales team with proof of your non-profit status for a 50% discount on all plans."
                                 }
                             ].map((faq, i) => (
-                                <div key={i} className="p-6 rounded-2xl bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 shadow-sm transition-all hover:border-blue-500/20">
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-start gap-3">
-                                        <HelpCircle className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
+                                <div key={i} className="card card-pad card-hover">
+                                    <h3 className="font-semibold text-slate-900 dark:text-white mb-1.5 flex items-start gap-3">
+                                        <HelpCircle className="h-5 w-5 text-violet-500 mt-0.5 shrink-0" />
                                         {faq.q}
                                     </h3>
-                                    <p className="text-slate-500 dark:text-slate-400 ml-8 leading-relaxed font-medium">
-                                        {faq.a}
-                                    </p>
+                                    <p className="prose-quiet ml-8">{faq.a}</p>
                                 </div>
                             ))}
                         </div>
@@ -275,8 +292,14 @@ export default function Pricing() {
                 </div>
             </main>
 
-            <footer className="border-t border-slate-200 dark:border-white/5 py-12 bg-white dark:bg-[#0B0E14] text-center">
-                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+            <footer className="border-t border-slate-200 dark:border-slate-800 py-10 bg-white dark:bg-slate-950 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
+                        <BarChart2 className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse Analytics</span>
+                </div>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );

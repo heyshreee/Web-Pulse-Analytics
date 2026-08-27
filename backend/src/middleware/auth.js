@@ -1,7 +1,7 @@
-const { verifyToken } = require('../utils/jwt');
-const supabase = require('../config/supabase');
+import { verifyToken } from '../utils/jwt.js';
+import supabase from '../config/supabase.js';
 
-module.exports = async (req, res, next) => {
+export default async (req, res, next) => {
     try {
         const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
 

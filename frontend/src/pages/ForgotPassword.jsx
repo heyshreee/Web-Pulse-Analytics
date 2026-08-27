@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -22,9 +23,6 @@ export default function ForgotPassword() {
             // Real API call
             await apiRequest('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
 
-            // Simulate API call (Removed)
-            // await new Promise(resolve => setTimeout(resolve, 1500));
-
             setSubmitted(true);
             showToast('Reset link sent successfully', 'success');
         } catch (error) {
@@ -36,21 +34,18 @@ export default function ForgotPassword() {
 
     if (submitted) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-500">
-                <div className="w-full max-w-md bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-2xl text-center">
-                    <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Mail className="h-8 w-8 text-green-500" />
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
+                <div className="w-full max-w-md card card-pad text-center">
+                    <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <Mail className="h-7 w-7 text-emerald-500" />
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Check your email</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
+                    <h2 className="page-title !text-2xl mb-2">Check your email</h2>
+                    <p className="page-sub mb-8">
                         We have sent a password reset link to<br />
-                        <span className="text-blue-600 dark:text-white font-black">{email}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
                     </p>
-                    <Link
-                        to="/login"
-                        className="inline-flex items-center justify-center w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98]"
-                    >
-                        Back to Login
+                    <Link to="/login" className="btn-primary btn-lg w-full">
+                        Back to login
                     </Link>
                 </div>
             </div>
@@ -58,54 +53,55 @@ export default function ForgotPassword() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-500">
-            <div className="w-full max-w-md bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-2xl">
-                <Link to="/" className="flex items-center gap-3 group mb-8">
-                    <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-300">
-                        <BarChart2 className="h-6 w-6 text-white" />
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
+            <div className="w-full max-w-md">
+                <div className="flex items-center justify-between mb-8">
+                    <Link to="/" className="flex items-center gap-3 group/logo">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
+                            <BarChart2 className="h-5 w-5" />
+                        </div>
+                        <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse Analytics</span>
+                    </Link>
+                    <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
+                        <ThemeToggle />
                     </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover:text-blue-600 transition-colors">WebPulse Analytics</span>
-                </Link>
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Reset Password</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
-                        Enter your email address and we will send you a<br />
-                        link to reset your password.
-                    </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-xs font-black text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-widest ml-1">Email Address</label>
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <span className="text-slate-400 group-focus-within:text-blue-500 transition-colors">@</span>
-                            </div>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-500 transition-all shadow-inner"
-                                placeholder="name@company.com"
-                            />
-                        </div>
+                <div className="card card-pad">
+                    <div className="text-center mb-8">
+                        <h2 className="page-title !text-2xl mb-2">Reset password</h2>
+                        <p className="page-sub">
+                            Enter your email address and we'll send you a link to reset your password.
+                        </p>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm tracking-tight transition-all shadow-xl shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center active:scale-[0.98]"
-                    >
-                        {loading ? <RefreshCw className="h-5 w-5 animate-spin mr-2" /> : null}
-                        {loading ? 'Sending...' : 'Send Reset Link'}
-                    </button>
-                </form>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div>
+                            <label className="label">Email address</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-slate-400" />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="input pl-10"
+                                    placeholder="name@company.com"
+                                />
+                            </div>
+                        </div>
 
-                <div className="mt-8 text-center">
-                    <Link to="/login" className="inline-flex items-center gap-2 text-sm font-black text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors uppercase tracking-widest text-[10px]">
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to Login
-                    </Link>
+                        <button type="submit" disabled={loading} className="btn-primary btn-lg w-full">
+                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                            {loading ? 'Sending...' : 'Send Reset Link'}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 text-center">
+                        <Link to="/login" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to login
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import Spinner from './components/Spinner';
+import ScrollToTop from './components/ScrollToTop';
 
 const ShareReport = lazy(() => import('./pages/ShareReport'));
 const Login = lazy(() => import('./pages/Login'));
@@ -43,6 +44,7 @@ function App() {
             <ToastProvider>
                 <BrowserRouter>
                     <div className="min-h-screen">
+                        <ScrollToTop />
                         <Suspense fallback={<Spinner />}>
                             <Routes>
                                 {/* Public Routes */}

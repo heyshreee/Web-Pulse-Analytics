@@ -80,16 +80,18 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-3 group/logo">
-                    <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
-                        <BarChart2 className="h-6 w-6 text-white" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
+                        <BarChart2 className="h-5 w-5" />
                     </div>
-                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter group-hover/logo:text-blue-600 transition-colors">WebPulse <span className="text-blue-600">Analytics</span></span>
+                    <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                        WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                    </span>
                 </Link>
-                <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
                     <ThemeToggle />
                 </div>
             </header>
@@ -99,20 +101,21 @@ export default function Login() {
                 <div className="w-full max-w-md">
                     {/* Tabs */}
                     {!showVerification && (
-                        <div className="flex w-full bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl mb-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
-                            <button className="flex-1 py-2.5 text-sm font-black text-white bg-blue-600 rounded-xl shadow-xl shadow-blue-600/20 transition-all">
+                        <div className="flex w-full bg-slate-100 dark:bg-slate-900/60 p-1 rounded-xl mb-6 border border-slate-200 dark:border-slate-800">
+                            <button className="flex-1 py-2.5 text-sm font-semibold text-white bg-slate-900 dark:bg-violet-500 rounded-lg shadow-sm transition-all">
                                 Login
                             </button>
-                            <Link to="/register" className="flex-1 py-2.5 text-sm font-black text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white text-center transition-all">
+                            <Link to="/register" className="flex-1 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-center transition-all">
                                 Register
                             </Link>
                         </div>
                     )}
 
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-10 shadow-2xl transition-all"
+                        transition={{ duration: 0.35, ease: 'easeOut' }}
+                        className="card card-pad sm:p-8"
                     >
                         {showVerification ? (
                             <OTPVerification
@@ -122,11 +125,11 @@ export default function Login() {
                             />
                         ) : (
                             <>
-                                <div className="mb-10">
-                                    <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">
-                                        Welcome Back
+                                <div className="mb-8">
+                                    <h2 className="page-title">
+                                        Welcome back
                                     </h2>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">Please enter your details to access your dashboard.</p>
+                                    <p className="page-sub mt-2">Enter your details to access your dashboard.</p>
                                 </div>
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -163,6 +166,7 @@ export default function Login() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowPassword(!showPassword)}
+                                                    aria-label={showPassword ? "Hide password" : "Show password"}
                                                     className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors focus:outline-none p-1"
                                                 >
                                                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -174,28 +178,28 @@ export default function Login() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-600/25 active:scale-[0.98]"
+                                        className="btn-primary btn-lg w-full"
                                     >
                                         {loading ? (
-                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                            <Loader2 className="h-4 w-4 animate-spin" />
                                         ) : (
-                                            'Sign In'
+                                            'Sign in'
                                         )}
                                     </button>
 
-                                    <div className="relative py-4">
+                                    <div className="relative py-3">
                                         <div className="absolute inset-0 flex items-center">
                                             <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
                                         </div>
-                                        <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.2em]">
-                                            <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 dark:text-slate-600">Or continue with</span>
+                                        <div className="relative flex justify-center">
+                                            <span className="bg-white dark:bg-slate-900 px-4 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">Or continue with</span>
                                         </div>
                                     </div>
 
                                     <button
                                         type="button"
                                         onClick={handleGoogleLogin}
-                                        className="w-full bg-white dark:bg-slate-950/50 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-sm"
+                                        className="btn-secondary btn-lg w-full"
                                     >
                                         <svg className="h-5 w-5" viewBox="0 0 24 24">
                                             <path
@@ -215,7 +219,7 @@ export default function Login() {
                                                 fill="#EA4335"
                                             />
                                         </svg>
-                                        Google
+                                        Continue with Google
                                     </button>
                                 </form>
                             </>
@@ -225,11 +229,11 @@ export default function Login() {
             </main>
 
             {/* Footer */}
-            <footer className="w-full max-w-7xl mx-auto p-6 text-center text-slate-500 text-sm">
-                <p className="mb-2">
-                    By continuing, you agree to our <Link to="/terms" className="text-blue-500 hover:text-blue-400">Terms of Service</Link> and <Link to="/privacy" className="text-blue-500 hover:text-blue-400">Privacy Policy</Link>.
+            <footer className="w-full max-w-7xl mx-auto p-6 text-center">
+                <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
+                    By continuing, you agree to our <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-violet-600 dark:text-violet-400 hover:underline">Privacy Policy</Link>.
                 </p>
-                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );

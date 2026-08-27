@@ -1,4 +1,4 @@
-const PDFDocument = require('pdfkit');
+import PDFDocument from 'pdfkit';
 
 class ReceiptService {
     static generateReceipt(payment, user, res) {
@@ -105,4 +105,7 @@ function generateHr(doc, y) {
         .stroke();
 }
 
-module.exports = ReceiptService;
+export default ReceiptService;
+export const generateReceipt = ReceiptService.generateReceipt;
+export const generatePDFBuffer = ReceiptService.generatePDFBuffer;
+export const _buildReceipt = ReceiptService._buildReceipt;

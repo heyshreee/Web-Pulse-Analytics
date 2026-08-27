@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const projectController = require('../../controllers/project.controller');
-const trackingCors = require('../../middleware/trackingCors');
-const auth = require('../../middleware/auth');
+import projectController from '../../controllers/project.controller.js';
+import trackingCors from '../../middleware/trackingCors.js';
+import auth from '../../middleware/auth.js';
 
 // Public routes
 router.get('/share/:shareToken', projectController.getShareReport);
@@ -18,4 +18,4 @@ router.delete('/:id', projectController.deleteProject);
 router.put('/:id/pin', projectController.togglePin);
 router.post('/:id/regenerate-token', projectController.regenerateShareToken);
 
-module.exports = router;
+export default router;

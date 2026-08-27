@@ -60,16 +60,16 @@ const WorldMap = ({ activityData = [] }) => {
             center={[activity.lat, activity.lng]}
             radius={8}
             pathOptions={{
-              fillColor: '#3B82F6',
+              fillColor: '#8B5CF6',
               fillOpacity: 0.6,
-              color: '#60A5FA',
+              color: '#A78BFA',
               weight: 2,
               className: 'pulse-marker'
             }}
           >
             <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-              <div className="bg-[#0F172A] border border-blue-500/30 rounded-lg p-2 text-center backdrop-blur-xl">
-                <p className="text-[10px] text-blue-400 font-bold tracking-widest uppercase mb-1">Incoming Hit</p>
+              <div className="bg-[#0F172A] border border-violet-500/30 rounded-lg p-2 text-center backdrop-blur-xl">
+                <p className="text-[10px] text-violet-400 font-bold tracking-widest uppercase mb-1">Incoming Hit</p>
                 <p className="text-sm text-white font-bold mb-0.5">
                   {activity.ip}
                 </p>

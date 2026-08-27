@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const authController = require('../controllers/auth.controller');
-const auth = require('../middleware/auth');
+import authController from '../controllers/auth.controller.js';
+import auth from '../middleware/auth.js';
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
@@ -13,4 +13,4 @@ router.post('/reset-password', authController.resetPassword);
 router.post('/google-login', authController.googleLogin);
 router.get('/me', auth, authController.getMe);
 
-module.exports = router;
+export default router;

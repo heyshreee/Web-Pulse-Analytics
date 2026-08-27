@@ -1,6 +1,6 @@
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, Zap, Layers, X, ArrowUpRight, Download, CreditCard, Calendar, Clock } from 'lucide-react';
+import { Check, Zap, CreditCard, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
@@ -176,12 +176,6 @@ export default function Billing() {
         });
     };
 
-
-
-    // ... existing useEffect ...
-
-    // ... existing loadPaymentHistory ...
-
     const handleUpgrade = async (planId) => {
         setLoading(true);
         try {
@@ -294,131 +288,136 @@ export default function Billing() {
     if (pageLoading) return <Spinner />;
 
     return (
-        <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-                <div className="flex items-center gap-5">
-                    <div className="p-4 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-600/20 group-hover:rotate-12 transition-transform duration-500">
-                        <CreditCard className="h-8 w-8 text-white" />
+        <div className="space-y-8 animate-fade-up">
+            {/* Header */}
+            <div className="page-header">
+                <div className="page-header-title">
+                    <div className="page-header-icon">
+                        <CreditCard className="h-5 w-5" />
                     </div>
-                    <div className="flex flex-col">
-                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Billing & Subscription</h2>
-                        <p className="text-lg font-medium text-slate-500 dark:text-slate-400 leading-relaxed italic opacity-80">Manage your subscription, view usage, and download invoices.</p>
+                    <div>
+                        <h1 className="page-title">Billing & Subscription</h1>
+                        <p className="page-sub">Manage your subscription, view usage, and download invoices.</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     {/* Currency Switcher */}
-                    <div className="bg-slate-100 dark:bg-slate-900/60 backdrop-blur-2xl border border-slate-200 dark:border-white/5 p-1 rounded-xl flex items-center shadow-sm">
+                    <div className="segmented">
                         <button
                             onClick={() => setCurrency('INR')}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currency === 'INR' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                            className={`segmented-btn ${currency === 'INR'
+                                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                             INR (₹)
                         </button>
                         <button
                             onClick={() => setCurrency('USD')}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currency === 'USD' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                            className={`segmented-btn ${currency === 'USD'
+                                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                             USD ($)
                         </button>
                     </div>
 
-                    <button className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <button className="icon-btn">
                         <Clock className="h-5 w-5" />
                     </button>
                 </div>
             </div>
 
             {/* Top Section: Current Plan & Usage */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Current Plan Card */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900/60 backdrop-blur-2xl border border-slate-200 dark:border-white/5 rounded-3xl p-8 relative overflow-hidden group shadow-sm dark:shadow-2xl">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 dark:bg-blue-500/10 blur-[100px] -mr-32 -mt-32 rounded-full"></div>
-
-                    <div className="flex justify-between items-start mb-12 relative z-10">
+                <div className="lg:col-span-2 card card-pad relative overflow-hidden">
+                    <div className="absolute inset-0 bg-violet-500/[0.03] pointer-events-none" />
+                    <div className="flex justify-between items-start gap-4 mb-8 relative z-10">
                         <div>
-                            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Current Plan</p>
+                            <p className="eyebrow mb-2">Current Plan</p>
                             <div className="flex items-center gap-3">
-                                <h2 className="text-4xl font-black text-slate-900 dark:text-white capitalize">{usageStats.plan} Plan</h2>
-                                <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-full uppercase tracking-wider border border-slate-200 dark:border-slate-700">Current</span>
+                                <h2 className="text-3xl font-bold text-slate-900 dark:text-white capitalize">{usageStats.plan} Plan</h2>
+                                <span className="badge-slate">Current</span>
                             </div>
                         </div>
                         <button
                             onClick={() => handleUpgrade('pro')}
                             disabled={usageStats.plan === 'pro' || loading}
-                            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                            className="btn-primary btn-md"
+                        >
                             {usageStats.plan === 'pro' ? 'Current Plan' : 'Upgrade Now'}
                         </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl p-6 shadow-inner">
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Monthly Limit</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{viewLimit.toLocaleString()} <span className="text-sm text-slate-500 ml-1">views</span></p>
+                        <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40">
+                            <p className="eyebrow mb-2">Monthly Limit</p>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{viewLimit.toLocaleString()} <span className="text-sm text-slate-500 ml-1">views</span></p>
                         </div>
-                        <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-2xl p-6 shadow-inner">
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-2">Next Reset</p>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{getNextResetDate()}</p>
+                        <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40">
+                            <p className="eyebrow mb-2">Next Reset</p>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{getNextResetDate()}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Usage Card */}
-                <div className="bg-white dark:bg-slate-900/60 backdrop-blur-2xl border border-slate-200 dark:border-white/5 rounded-3xl p-8 flex flex-col shadow-sm dark:shadow-2xl transition-all">
+                <div className="card card-pad flex flex-col">
                     <div className="flex items-center gap-3 mb-8">
-                        <div className="p-2 bg-blue-50 dark:bg-blue-400/10 rounded-lg">
-                            <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400 fill-blue-600/10 dark:fill-blue-400/20" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
+                            <Zap className="h-5 w-5 text-violet-500" />
                         </div>
-                        <h3 className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">Usage This Month</h3>
+                        <h3 className="eyebrow">Usage This Month</h3>
                     </div>
 
                     <div className="space-y-8 flex-1">
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Project Views</p>
-                                <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
-                                    {totalViewsUsed.toLocaleString()} <span className="text-slate-400 dark:text-slate-500 font-medium">/ {viewLimit.toLocaleString()}</span>
+                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Project Views</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                                    {totalViewsUsed.toLocaleString()} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {viewLimit.toLocaleString()}</span>
                                 </p>
                             </div>
                             <div className="h-2 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${viewPercentage}%` }}
-                                    className="h-full bg-blue-500 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.5)]"
+                                    className="h-full bg-violet-500 rounded-full"
                                 />
                             </div>
                         </div>
 
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Active Projects</p>
-                                <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
-                                    {projectsCount} <span className="text-slate-400 dark:text-slate-500 font-medium">/ {projectLimit}</span>
+                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Active Projects</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                                    {projectsCount} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {projectLimit}</span>
                                 </p>
                             </div>
                             <div className="h-2 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${projectPercentage}%` }}
-                                    className="h-full bg-blue-500 rounded-full shadow-[0_0_12px_rgba(59,130,246,0.5)]"
+                                    className="h-full bg-violet-500 rounded-full"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <p className="text-[10px] text-slate-500 mt-8 italic leading-relaxed">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-8 italic leading-relaxed">
                         Resets automatically at the start of next billing cycle.
                     </p>
                 </div>
             </div>
 
             {/* Plan Comparison Section */}
-            <div className="mb-16">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Choose your plan</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-10">Pick the best plan that fits your growth needs.</p>
+            <div>
+                <h2 className="section-title mb-2">Choose your plan</h2>
+                <p className="page-sub mb-8">Pick the best plan that fits your growth needs.</p>
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -436,28 +435,21 @@ export default function Billing() {
 
                             return (
                                 <div key={plan.id} className={`
-                                    backdrop-blur-2xl border rounded-3xl p-6 flex flex-col h-full transition-all group relative shadow-sm hover:shadow-2xl
+                                    card card-pad flex flex-col h-full relative transition-all duration-200
                                     ${isCurrentPlan
-                                        ? 'bg-blue-50/50 dark:bg-blue-500/10 border-blue-200/50 dark:border-blue-500/30'
+                                        ? 'border-violet-300 dark:border-violet-500/40 ring-1 ring-violet-500/20'
                                         : isPro
-                                            ? 'bg-white dark:bg-slate-900/60 border-blue-200 dark:border-blue-500/30 hover:border-blue-400 dark:hover:border-blue-500/50'
-                                            : 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10'}
+                                            ? 'border-violet-200 dark:border-violet-500/30 card-hover'
+                                            : 'card-hover'}
                                 `}>
                                     {isPro && (
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                                            <span className="px-3 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-[0_0_20px_rgba(37,99,235,0.4)]">Popular</span>
+                                            <span className="px-3 py-1 bg-violet-500 text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm">Popular</span>
                                         </div>
-                                    )}
-                                    {isPro && (
-                                        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
                                     )}
 
                                     <div className="mb-6">
-                                        <h3 className={`text-lg font-black mb-1 ${isFree ? 'text-slate-900 dark:text-white' :
-                                            isBasic ? 'text-blue-600 dark:text-blue-400' :
-                                                isPro ? 'text-blue-600 dark:text-white' :
-                                                    'text-purple-600 dark:text-purple-400'
-                                            }`}>{plan.name}</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{plan.name}</h3>
                                         <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                             {plan.description}
                                         </p>
@@ -465,10 +457,10 @@ export default function Billing() {
 
                                     <div className="mb-6">
                                         <div className="flex items-baseline gap-1">
-                                            <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                                            <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                                                 {priceDisplay}
                                             </span>
-                                            <span className="text-slate-500 font-bold text-xs">/mo</span>
+                                            <span className="text-slate-500 font-semibold text-xs">/mo</span>
                                         </div>
                                     </div>
 
@@ -476,28 +468,28 @@ export default function Billing() {
                                         <ul className="space-y-4">
                                             {plan.features && plan.features.length > 0 ? (
                                                 plan.features.map((feature, idx) => (
-                                                    <li key={idx} className="flex items-center gap-3 text-xs font-bold text-slate-600 dark:text-slate-400">
-                                                        <Check className={`h-4 w-4 shrink-0 p-1 rounded-full ${isFree || isBasic ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' :
+                                                    <li key={idx} className="flex items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                        <Check className={`h-4 w-4 shrink-0 p-1 rounded-full ${isFree || isBasic ? 'text-violet-600 bg-violet-50 dark:bg-violet-500/10 dark:text-violet-400' :
                                                             isPro ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' :
-                                                                'text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
+                                                                'text-violet-500 bg-violet-50 dark:bg-violet-500/10'
                                                             }`} />
                                                         {feature.text || feature}
                                                     </li>
                                                 ))
                                             ) : (
                                                 <>
-                                                    <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
-                                                        <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> {plan.max_projects === 100 ? 'Unlimited' : plan.max_projects} Projects
+                                                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                        <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> {plan.max_projects === 100 ? 'Unlimited' : plan.max_projects} Projects
                                                     </li>
-                                                    <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
-                                                        <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> {plan.allowed_origins} Allowed Origin{plan.allowed_origins > 1 ? 's' : ''}
+                                                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                        <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> {plan.allowed_origins} Allowed Origin{plan.allowed_origins > 1 ? 's' : ''}
                                                     </li>
-                                                    <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
-                                                        <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events)} events/mo
+                                                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                        <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events)} events/mo
                                                     </li>
                                                     {plan.live_logs && (
-                                                        <li className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
-                                                            <Check className="h-4 w-4 text-blue-600 bg-blue-50 dark:bg-blue-500/10 shrink-0 p-0.5 rounded-full" /> Live Activity Logs
+                                                        <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                            <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> Live Activity Logs
                                                         </li>
                                                     )}
                                                 </>
@@ -514,14 +506,12 @@ export default function Billing() {
                                         }}
                                         disabled={isCurrentPlan || (isFree && usageStats.plan === 'free') || (plan.id === 'business')} // Disable business button
                                         className={`
-                                            w-full py-4 rounded-2xl font-black text-sm transition-all shadow-sm
+                                            w-full btn-lg
                                             ${isCurrentPlan
-                                                ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 cursor-default border border-blue-200 dark:border-blue-500/50'
-                                                : isFree
-                                                    ? 'bg-slate-50 dark:bg-transparent border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
-                                                    : isBusiness
-                                                        ? 'bg-slate-50 dark:bg-transparent border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 active:scale-[0.98]' // Style for Contact Sales
-                                                        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20 active:scale-[0.98]'}
+                                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-default border border-slate-200 dark:border-slate-700'
+                                                : isFree || isBusiness
+                                                    ? 'btn-secondary'
+                                                    : 'btn-primary'}
                                             disabled:opacity-50 disabled:cursor-not-allowed
                                         `}
                                     >

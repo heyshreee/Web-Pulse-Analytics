@@ -1,13 +1,17 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const csrf = require('../../middleware/csrf');
+import csrf from '../../middleware/csrf.js';
 
 // Import sub-routers
-const authRoutes = require('./auth.routes');
-const projectRoutes = require('./projects.routes');
-const analyticsRoutes = require('./analytics.routes');
-const trackRoutes = require('./track.routes');
-const usageRoutes = require('./usage.routes');
+import authRoutes from './auth.routes.js';
+import projectRoutes from './projects.routes.js';
+import analyticsRoutes from './analytics.routes.js';
+import trackRoutes from './track.routes.js';
+import usageRoutes from './usage.routes.js';
+import notificationRoutes from './notification.routes.js';
+import activityRoutes from './activity.routes.js';
+import paymentRoutes from './payment.routes.js';
+import userRoutes from './user.routes.js';
 
 // Apply CSRF protection to all non-GET v1 routes, except public tracking
 router.use((req, res, next) => {
@@ -24,9 +28,9 @@ router.use('/analytics', analyticsRoutes);
 router.use('/track', trackRoutes);
 router.use('/usage', usageRoutes);
 
-router.use('/notifications', require('./notification.routes'));
-router.use('/activity', require('./activity.routes'));
-router.use('/payment', require('./payment.routes'));
-router.use('/user', require('./user.routes'));
+router.use('/notifications', notificationRoutes);
+router.use('/activity', activityRoutes);
+router.use('/payment', paymentRoutes);
+router.use('/user', userRoutes);
 
-module.exports = router;
+export default router;

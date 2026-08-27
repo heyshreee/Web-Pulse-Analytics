@@ -17,11 +17,11 @@ export default function CopyButton({ text, label }) {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-all"
+      className="btn-secondary btn-sm"
     >
       {copied ? (
         <>
-          <Check className="h-4 w-4 text-green-400" />
+          <Check className="h-4 w-4 text-emerald-500" />
           {label && <span>Copied!</span>}
         </>
       ) : (

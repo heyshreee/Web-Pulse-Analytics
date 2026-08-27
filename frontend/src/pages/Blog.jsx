@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Calendar, ArrowRight, BarChart2 } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Blog() {
     const posts = [
@@ -38,55 +39,57 @@ export default function Blog() {
     ];
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0B0E14] text-slate-900 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-500">
-            {/* Header */}
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-5 w-5" />
-                        <span className="font-medium">Back to Home</span>
+        <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
+                        <ArrowLeft className="h-4 w-4" />
+                        <span className="font-medium text-sm">Back to Home</span>
                     </Link>
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        <Link to="/features" className="hidden sm:block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Features</Link>
+                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
+                    </div>
                 </div>
             </header>
 
-            <main className="pt-32 pb-20">
+            <main className="pt-28 pb-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter">Latest Updates</h2>
-                        <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
+                    <div className="text-center mb-16">
+                        <p className="eyebrow mb-3">Blog</p>
+                        <h2 className="page-title !text-4xl">Latest updates</h2>
+                        <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
                             News, tips, and insights from the WebPulse team.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                         {posts.map((post, i) => (
-                            <article key={i} className="group bg-slate-50 dark:bg-[#151921] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:border-blue-500/30 dark:hover:border-white/10 transition-all hover:shadow-2xl hover:shadow-blue-500/5">
-                                <div className="h-60 relative overflow-hidden">
+                            <article key={i} className="card card-hover overflow-hidden group bg-white dark:bg-slate-900">
+                                <div className="h-52 relative overflow-hidden">
                                     <img
                                         src={post.image}
                                         alt={post.title}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                                 </div>
-                                <div className="p-8">
-                                    <div className="flex items-center gap-4 text-xs font-medium text-slate-500 mb-4">
-                                        <span className="text-blue-400 uppercase tracking-wider">{post.category}</span>
+                                <div className="p-7">
+                                    <div className="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mb-3">
+                                        <span className="font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wider">{post.category}</span>
                                         <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {post.date}</span>
                                     </div>
-                                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 tracking-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                                         {post.title}
                                     </h2>
-                                    <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-                                        {post.excerpt}
-                                    </p>
+                                    <p className="prose-quiet mb-5">{post.excerpt}</p>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                            <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                                            <div className="h-6 w-6 rounded-full bg-violet-100 dark:bg-violet-500/20"></div>
                                             {post.author}
                                         </div>
-                                        <span className="text-blue-500 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                                            Read Article <ArrowRight className="h-4 w-4" />
+                                        <span className="text-violet-600 dark:text-violet-400 font-medium flex items-center gap-1 text-sm group-hover:gap-2 transition-all">
+                                            Read article <ArrowRight className="h-4 w-4" />
                                         </span>
                                     </div>
                                 </div>
@@ -96,8 +99,14 @@ export default function Blog() {
                 </div>
             </main>
 
-            <footer className="border-t border-slate-200 dark:border-white/5 py-12 bg-white dark:bg-[#0B0E14] text-center">
-                <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+            <footer className="border-t border-slate-200 dark:border-slate-800 py-10 bg-white dark:bg-slate-950 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
+                        <BarChart2 className="h-4 w-4" />
+                    </div>
+                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse Analytics</span>
+                </div>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
             </footer>
         </div>
     );

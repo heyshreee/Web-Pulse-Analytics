@@ -1,5 +1,5 @@
-const supabase = require('../config/supabase');
-const crypto = require('crypto');
+import supabase from '../config/supabase.js';
+import crypto from 'crypto';
 
 class ActivityLogService {
     /**
@@ -273,4 +273,9 @@ class ActivityLogService {
     }
 }
 
-module.exports = ActivityLogService;
+export default ActivityLogService;
+export const log = ActivityLogService.log;
+export const enforceLimit = ActivityLogService.enforceLimit;
+export const emitRealTimeUpdate = ActivityLogService.emitRealTimeUpdate;
+export const getLogs = ActivityLogService.getLogs;
+export const cleanup = ActivityLogService.cleanup;

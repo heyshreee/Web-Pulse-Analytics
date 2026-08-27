@@ -1,19 +1,15 @@
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+import { createClient } from '@supabase/supabase-js';
+import env from './env.js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-
-// Increasing the timeout for backend interactions to 60s
-const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createClient(env.supabaseUrl, env.supabaseServiceKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
-    detectSessionInUrl: false
+    detectSessionInUrl: false,
   },
   global: {
-    headers: { 'x-application-name': 'webpulse-backend' }
-  }
+    headers: { 'x-application-name': 'webpulse-backend' },
+  },
 });
 
-module.exports = supabase;
+export default supabase;

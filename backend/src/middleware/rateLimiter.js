@@ -1,6 +1,6 @@
-const rateLimit = require('express-rate-limit');
-const ActivityLogService = require('../services/activity.service');
-const { getClientIp } = require('../utils/ip');
+import rateLimit from 'express-rate-limit';
+import ActivityLogService from '../services/activity.service.js';
+import { getClientIp } from '../utils/ip.js';
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -32,4 +32,4 @@ const limiter = rateLimit({
     }
 });
 
-module.exports = limiter;
+export default limiter;

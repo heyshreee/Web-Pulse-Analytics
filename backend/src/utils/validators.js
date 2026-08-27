@@ -1,8 +1,7 @@
-exports.validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-exports.validatePassword = (password) => {
-    return password.length >= 6;
-};
+export const validateEmail = (email) => EMAIL_RE.test(email);
+
+export const validatePassword = (password) => password.length >= 6;
+
+export default { validateEmail, validatePassword };

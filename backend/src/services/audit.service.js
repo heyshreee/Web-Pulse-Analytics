@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+import supabase from '../config/supabase.js';
 
 /**
  * Audit logging service to track critical actions.
@@ -36,4 +36,5 @@ const logAction = async (userId, action, metadata = {}) => {
     }
 };
 
-module.exports = { logAction };
+export default { logAction };
+export { logAction };

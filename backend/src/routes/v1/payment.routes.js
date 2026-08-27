@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const paymentController = require('../../controllers/payment.controller');
-const authenticate = require('../../middleware/auth');
+import paymentController from '../../controllers/payment.controller.js';
+import authenticate from '../../middleware/auth.js';
 
 router.get('/plans', paymentController.getPlans);
 router.post('/order', authenticate, paymentController.createOrder);
@@ -11,4 +11,4 @@ router.get('/receipt/:id', authenticate, paymentController.getReceipt);
 router.post('/downgrade', authenticate, paymentController.downgradePlan);
 router.post('/receipt/:id/email', authenticate, paymentController.emailReceipt);
 
-module.exports = router;
+export default router;

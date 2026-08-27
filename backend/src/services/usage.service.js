@@ -1,5 +1,6 @@
-const supabase = require('../config/supabase');
-const NotificationService = require('./notification.service');
+import supabase from '../config/supabase.js';
+import NotificationService from './notification.service.js';
+import ActivityLogService from './activity.service.js';
 
 const PLAN_LIMITS = {
     free: {
@@ -47,14 +48,14 @@ const PLAN_LIMITS = {
 /**
  * Get limits for a specific plan
  */
-exports.getPlanLimits = (plan = 'free') => {
+export const getPlanLimits = (plan = 'free') => {
     return PLAN_LIMITS[plan] || PLAN_LIMITS.free;
 };
 
 /**
  * Calculate current usage for a user
  */
-exports.calculateUsage = async (userId) => {
+export const calculateUsage = async (userId) => {
     const currentMonth = new Date().toISOString().slice(0, 7);
 
     // 1. Get user plan
@@ -65,7 +66,7 @@ exports.calculateUsage = async (userId) => {
         .single();
 
     const plan = user?.plan || 'free';
-    const limits = exports.getPlanLimits(plan);
+    const limits = getPlanLimits(plan);
 
     // 2. Calculate Views (Current Month)
     const { data: projects } = await supabase
@@ -158,7 +159,7 @@ exports.calculateUsage = async (userId) => {
 /**
  * Calculate storage and stats for a specific project
  */
-exports.calculateProjectUsage = async (projectId) => {
+export const calculateProjectUsage = async (projectId) => {
     const [{ count: visitorCount }, { count: viewCount }] = await Promise.all([
         supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', projectId),
         supabase.from('page_views').select('*', { count: 'exact', head: true }).eq('project_id', projectId)
@@ -191,7 +192,7 @@ exports.calculateProjectUsage = async (projectId) => {
 /**
  * Check if a user can still track data
  */
-exports.checkLimit = async (userId, type = 'track') => {
+export const checkLimit = async (userId, type = 'track') => {
     const usage = await this.calculateUsage(userId);
 
     if (type === 'create_project') {
@@ -211,7 +212,6 @@ exports.checkLimit = async (userId, type = 'track') => {
             );
 
             // Log to activity logs
-            const ActivityLogService = require('./activity.service');
             const { data: projects } = await supabase
                 .from('projects')
                 .select('id')
@@ -298,3 +298,5 @@ exports.checkLimit = async (userId, type = 'track') => {
         usage
     };
 };
+
+export default { getPlanLimits, calculateUsage, calculateProjectUsage, checkLimit };

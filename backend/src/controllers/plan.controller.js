@@ -1,11 +1,9 @@
-const planService = require('../services/plan.service');
+import asyncHandler from '../utils/asyncHandler.js';
+import planService from '../services/plan.service.js';
 
-exports.getPlans = async (req, res) => {
-    try {
-        const plans = await planService.getAllPlans();
-        res.json(plans);
-    } catch (error) {
-        console.error('Error in getPlans controller:', error);
-        res.status(500).json({ message: 'Failed to fetch subscription plans' });
-    }
-};
+export const getPlans = asyncHandler(async (req, res) => {
+    const plans = await planService.getAllPlans();
+    res.json(plans);
+});
+
+export default { getPlans };
