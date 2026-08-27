@@ -200,7 +200,7 @@ export default function Dashboard() {
 
           <div className="card card-pad h-[240px] flex flex-col">
             <h3 className="eyebrow mb-6">Traffic Momentum</h3>
-            <div className="flex-1 w-full min-h-0">
+            <div className="flex-1 w-full min-h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={sparkline || []}>
                   <Bar dataKey="value" radius={[6, 6, 0, 0]}>
@@ -244,7 +244,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-        <div className="flex-1 w-full min-h-0 bg-slate-50 dark:bg-slate-950/40 rounded-xl p-4 sm:p-6 border border-slate-100 dark:border-slate-800">
+        <div className="flex-1 w-full min-h-[280px] bg-slate-50 dark:bg-slate-950/40 rounded-xl p-4 sm:p-6 border border-slate-100 dark:border-slate-800">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={trafficData}>
               <defs>
