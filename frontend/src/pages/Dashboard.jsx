@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext, Link } from 'react-router-dom';
-import { Plus, Globe, Code, Activity, ArrowUpRight, TrendingUp } from 'lucide-react';
+import { Plus, Globe, Code, Activity, ArrowUpRight, TrendingUp, X, MapPin } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
 import { useToast } from '../context/ToastContext';
-import GlobalGlobe from '../components/dashboard/GlobalGlobe';
+import NetworkGlobe from '../components/dashboard/NetworkGlobe';
 import { useTheme } from '../context/ThemeContext';
 import {
   AreaChart,
@@ -42,6 +42,8 @@ export default function Dashboard() {
   });
 
   const [timeRange, setTimeRange] = useState('30d');
+  const [globeError, setGlobeError] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -73,6 +75,7 @@ export default function Dashboard() {
         apiRequest(`/analytics/overview?range=${timeRange}`).catch(() => null)
       ]);
 
+      setGlobeError(!statsData);
       setProjects(projectsData);
 
       if (statsData) {
@@ -164,13 +167,79 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Hero Section: 3D Global View */}
+      {/* Hero Section: Data Network Globe */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 card overflow-hidden min-h-[400px] lg:min-h-[520px] relative">
-          <div className="absolute inset-0 bg-violet-500/[0.03] pointer-events-none" />
-          <div className="relative h-full flex items-center justify-center">
-            <GlobalGlobe activityData={liveActivity} />
+        <div className="lg:col-span-3 space-y-4">
+          <div className="card overflow-hidden h-[400px] lg:h-[520px] relative flex">
+            <div className="absolute inset-0 bg-violet-500/[0.03] pointer-events-none" />
+            <div className="relative flex-1">
+              <NetworkGlobe
+                activityData={liveActivity}
+                loading={false}
+                error={globeError}
+                onRetry={() => loadData(false)}
+                realTimeVisitors={realTimeVisitors}
+                selectedLocation={selectedLocation}
+                onSelectLocation={setSelectedLocation}
+                isDark={isDark}
+              />
+            </div>
           </div>
+
+          {/* Selected location detail */}
+          {selectedLocation && (
+            <div className="card card-pad animate-fade-in">
+              <div className="flex items-start justify-between gap-6">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="badge-green">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                      </span>
+                      Active
+                    </span>
+                    <button
+                      onClick={() => setSelectedLocation(null)}
+                      className="ml-auto text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                      aria-label="Close location detail"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">
+                    {selectedLocation.location || 'Unknown Location'}
+                  </h3>
+                  <p className="eyebrow mt-1">Location detail</p>
+                </div>
+
+                <div className="text-right flex-shrink-0">
+                  <span className="text-4xl font-bold text-violet-600 dark:text-violet-400 tabular-nums tracking-tight">
+                    {selectedLocation.count.toLocaleString()}
+                  </span>
+                  <p className="eyebrow mt-1">Active Visitors</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <InfoItem
+                  icon={<MapPin className="h-4 w-4" />}
+                  label="Device"
+                  value={<span className="capitalize">{selectedLocation.device || 'Unknown'}</span>}
+                />
+                <InfoItem
+                  icon={<TrendingUp className="h-4 w-4" />}
+                  label="Current page"
+                  value={<span className="font-mono truncate">{selectedLocation.path || '/'}</span>}
+                />
+                <InfoItem
+                  icon={<Activity className="h-4 w-4" />}
+                  label="Coordinates"
+                  value={<span className="font-mono">{selectedLocation.lat?.toFixed(2)}, {selectedLocation.lng?.toFixed(2)}</span>}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Real-time stats sidebar */}
@@ -456,6 +525,21 @@ export default function Dashboard() {
           <Spinner fullScreen={false} />
         </div>
       )}
+    </div>
+  );
+}
+
+function InfoItem({ icon, label, value }) {
+  const muted = 'text-slate-500 dark:text-slate-400';
+  return (
+    <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800">
+      <div className="p-2 rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 flex-shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className={`text-[10px] uppercase tracking-[0.18em] font-bold mb-1 ${muted}`}>{label}</p>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{value}</p>
+      </div>
     </div>
   );
 }
