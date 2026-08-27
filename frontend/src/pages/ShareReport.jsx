@@ -181,21 +181,20 @@ export default function ShareReport() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Top Referrers */}
-                    <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-all">
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-8">Top Referrers</h3>
+                    <div className="card card-pad">
+                        <h3 className="section-title mb-6">Top Referrers</h3>
                         <div className="space-y-6">
                             {stats.topReferrers?.map((referrer, i) => (
                                 <div key={i} className="group">
-                                    <div className="flex justify-between text-xs mb-2 uppercase tracking-widest font-black">
-                                        <span className="text-slate-900 dark:text-white">{referrer.name}</span>
-                                        <span className="text-slate-400 dark:text-slate-500">{referrer.value.toLocaleString()} views</span>
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className="font-semibold text-slate-900 dark:text-white">{referrer.name}</span>
+                                        <span className="text-slate-400 dark:text-slate-500 tabular-nums">{referrer.value.toLocaleString()} views</span>
                                     </div>
-                                    <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner ring-1 ring-slate-200/50 dark:ring-transparent">
+                                    <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden ring-1 ring-slate-200/50 dark:ring-transparent">
                                         <div
-                                            className="h-full rounded-full transition-all duration-1000 ease-out"
+                                            className="h-full rounded-full bg-violet-500 transition-all duration-1000 ease-out"
                                             style={{
                                                 width: `${Math.min((referrer.value / (stats.topReferrers[0]?.value || 1)) * 100, 100)}%`,
-                                                backgroundColor: referrer.color || '#3B82F6'
                                             }}
                                         ></div>
                                     </div>
@@ -204,27 +203,27 @@ export default function ShareReport() {
                             {(!stats.topReferrers || stats.topReferrers.length === 0) && (
                                 <div className="text-center py-12">
                                     <Globe className="h-12 w-12 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No referrer data available</p>
+                                    <p className="text-sm font-medium text-slate-400">No referrer data available</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {/* Device Stats */}
-                    <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-slate-800/50 rounded-3xl p-8 shadow-sm dark:shadow-xl transition-all">
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-8">Device Breakdown</h3>
+                    <div className="card card-pad">
+                        <h3 className="section-title mb-6">Device Breakdown</h3>
                         <div className="space-y-4">
                             {stats.deviceStats?.map((device, i) => (
-                                <div key={i} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all hover:border-blue-400 dark:hover:border-slate-700 shadow-sm group">
+                                <div key={i} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all hover:border-violet-300 dark:hover:border-slate-700 group">
                                     <div className="flex items-center gap-4">
                                         <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-all">
-                                            {device.name.toLowerCase() === 'desktop' ? <Monitor className="h-5 w-5 text-blue-500" /> :
+                                            {device.name.toLowerCase() === 'desktop' ? <Monitor className="h-5 w-5 text-violet-500" /> :
                                                 device.name.toLowerCase() === 'mobile' ? <Smartphone className="h-5 w-5 text-emerald-500" /> :
                                                     <Tablet className="h-5 w-5 text-orange-500" />}
                                         </div>
-                                        <span className="text-base font-black text-slate-900 dark:text-white tracking-tight">{device.name}</span>
+                                        <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">{device.name}</span>
                                     </div>
-                                    <span className="text-base font-black text-blue-600 dark:text-blue-400 tabular-nums">
+                                    <span className="text-base font-semibold text-violet-600 dark:text-violet-400 tabular-nums">
                                         {((device.value / stats.total_views) * 100).toFixed(0)}%
                                     </span>
                                 </div>
@@ -232,7 +231,7 @@ export default function ShareReport() {
                             {(!stats.deviceStats || stats.deviceStats.length === 0) && (
                                 <div className="text-center py-12">
                                     <Monitor className="h-12 w-12 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No device data available</p>
+                                    <p className="text-sm font-medium text-slate-400">No device data available</p>
                                 </div>
                             )}
                         </div>
