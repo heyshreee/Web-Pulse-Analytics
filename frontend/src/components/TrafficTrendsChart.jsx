@@ -21,15 +21,15 @@ export default function TrafficTrendsChart({
         <div className="h-full w-full relative min-h-[300px]">
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm z-10 rounded-2xl">
-                    <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
                 </div>
             )}
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                         <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
                         </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
@@ -59,12 +59,12 @@ export default function TrafficTrendsChart({
                             fontWeight: 'bold',
                             padding: '12px'
                         }}
-                        itemStyle={{ color: '#3B82F6' }}
+                        itemStyle={{ color: '#8B5CF6' }}
                     />
                     <Area
                         type="monotone"
                         dataKey="views"
-                        stroke="#3B82F6"
+                        stroke="#8B5CF6"
                         strokeWidth={3}
                         fillOpacity={1}
                         fill="url(#colorViews)"

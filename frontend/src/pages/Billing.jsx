@@ -290,10 +290,10 @@ export default function Billing() {
     return (
         <div className="space-y-8 animate-fade-up">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                        <CreditCard className="h-5 w-5 text-violet-500" />
+            <div className="page-header">
+                <div className="page-header-title">
+                    <div className="page-header-icon">
+                        <CreditCard className="h-5 w-5" />
                     </div>
                     <div>
                         <h1 className="page-title">Billing & Subscription</h1>
@@ -302,10 +302,10 @@ export default function Billing() {
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Currency Switcher */}
-                    <div className="flex bg-slate-100 dark:bg-slate-800/60 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <div className="segmented">
                         <button
                             onClick={() => setCurrency('INR')}
-                            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${currency === 'INR'
+                            className={`segmented-btn ${currency === 'INR'
                                 ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
@@ -313,7 +313,7 @@ export default function Billing() {
                         </button>
                         <button
                             onClick={() => setCurrency('USD')}
-                            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${currency === 'USD'
+                            className={`segmented-btn ${currency === 'USD'
                                 ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
@@ -321,7 +321,7 @@ export default function Billing() {
                         </button>
                     </div>
 
-                    <button className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <button className="icon-btn">
                         <Clock className="h-5 w-5" />
                     </button>
                 </div>
@@ -412,7 +412,7 @@ export default function Billing() {
 
             {/* Plan Comparison Section */}
             <div>
-                <h2 className="page-title !text-2xl mb-2">Choose your plan</h2>
+                <h2 className="section-title mb-2">Choose your plan</h2>
                 <p className="page-sub mb-8">Pick the best plan that fits your growth needs.</p>
 
                 {loading ? (

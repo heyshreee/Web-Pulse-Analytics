@@ -155,10 +155,10 @@ export default function ProjectActivity() {
     return (
         <div className="space-y-8 animate-fade-up">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                        <Activity className="h-5 w-5 text-violet-500" />
+            <div className="page-header">
+                <div className="page-header-title">
+                    <div className="page-header-icon">
+                        <Activity className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col">
                         <h2 className="page-title">Activity Log</h2>
@@ -189,7 +189,7 @@ export default function ProjectActivity() {
             </div>
 
             {/* Controls */}
-            <div className="card card-pad flex flex-col lg:flex-row gap-4 items-center justify-between !p-4">
+            <div className="card card-pad flex flex-col lg:flex-row gap-4 items-center justify-between p-4">
                 <div className="relative flex-1 w-full lg:max-w-md">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
@@ -274,7 +274,7 @@ export default function ProjectActivity() {
                             ) : logs.length === 0 ? (
                                 <tr>
                                     <td colSpan={idOrName ? 5 : 6} className="px-4 py-12 text-center">
-                                        <div className="card card-pad py-14 text-center !shadow-none !border-0">
+                                        <div className="py-14 text-center">
                                             <Activity className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                                             <p className="text-slate-500 dark:text-slate-400">No activity logs found matching your criteria.</p>
                                         </div>

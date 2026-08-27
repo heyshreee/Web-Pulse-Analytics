@@ -38,10 +38,10 @@ export default function APIKeys() {
     return (
         <div className="space-y-8 animate-fade-up">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                        <Key className="h-5 w-5 text-violet-500" />
+            <div className="page-header">
+                <div className="page-header-title">
+                    <div className="page-header-icon">
+                        <Key className="h-5 w-5" />
                     </div>
                     <div>
                         <h1 className="page-title">API Keys & Tracking IDs</h1>
@@ -54,7 +54,7 @@ export default function APIKeys() {
             <div className="card card-pad">
                 <div className="flex items-start justify-between gap-4 mb-6">
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Personal Access Token</h2>
+                        <h2 className="section-title mb-1">Personal Access Token</h2>
                         <p className="prose-quiet">Use this key to authenticate with the API programmatically.</p>
                     </div>
                     <span className="badge-violet shrink-0">Coming Soon</span>
@@ -73,14 +73,14 @@ export default function APIKeys() {
 
             {/* Project Tracking IDs */}
             <div className="card card-pad">
-                <h2 className="page-title !text-xl mb-6">Project Tracking IDs</h2>
+                <h2 className="section-title mb-6">Project Tracking IDs</h2>
 
                 <div className="space-y-3">
                     {projects.map(project => (
-                        <div key={project.id} className="card card-pad card-hover flex flex-col sm:flex-row sm:items-center justify-between gap-4 !p-4">
+                        <div key={project.id} className="card card-hover flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
                             <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                                    <Shield className="h-5 w-5 text-violet-500" />
+                                <div className="page-header-icon">
+                                    <Shield className="h-5 w-5" />
                                 </div>
                                 <div>
                                     <div className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">{project.name}</div>

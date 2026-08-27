@@ -30,10 +30,10 @@ export default function Settings() {
 
     return (
         <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                <div className="flex items-center gap-5">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                        <SettingsIcon className="h-5 w-5 text-violet-500" />
+            <div className="page-header">
+                <div className="page-header-title">
+                    <div className="page-header-icon">
+                        <SettingsIcon className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col">
                         <h2 className="page-title">Account Settings</h2>
