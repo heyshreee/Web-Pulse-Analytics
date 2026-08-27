@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const visitorController = require('../controllers/visitor.controller');
-const rateLimiter = require('../middleware/rateLimiter');
-const auth = require('../middleware/auth');
+import visitorController from '../controllers/visitor.controller.js';
+import rateLimiter from '../middleware/rateLimiter.js';
+import auth from '../middleware/auth.js';
 
 // Public endpoint for tracking (no auth required)
 router.post('/track', rateLimiter, visitorController.trackVisitor);
@@ -11,4 +11,4 @@ router.post('/track', rateLimiter, visitorController.trackVisitor);
 router.get('/live', auth, visitorController.getLiveVisitors);
 router.get('/dashboard-stats', auth, visitorController.getDashboardStats);
 
-module.exports = router;
+export default router;

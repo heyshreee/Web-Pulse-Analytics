@@ -1,5 +1,5 @@
-const ActivityLogService = require('../services/activity.service');
-const { getClientIp } = require('../utils/ip');
+import ActivityLogService from '../services/activity.service.js';
+import { getClientIp } from '../utils/ip.js';
 
 /**
  * Middleware to log requests to the activity log
@@ -51,4 +51,5 @@ const autoLog = (action) => {
     };
 };
 
-module.exports = { autoLog };
+export { autoLog };
+export default { autoLog };

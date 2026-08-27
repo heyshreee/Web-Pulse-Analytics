@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const userController = require('../../controllers/user.controller');
-const authenticate = require('../../middleware/auth');
-const upload = require('../../middleware/upload');
+import userController from '../../controllers/user.controller.js';
+import authenticate from '../../middleware/auth.js';
+import upload from '../../middleware/upload.js';
 
 router.use(authenticate);
 
@@ -13,4 +13,4 @@ router.get('/sessions', userController.getSessions);
 router.delete('/sessions/:sessionId', userController.revokeSession);
 router.put('/notifications', userController.updateNotificationPreferences);
 
-module.exports = router;
+export default router;

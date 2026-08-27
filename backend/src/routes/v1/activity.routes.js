@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const activityController = require('../../controllers/activity.controller');
-const requireAuth = require('../../middleware/auth');
+import activityController from '../../controllers/activity.controller.js';
+import requireAuth from '../../middleware/auth.js';
 
 router.get('/:projectId', requireAuth, activityController.getProjectLogs);
 router.get('/', requireAuth, activityController.getProjectLogs);
 
-module.exports = router;
+export default router;

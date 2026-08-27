@@ -4,7 +4,7 @@
  * This is effective because browsers won't add custom headers to cross-origin 
  * requests unless they are pre-flighted and allowed by CORS.
  */
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
     const safeMethods = ['GET', 'HEAD', 'OPTIONS'];
 
     if (safeMethods.includes(req.method)) {

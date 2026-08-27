@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const visitorController = require('../controllers/visitor.controller');
-const rateLimiter = require('../middleware/rateLimiter');
+import visitorController from '../controllers/visitor.controller.js';
+import rateLimiter from '../middleware/rateLimiter.js';
 
-const trackingCors = require('../middleware/trackingCors');
+import trackingCors from '../middleware/trackingCors.js';
 
 // Apply CORS middleware to all tracking routes
 router.use('/:trackingId', trackingCors);
@@ -14,4 +14,4 @@ router.post('/:trackingId', rateLimiter, visitorController.trackVisitorPublic);
 // Public stats endpoint (GET /api/track/:trackingId)
 router.get('/:trackingId', visitorController.getVisitorCountPublic);
 
-module.exports = router;
+export default router;

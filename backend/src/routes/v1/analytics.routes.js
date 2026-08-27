@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const projectController = require('../../controllers/project.controller');
-const visitorController = require('../../controllers/visitor.controller');
-const auth = require('../../middleware/auth');
+import projectController from '../../controllers/project.controller.js';
+import visitorController from '../../controllers/visitor.controller.js';
+import auth from '../../middleware/auth.js';
 
 // Public Analytics (Standard SaaS API)
 router.get('/count', visitorController.getEventCount);
@@ -18,4 +18,4 @@ router.get('/projects/:id/traffic', visitorController.getProjectDetailedStats);
 router.get('/projects/:id/pages', projectController.getProjectPages);
 router.get('/projects/:id/activity', projectController.getProjectActivity);
 
-module.exports = router;
+export default router;
