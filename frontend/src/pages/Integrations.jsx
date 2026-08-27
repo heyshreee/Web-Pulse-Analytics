@@ -1,38 +1,32 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, BarChart2 } from 'lucide-react';
+import { ArrowLeft, BarChart2 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function Integrations() {
-    const integrations = [
+    const groups = [
         {
-            name: "OBS Studio",
-            desc: "Native browser source integration for seamless tracking.",
-            tint: "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white"
+            title: "Infrastructure",
+            tint: "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
+            items: [
+                { name: "AWS", desc: "Deploy and scale your tracked services on AWS without friction." },
+                { name: "Cloudflare", desc: "Run WebPulse alongside your Cloudflare-served sites and apps." },
+                { name: "Vercel", desc: "Add WebPulse to Vercel-hosted frontends in minutes." }
+            ]
         },
         {
-            name: "Streamlabs",
-            desc: "Compatible with Streamlabs Desktop and widgets.",
-            tint: "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400"
+            title: "Data",
+            tint: "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400",
+            items: [
+                { name: "Supabase", desc: "Backend and storage that plays well with your analytics stream." },
+                { name: "Google Analytics", desc: "Complement your existing analytics with real-time events." }
+            ]
         },
         {
-            name: "Twitch",
-            desc: "Connect your Twitch account for subscriber-only analytics.",
-            tint: "bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400"
-        },
-        {
-            name: "YouTube Live",
-            desc: "Track YouTube Live viewer engagement metrics.",
-            tint: "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400"
-        },
-        {
-            name: "Discord",
-            desc: "Send stream alerts directly to your Discord server.",
-            tint: "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-        },
-        {
-            name: "Zapier",
-            desc: "Connect WebPulse Analytics to 5,000+ other apps.",
-            tint: "bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400"
+            title: "Payments",
+            tint: "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+            items: [
+                { name: "Razorpay", desc: "Track and analyze usage alongside your payment flows." }
+            ]
         }
     ];
 
@@ -55,26 +49,30 @@ export default function Integrations() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <p className="eyebrow mb-3">Integrations</p>
-                        <h2 className="page-title !text-4xl">Integrations</h2>
+                        <h2 className="page-title !text-4xl">Works with your stack</h2>
                         <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
-                            Connect WebPulse Analytics with the tools you already use.
+                            Run WebPulse alongside the tools and services you already use every day.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-5">
-                        {integrations.map((item, i) => (
-                            <div key={i} className="card card-pad card-hover group cursor-pointer">
-                                <div className={`w-11 h-11 rounded-xl ${item.tint} flex items-center justify-center font-bold text-lg mb-4 transition-transform group-hover:scale-105`}>
-                                    {item.name[0]}
-                                </div>
-                                <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1.5 flex items-center gap-2 tracking-tight">
-                                    {item.name}
-                                    <ExternalLink className="h-4 w-4 text-slate-400 dark:text-slate-600 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors" />
-                                </h3>
-                                <p className="prose-quiet text-sm">{item.desc}</p>
+                    {groups.map((group) => (
+                        <div key={group.title} className="mb-12">
+                            <h3 className="eyebrow mb-4">{group.title}</h3>
+                            <div className="grid md:grid-cols-3 gap-5">
+                                {group.items.map((item) => (
+                                    <div key={item.name} className="card card-pad card-hover">
+                                        <div className={`w-11 h-11 rounded-xl ${group.tint} flex items-center justify-center font-bold text-lg mb-4`}>
+                                            {item.name[0]}
+                                        </div>
+                                        <h4 className="text-base font-semibold text-slate-900 dark:text-white mb-1.5 tracking-tight">
+                                            {item.name}
+                                        </h4>
+                                        <p className="prose-quiet text-sm">{item.desc}</p>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </main>
 

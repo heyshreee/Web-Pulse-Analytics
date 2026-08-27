@@ -191,19 +191,19 @@ export default function Landing() {
                         </div>
 
                         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
-                            Track every <span className="text-violet-600 dark:text-violet-400">frame</span>.
+                            Every <span className="text-violet-600 dark:text-violet-400">event</span>.
                             <br />
-                            Know every <span className="text-violet-600 dark:text-violet-400">viewer</span>.
+                            Every <span className="text-violet-600 dark:text-violet-400">visitor</span>. Real-time.
                         </h1>
 
                         <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                            Stop guessing who's watching. Get granular, real-time analytics for every stream.
-                            Understand your audience, optimize your content, and grow your channel.
+                            WebPulse Analytics gives you real-time visibility into your websites, applications, and live audiences.
+                            Track visitors, sessions, engagement, and custom events without waiting for delayed reports.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
                             <Link to="/register" className="btn-primary btn-lg w-full sm:w-auto">
-                                Start Tracking Now
+                                Start Tracking Free
                             </Link>
                             <button
                                 onClick={() => setIsVideoOpen(true)}
@@ -250,14 +250,29 @@ export default function Landing() {
                 {/* Logos */}
                 <section className="py-12 border-y border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/[0.02]">
                     <div className="max-w-7xl mx-auto px-4 text-center">
-                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-8">Integrated with your favorite platforms</p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60">
-                            <div className="text-xl font-bold text-slate-700 dark:text-slate-300 tracking-tight">Razorpay</div>
-                            <div className="text-xl font-bold text-[#3ECF8E] tracking-tight">Supabase</div>
-                            <div className="text-xl font-bold text-[#F9AB00] tracking-tight">Google Analytics</div>
-                            <div className="text-xl font-bold text-[#F38020] tracking-tight">Cloudflare</div>
-                            <div className="text-xl font-bold text-[#FF9900] tracking-tight">AWS</div>
-                            <div className="text-xl font-bold text-slate-700 dark:text-slate-300 tracking-tight">Vercel</div>
+                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-8">Works with your stack</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
+                            <div>
+                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3">Infrastructure</p>
+                                <div className="flex flex-wrap items-center gap-5 opacity-70">
+                                    <div className="text-lg font-bold text-[#FF9900] tracking-tight">AWS</div>
+                                    <div className="text-lg font-bold text-[#F38020] tracking-tight">Cloudflare</div>
+                                    <div className="text-lg font-bold text-slate-700 dark:text-slate-300 tracking-tight">Vercel</div>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3">Data</p>
+                                <div className="flex flex-wrap items-center gap-5 opacity-70">
+                                    <div className="text-lg font-bold text-[#3ECF8E] tracking-tight">Supabase</div>
+                                    <div className="text-lg font-bold text-[#F9AB00] tracking-tight">Google Analytics</div>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-3">Payments</p>
+                                <div className="flex flex-wrap items-center gap-5 opacity-70">
+                                    <div className="text-lg font-bold text-slate-700 dark:text-slate-300 tracking-tight">Razorpay</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -267,9 +282,9 @@ export default function Landing() {
                     <div className="text-center mb-16 max-w-3xl mx-auto">
                         <p className="eyebrow mb-3">Why WebPulse</p>
                         <h2 className="page-title !text-4xl sm:!text-5xl">
-                            Precision analytics for <span className="text-violet-600 dark:text-violet-400">streamers</span>
+                            Real-time analytics for your <span className="text-violet-600 dark:text-violet-400">whole product</span>
                         </h2>
-                        <p className="mt-4 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Everything you need to take your content to the next level.</p>
+                        <p className="mt-4 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Track websites, applications, and live experiences from one dashboard.</p>
                     </div>
 
                     <div className="grid lg:grid-cols-3 gap-6 mb-16">
@@ -278,25 +293,25 @@ export default function Landing() {
                                 icon: <Activity className="h-6 w-6" />,
                                 color: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400",
                                 title: "Real-time Activity Logs",
-                                desc: "Track every visitor action as it happens — not minutes later. WebPulse captures live events such as page visits, session starts, and engagement activity in real time using WebSockets.",
-                                get: ["Live visitor activity feed", "Real-time page and session tracking", "Instant data updates", "Low-latency event delivery"],
-                                why: ["Perfect for live streams and launches", "Immediate insight into traffic spikes", "No waiting for analytics reports"]
+                                desc: "See visitor activity as it happens. Track page views, sessions, and custom events with low-latency event delivery.",
+                                get: ["Live activity feed", "Session tracking", "Instant updates", "Low-latency events"],
+                                why: ["Catch traffic spikes immediately", "Monitor launches in real time", "React before problems escalate"]
                             },
                             {
                                 icon: <Layers className="h-6 w-6" />,
                                 color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
                                 title: "Multi-Project Management",
-                                desc: "Manage multiple websites, streams, or applications from one centralized dashboard. Each project is fully isolated with its own tracking ID and data stream.",
-                                get: ["Multiple project support", "Dedicated tracking IDs per project", "Fast project switching", "Secure data separation"],
+                                desc: "Manage all your applications from one place. Each project is isolated with its own tracking ID and data stream.",
+                                get: ["Multiple project support", "Dedicated tracking IDs", "Fast project switching", "Secure data separation"],
                                 why: ["Ideal for agencies, creators, and dev teams", "One account, many projects", "Clean organization without complexity"]
                             },
                             {
                                 icon: <Bell className="h-6 w-6" />,
                                 color: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
                                 title: "Instant Usage Alerts",
-                                desc: "Stay informed the moment something changes. WebPulse monitors usage patterns and notifies you immediately when predefined thresholds are reached.",
-                                get: ["Real-time usage notifications", "Viewer milestone alerts", "Performance degradation alerts", "Custom alert thresholds"],
-                                why: ["React before problems escalate", "Never miss peak engagement moments", "Better stream and site reliability"]
+                                desc: "Know when important thresholds are reached. WebPulse monitors usage and notifies you the moment something changes.",
+                                get: ["Real-time usage notifications", "Milestone alerts", "Performance alerts", "Custom alert thresholds"],
+                                why: ["React before problems escalate", "Never miss peak engagement", "Better site reliability"]
                             }
                         ].map((feature, i) => (
                             <div key={i} className="card card-pad card-hover flex flex-col">
@@ -348,7 +363,7 @@ export default function Landing() {
                                 Built for speed <br />and <span className="text-violet-600 dark:text-violet-400">scale</span>
                             </h2>
                             <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 leading-relaxed max-w-lg">
-                                Our edge-optimized stack tracks millions of events in real-time, delivering insights directly to your dashboard and OBS overlays.
+                                Built with a real-time, event-driven architecture so your dashboard and live views stay in sync as your data grows.
                             </p>
 
                             <div className="space-y-8">
@@ -357,19 +372,19 @@ export default function Landing() {
                                         icon: <Zap className="h-5 w-5" />,
                                         bg: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
                                         title: "Real-Time WebSockets",
-                                        desc: "Sub-100ms latency for all visitor events. Your OBS overlay and dashboard stay perfectly in sync."
+                                        desc: "Visitors, sessions, and events stream to your dashboard the moment they happen."
                                     },
                                     {
                                         icon: <Globe className="h-5 w-5" />,
                                         bg: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
-                                        title: "Edge Optimized",
-                                        desc: "Global tracking network ensures minimal impact on your site's performance and SEO."
+                                        title: "Lightweight Tracking",
+                                        desc: "A small SDK keeps a minimal impact on your site's performance and loading time."
                                     },
                                     {
                                         icon: <Layers className="h-5 w-5" />,
                                         bg: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400",
                                         title: "OBS Native",
-                                        desc: "Seamlessly integrate your live stats into OBS Browser Sources with customizable templates."
+                                        desc: "Push your live stats into OBS Browser Sources with customizable templates."
                                     }
                                 ].map((feature, i) => (
                                     <div key={i} className="flex items-start gap-4 group">
@@ -434,7 +449,7 @@ export default function Landing() {
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">useEffect</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'react'</span><span className="text-slate-400">;</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">03</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_xxxxxxxxx'</span><span className="text-slate-400">);</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span> </span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">06</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">App</span> <span className="text-slate-400">=</span> <span className="text-slate-400">()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">07</span><span>    <span className="text-cyan-400">useEffect</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
@@ -449,7 +464,7 @@ export default function Landing() {
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">03</span><span> </span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span><span className="text-cyan-400">onMounted</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span>    <span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7k2...'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span>    <span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_xxxxxxxxx'</span><span className="text-slate-400">);</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">06</span><span> </span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">07</span><span>    <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">on</span><span className="text-slate-400">(</span><span className="text-emerald-400">'visitor'</span><span className="text-slate-400">, (</span><span className="text-indigo-100">event</span><span className="text-slate-400">)</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">08</span><span>        <span className="text-slate-400">console</span><span className="text-slate-400">.</span><span className="text-cyan-400">log</span><span className="text-slate-400">(</span><span className="text-emerald-400">`Live: ${'{'}event.city{'}'}`</span><span className="text-slate-400">);</span></span></div>
@@ -462,7 +477,7 @@ export default function Landing() {
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">01</span><span><span className="text-fuchsia-400">const</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-slate-400">=</span> <span className="text-cyan-400">require</span><span className="text-slate-400">(</span><span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">);</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">02</span><span> </span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">03</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">({'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span>    <span className="text-indigo-100">apiKey</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">,</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span>    <span className="text-indigo-100">apiKey</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'wp_live_xxxxxxxxx'</span><span className="text-slate-400">,</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span>    <span className="text-indigo-100">env</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'production'</span><span className="text-slate-400">,</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">06</span><span>    <span className="text-indigo-100">bufferSize</span><span className="text-slate-400">:</span> <span className="text-amber-400">10</span></span></div>
                                                     <div className="flex gap-4"><span className="text-slate-600 select-none">07</span><span><span className="text-slate-400">{'}'});</span></span></div>
@@ -479,41 +494,30 @@ export default function Landing() {
                     </div>
                 </section>
 
-                {/* Testimonial */}
+                {/* Who it's for */}
                 <section id="testimonials" className="py-20 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid md:grid-cols-2 gap-12 items-center">
-                            <div>
-                                <p className="eyebrow mb-3">Loved by creators</p>
-                                <h2 className="page-title !text-4xl mb-6">
-                                    Trusted by over <span className="text-violet-600 dark:text-violet-400">5,000+ creators</span>
-                                </h2>
-                                <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 leading-relaxed max-w-lg">
-                                    "WebPulse Analytics is the only analytics tool that gives me the granularity I need to understand my audience retention. It's completely changed how I plan my content schedule."
-                                </p>
-                                <div className="flex items-center gap-4">
-                                    <div className="h-11 w-11 rounded-full bg-slate-200 dark:bg-slate-700"></div>
-                                    <div>
-                                        <div className="font-semibold text-slate-900 dark:text-white">Alex Rivera</div>
-                                        <div className="text-sm text-slate-500 dark:text-slate-400">Professional Streamer, 500k+ Subs</div>
-                                    </div>
+                        <div className="text-center mb-12 max-w-3xl mx-auto">
+                            <p className="eyebrow mb-3">Who it's for</p>
+                            <h2 className="page-title !text-4xl mb-6">
+                                Built for <span className="text-violet-600 dark:text-violet-400">creators, developers, and modern teams</span>
+                            </h2>
+                            <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                                Whether you run a website, ship an app, host a live stream, or manage many products, WebPulse plugs into your stack and shows you what's happening in real time.
+                            </p>
+                        </div>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                { title: 'For creators', desc: 'Monitor your audience live and connect OBS overlays with your viewer stats.' },
+                                { title: 'For developers', desc: 'A simple SDK and clean APIs to send custom events straight from your application.' },
+                                { title: 'For agencies', desc: 'Manage every client project from one dashboard with isolated data streams.' },
+                                { title: 'For growing teams', desc: 'Share real-time usage, traffic, and engagement metrics with everyone who needs them.' },
+                            ].map((item) => (
+                                <div key={item.title} className="card card-pad card-hover">
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">{item.title}</h3>
+                                    <p className="prose-quiet text-sm">{item.desc}</p>
                                 </div>
-                            </div>
-                            <div className="card card-pad">
-                                <div className="flex gap-1 mb-4">
-                                    {[1, 2, 3, 4, 5].map(i => (
-                                        <Star key={i} className="h-5 w-5 text-amber-400 fill-current" />
-                                    ))}
-                                </div>
-                                <div className="space-y-3">
-                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-700/40">
-                                        <div className="text-sm text-slate-700 dark:text-slate-300">"The real-time alerts saved my stream twice last week. Indispensable."</div>
-                                    </div>
-                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-700/40">
-                                        <div className="text-sm text-slate-700 dark:text-slate-300">"Finally, analytics that actually look good and make sense."</div>
-                                    </div>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -563,7 +567,7 @@ export default function Landing() {
                                         <p className={`text-sm mb-6 min-h-[40px] ${isPro ? 'text-slate-200' : 'text-slate-400 dark:text-slate-500'}`}>
                                             {plan.id === 'free' && 'Trying WebPulse'}
                                             {plan.id === 'basic' && 'Students & solo devs'}
-                                            {plan.id === 'pro' && 'Streamers & growing apps'}
+                                            {plan.id === 'pro' && 'Creators & growing apps'}
                                             {plan.id === 'business' && 'Scale-ups & teams'}
                                         </p>
 
@@ -614,25 +618,9 @@ export default function Landing() {
                             })}
                         </div>
                     )}
-                </section>
-
-                {/* Stats */}
-                <section className="py-16 border-y border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                            {[
-                                { value: '500M+', label: 'Views Tracked' },
-                                { value: '12K+', label: 'Active Creators' },
-                                { value: '99.9%', label: 'Uptime' },
-                                { value: '24/7', label: 'Support' },
-                            ].map((stat) => (
-                                <div key={stat.label}>
-                                    <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">{stat.value}</div>
-                                    <div className="text-[10px] text-slate-500 dark:text-slate-500 font-medium uppercase tracking-[0.3em]">{stat.label}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <p className="mt-8 text-center text-sm text-slate-400 dark:text-slate-500">
+                        Prices shown in ₹ are regional INR pricing; USD pricing may vary by region.
+                    </p>
                 </section>
 
                 {/* CTA */}
@@ -641,11 +629,11 @@ export default function Landing() {
                         <div className="absolute -top-20 -right-20 w-64 h-64 bg-violet-500/20 dark:bg-white/10 rounded-full blur-3xl" />
                         <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-500/10 dark:bg-white/10 rounded-full blur-3xl" />
                         <div className="relative z-10">
-                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">Your growth starts with better data.</h2>
-                            <p className="text-slate-200 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">Join thousands of creators who are using WebPulse Analytics to build their audience.</p>
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">Know what's happening in real time.</h2>
+                            <p className="text-slate-200 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">Start tracking your audience, events, and applications today.</p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                                 <Link to="/register" className="btn-primary btn-lg !bg-white !text-slate-900 hover:!bg-slate-100">
-                                    Get Started Free <ArrowRight className="h-4 w-4" />
+                                    Start Tracking Free <ArrowRight className="h-4 w-4" />
                                 </Link>
                                 <Link to="/pricing" className="btn-md inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold px-5 py-3 text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all">
                                     View Pricing
@@ -667,7 +655,7 @@ export default function Landing() {
                                     <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span></span>
                                 </Link>
                                 <p className="prose-quiet">
-                                    The advanced analytics platform for modern content creators. Track, analyze, and grow.
+                                    Real-time analytics for websites, applications, and live audiences. Track, analyze, and grow.
                                 </p>
                             </div>
                             {[
@@ -713,9 +701,9 @@ export default function Landing() {
                         <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                             <p className="text-xs text-slate-400 dark:text-slate-600">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
                             <div className="flex gap-6 text-sm text-slate-500 dark:text-slate-400">
-                                <a href="#" className="hover:text-violet-600 dark:hover:text-white transition-colors">Twitter</a>
-                                <a href="#" className="hover:text-violet-600 dark:hover:text-white transition-colors">GitHub</a>
-                                <a href="#" className="hover:text-violet-600 dark:hover:text-white transition-colors">Discord</a>
+                                <Link to="/docs" className="hover:text-violet-600 dark:hover:text-white transition-colors">Documentation</Link>
+                                <Link to="/api" className="hover:text-violet-600 dark:hover:text-white transition-colors">API</Link>
+                                <Link to="/community" className="hover:text-violet-600 dark:hover:text-white transition-colors">Community</Link>
                             </div>
                         </div>
                     </div>

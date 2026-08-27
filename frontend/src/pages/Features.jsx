@@ -7,32 +7,32 @@ export default function Features() {
         {
             icon: Activity,
             title: "Real-Time Tracking",
-            description: "See every viewer join and leave your stream instantly. Our low-latency tracking ensures you're always up to date with your audience numbers."
+            description: "See every visitor, session, and event as it happens. Live event delivery keeps your dashboard always up to date."
         },
         {
             icon: Layout,
             title: "Multi-Project Dashboard",
-            description: "Manage multiple streams, channels, or shows from a single interface. Switch between projects with one click."
+            description: "Manage multiple websites, apps, or live experiences from a single interface. Switch between projects with one click."
         },
         {
             icon: Bell,
             title: "Smart Alerts",
-            description: "Set custom thresholds for viewer counts or stream health metrics. Get notified via Discord, Email, or Slack when goals are met."
+            description: "Set custom thresholds for traffic, usage, or engagement. Get notified the moment important milestones are reached."
         },
         {
             icon: Zap,
-            title: "Instant Setup",
-            description: "No complex configuration. Just copy your unique tracking URL into your OBS browser source and you're live."
+            title: "Developer SDK",
+            description: "A lightweight SDK and clean APIs make it easy to send custom events straight from your application."
         },
         {
             icon: Shield,
             title: "Privacy First",
-            description: "We respect your data and your viewers' privacy. We are GDPR compliant and never sell your data to third parties."
+            description: "We respect your data and your visitors' privacy. We are GDPR compliant and never sell your data to third parties."
         },
         {
             icon: Globe,
-            title: "Global CDN",
-            description: "Our tracking pixels are served from edge locations around the world, ensuring minimal latency for viewers everywhere."
+            title: "Adaptable Tracking",
+            description: "Track websites, native apps, and live audiences with one account — no lock-in, no complex setup."
         }
     ];
 
@@ -56,9 +56,9 @@ export default function Features() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <p className="eyebrow mb-3">Features</p>
-                        <h2 className="page-title !text-4xl">Powerful features for modern creators</h2>
+                        <h2 className="page-title !text-4xl">Real-time analytics for your whole product</h2>
                         <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
-                            Everything you need to understand your audience and grow your stream.
+                            Everything you need to understand your visitors, track your events, and grow.
                         </p>
                     </div>
 
