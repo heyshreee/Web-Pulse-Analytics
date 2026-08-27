@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+import supabase from '../config/supabase.js';
 
 class NotificationService {
     /**
@@ -137,4 +137,9 @@ class NotificationService {
     }
 }
 
-module.exports = NotificationService;
+export default NotificationService;
+export const create = NotificationService.create;
+export const getAll = NotificationService.getAll;
+export const markAsRead = NotificationService.markAsRead;
+export const markAllAsRead = NotificationService.markAllAsRead;
+export const cleanup = NotificationService.cleanup;

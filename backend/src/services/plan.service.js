@@ -1,4 +1,4 @@
-const supabase = require('../config/supabase');
+import supabase from '../config/supabase.js';
 
 let plansCache = null;
 let lastFetchTime = 0;
@@ -8,7 +8,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
  * Fetch all plans from Supabase
  * @returns {Promise<Array>} List of plans
  */
-exports.getAllPlans = async () => {
+export const getAllPlans = async () => {
     const now = Date.now();
     if (plansCache && (now - lastFetchTime < CACHE_DURATION)) {
         return plansCache;
@@ -41,7 +41,7 @@ exports.getAllPlans = async () => {
  * @param {string} planId 
  * @returns {Promise<Object>} Plan limits
  */
-exports.getPlanLimits = async (planId) => {
+export const getPlanLimits = async (planId) => {
     const plans = await this.getAllPlans();
     const plan = plans.find(p => p.id === planId);
 
@@ -72,3 +72,5 @@ exports.getPlanLimits = async (planId) => {
         amount: plan.price_usd // Default to USD for internal compatibility if currency not specified
     };
 };
+
+export default { getAllPlans, getPlanLimits };

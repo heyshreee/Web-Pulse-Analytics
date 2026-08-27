@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 /**
  * Telegram Notification Service
@@ -56,4 +56,6 @@ class TelegramService {
     }
 }
 
-module.exports = TelegramService;
+export default TelegramService;
+export const send = TelegramService.send;
+export const sendVerificationCode = TelegramService.sendVerificationCode;
