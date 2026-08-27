@@ -1,60 +1,42 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle, AlertTriangle, XCircle, Info, X, Shield, Activity, Settings } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, Info, X, Shield, Activity } from 'lucide-react';
 
 const variants = {
     success: {
         icon: CheckCircle,
-        bg: 'bg-slate-900/90',
-        border: 'border-green-500/20',
-        iconBg: 'bg-green-500/20',
-        iconColor: 'text-green-400',
+        iconColor: 'text-emerald-500',
+        bar: 'bg-emerald-500',
         title: 'Success',
-        glow: 'shadow-[0_0_30px_-10px_rgba(74,222,128,0.3)]'
     },
     error: {
         icon: XCircle,
-        bg: 'bg-slate-900/90',
-        border: 'border-red-500/20',
-        iconBg: 'bg-red-500/20',
-        iconColor: 'text-red-400',
+        iconColor: 'text-red-500',
+        bar: 'bg-red-500',
         title: 'Error',
-        glow: 'shadow-[0_0_30px_-10px_rgba(248,113,113,0.3)]'
     },
     warning: {
         icon: AlertTriangle,
-        bg: 'bg-slate-900/90',
-        border: 'border-yellow-500/20',
-        iconBg: 'bg-yellow-500/20',
-        iconColor: 'text-yellow-400',
+        iconColor: 'text-amber-500',
+        bar: 'bg-amber-500',
         title: 'Warning',
-        glow: 'shadow-[0_0_30px_-10px_rgba(250,204,21,0.3)]'
     },
     info: {
         icon: Info,
-        bg: 'bg-slate-900/90',
-        border: 'border-blue-500/20',
-        iconBg: 'bg-blue-500/20',
-        iconColor: 'text-blue-400',
+        iconColor: 'text-blue-500',
+        bar: 'bg-blue-500',
         title: 'Info',
-        glow: 'shadow-[0_0_30px_-10px_rgba(96,165,250,0.3)]'
     },
     security: {
         icon: Shield,
-        bg: 'bg-slate-900/90',
-        border: 'border-orange-500/20',
-        iconBg: 'bg-orange-500/20',
-        iconColor: 'text-orange-400',
+        iconColor: 'text-orange-500',
+        bar: 'bg-orange-500',
         title: 'Security Alert',
-        glow: 'shadow-[0_0_30px_-10px_rgba(251,146,60,0.3)]'
     },
     system: {
         icon: Activity,
-        bg: 'bg-slate-900/90',
-        border: 'border-purple-500/20',
-        iconBg: 'bg-purple-500/20',
-        iconColor: 'text-purple-400',
+        iconColor: 'text-violet-500',
+        bar: 'bg-violet-500',
         title: 'System Update',
-        glow: 'shadow-[0_0_30px_-10px_rgba(192,132,252,0.3)]'
     }
 };
 
@@ -75,26 +57,21 @@ export default function Toast({ message, type = 'info', onClose, duration = 5000
 
     return (
         <div className={`fixed bottom-6 right-6 z-[100] transition-all duration-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <div className={`
-                relative overflow-hidden
-                flex items-center gap-4 p-4 pr-12
-                min-w-[320px] max-w-md
-                rounded-2xl backdrop-blur-xl
-                border ${variant.border}
-                ${variant.bg}
-                ${variant.glow}
-            `}>
+            <div className="relative overflow-hidden flex items-center gap-3.5 p-4 pr-12 min-w-[320px] max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lift">
+                {/* Accent bar */}
+                <div className={`absolute left-0 top-0 bottom-0 w-1 ${variant.bar}`} />
+
                 {/* Icon */}
-                <div className={`p-2 rounded-xl ${variant.iconBg} ${variant.iconColor}`}>
+                <div className={`shrink-0 ml-1 ${variant.iconColor}`}>
                     <Icon className="h-5 w-5" />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1">
-                    <h4 className={`text-sm font-bold ${variant.iconColor} mb-0.5`}>
+                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">
                         {variant.title}
                     </h4>
-                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                         {message}
                     </p>
                 </div>
@@ -102,13 +79,10 @@ export default function Toast({ message, type = 'info', onClose, duration = 5000
                 {/* Close Button */}
                 <button
                     onClick={() => setIsVisible(false)}
-                    className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
+                    className="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
                 >
                     <X className="h-4 w-4" />
                 </button>
-
-                {/* Progress Bar (Optional visual flair) */}
-                <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full opacity-50" />
             </div>
         </div>
     );

@@ -2,21 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-white text-slate-900 antialiased transition-colors duration-300;
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased font-sans transition-colors duration-300;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  ::selection {
+    @apply bg-violet-500/20 text-violet-900 dark:text-violet-100;
+  }
 }
 
-.dark body {
-  @apply bg-slate-950 text-slate-50;
+@layer components {
+  /* ---- Buttons ---- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-900 text-white hover:bg-slate-800 shadow-sm dark:bg-violet-500 dark:hover:bg-violet-400 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-red-600 text-white hover:bg-red-500 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .btn-md { @apply px-4 py-2 text-sm; }
+  .btn-lg { @apply px-5 py-3 text-sm; }
+
+  /* ---- Cards ---- */
+  .card {
+    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl;
+  }
+  .card-pad { @apply p-5 sm:p-6; }
+  .card-hover {
+    @apply transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-slate-950/80;
+  }
+
+  /* ---- Inputs ---- */
+  .input {
+    @apply w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all disabled:opacity-60;
+  }
+  .label {
+    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
+  }
+
+  /* ---- Badges ---- */
+  .badge-violet { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300; }
+  .badge-green { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300; }
+  .badge-amber { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300; }
+  .badge-red { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300; }
+  .badge-slate { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300; }
+
+  /* ---- Section headings ---- */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500;
+  }
+  .page-title {
+    @apply text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
+  }
+  .page-sub {
+    @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
+  }
+
+  /* ---- Wrappers ---- */
+  .container-page {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .prose-quiet {
+    @apply text-sm leading-relaxed text-slate-600 dark:text-slate-300;
+  }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-slate-900;
+  @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600;
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-slate-50 dark:border-slate-950 hover:bg-slate-400 dark:hover:bg-slate-600;
 }

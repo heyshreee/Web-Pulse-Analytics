@@ -4,26 +4,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
 import {
     Activity,
-    Zap,
-    Shield,
-    Globe,
+    Bell,
     BarChart2,
-    Clock,
     Check,
     Menu,
     X,
-    ChevronRight,
-    Users,
-    Layers,
-    Lock,
     Play,
-    Layout,
-    Bell,
     Star,
-    Database,
-    ShieldCheck,
-    Cpu,
-    Terminal
+    ArrowRight,
+    Globe,
+    Zap,
+    Layers
 } from 'lucide-react';
 
 export default function Landing() {
@@ -48,6 +39,7 @@ export default function Landing() {
 
         return () => clearInterval(interval);
     }, [isAutoCycling]);
+
     const [plans, setPlans] = useState([
         {
             id: 'free',
@@ -115,220 +107,223 @@ export default function Landing() {
         fetchPlans();
     }, []);
 
+    const navLinks = [
+        { to: '/', label: 'Home' },
+        { to: '/features', label: 'Features' },
+        { to: '/pricing', label: 'Pricing' },
+        { to: '/blog', label: 'Blog' },
+    ];
+
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0B0E14] text-slate-900 dark:text-white selection:bg-blue-500/30 font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-sans transition-colors duration-300">
             {/* Header */}
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#0B0E14]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-colors duration-300">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-3 group/logo">
-                        <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
-                            <BarChart2 className="h-5 w-5 text-white" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
+                            <BarChart2 className="h-5 w-5" />
                         </div>
-                        <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">
-                            WebPulse <span className="text-blue-600">Analytics</span>
+                        <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                            WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
                         </span>
                     </Link>
 
-                    <div className="flex items-center gap-4">
-                        <div className="hidden md:flex items-center gap-2 lg:gap-4">
-                            <nav className="flex items-center gap-4 lg:gap-8 text-sm font-medium text-slate-500 dark:text-slate-400 mr-2 lg:mr-4">
-                                <Link to="/" className="hover:text-blue-600 dark:hover:text-white transition-colors">Home</Link>
-                                <Link to="/features" className="hover:text-blue-600 dark:hover:text-white transition-colors">Features</Link>
-                                <Link to="/pricing" className="hover:text-blue-600 dark:hover:text-white transition-colors">Pricing</Link>
-                                <Link to="/blog" className="hover:text-blue-600 dark:hover:text-white transition-colors">Blog</Link>
+                    <div className="flex items-center gap-3">
+                        <div className="hidden md:flex items-center gap-1">
+                            <nav className="flex items-center mr-2">
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.to}
+                                        to={link.to}
+                                        className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
                             </nav>
-                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1 lg:mx-2"></div>
-                            <Link to="/login" className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors">
-                                Log In
+                            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                            <Link to="/login" className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                                Log in
                             </Link>
-                            <Link
-                                to="/register"
-                                className="px-4 lg:px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all hover:shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]"
-                            >
+                            <Link to="/register" className="btn-primary btn-md ml-1">
                                 Start Tracking
                             </Link>
                         </div>
-                        
+
                         <ThemeToggle />
 
                         {/* Mobile Menu Button */}
                         <button
-                            className="md:hidden text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+                            className="md:hidden p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
-                            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                         </button>
                     </div>
                 </div>
 
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden bg-white dark:bg-[#0B0E14] border-b border-slate-200 dark:border-white/5 px-4 py-4 space-y-4">
-                        <Link to="/" className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white font-medium">Home</Link>
-                        <Link to="/features" className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white font-medium">Features</Link>
-                        <Link to="/pricing" className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white font-medium">Pricing</Link>
-                        <Link to="/blog" className="block text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white font-medium">Blog</Link>
-                        <div className="pt-4 border-t border-slate-200 dark:border-white/5 flex flex-col gap-4">
-                            <Link to="/login" className="block text-center text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-white font-medium">
-                                Log In
+                    <div className="md:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 py-4 space-y-1">
+                        {navLinks.map((link) => (
+                            <Link key={link.to} to={link.to} className="block px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium">
+                                {link.label}
                             </Link>
-                            <Link
-                                to="/register"
-                                className="block text-center px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full"
-                            >
-                                Get Started
+                        ))}
+                        <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
+                            <Link to="/login" className="block px-3 py-2 text-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium">
+                                Log in
                             </Link>
+                            <Link to="/register" className="btn-primary btn-md w-full">Get Started</Link>
                         </div>
                     </div>
                 )}
             </header>
 
-            <main className="pt-24 sm:pt-32">
+            <main className="pt-16">
                 {/* Hero Section */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16 sm:mb-20">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-900/20 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black tracking-widest uppercase mb-8 shadow-xl shadow-blue-500/5">
-                        WEBPULSE ANALYTICS SOLUTIONS
-                    </div>
+                <section className="relative overflow-hidden">
+                    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950" />
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20 sm:py-28">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full badge-slate mb-8">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            WebPulse Analytics Solutions
+                        </div>
 
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                        Track Every <span className="text-blue-500">Frame</span>.
-                        <br />
-                        Know Every <span className="text-purple-500">Viewer</span>.
-                    </h1>
+                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
+                            Track every <span className="text-violet-600 dark:text-violet-400">frame</span>.
+                            <br />
+                            Know every <span className="text-violet-600 dark:text-violet-400">viewer</span>.
+                        </h1>
 
-                    <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
-                        Stop guessing who's watching. Get granular, real-time analytics for every stream.
-                        Understand your audience, optimize your content, and grow your channel.
-                    </p>
+                        <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                            Stop guessing who's watching. Get granular, real-time analytics for every stream.
+                            Understand your audience, optimize your content, and grow your channel.
+                        </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 sm:mb-20">
-                        <Link
-                            to="/register"
-                            className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-[0_0_30px_-5px_rgba(37,99,235,0.5)] min-w-[180px] text-center"
-                        >
-                            Start Tracking Now
-                        </Link>
-                        <button
-                            onClick={() => setIsVideoOpen(true)}
-                            className="w-full sm:w-auto px-8 py-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white font-semibold rounded-full border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 min-w-[180px] justify-center"
-                        >
-                            <Play className="h-4 w-4 fill-current" /> Watch Demo
-                        </button>
-                    </div>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
+                            <Link to="/register" className="btn-primary btn-lg w-full sm:w-auto">
+                                Start Tracking Now
+                            </Link>
+                            <button
+                                onClick={() => setIsVideoOpen(true)}
+                                className="btn-secondary btn-lg w-full sm:w-auto"
+                            >
+                                <Play className="h-4 w-4 fill-current" /> Watch Demo
+                            </button>
+                        </div>
 
-                    {/* Mockup */}
-                    <div className="relative max-w-5xl mx-auto rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151921] p-1 sm:p-2 shadow-2xl shadow-blue-500/5">
-                        <div className="bg-white dark:bg-[#0B0E14] rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 aspect-[4/3] sm:aspect-[16/9] relative group">
-                            {/* Fake UI Header */}
-                            <div className="h-10 border-b border-white/5 bg-[#151921] flex items-center px-4 gap-2">
-                                <div className="flex gap-1.5">
-                                    <div className="w-3 h-3 rounded-full bg-red-500/20"></div>
-                                    <div className="w-3 h-3 rounded-full bg-yellow-500/20"></div>
-                                    <div className="w-3 h-3 rounded-full bg-green-500/20"></div>
-                                </div>
-                                <div className="ml-4 text-[10px] text-slate-500 font-black uppercase tracking-widest">WebPulse Analytics Dashboard</div>
-                            </div>
-                            {/* Fake UI Content */}
-                            <div className="p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 h-full">
-                                <div className="hidden sm:block col-span-1 border-r border-slate-200 dark:border-white/5 pr-6 space-y-4">
-                                    <div className="h-8 w-3/4 bg-slate-100 dark:bg-white/5 rounded"></div>
-                                    <div className="h-4 w-1/2 bg-slate-100 dark:bg-white/5 rounded"></div>
-                                    <div className="h-4 w-2/3 bg-slate-100 dark:bg-white/5 rounded"></div>
-                                    <div className="h-4 w-1/2 bg-slate-100 dark:bg-white/5 rounded"></div>
-                                </div>
-                                <div className="col-span-3 space-y-6">
-                                    <div className="flex gap-4">
-                                        <div className="h-24 w-1/3 bg-blue-500/10 border border-blue-500/20 rounded-xl"></div>
-                                        <div className="h-24 w-1/3 bg-purple-500/10 border border-purple-500/20 rounded-xl"></div>
-                                        <div className="h-24 w-1/3 bg-green-500/10 border border-green-500/20 rounded-xl"></div>
+                        {/* Mockup */}
+                        <div className="relative max-w-5xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-1.5 shadow-lift">
+                            <div className="bg-white dark:bg-slate-950 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/3] sm:aspect-[16/9] relative group">
+                                {/* Fake UI Header */}
+                                <div className="h-10 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center px-4 gap-2">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-3 h-3 rounded-full bg-red-300 dark:bg-red-500/40"></div>
+                                        <div className="w-3 h-3 rounded-full bg-amber-300 dark:bg-amber-500/40"></div>
+                                        <div className="w-3 h-3 rounded-full bg-emerald-300 dark:bg-emerald-500/40"></div>
                                     </div>
-                                    <div className="h-64 bg-white/5 rounded-xl border border-white/5"></div>
+                                    <div className="ml-4 text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-widest">WebPulse Analytics Dashboard</div>
+                                </div>
+                                {/* Fake UI Content */}
+                                <div className="p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6 h-full">
+                                    <div className="hidden sm:block col-span-1 border-r border-slate-100 dark:border-slate-800 pr-6 space-y-4">
+                                        <div className="h-8 w-3/4 bg-slate-100 dark:bg-slate-800 rounded-lg"></div>
+                                        <div className="h-4 w-1/2 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                                        <div className="h-4 w-2/3 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                                        <div className="h-4 w-1/2 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                                    </div>
+                                    <div className="col-span-3 space-y-6">
+                                        <div className="flex gap-4">
+                                            <div className="h-24 w-1/3 bg-violet-500/10 border border-violet-500/20 rounded-xl"></div>
+                                            <div className="h-24 w-1/3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl"></div>
+                                            <div className="h-24 w-1/3 bg-amber-500/10 border border-amber-500/20 rounded-xl"></div>
+                                        </div>
+                                        <div className="h-64 bg-slate-100 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800"></div>
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* Overlay Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0E14] via-transparent to-transparent opacity-50"></div>
                         </div>
                     </div>
                 </section>
 
                 {/* Logos */}
-                <section className="py-12 border-y border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                <section className="py-12 border-y border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/[0.02]">
                     <div className="max-w-7xl mx-auto px-4 text-center">
-                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-8">Integrated with your favorite platforms</p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                            <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Razorpay</div>
+                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-8">Integrated with your favorite platforms</p>
+                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60">
+                            <div className="text-xl font-bold text-slate-700 dark:text-slate-300 tracking-tight">Razorpay</div>
                             <div className="text-xl font-bold text-[#3ECF8E] tracking-tight">Supabase</div>
                             <div className="text-xl font-bold text-[#F9AB00] tracking-tight">Google Analytics</div>
                             <div className="text-xl font-bold text-[#F38020] tracking-tight">Cloudflare</div>
                             <div className="text-xl font-bold text-[#FF9900] tracking-tight">AWS</div>
-                            <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Vercel</div>
+                            <div className="text-xl font-bold text-slate-700 dark:text-slate-300 tracking-tight">Vercel</div>
                         </div>
                     </div>
                 </section>
 
                 {/* Features */}
-                <section id="features" className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20 max-w-3xl mx-auto">
-                        <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">
-                            Precision Analytics <br className="hidden md:block" />
-                            for <span className="text-blue-600">Streamers</span>
+                <section id="features" className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16 max-w-3xl mx-auto">
+                        <p className="eyebrow mb-3">Why WebPulse</p>
+                        <h2 className="page-title !text-4xl sm:!text-5xl">
+                            Precision analytics for <span className="text-violet-600 dark:text-violet-400">streamers</span>
                         </h2>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Everything you need to take your content to the next level.</p>
+                        <p className="mt-4 text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Everything you need to take your content to the next level.</p>
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-8 mb-24">
+                    <div className="grid lg:grid-cols-3 gap-6 mb-16">
                         {[
                             {
-                                icon: <Activity className="h-6 w-6 text-blue-400" />,
-                                color: "bg-blue-500/10",
+                                icon: <Activity className="h-6 w-6" />,
+                                color: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400",
                                 title: "Real-time Activity Logs",
-                                desc: "Track every visitor action as it happens — not minutes later. WebPulse captures live events such as page visits, session starts, and engagement activity in real time using WebSockets. This allows you to react instantly to audience behavior instead of guessing based on outdated data.",
-                                get: ["Live visitor activity feed", "Real-time page and session tracking", "Instant data updates without refresh", "Low-latency event delivery"],
+                                desc: "Track every visitor action as it happens — not minutes later. WebPulse captures live events such as page visits, session starts, and engagement activity in real time using WebSockets.",
+                                get: ["Live visitor activity feed", "Real-time page and session tracking", "Instant data updates", "Low-latency event delivery"],
                                 why: ["Perfect for live streams and launches", "Immediate insight into traffic spikes", "No waiting for analytics reports"]
                             },
                             {
-                                icon: <Layout className="h-6 w-6 text-purple-400" />,
-                                color: "bg-purple-500/10",
+                                icon: <Layers className="h-6 w-6" />,
+                                color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
                                 title: "Multi-Project Management",
-                                desc: "Manage multiple websites, streams, or applications from one centralized dashboard. Each project is fully isolated with its own tracking ID and data stream. You can switch between projects instantly without losing context or data.",
+                                desc: "Manage multiple websites, streams, or applications from one centralized dashboard. Each project is fully isolated with its own tracking ID and data stream.",
                                 get: ["Multiple project support", "Dedicated tracking IDs per project", "Fast project switching", "Secure data separation"],
                                 why: ["Ideal for agencies, creators, and dev teams", "One account, many projects", "Clean organization without complexity"]
                             },
                             {
-                                icon: <Bell className="h-6 w-6 text-teal-400" />,
-                                color: "bg-teal-500/10",
+                                icon: <Bell className="h-6 w-6" />,
+                                color: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
                                 title: "Instant Usage Alerts",
-                                desc: "Stay informed the moment something changes. WebPulse monitors usage patterns and notifies you immediately when predefined thresholds are reached — whether that’s a surge in viewers or a sudden performance drop.",
+                                desc: "Stay informed the moment something changes. WebPulse monitors usage patterns and notifies you immediately when predefined thresholds are reached.",
                                 get: ["Real-time usage notifications", "Viewer milestone alerts", "Performance degradation alerts", "Custom alert thresholds"],
                                 why: ["React before problems escalate", "Never miss peak engagement moments", "Better stream and site reliability"]
                             }
                         ].map((feature, i) => (
-                            <div key={i} className="p-8 rounded-3xl bg-white dark:bg-[#151921] border border-slate-200 dark:border-white/5 hover:border-blue-500/30 dark:hover:border-white/10 transition-colors group flex flex-col shadow-sm hover:shadow-xl transition-all duration-300">
-                                <div className={`h-14 w-14 rounded-2xl ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                            <div key={i} className="card card-pad card-hover flex flex-col">
+                                <div className={`h-12 w-12 rounded-xl ${feature.color} flex items-center justify-center mb-5`}>
                                     {feature.icon}
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{feature.title}</h3>
-                                <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm mb-8">{feature.desc}</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{feature.title}</h3>
+                                <p className="prose-quiet mb-6">{feature.desc}</p>
 
-                                <div className="space-y-6 mt-auto">
+                                <div className="space-y-5 mt-auto">
                                     <div>
-                                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider mb-3">What you get</h4>
+                                        <h4 className="eyebrow mb-2.5 !text-[11px] !tracking-[0.12em]">What you get</h4>
                                         <ul className="space-y-2">
                                             {feature.get.map((item, j) => (
-                                                <li key={j} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
-                                                    <Check className="h-3.5 w-3.5 text-blue-500 mt-0.5" />
+                                                <li key={j} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                                    <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                                                     <span>{item}</span>
                                                 </li>
                                             ))}
                                         </ul>
                                     </div>
                                     <div>
-                                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider mb-3">Why it matters</h4>
+                                        <h4 className="eyebrow mb-2.5 !text-[11px] !tracking-[0.12em]">Why it matters</h4>
                                         <ul className="space-y-2">
                                             {feature.why.map((item, j) => (
-                                                <li key={j} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
-                                                    <Star className="h-3.5 w-3.5 text-purple-500 mt-0.5" />
+                                                <li key={j} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                                    <Star className="h-4 w-4 text-violet-500 mt-0.5 shrink-0" />
                                                     <span>{item}</span>
                                                 </li>
                                             ))}
@@ -340,7 +335,7 @@ export default function Landing() {
                     </div>
 
                     {/* Technical Highlights */}
-                    <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0B0E14] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.05),transparent_70%)] transition-colors duration-500 py-20 sm:py-32 border-y border-slate-200 dark:border-white/5">
+                    <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center py-12">
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             whileInView={{ opacity: 1, x: 0 }}
@@ -348,42 +343,42 @@ export default function Landing() {
                             transition={{ duration: 0.6 }}
                             className="text-left"
                         >
-                            <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-tight">
-                                Technical <br />
-                                <span className="text-blue-600">Highlights</span>
+                            <p className="eyebrow mb-3">Technical highlights</p>
+                            <h2 className="page-title !text-4xl mb-5">
+                                Built for speed <br />and <span className="text-violet-600 dark:text-violet-400">scale</span>
                             </h2>
-                            <p className="text-xl font-medium text-slate-500 dark:text-slate-400 mb-12 leading-relaxed max-w-lg">
-                                Built for speed and scale. Our edge-optimized stack tracks millions of events in real-time, delivering insights directly to your dashboard and OBS overlays.
+                            <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 leading-relaxed max-w-lg">
+                                Our edge-optimized stack tracks millions of events in real-time, delivering insights directly to your dashboard and OBS overlays.
                             </p>
 
-                            <div className="space-y-10">
+                            <div className="space-y-8">
                                 {[
                                     {
-                                        icon: <Zap className="h-6 w-6 text-amber-400" />,
-                                        bg: "bg-amber-500/10",
+                                        icon: <Zap className="h-5 w-5" />,
+                                        bg: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
                                         title: "Real-Time WebSockets",
                                         desc: "Sub-100ms latency for all visitor events. Your OBS overlay and dashboard stay perfectly in sync."
                                     },
                                     {
-                                        icon: <Globe className="h-6 w-6 text-emerald-400" />,
-                                        bg: "bg-emerald-500/10",
+                                        icon: <Globe className="h-5 w-5" />,
+                                        bg: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
                                         title: "Edge Optimized",
                                         desc: "Global tracking network ensures minimal impact on your site's performance and SEO."
                                     },
                                     {
-                                        icon: <Layers className="h-6 w-6 text-blue-400" />,
-                                        bg: "bg-blue-500/10",
+                                        icon: <Layers className="h-5 w-5" />,
+                                        bg: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400",
                                         title: "OBS Native",
                                         desc: "Seamlessly integrate your live stats into OBS Browser Sources with customizable templates."
                                     }
                                 ].map((feature, i) => (
-                                    <div key={i} className="flex items-start gap-6 group">
-                                        <div className={`p-4 rounded-2xl ${feature.bg} border border-white/5 shadow-xl group-hover:scale-110 transition-transform`}>
+                                    <div key={i} className="flex items-start gap-4 group">
+                                        <div className={`p-3 rounded-xl ${feature.bg} transition-transform group-hover:scale-105`}>
                                             {feature.icon}
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">{feature.title}</h3>
-                                            <p className="text-slate-500 dark:text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
+                                            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">{feature.title}</h3>
+                                            <p className="prose-quiet">{feature.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -397,18 +392,15 @@ export default function Landing() {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className="relative group"
                         >
-                            {/* Glow Effect */}
-                            <div className="absolute -inset-8 bg-blue-500/10 blur-[120px] rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-
-                            <div className="relative bg-[#090B10] rounded-[2.5rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-2xl transition-all duration-500 backdrop-blur-sm">
+                            <div className="card overflow-hidden">
                                 {/* Header */}
-                                <div className="h-10 bg-white/[0.03] border-b border-white/5 flex items-center px-6 gap-2">
+                                <div className="h-10 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-5 gap-2">
                                     <div className="flex gap-1.5">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/40 border border-red-500/20"></div>
-                                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40 border border-yellow-500/20"></div>
-                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/40 border border-green-500/20"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-red-300 dark:bg-red-500/40"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-amber-300 dark:bg-amber-500/40"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-300 dark:bg-emerald-500/40"></div>
                                     </div>
-                                    <div className="ml-4 flex gap-4">
+                                    <div className="ml-4 flex gap-2">
                                         {['react', 'vue', 'node'].map((tab) => (
                                             <button
                                                 key={tab}
@@ -416,19 +408,19 @@ export default function Landing() {
                                                     setActiveTab(tab);
                                                     setIsAutoCycling(false);
                                                 }}
-                                                className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-black transition-all ${activeTab === tab
-                                                    ? 'text-blue-400 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
-                                                    : 'text-slate-500 hover:text-slate-400'
+                                                className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-medium transition-all ${activeTab === tab
+                                                    ? 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
+                                                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                                                     }`}
                                             >
                                                 {tab}
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="ml-auto text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] hidden sm:block">SDK v2.0</div>
+                                    <div className="ml-auto text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-[0.2em] hidden sm:block">SDK v2.0</div>
                                 </div>
                                 {/* Code content */}
-                                <div className="p-8 sm:p-10 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto whitespace-pre min-h-[360px] relative">
+                                <div className="p-6 sm:p-8 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto whitespace-pre min-h-[320px] relative bg-slate-950 dark:bg-[#0B0E14] text-slate-200">
                                     <AnimatePresence mode="wait">
                                         <motion.div
                                             key={activeTab}
@@ -439,44 +431,44 @@ export default function Landing() {
                                         >
                                             {activeTab === 'react' && (
                                                 <div className="space-y-1">
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">useEffect</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'react'</span><span className="text-slate-400">;</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">03</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">04</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">);</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">05</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">06</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">App</span> <span className="text-slate-400">=</span> <span className="text-slate-400">()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">07</span><span>    <span className="text-cyan-400">useEffect</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">08</span><span>        <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">init</span><span className="text-slate-400">({'{'}</span> <span className="text-slate-200">realtime</span><span className="text-slate-400">:</span> <span className="text-amber-400">true</span> <span className="text-slate-400">{'}'});</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">09</span><span>    <span className="text-slate-400">{'}'}, []);</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">10</span><span><span className="text-slate-400">{'}'};</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">useEffect</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'react'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">03</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">06</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">App</span> <span className="text-slate-400">=</span> <span className="text-slate-400">()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">07</span><span>    <span className="text-cyan-400">useEffect</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">08</span><span>        <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">init</span><span className="text-slate-400">({'{'}</span> <span className="text-slate-200">realtime</span><span className="text-slate-400">:</span> <span className="text-amber-400">true</span> <span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">09</span><span>    <span className="text-slate-400">{'}'}, []);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">10</span><span><span className="text-slate-400">{'}'};</span></span></div>
                                                 </div>
                                             )}
                                             {activeTab === 'vue' && (
                                                 <div className="space-y-1">
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">onMounted</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'vue'</span><span className="text-slate-400">;</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">03</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">04</span><span><span className="text-cyan-400">onMounted</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">05</span><span>    <span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7k2...'</span><span className="text-slate-400">);</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">06</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">07</span><span>    <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">on</span><span className="text-slate-400">(</span><span className="text-emerald-400">'visitor'</span><span className="text-slate-400">, (</span><span className="text-indigo-100">event</span><span className="text-slate-400">)</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">08</span><span>        <span className="text-slate-400">console</span><span className="text-slate-400">.</span><span className="text-cyan-400">log</span><span className="text-slate-400">(</span><span className="text-emerald-400">`Live: ${'{'}event.city{'}'}`</span><span className="text-slate-400">);</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">09</span><span>    <span className="text-slate-400">{'}'});</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">10</span><span><span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">01</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">onMounted</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'vue'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">02</span><span><span className="text-fuchsia-400">import</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-fuchsia-400">from</span> <span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">;</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">03</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span><span className="text-cyan-400">onMounted</span><span className="text-slate-400">(()</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span>    <span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">(</span><span className="text-emerald-400">'wp_live_7k2...'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">06</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">07</span><span>    <span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">on</span><span className="text-slate-400">(</span><span className="text-emerald-400">'visitor'</span><span className="text-slate-400">, (</span><span className="text-indigo-100">event</span><span className="text-slate-400">)</span> <span className="text-slate-400">={'>'}</span> <span className="text-slate-400">{'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">08</span><span>        <span className="text-slate-400">console</span><span className="text-slate-400">.</span><span className="text-cyan-400">log</span><span className="text-slate-400">(</span><span className="text-emerald-400">`Live: ${'{'}event.city{'}'}`</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">09</span><span>    <span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">10</span><span><span className="text-slate-400">{'}'});</span></span></div>
                                                 </div>
                                             )}
                                             {activeTab === 'node' && (
                                                 <div className="space-y-1">
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">01</span><span><span className="text-fuchsia-400">const</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-slate-400">=</span> <span className="text-cyan-400">require</span><span className="text-slate-400">(</span><span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">);</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">02</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">03</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">({'{'}</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">04</span><span>    <span className="text-indigo-100">apiKey</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">,</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">05</span><span>    <span className="text-indigo-100">env</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'production'</span><span className="text-slate-400">,</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">06</span><span>    <span className="text-indigo-100">bufferSize</span><span className="text-slate-400">:</span> <span className="text-amber-400">10</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">07</span><span><span className="text-slate-400">{'}'});</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">08</span><span> </span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">09</span><span><span className="text-slate-500">// Track server-side events</span></span></div>
-                                                    <div className="flex gap-4"><span className="text-slate-500 select-none">10</span><span><span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">capture</span><span className="text-slate-400">(</span><span className="text-emerald-400">'api_call'</span><span className="text-slate-400">, {'{'}</span> <span className="text-indigo-100">userId</span><span className="text-slate-400">:</span> <span className="text-amber-400">123</span> <span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">01</span><span><span className="text-fuchsia-400">const</span> <span className="text-slate-400">{'{'}</span> <span className="text-cyan-400">WebPulse</span> <span className="text-slate-400">{'}'}</span> <span className="text-slate-400">=</span> <span className="text-cyan-400">require</span><span className="text-slate-400">(</span><span className="text-emerald-400">'@webpulse/sdk'</span><span className="text-slate-400">);</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">02</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">03</span><span><span className="text-fuchsia-400">const</span> <span className="text-indigo-100">tracker</span> <span className="text-slate-400">=</span> <span className="text-fuchsia-400">new</span> <span className="text-cyan-400">WebPulse</span><span className="text-slate-400">({'{'}</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">04</span><span>    <span className="text-indigo-100">apiKey</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'wp_live_7x92k...'</span><span className="text-slate-400">,</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">05</span><span>    <span className="text-indigo-100">env</span><span className="text-slate-400">:</span> <span className="text-emerald-400">'production'</span><span className="text-slate-400">,</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">06</span><span>    <span className="text-indigo-100">bufferSize</span><span className="text-slate-400">:</span> <span className="text-amber-400">10</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">07</span><span><span className="text-slate-400">{'}'});</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">08</span><span> </span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">09</span><span><span className="text-slate-500">// Track server-side events</span></span></div>
+                                                    <div className="flex gap-4"><span className="text-slate-600 select-none">10</span><span><span className="text-indigo-100">tracker</span><span className="text-slate-400">.</span><span className="text-cyan-400">capture</span><span className="text-slate-400">(</span><span className="text-emerald-400">'api_call'</span><span className="text-slate-400">, {'{'}</span> <span className="text-indigo-100">userId</span><span className="text-slate-400">:</span> <span className="text-amber-400">123</span> <span className="text-slate-400">{'}'});</span></span></div>
                                                 </div>
                                             )}
                                         </motion.div>
@@ -488,37 +480,37 @@ export default function Landing() {
                 </section>
 
                 {/* Testimonial */}
-                <section id="testimonials" className="py-20 bg-gradient-to-b from-slate-50 to-white dark:from-[#151921] dark:to-[#0B0E14] border-y border-slate-200 dark:border-white/5">
+                <section id="testimonials" className="py-20 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div>
-                                <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-tight">
-                                    Trusted by over <br />
-                                    <span className="text-blue-600">5,000+ creators</span>
+                                <p className="eyebrow mb-3">Loved by creators</p>
+                                <h2 className="page-title !text-4xl mb-6">
+                                    Trusted by over <span className="text-violet-600 dark:text-violet-400">5,000+ creators</span>
                                 </h2>
-                                <p className="text-xl font-medium text-slate-500 dark:text-slate-400 mb-8 leading-relaxed max-w-lg">
+                                <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 leading-relaxed max-w-lg">
                                     "WebPulse Analytics is the only analytics tool that gives me the granularity I need to understand my audience retention. It's completely changed how I plan my content schedule."
                                 </p>
                                 <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-white/10"></div>
+                                    <div className="h-11 w-11 rounded-full bg-slate-200 dark:bg-slate-700"></div>
                                     <div>
-                                        <div className="font-bold text-slate-900 dark:text-white">Alex Rivera</div>
-                                        <div className="text-sm text-slate-500">Professional Streamer, 500k+ Subs</div>
+                                        <div className="font-semibold text-slate-900 dark:text-white">Alex Rivera</div>
+                                        <div className="text-sm text-slate-500 dark:text-slate-400">Professional Streamer, 500k+ Subs</div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-[#0B0E14] p-8 rounded-2xl border border-slate-200 dark:border-white/5 relative shadow-xl">
+                            <div className="card card-pad">
                                 <div className="flex gap-1 mb-4">
                                     {[1, 2, 3, 4, 5].map(i => (
-                                        <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                                        <Star key={i} className="h-5 w-5 text-amber-400 fill-current" />
                                     ))}
                                 </div>
-                                <div className="space-y-4">
-                                    <div className="p-4 bg-white/5 rounded-lg border border-white/5">
-                                        <div className="text-sm text-slate-300">"The real-time alerts saved my stream twice last week. Indispensable."</div>
+                                <div className="space-y-3">
+                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-700/40">
+                                        <div className="text-sm text-slate-700 dark:text-slate-300">"The real-time alerts saved my stream twice last week. Indispensable."</div>
                                     </div>
-                                    <div className="p-4 bg-white/5 rounded-lg border border-white/5">
-                                        <div className="text-sm text-slate-300">"Finally, analytics that actually look good and make sense."</div>
+                                    <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-700/40">
+                                        <div className="text-sm text-slate-700 dark:text-slate-300">"Finally, analytics that actually look good and make sense."</div>
                                     </div>
                                 </div>
                             </div>
@@ -527,50 +519,48 @@ export default function Landing() {
                 </section>
 
                 {/* Pricing */}
-                <section id="pricing" className="py-20 sm:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16 sm:mb-20">
-                        <h2 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Transparent <span className="text-blue-600">Pricing</span></h2>
-                        <p className="text-lg sm:text-xl font-medium text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">The perfect plan for every stage of your journey.</p>
+                <section id="pricing" className="py-20 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-14">
+                        <p className="eyebrow mb-3">Pricing</p>
+                        <h2 className="page-title !text-4xl mb-3">Transparent pricing</h2>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg">The perfect plan for every stage of your journey.</p>
                     </div>
 
                     {loading ? (
                         <div className="flex justify-center items-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                            <div className="animate-spin rounded-full h-10 w-10 border-2 border-violet-500 border-t-transparent"></div>
                         </div>
                     ) : (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {plans.map((plan) => {
                                 const isPro = plan.id === 'pro';
-                                const isBusiness = plan.id === 'business';
-                                const isBasic = plan.id === 'basic';
                                 const isFree = plan.id === 'free';
 
                                 return (
-                                    <div key={plan.id} className={`p-6 rounded-3xl flex flex-col transition-all duration-300 relative ${isPro
-                                        ? 'bg-blue-600 border border-blue-500 shadow-2xl shadow-blue-900/20 transform lg:-translate-y-4'
-                                        : isBusiness
-                                            ? 'bg-gradient-to-b from-white to-blue-50 dark:from-[#151921] dark:to-blue-900/20 border border-blue-500/30 hover:border-blue-500/50 shadow-lg'
-                                            : 'bg-white dark:bg-[#151921] border border-slate-200 dark:border-white/5 hover:border-blue-500/30 dark:hover:border-white/10 shadow-sm hover:shadow-xl'
+                                    <div key={plan.id} className={`card card-pad flex flex-col transition-all duration-300 relative ${isPro
+                                        ? 'bg-slate-900 border-slate-900 dark:bg-violet-500 dark:border-violet-500 transform lg:-translate-y-2'
+                                        : 'card-hover'
                                         }`}>
                                         {isPro && (
-                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-blue-500 rounded-full text-[10px] font-bold text-white border border-blue-400 tracking-wide">MOST POPULAR</div>
+                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-violet-600 rounded-full text-[10px] font-semibold text-white tracking-wide shadow-soft">
+                                                MOST POPULAR
+                                            </div>
                                         )}
 
-                                        <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${isPro ? 'text-blue-100' : isBasic || isBusiness ? 'text-blue-400' : 'text-slate-400'
-                                            }`}>{plan.name}</h3>
+                                        <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isPro ? 'text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{plan.name}</h3>
 
                                         <div className="flex items-baseline gap-1 mb-1">
                                             <span className={`text-3xl font-bold ${isPro ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                                                 {!plan.price_inr && !plan.price_usd ? 'Free' : `₹${plan.price_inr}`}
                                             </span>
-                                            {(plan.price_inr > 0) && <span className={isPro ? 'text-blue-200' : 'text-slate-500 dark:text-slate-400'}>/mo</span>}
+                                            {(plan.price_inr > 0) && <span className={isPro ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}>/mo</span>}
                                         </div>
 
-                                        <div className={`text-xs mb-6 ${isPro ? 'text-blue-200' : 'text-slate-500 dark:text-slate-400'}`}>
+                                        <div className={`text-xs mb-5 ${isPro ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
                                             {plan.price_usd > 0 ? `$${plan.price_usd} / month` : '$0 / month'}
                                         </div>
 
-                                        <p className={`text-sm mb-6 min-h-[40px] ${isPro ? 'text-blue-100' : 'text-slate-400'}`}>
+                                        <p className={`text-sm mb-6 min-h-[40px] ${isPro ? 'text-slate-200' : 'text-slate-400 dark:text-slate-500'}`}>
                                             {plan.id === 'free' && 'Trying WebPulse'}
                                             {plan.id === 'basic' && 'Students & solo devs'}
                                             {plan.id === 'pro' && 'Streamers & growing apps'}
@@ -578,38 +568,34 @@ export default function Landing() {
                                         </p>
 
                                         <ul className="space-y-3 mb-8 flex-1">
-                                            {/* Feature list from plan features JSON if available, else usage limits */}
                                             {plan.features && plan.features.length > 0 ? (
-                                                // If backend returns formatted features list (preferred for UI consistency)
-                                                // Assuming specific structure or defaulting to constructing it
-                                                plan.features.slice(0, 6).map((feature, idx) => ( // Show top 6 features
-                                                    <li key={idx} className={`flex items-center gap-2 text-xs ${isPro ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                        <Check className={`h-3.5 w-3.5 shrink-0 ${isPro ? 'text-white' : 'text-blue-500'}`} />
+                                                plan.features.slice(0, 6).map((feature, idx) => (
+                                                    <li key={idx} className={`flex items-center gap-2 text-sm ${isPro ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                        <Check className={`h-4 w-4 shrink-0 ${isPro ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                                         {feature.text || feature}
                                                     </li>
                                                 ))
                                             ) : (
-                                                // Fallback to constructing user-friendly list from limits if "features" array is empty/missing
                                                 <>
-                                                    <li className={`flex items-center gap-2 text-xs ${isPro ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                        <Check className={`h-3.5 w-3.5 shrink-0 ${isPro ? 'text-white' : 'text-blue-500'}`} />
+                                                    <li className={`flex items-center gap-2 text-sm ${isPro ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                        <Check className={`h-4 w-4 shrink-0 ${isPro ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                                         {plan.max_projects === 100 ? 'Unlimited' : plan.max_projects} Projects
                                                     </li>
-                                                    <li className={`flex items-center gap-2 text-xs ${isPro ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                        <Check className={`h-3.5 w-3.5 shrink-0 ${isPro ? 'text-white' : 'text-blue-500'}`} />
+                                                    <li className={`flex items-center gap-2 text-sm ${isPro ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                        <Check className={`h-4 w-4 shrink-0 ${isPro ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                                         {plan.allowed_origins} Allowed Origin{plan.allowed_origins > 1 ? 's' : ''}
                                                     </li>
-                                                    <li className={`flex items-center gap-2 text-xs ${isPro ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                        <Check className={`h-3.5 w-3.5 shrink-0 ${isPro ? 'text-white' : 'text-blue-500'}`} />
+                                                    <li className={`flex items-center gap-2 text-sm ${isPro ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                        <Check className={`h-4 w-4 shrink-0 ${isPro ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                                         {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events)} events/mo
                                                     </li>
-                                                    <li className={`flex items-center gap-2 text-xs ${isPro ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                        <Check className={`h-3.5 w-3.5 shrink-0 ${isPro ? 'text-white' : 'text-blue-500'}`} />
+                                                    <li className={`flex items-center gap-2 text-sm ${isPro ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                        <Check className={`h-4 w-4 shrink-0 ${isPro ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                                         {plan.refresh_rate === 0 ? 'Real-time' : `${plan.refresh_rate} sec`} dashboard refresh
                                                     </li>
                                                     {plan.live_logs && (
-                                                        <li className={`flex items-center gap-2 text-xs ${isPro ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                            <Check className={`h-3.5 w-3.5 shrink-0 ${isPro ? 'text-white' : 'text-blue-500'}`} />
+                                                        <li className={`flex items-center gap-2 text-sm ${isPro ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                            <Check className={`h-4 w-4 shrink-0 ${isPro ? 'text-emerald-400' : 'text-emerald-500'}`} />
                                                             Live Activity Logs
                                                         </li>
                                                     )}
@@ -619,14 +605,7 @@ export default function Landing() {
 
                                         <Link
                                             to="/register"
-                                            className={`block w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium transition-colors ${isPro
-                                                ? 'bg-white text-blue-600 hover:bg-blue-50'
-                                                : isBasic
-                                                    ? 'bg-blue-600/10 text-blue-400 border border-blue-500/50 hover:bg-blue-600/20'
-                                                    : isBusiness
-                                                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-900/20'
-                                                        : 'border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5'
-                                                }`}
+                                            className={isPro ? 'btn-primary btn-md w-full !bg-white !text-slate-900 dark:!bg-white dark:!text-slate-900 hover:!bg-slate-100' : 'btn-secondary btn-md w-full'}
                                         >
                                             {isFree ? 'Get Started' : `Choose ${plan.name}`}
                                         </Link>
@@ -638,47 +617,37 @@ export default function Landing() {
                 </section>
 
                 {/* Stats */}
-                <section className="py-20 border-t border-white/5">
+                <section className="py-16 border-y border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                            <div>
-                                <div className="text-5xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">500M+</div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-600 font-black uppercase tracking-[0.3em]">Views Tracked</div>
-                            </div>
-                            <div>
-                                <div className="text-5xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">12K+</div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-600 font-black uppercase tracking-[0.3em]">Active Creators</div>
-                            </div>
-                            <div>
-                                <div className="text-5xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">99.9%</div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-600 font-black uppercase tracking-[0.3em]">Uptime</div>
-                            </div>
-                            <div>
-                                <div className="text-5xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">24/7</div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-600 font-black uppercase tracking-[0.3em]">Support</div>
-                            </div>
+                            {[
+                                { value: '500M+', label: 'Views Tracked' },
+                                { value: '12K+', label: 'Active Creators' },
+                                { value: '99.9%', label: 'Uptime' },
+                                { value: '24/7', label: 'Support' },
+                            ].map((stat) => (
+                                <div key={stat.label}>
+                                    <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">{stat.value}</div>
+                                    <div className="text-[10px] text-slate-500 dark:text-slate-500 font-medium uppercase tracking-[0.3em]">{stat.label}</div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
 
                 {/* CTA */}
                 <section className="py-20 px-4">
-                    <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-r from-blue-600 to-purple-600 p-12 text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('/noise.svg')] opacity-20 transform scale-[3] pointer-events-none mix-blend-overlay"></div>
+                    <div className="max-w-5xl mx-auto rounded-3xl bg-slate-900 dark:bg-violet-600 p-12 text-center relative overflow-hidden">
+                        <div className="absolute -top-20 -right-20 w-64 h-64 bg-violet-500/20 dark:bg-white/10 rounded-full blur-3xl" />
+                        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-500/10 dark:bg-white/10 rounded-full blur-3xl" />
                         <div className="relative z-10">
-                            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter leading-tight">Your growth starts with <br /> better data.</h2>
-                            <p className="text-blue-100 text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">Join thousands of creators who are using WebPulse Analytics to build their audience.</p>
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <Link
-                                    to="/register"
-                                    className="px-8 py-4 bg-white text-blue-600 font-bold rounded-full hover:bg-blue-50 transition-colors"
-                                >
-                                    Get Started Free
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight leading-tight">Your growth starts with better data.</h2>
+                            <p className="text-slate-200 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">Join thousands of creators who are using WebPulse Analytics to build their audience.</p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                                <Link to="/register" className="btn-primary btn-lg !bg-white !text-slate-900 hover:!bg-slate-100">
+                                    Get Started Free <ArrowRight className="h-4 w-4" />
                                 </Link>
-                                <Link
-                                    to="/pricing"
-                                    className="px-8 py-4 bg-blue-700/50 text-white font-bold rounded-full hover:bg-blue-700 transition-colors border border-white/20"
-                                >
+                                <Link to="/pricing" className="btn-md inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold px-5 py-3 text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all">
                                     View Pricing
                                 </Link>
                             </div>
@@ -687,53 +656,66 @@ export default function Landing() {
                 </section>
 
                 {/* Footer */}
-                <footer className="border-t border-slate-200 dark:border-white/5 py-16 bg-slate-50 dark:bg-[#0B0E14] transition-colors duration-300">
+                <footer className="border-t border-slate-200 dark:border-slate-800 py-14 bg-white dark:bg-slate-950 transition-colors duration-300">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid md:grid-cols-4 gap-12 mb-12">
-                            <div className="col-span-1 md:col-span-1">
-                                <Link to="/" className="flex items-center gap-3 group/logo mb-6">
-                                    <div className="bg-blue-600 p-2.5 rounded-2xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
-                                        <BarChart2 className="h-5 w-5 text-white" />
+                        <div className="grid md:grid-cols-4 gap-10 mb-10">
+                            <div className="col-span-1">
+                                <Link to="/" className="flex items-center gap-3 mb-4">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white">
+                                        <BarChart2 className="h-5 w-5" />
                                     </div>
-                                    <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
+                                    <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span></span>
                                 </Link>
-                                <p className="text-slate-500 dark:text-slate-500 text-sm leading-relaxed">
+                                <p className="prose-quiet">
                                     The advanced analytics platform for modern content creators. Track, analyze, and grow.
                                 </p>
                             </div>
-                            <div>
-                                <h4 className="text-slate-900 dark:text-white font-bold mb-6">Product</h4>
-                                <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-500">
-                                    <li><Link to="/features" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Features</Link></li>
-                                    <li><Link to="/pricing" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Pricing</Link></li>
-                                    <li><Link to="/api" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">API</Link></li>
-                                    <li><Link to="/integrations" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Integrations</Link></li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-slate-900 dark:text-white font-bold mb-6">Resources</h4>
-                                <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-500">
-                                    <li><Link to="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link></li>
-                                    <li><Link to="/docs" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Documentation</Link></li>
-                                    <li><Link to="/community" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Community</Link></li>
-                                    <li><Link to="/help" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Help Center</Link></li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-slate-900 dark:text-white font-bold mb-6">Legal</h4>
-                                <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-500">
-                                    <li><Link to="/privacy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Privacy Policy</Link></li>
-                                    <li><Link to="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Terms of Service</Link></li>
-                                    <li><Link to="/cookies" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Cookie Policy</Link></li>
-                                </ul>
-                            </div>
+                            {[
+                                {
+                                    title: 'Product',
+                                    links: [
+                                        { to: '/features', label: 'Features' },
+                                        { to: '/pricing', label: 'Pricing' },
+                                        { to: '/api', label: 'API' },
+                                        { to: '/integrations', label: 'Integrations' },
+                                    ]
+                                },
+                                {
+                                    title: 'Resources',
+                                    links: [
+                                        { to: '/blog', label: 'Blog' },
+                                        { to: '/docs', label: 'Documentation' },
+                                        { to: '/community', label: 'Community' },
+                                        { to: '/help', label: 'Help Center' },
+                                    ]
+                                },
+                                {
+                                    title: 'Legal',
+                                    links: [
+                                        { to: '/privacy', label: 'Privacy Policy' },
+                                        { to: '/terms', label: 'Terms of Service' },
+                                        { to: '/cookies', label: 'Cookie Policy' },
+                                    ]
+                                },
+                            ].map((col) => (
+                                <div key={col.title}>
+                                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{col.title}</h4>
+                                    <ul className="space-y-3">
+                                        {col.links.map((link) => (
+                                            <li key={link.to}>
+                                                <Link to={link.to} className="text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-300 transition-colors">{link.label}</Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
                         </div>
-                        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-                            <p className="text-slate-500 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
-                            <div className="flex gap-6 text-slate-500">
-                                <a href="#" className="hover:text-blue-600 dark:hover:text-white transition-colors">Twitter</a>
-                                <a href="#" className="hover:text-blue-600 dark:hover:text-white transition-colors">GitHub</a>
-                                <a href="#" className="hover:text-blue-600 dark:hover:text-white transition-colors">Discord</a>
+                        <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <p className="text-xs text-slate-400 dark:text-slate-600">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                            <div className="flex gap-6 text-sm text-slate-500 dark:text-slate-400">
+                                <a href="#" className="hover:text-violet-600 dark:hover:text-white transition-colors">Twitter</a>
+                                <a href="#" className="hover:text-violet-600 dark:hover:text-white transition-colors">GitHub</a>
+                                <a href="#" className="hover:text-violet-600 dark:hover:text-white transition-colors">Discord</a>
                             </div>
                         </div>
                     </div>
@@ -742,8 +724,8 @@ export default function Landing() {
 
             {/* Video Modal */}
             {isVideoOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                    <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-slate-700 shadow-lift">
                         <button
                             onClick={() => setIsVideoOpen(false)}
                             className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-white/20 transition-colors z-10"
