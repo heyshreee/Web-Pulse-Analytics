@@ -374,7 +374,7 @@ export default function Layout() {
 
                 {/* Page Content */}
                 <main className="flex-1 overflow-auto">
-                    <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full">
+                    <div className="container-app py-6 sm:py-8">
                         <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
                     </div>
                 </main>

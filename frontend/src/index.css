@@ -5,6 +5,31 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* ---- Layout grid ---- */
+    --sidebar-width: 16rem;            /* 256px */
+    --topbar-height: 4rem;             /* 64px */
+    --page-padding: 1.5rem;            /* 24px horizontal */
+    --page-gap: 2rem;                  /* 32px vertical between sections */
+    /* ---- Spacing ---- */
+    --space-1: 0.25rem;                /* 4px  */
+    --space-2: 0.5rem;                 /* 8px  */
+    --space-3: 0.75rem;                /* 12px */
+    --space-4: 1rem;                   /* 16px */
+    --space-5: 1.25rem;                /* 20px */
+    --space-6: 1.5rem;                 /* 24px */
+    --space-8: 2rem;                   /* 32px */
+    --space-10: 2.5rem;                /* 40px */
+    --space-12: 3rem;                  /* 48px */
+    /* ---- Cards ---- */
+    --card-padding: 1.5rem;            /* 24px */
+    --card-radius: 0.75rem;            /* 12px */
+    /* ---- Controls ---- */
+    --control-height: 2.5rem;          /* 40px buttons/inputs */
+    --control-radius: 0.625rem;        /* 10px */
+  }
+
+  .dark {
+    color-scheme: dark;
   }
 
   body {
@@ -58,6 +83,9 @@
   .label {
     @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
   }
+  .field-hint {
+    @apply mt-1.5 text-xs text-slate-500 dark:text-slate-500;
+  }
 
   /* ---- Badges ---- */
   .badge-violet { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300; }
@@ -77,7 +105,53 @@
     @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
   }
 
+  /* ---- Section / card heading ---- */
+  .section-title {
+    @apply text-base font-semibold tracking-tight text-slate-900 dark:text-white;
+  }
+
+  /* ---- Page header (standardized across app) ---- */
+  .page-header {
+    @apply flex flex-col md:flex-row md:items-end justify-between gap-4;
+  }
+  .page-header-title {
+    @apply flex items-center gap-4;
+  }
+  .page-header-icon {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400;
+  }
+
+  /* ---- Segmented control (time range / view toggle) ---- */
+  .segmented {
+    @apply inline-flex items-center gap-0.5 rounded-lg border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800/60;
+  }
+  .segmented-btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all;
+  }
+
+  /* ---- Tables ---- */
+  .table {
+    @apply w-full text-left;
+  }
+  .table-head {
+    @apply bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/40 dark:text-slate-400;
+  }
+  .table-th {
+    @apply px-6 py-3.5 font-semibold;
+  }
+  .table-td {
+    @apply px-6 py-4 text-sm text-slate-600 dark:text-slate-300;
+  }
+
+  /* ---- Icon action button ---- */
+  .icon-btn {
+    @apply inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white;
+  }
+
   /* ---- Wrappers ---- */
+  .container-app {
+    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8;
+  }
   .container-page {
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
