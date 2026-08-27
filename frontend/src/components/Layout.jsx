@@ -373,7 +373,7 @@ export default function Layout() {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-auto">
+                <main className="flex-1 overflow-auto layout-scroll-content">
                     <div className="container-app py-6 sm:py-8">
                         <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
                     </div>
