@@ -166,10 +166,15 @@ export default function Projects() {
             )}
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
-                <div>
-                    <h1 className="page-title">Your Projects</h1>
-                    <p className="page-sub">Manage and monitor your connected domains and tracking infrastructure.</p>
+            <div className="page-header">
+                <div className="page-header-title">
+                    <div className="page-header-icon">
+                        <Folder className="h-5 w-5" />
+                    </div>
+                    <div>
+                        <h1 className="page-title">Your Projects</h1>
+                        <p className="page-sub">Manage and monitor your connected domains and tracking infrastructure.</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="badge-slate capitalize">{user?.plan ? user.plan : 'Free'} Tier</span>
@@ -211,7 +216,7 @@ export default function Projects() {
             </div>
 
             {/* Controls */}
-            <div className="card card-pad flex flex-col md:flex-row gap-4 justify-between items-center !p-4">
+            <div className="card p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
                 <div className="relative w-full md:w-80">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
@@ -222,10 +227,10 @@ export default function Projects() {
                         className="input pl-10"
                     />
                 </div>
-                <div className="flex items-center bg-slate-100 dark:bg-slate-800/60 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
+                <div className="segmented">
                     <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-md transition-all ${viewMode === 'grid'
+                        className={`segmented-btn ${viewMode === 'grid'
                             ? 'text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-700 shadow-sm'
                             : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                     >
@@ -233,7 +238,7 @@ export default function Projects() {
                     </button>
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-md transition-all ${viewMode === 'list'
+                        className={`segmented-btn ${viewMode === 'list'
                             ? 'text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-700 shadow-sm'
                             : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                     >
@@ -308,15 +313,15 @@ export default function Projects() {
             ) : (
                 <div className="space-y-3">
                     <div className="card overflow-hidden">
-                        <table className="w-full text-left">
+                        <table className="table">
                             <thead>
-                                <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.14em]">
-                                    <th className="px-6 py-4">Project Name</th>
-                                    <th className="px-6 py-4">Total Views</th>
-                                    <th className="px-6 py-4">Sessions</th>
-                                    <th className="px-6 py-4">Storage</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
+                                <tr className="table-head border-b border-slate-200 dark:border-slate-800">
+                                    <th className="table-th">Project Name</th>
+                                    <th className="table-th text-right">Total Views</th>
+                                    <th className="table-th text-right">Sessions</th>
+                                    <th className="table-th text-right">Storage</th>
+                                    <th className="table-th">Status</th>
+                                    <th className="table-th text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -326,7 +331,7 @@ export default function Projects() {
                                         onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
                                         className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
                                     >
-                                        <td className="px-6 py-5 whitespace-nowrap">
+                                        <td className="table-td whitespace-nowrap">
                                             <div className="flex items-center gap-3">
                                                 <div className="p-2.5 bg-slate-900 dark:bg-violet-500 text-white rounded-lg group-hover:scale-105 transition-transform">
                                                     <BarChart2 className="h-4 w-4" />
@@ -334,25 +339,25 @@ export default function Projects() {
                                                 <span className="font-semibold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors truncate max-w-[200px]" title={project.name}>{project.name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
                                             {stats[project.id]?.total_views?.toLocaleString() || 0}
                                         </td>
-                                        <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
                                             {stats[project.id]?.sessionCount?.toLocaleString() || 0}
                                         </td>
-                                        <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
                                             {stats[project.id]?.storageUsed < 1024 * 1024
                                                 ? `${(stats[project.id]?.storageUsed / 1024).toFixed(1)} KB`
                                                 : `${(stats[project.id]?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
                                             }
                                         </td>
-                                        <td className="px-6 py-5 whitespace-nowrap">
+                                        <td className="table-td whitespace-nowrap">
                                             <span className="badge-green">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                                 Operational
                                             </span>
                                         </td>
-                                        <td className="px-6 py-5 whitespace-nowrap text-right">
+                                        <td className="table-td whitespace-nowrap text-right">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();

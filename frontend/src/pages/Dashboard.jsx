@@ -144,12 +144,17 @@ export default function Dashboard() {
   const strong = 'text-slate-900 dark:text-white';
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="space-y-8 animate-fade-up">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h1 className="page-title">Global Insights</h1>
-          <p className="page-sub">Real-time visitor activity from across all tracked domains.</p>
+      <div className="page-header">
+        <div className="page-header-title">
+          <div className="page-header-icon">
+            <Globe className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="page-title">Global Insights</h1>
+            <p className="page-sub">Real-time visitor activity from across all tracked domains.</p>
+          </div>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -218,20 +223,20 @@ export default function Dashboard() {
       <div className="card card-pad h-full min-h-[420px] flex flex-col">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h3 className="page-title !text-xl flex items-center gap-2.5">
+            <h3 className="section-title flex items-center gap-2.5">
               <TrendingUp className="h-5 w-5 text-violet-500" />
               Traffic Trends
             </h3>
             <p className="page-sub">Cross-domain historical analytics</p>
           </div>
-          <div className="flex bg-slate-100 dark:bg-slate-800/60 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+          <div className="segmented">
             {['24h', '7d', '30d'].map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${timeRange === range
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                className={`segmented-btn ${timeRange === range
+                  ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                  : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                   }`}
               >
                 {range}
@@ -393,7 +398,7 @@ export default function Dashboard() {
       <div className="card card-pad flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-violet-500/[0.02] pointer-events-none" />
         <div className="relative z-10 text-center md:text-left">
-          <h3 className="page-title !text-xl mb-1.5">Expand Your Reach</h3>
+          <h3 className="section-title mb-1.5">Expand Your Reach</h3>
           <p className={`${muted} text-sm`}>Deploy the global tracker script or integrate new domains in seconds.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
