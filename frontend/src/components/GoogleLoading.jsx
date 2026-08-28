@@ -7,7 +7,7 @@ export default function GoogleLoading() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft">
                     <BarChart2 className="h-5 w-5" />
                 </div>
-                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">WebPulse Analytics</span>
+                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">WebPulse</span>
             </div>
 
             <div className="relative mb-8">

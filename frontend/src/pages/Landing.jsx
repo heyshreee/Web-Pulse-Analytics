@@ -18,10 +18,9 @@ import {
   Fingerprint,
   Trash2,
 } from 'lucide-react';
-import CountUp from '../components/landing/CountUp';
+import AnimatedNumber from '../components/landing/AnimatedNumber';
 import HeroGlobe from '../components/landing/HeroGlobe';
 import LiveEventStream from '../components/landing/LiveEventStream';
-import ThemeToggle from '../components/ThemeToggle';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -102,6 +101,7 @@ const STATIC_SESSION = '04:21';
 export default function Landing() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sceneDone, setSceneDone] = useState(false);
+  const [countRun, setCountRun] = useState(false);
 
   const pageRef = useRef(null);
   const heroSceneRef = useRef(null);
@@ -198,6 +198,19 @@ export default function Landing() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Start the live count-up animation only once the user scrolls.
+  useEffect(() => {
+    if (REDUCED_MOTION) return;
+    const onScroll = () => {
+      if (window.scrollY > 5) {
+        setCountRun(true);
+        window.removeEventListener('scroll', onScroll);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <div
       ref={pageRef}
@@ -233,7 +246,6 @@ export default function Landing() {
               <Link to="/login" className="hidden md:inline-flex text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
                 Log in
               </Link>
-              <ThemeToggle />
               <Link to="/register" className="btn-signal btn-md hidden sm:inline-flex">
                 Start Tracking
               </Link>
@@ -322,7 +334,7 @@ export default function Landing() {
                     </div>
                     <div className="metric-num text-3xl font-bold text-slate-900 dark:text-slate-100 font-display">
                       {REDUCED_MOTION ? STATIC_COUNTS.toLocaleString() : (
-                        <CountUp end={STATIC_COUNTS} duration={2.4} />
+                        <AnimatedNumber end={STATIC_COUNTS} duration={2.4} run={countRun} />
                       )}
                     </div>
                     <div className="text-[11px] text-slate-600 dark:text-slate-300">ACTIVE USERS</div>
@@ -357,7 +369,7 @@ export default function Landing() {
         </section>
 
         {/* ============ TRUST / CUSTOMERS ============ */}
-        <section className="relative z-10 border-y border-slate-200 dark:border-white/[0.06] bg-slate-100/60 dark:bg-white/[0.015] py-14">
+        <section className="relative z-10 border-y border-slate-200 dark:border-white/[0.06] bg-slate-100/60 dark:bg-white/[0.015] py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] mb-8">
               Connect WebPulse to your stack
@@ -396,7 +408,7 @@ export default function Landing() {
                   <span className="w-3 h-3 rounded-full bg-emerald-400" />
                 </div>
                 <div className="ml-4 text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] font-medium">
-                  WebPulse Analytics · Panel
+                  WebPulse · Panel
                 </div>
                 <div className="ml-auto flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-widest">
                   <span className="relative flex h-1.5 w-1.5">
@@ -412,7 +424,7 @@ export default function Landing() {
                 <div className="bg-white dark:bg-space-800 p-6 space-y-5">
                   <KpiCard label="ACTIVE USERS" value={STATIC_COUNTS} format={true} accent="#8B5CF6" />
                   <KpiCard label="PAGEVIEWS" value={STATIC_VIEWS} format={true} accent="#A78BFA" />
-                  <KpiCard label="BOUNCE RATE" value={`${STATIC_BOUNCE}%`} accent="#48E6A1" />
+                  <KpiCard label="BOUNCE RATE" value={STATIC_BOUNCE} format={true} decimals={1} suffix="%" accent="#48E6A1" />
                   <KpiCard label="AVG SESSION" value={STATIC_SESSION} accent="#F59E0B" />
 
                   {/* Live activity */}
@@ -695,7 +707,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="pt-6 border-t border-slate-200 dark:border-white/[0.07] flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">© 2026 WebPulse Analytics. All rights reserved.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">© 2026 WebPulse. All rights reserved.</p>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
@@ -714,12 +726,16 @@ export default function Landing() {
    Section sub-components
 --------------------------------------------------------------------------- */
 
-function KpiCard({ label, value, accent, format }) {
+function KpiCard({ label, value, accent, format, decimals = 0, suffix = '' }) {
   return (
     <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
       <div className="metric-num text-2xl font-bold" style={{ color: accent }}>
-        {format ? <CountUp end={value} duration={2} /> : value}
+        {format ? (
+          <AnimatedNumber end={value} decimals={decimals} suffix={suffix} />
+        ) : (
+          value
+        )}
       </div>
     </div>
   );
@@ -762,7 +778,9 @@ function AcquisitionBars() {
           <div key={r.l}>
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="text-slate-600 dark:text-slate-300">{r.l}</span>
-              <span className="metric-num font-semibold" style={{ color: r.c }}>{r.v}%</span>
+              <span className="metric-num font-semibold" style={{ color: r.c }}>
+                <AnimatedNumber end={r.v} suffix="%" />
+              </span>
             </div>
             <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden" style={{ transform: `translateX(${(i % 2) * 3}px)` }}>
               <div
@@ -796,7 +814,9 @@ function GeoList() {
                 <span key={i} className="flex-1 rounded-sm" style={{ background: r.c, opacity: 0.5 + (i / 10) }} />
               ))}
             </div>
-            <span className="metric-num font-semibold w-10 text-right" style={{ color: r.c }}>{r.v}</span>
+            <span className="metric-num font-semibold w-10 text-right" style={{ color: r.c }}>
+              <AnimatedNumber end={parseInt(r.v.replace(/,/g, ''), 10)} />
+            </span>
           </div>
         ))}
       </div>
@@ -850,7 +870,9 @@ function GeoVisual() {
           <div key={r.label}>
             <div className="flex items-center justify-between text-sm mb-1.5">
               <span className="text-slate-800 dark:text-slate-100">{r.label}</span>
-              <span className="metric-num font-semibold text-slate-800 dark:text-slate-100">{r.value}</span>
+              <span className="metric-num font-semibold text-slate-800 dark:text-slate-100">
+                <AnimatedNumber end={parseInt(r.value.replace(/,/g, ''), 10)} />
+              </span>
             </div>
             <div className="h-2.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden">
               <div
@@ -911,7 +933,9 @@ function AcqVisual() {
               style={{ width: `${r.v}%`, background: r.c }}
             />
           </div>
-          <span className="metric-num text-sm font-semibold w-10 text-right" style={{ color: r.c }}>{r.v}%</span>
+          <span className="metric-num text-sm font-semibold w-10 text-right" style={{ color: r.c }}>
+            <AnimatedNumber end={r.v} suffix="%" />
+          </span>
         </div>
       ))}
     </div>

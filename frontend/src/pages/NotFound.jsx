@@ -10,7 +10,7 @@ export default function NotFound() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft">
                         <BarChart2 className="h-5 w-5" />
                     </div>
-                    <span className="font-bold tracking-tight text-slate-900 dark:text-white">WebPulse Analytics</span>
+                    <span className="font-bold tracking-tight text-slate-900 dark:text-white">WebPulse</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
@@ -44,7 +44,7 @@ export default function NotFound() {
 
             <footer className="p-6 md:px-12 md:py-6 text-center">
                 <p className="text-slate-400 dark:text-slate-600 text-xs">
-                    © 2026 WebPulse Analytics Inc. All rights reserved.
+                    © 2026 WebPulse Inc. All rights reserved.
                 </p>
             </footer>
         </div>

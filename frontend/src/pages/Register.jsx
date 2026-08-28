@@ -253,7 +253,7 @@ export default function Register() {
                 <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
                     By continuing, you agree to our <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-violet-600 dark:text-violet-400 hover:underline">Privacy Policy</Link>.
                 </p>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Inc. All rights reserved.</p>
             </footer>
         </div>
     );

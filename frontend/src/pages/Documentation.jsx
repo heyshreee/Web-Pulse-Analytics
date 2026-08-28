@@ -47,7 +47,7 @@ export default function Documentation() {
                         <p className="eyebrow mb-3">Documentation</p>
                         <h2 className="page-title !text-4xl">Documentation</h2>
                         <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
-                            Learn how to get the most out of WebPulse Analytics.
+                            Learn how to get the most out of WebPulse.
                         </p>
                     </div>
 
@@ -75,9 +75,9 @@ export default function Documentation() {
                     <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
                         <BarChart2 className="h-4 w-4" />
                     </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse Analytics</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
                 </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Inc. All rights reserved.</p>
             </footer>
         </div>
     );

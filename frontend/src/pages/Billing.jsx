@@ -197,7 +197,7 @@ export default function Billing() {
                 amount: order.amount,
                 currency: order.currency,
                 name: "WebPulse",
-                description: "Subscription payment for WebPulse analytics services",
+                description: "Subscription payment for WebPulse services",
                 image: "https://example.com/your_logo",
                 order_id: order.id,
                 handler: async function (response) {

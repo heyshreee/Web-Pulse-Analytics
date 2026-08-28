@@ -470,7 +470,7 @@ export default function API() {
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover:scale-105">
                         <Activity className="h-5 w-5" />
                     </div>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">WebPulse analytics</span>
+                    <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">WebPulse</span>
                 </Link>
                 <div className="flex flex-wrap justify-center gap-8 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                     <Link to="/privacy" className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors">Privacy Policy</Link>

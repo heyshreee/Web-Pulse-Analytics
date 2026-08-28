@@ -10,11 +10,11 @@ export default function Legal({ type }) {
             lastUpdated: "January 14, 2026",
             body: (
                 <>
-                    <p>At WebPulse Analytics, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.</p>
+                    <p>At WebPulse, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.</p>
                     <h3>1. Information We Collect</h3>
                     <p>We collect information you provide directly to us, such as when you create an account, subscribe to our newsletter, or contact customer support.</p>
                     <h3>2. How We Use Your Information</h3>
-                    <p>We use the information we collect to provide, maintain, and improve our services, to develop new ones, and to protect WebPulse Analytics and our users.</p>
+                    <p>We use the information we collect to provide, maintain, and improve our services, to develop new ones, and to protect WebPulse and our users.</p>
                 </>
             )
         },
@@ -23,7 +23,7 @@ export default function Legal({ type }) {
             lastUpdated: "January 14, 2026",
             body: (
                 <>
-                    <p>By accessing or using WebPulse Analytics, you agree to be bound by these Terms of Service.</p>
+                    <p>By accessing or using WebPulse, you agree to be bound by these Terms of Service.</p>
                     <h3>1. Use of Service</h3>
                     <p>You must follow any policies made available to you within the Services. You may not misuse our Services.</p>
                     <h3>2. Account Responsibilities</h3>
@@ -38,7 +38,7 @@ export default function Legal({ type }) {
             lastUpdated: "January 14, 2026",
             body: (
                 <>
-                    <p>WebPulse Analytics uses cookies to improve your experience on our website.</p>
+                    <p>WebPulse uses cookies to improve your experience on our website.</p>
                     <h3>1. What are cookies?</h3>
                     <p>Cookies are small text files that are placed on your computer by websites that you visit.</p>
                     <h3>2. How we use cookies</h3>
@@ -88,9 +88,9 @@ export default function Legal({ type }) {
                     <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
                         <BarChart2 className="h-4 w-4" />
                     </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse Analytics</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
                 </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Inc. All rights reserved.</p>
             </footer>
         </div>
     );

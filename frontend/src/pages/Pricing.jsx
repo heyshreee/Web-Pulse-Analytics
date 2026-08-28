@@ -297,9 +297,9 @@ export default function Pricing() {
                     <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
                         <BarChart2 className="h-4 w-4" />
                     </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse Analytics</span>
+                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
                 </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Inc. All rights reserved.</p>
             </footer>
         </div>
     );
