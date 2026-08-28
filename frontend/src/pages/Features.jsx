@@ -87,7 +87,7 @@ export default function Features() {
                     </div>
                     <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
                 </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
             </footer>
         </div>
     );

@@ -19,7 +19,7 @@ export default function Navbar() {
             <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
               <BarChart2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse</span>
           </Link>
 
           <div className="flex items-center gap-4">

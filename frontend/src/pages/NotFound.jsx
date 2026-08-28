@@ -44,7 +44,7 @@ export default function NotFound() {
 
             <footer className="p-6 md:px-12 md:py-6 text-center">
                 <p className="text-slate-400 dark:text-slate-600 text-xs">
-                    © 2026 WebPulse Inc. All rights reserved.
+                    © 2026 WebPulse
                 </p>
             </footer>
         </div>

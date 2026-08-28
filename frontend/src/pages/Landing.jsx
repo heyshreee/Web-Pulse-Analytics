@@ -861,7 +861,7 @@ export default function Landing() {
               <div className="pt-8 border-t border-slate-200 dark:border-white/[0.08]">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <p className="text-xs text-slate-500 dark:text-slate-500">
-                    © 2026 WebPulse Analytics
+                    © 2026 WebPulse
                   </p>
                   <div className="flex items-center gap-5">
                     <nav aria-label="Legal" className="flex items-center gap-5">

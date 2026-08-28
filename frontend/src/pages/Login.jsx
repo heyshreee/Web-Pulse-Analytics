@@ -88,7 +88,7 @@ export default function Login() {
                         <BarChart2 className="h-5 w-5" />
                     </div>
                     <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                        WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                        WebPulse
                     </span>
                 </Link>
                 <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
@@ -233,7 +233,7 @@ export default function Login() {
                 <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
                     By continuing, you agree to our <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-violet-600 dark:text-violet-400 hover:underline">Privacy Policy</Link>.
                 </p>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
             </footer>
         </div>
     );

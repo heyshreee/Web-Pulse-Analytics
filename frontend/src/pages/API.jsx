@@ -148,7 +148,7 @@ export default function API() {
                             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
                                 <Activity className="h-5 w-5" />
                             </div>
-                            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span></span>
+                            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse</span>
                         </Link>
                     </div>
 

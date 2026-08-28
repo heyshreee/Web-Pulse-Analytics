@@ -195,7 +195,7 @@ export default function Layout() {
                                 <BarChart2 className="h-5 w-5" />
                             </div>
                             <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                                WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                                WebPulse
                             </span>
                         </Link>
                     </div>
@@ -319,7 +319,7 @@ export default function Layout() {
                                     <BarChart2 className="h-4 w-4" />
                                 </div>
                                 <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                                    WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                                    WebPulse
                                 </span>
                             </Link>
                         )}
