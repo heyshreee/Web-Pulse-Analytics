@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 import { Mail, Lock, Loader2, Moon, BarChart2, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { setToken } from '../utils/auth';
