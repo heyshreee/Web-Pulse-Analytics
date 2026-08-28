@@ -17,6 +17,7 @@ import {
   Activity,
   Fingerprint,
   Trash2,
+  Send,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import HeroGlobe from '../components/landing/HeroGlobe';
@@ -103,6 +104,8 @@ export default function Landing() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sceneDone, setSceneDone] = useState(false);
   const [countRun, setCountRun] = useState(false);
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
 
   const pageRef = useRef(null);
   const heroSceneRef = useRef(null);
@@ -695,45 +698,184 @@ export default function Landing() {
       </main>
 
       {/* ============ FOOTER ============ */}
-      <footer className="relative z-10 border-t border-slate-200 dark:border-white/[0.07] py-14 bg-white dark:bg-[#070A10]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-5 gap-10 mb-10">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2.5 mb-4">
+      <footer className="relative z-10 border-t border-slate-200 dark:border-white/[0.07] bg-white dark:bg-[#070A10]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16 lg:py-20" data-reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-12">
+            {/* Left: brand + positioning */}
+            <div className="lg:col-span-4 max-w-sm">
+              <div className="flex items-center gap-2.5 mb-5">
                 <span className="relative flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden"
                   style={{ background: 'linear-gradient(135deg,#7C6CE0,#8B5CF6)' }}>
                   <BarChart2 className="h-4.5 w-4.5 text-white" />
                 </span>
                 <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">WebPulse</span>
               </div>
-              <p className="text-slate-600 dark:text-slate-300 text-sm max-w-xs leading-relaxed">
-                Analytics for the modern web.
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-relaxed">
+                Real-time analytics for the modern web.
+              </p>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                WebPulse is a real-time visitor intelligence platform that turns every
+                pageview, event, and signal into insight — streamed live to your dashboard.
               </p>
             </div>
-            {[
-              { t: 'Product', l: [['/features', 'Features'], ['/pricing', 'Pricing'], ['/integrations', 'Integrations'], ['/api', 'API']] },
-              { t: 'Developers', l: [['/docs', 'Documentation'], ['/api', 'API'], ['/api-keys', 'SDK']] },
-              { t: 'Company', l: [['/blog', 'Blog'], ['/community', 'Community'], ['/help', 'Contact']] },
-              { t: 'Legal', l: [['/privacy', 'Privacy'], ['/terms', 'Terms'], ['/security', 'Security']] },
-            ].map((col) => (
-              <div key={col.t}>
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">{col.t}</h4>
-                <ul className="space-y-3">
-                  {col.l.map(([to, label]) => (
-                    <li key={label}><Link to={to} className="text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">{label}</Link></li>
-                  ))}
-                </ul>
+
+            {/* Explore */}
+            <nav aria-label="Explore" className="lg:col-span-2">
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+                Explore
+              </h4>
+              <ul className="space-y-2.5">
+                {[
+                  ['/', 'Home'],
+                  ['/features', 'Features'],
+                  ['/pricing', 'Pricing'],
+                  ['/integrations', 'Integrations'],
+                  ['/api', 'API'],
+                  ['/docs', 'Developers'],
+                  ['/docs', 'Documentation'],
+                  ['/api-keys', 'SDK'],
+                  ['/blog', 'Blog'],
+                  ['/help', 'Help Center'],
+                ].map(([to, label]) => (
+                  <li key={label}>
+                    <Link
+                      to={to}
+                      className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Product */}
+            <nav aria-label="Product" className="lg:col-span-2">
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+                Product
+              </h4>
+              <ul className="space-y-2.5">
+                {[
+                  ['/features', 'Live Analytics'],
+                  ['/features', 'Visitor Intelligence'],
+                  ['/features', 'Traffic Analytics'],
+                  ['/features', 'Event Tracking'],
+                  ['/features', 'Insights'],
+                  ['/api', 'API'],
+                ].map(([to, label]) => (
+                  <li key={label}>
+                    <Link
+                      to={to}
+                      className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Connect */}
+            <nav aria-label="Connect" className="lg:col-span-2">
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+                Connect
+              </h4>
+              <ul className="space-y-2.5">
+                <li>
+                  <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                    className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
+                    GitHub
+                  </a>
+                </li>
+                <li>
+                  <a href="https://x.com" target="_blank" rel="noopener noreferrer"
+                    className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
+                    X / Twitter
+                  </a>
+                </li>
+                <li>
+                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
+                    className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
+                    LinkedIn
+                  </a>
+                </li>
+                <li>
+                  <a href="https://discord.com" target="_blank" rel="noopener noreferrer"
+                    className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
+                    Discord
+                  </a>
+                </li>
+                <li>
+                  <Link to="/community" className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
+                    Community
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/help" className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            {/* Subscribe */}
+            <div className="lg:col-span-2" aria-label="Subscribe">
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+                Stay in the loop
+              </h4>
+              <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Product updates and releases, no spam.
+              </p>
+              <form
+                className="flex flex-col gap-2"
+                onSubmit={(e) => { e.preventDefault(); if (email.trim()) setSubscribed(true); }}
+              >
+                {subscribed ? (
+                  <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                    <Check className="h-4 w-4" /> Subscribed — thanks!
+                  </span>
+                ) : (
+                  <>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email address"
+                      required
+                      aria-label="Email address"
+                      className="w-full px-3.5 py-2.5 rounded-md text-sm bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.1] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:border-violet-500/70 focus:ring-2 focus:ring-violet-500/20 transition"
+                    />
+                    <button
+                      type="submit"
+                      className="btn-signal btn-md w-full inline-flex items-center justify-center gap-1.5"
+                    >
+                      Subscribe <Send className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </form>
+            </div>
+
+            {/* Bottom bar */}
+            <div className="lg:col-span-12">
+              <div className="pt-8 border-t border-slate-200 dark:border-white/[0.08]">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-slate-500 dark:text-slate-500">
+                    © 2026 WebPulse Analytics
+                  </p>
+                  <div className="flex items-center gap-5">
+                    <nav aria-label="Legal" className="flex items-center gap-5">
+                      <Link to="/privacy" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Privacy</Link>
+                      <Link to="/terms" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Terms</Link>
+                      <Link to="/security" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Security</Link>
+                    </nav>
+                    <span className="hidden sm:inline text-xs text-slate-400 dark:text-slate-600">·</span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Built with intention.
+                    </p>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="pt-6 border-t border-slate-200 dark:border-white/[0.07] flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">© 2026 WebPulse. All rights reserved.</p>
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              Systems operational
             </div>
           </div>
         </div>
