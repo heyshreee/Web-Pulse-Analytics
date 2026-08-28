@@ -226,7 +226,7 @@ export default function Pricing() {
 
                     {/* Feature Comparison Table */}
                     <div className="max-w-7xl mx-auto mb-24">
-                        <h2 className="page-title !text-3xl text-center mb-10">Compare plans</h2>
+                        <h2 className="page-title text-3xl text-center mb-10">Compare plans</h2>
                         {loading ? (
                             <div className="flex justify-center py-10">
                                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
@@ -263,7 +263,7 @@ export default function Pricing() {
 
                     {/* FAQ */}
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="page-title !text-3xl text-center mb-10">Frequently asked questions</h2>
+                        <h2 className="page-title text-3xl text-center mb-10">Frequently asked questions</h2>
                         <div className="space-y-4">
                             {[
                                 {

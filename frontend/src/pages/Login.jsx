@@ -126,7 +126,7 @@ export default function Login() {
                         ) : (
                             <>
                                 <div className="mb-8">
-                                    <h2 className="page-title">
+                                    <h2 className="auth-title">
                                         Welcome back
                                     </h2>
                                     <p className="page-sub mt-2">Enter your details to access your dashboard.</p>

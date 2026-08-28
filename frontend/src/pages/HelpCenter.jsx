@@ -21,7 +21,7 @@ export default function HelpCenter() {
             <main className="pt-28 pb-20">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <p className="eyebrow mb-3">Help Center</p>
-                    <h2 className="page-title !text-4xl mb-8">How can we help?</h2>
+                    <h2 className="page-title mb-8">How can we help?</h2>
 
                     <div className="relative max-w-xl mx-auto mb-16">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />

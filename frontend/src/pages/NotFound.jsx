@@ -24,7 +24,7 @@ export default function NotFound() {
                 <div className="text-[9rem] md:text-[12rem] font-bold leading-none tracking-tighter text-slate-900/[0.05] dark:text-white/[0.05] select-none">
                     404
                 </div>
-                <h2 className="page-title !text-3xl md:!text-4xl -mt-10 mb-3">Page not found</h2>
+                <h2 className="page-title -mt-10 mb-3">Page not found</h2>
                 <p className="page-sub max-w-lg mx-auto mb-10">
                     The page you're looking for doesn't exist or has been moved.
                     Let's get you back on track.

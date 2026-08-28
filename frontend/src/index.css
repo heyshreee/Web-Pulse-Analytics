@@ -99,15 +99,20 @@
     @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500;
   }
   .page-title {
-    @apply text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
+    @apply text-2xl sm:text-[1.75rem] font-bold tracking-tight text-slate-900 dark:text-white;
   }
   .page-sub {
     @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
   }
 
-  /* ---- Section / card heading ---- */
+  /* ---- Auth page heading (28–36px, larger than dashboard title) ---- */
+  .auth-title {
+    @apply text-[1.75rem] sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
+  }
+
+  /* ---- Section / card heading (18–20px) ---- */
   .section-title {
-    @apply text-base font-semibold tracking-tight text-slate-900 dark:text-white;
+    @apply text-lg font-semibold tracking-tight text-slate-900 dark:text-white;
   }
 
   /* ---- Page header (standardized across app) ---- */

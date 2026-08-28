@@ -45,7 +45,7 @@ export default function Documentation() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <p className="eyebrow mb-3">Documentation</p>
-                        <h2 className="page-title !text-4xl">Documentation</h2>
+                        <h2 className="page-title">Documentation</h2>
                         <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
                             Learn how to get the most out of WebPulse.
                         </p>

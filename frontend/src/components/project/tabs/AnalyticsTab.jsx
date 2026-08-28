@@ -74,7 +74,7 @@ export default function AnalyticsTab({
               <span className="uppercase tracking-widest text-[10px] font-semibold">Live Pulse</span>
             </div>
 
-            <div className="text-6xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+            <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight tabular-nums">
               {overviewStats?.realTimeVisitors || 0}
             </div>
             <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest">Active Visitors Now</p>

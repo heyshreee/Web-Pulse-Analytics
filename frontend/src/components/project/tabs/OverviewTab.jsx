@@ -44,7 +44,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
             </div>
           </div>
           <div className="flex items-baseline gap-3">
-            <span className="text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums">
                 {overviewStats.realTimeVisitors || 0}
             </span>
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">Live</span>

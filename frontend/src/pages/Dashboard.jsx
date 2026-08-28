@@ -263,7 +263,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="mt-4">
-              <span className="text-6xl font-bold text-slate-900 dark:text-white tracking-tight">{realTimeVisitors.toLocaleString()}</span>
+              <span className="text-[2rem] font-bold text-slate-900 dark:text-white tracking-tight tabular-nums">{realTimeVisitors.toLocaleString()}</span>
             </div>
           </div>
 

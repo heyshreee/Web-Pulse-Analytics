@@ -134,7 +134,7 @@ export default function Register() {
                         ) : (
                             <>
                                 <div className="mb-8">
-                                    <h2 className="page-title">
+                                    <h2 className="auth-title">
                                         Create account
                                     </h2>
                                     <p className="page-sub mt-2">Start tracking your visitors today.</p>
