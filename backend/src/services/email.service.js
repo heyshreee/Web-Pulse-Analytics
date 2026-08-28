@@ -29,6 +29,41 @@ class EmailService {
     }
 
     /**
+     * Forward a message submitted through the public contact form to the
+     * monitored support mailbox. The sender address is used as reply-to.
+     */
+    static async sendContactRequest({ name = 'Anonymous', email, subject = 'General question', message }) {
+        const to = process.env.SUPPORT_EMAIL || FROM_EMAIL;
+        const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        try {
+            const html = EmailService.getBaseTemplate(`
+                <h2 style="color: #111827; margin-bottom: 20px;">New message from the contact form</h2>
+                <p><strong>Name:</strong> ${esc(name)}</p>
+                <p><strong>Email:</strong> ${esc(email)}</p>
+                <p><strong>Subject:</strong> ${esc(subject)}</p>
+                <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin-top: 16px; white-space: pre-wrap; color: #333333;">
+                    ${esc(message)}
+                </div>
+                <p style="margin-top: 20px; font-size: 13px; color: #888888;">Reply to the sender directly at ${esc(email)}.</p>
+            `);
+
+            const { data, error } = await resend.emails.send({
+                from: FROM_EMAIL,
+                to,
+                reply_to: email,
+                subject: `[Contact] ${subject}`,
+                html
+            });
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('[EmailService] Contact request failed:', error.message);
+            throw error;
+        }
+    }
+
+    /**
      * Send verification email (Welcome + Verify)
      */
     static async sendVerificationEmail(email, code, name = 'User') {
