@@ -22,7 +22,10 @@ const Legal = lazy(() => import('./pages/Legal'));
 const Features = lazy(() => import('./pages/Features'));
 const API = lazy(() => import('./pages/API'));
 const Integrations = lazy(() => import('./pages/Integrations'));
-const Documentation = lazy(() => import('./pages/Documentation'));
+const Security = lazy(() => import('./pages/Security'));
+const DocsLayout = lazy(() => import('./pages/docs/DocsLayout'));
+const DocsIndex = lazy(() => import('./pages/docs/DocsIndex'));
+const DocPage = lazy(() => import('./pages/docs/DocPage'));
 const Community = lazy(() => import('./pages/Community'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -133,9 +136,23 @@ function App() {
                                 <Route path="/features" element={<Features />} />
                                 <Route path="/api" element={<API />} />
                                 <Route path="/integrations" element={<Integrations />} />
-                                <Route path="/docs" element={<Documentation />} />
+                                <Route path="/docs" element={<DocsLayout />}>
+                                    <Route index element={<DocsIndex />} />
+                                    <Route path="getting-started" element={<DocPage slug="getting-started" />} />
+                                    <Route path="tracking" element={<DocPage slug="tracking" />} />
+                                    <Route path="tracking/events" element={<DocPage slug="tracking-events" />} />
+                                    <Route path="api" element={<DocPage slug="api" />} />
+                                    <Route path="api/authentication" element={<DocPage slug="api-authentication" />} />
+                                    <Route path="api/events" element={<DocPage slug="api-events" />} />
+                                    <Route path="api/analytics" element={<DocPage slug="api-analytics" />} />
+                                    <Route path="javascript" element={<DocPage slug="javascript" />} />
+                                    <Route path="guides" element={<DocPage slug="guides" />} />
+                                    <Route path="guides/react" element={<DocPage slug="guide-react" />} />
+                                    <Route path="security" element={<DocPage slug="security" />} />
+                                </Route>
                                 <Route path="/community" element={<Community />} />
                                 <Route path="/help" element={<HelpCenter />} />
+                                <Route path="/security" element={<Security />} />
                                 <Route path="/privacy" element={<Legal type="privacy" />} />
                                 <Route path="/terms" element={<Legal type="terms" />} />
                                 <Route path="/cookies" element={<Legal type="cookies" />} />
