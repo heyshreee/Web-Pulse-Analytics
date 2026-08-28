@@ -30,6 +30,8 @@ export const env = {
   razorpayKeySecret: read('RAZORPAY_KEY_SECRET'),
   resendApiKey: read('RESEND_API_KEY'),
   resendFromEmail: read('RESEND_FROM_EMAIL'),
+  supportEmail: read('SUPPORT_EMAIL'),
+  privacyEmail: read('PRIVACY_EMAIL'),
   googleClientId: read('GOOGLE_CLIENT_ID'),
   googleClientSecret: read('GOOGLE_CLIENT_SECRET'),
   cloudinaryCloudName: read('CLOUDINARY_CLOUD_NAME'),

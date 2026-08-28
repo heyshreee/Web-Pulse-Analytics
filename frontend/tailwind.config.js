@@ -9,7 +9,23 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        display: ['Inter', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+      },
+      colors: {
+        space: {
+          950: '#070A10',
+          900: '#0B0F17',
+          800: '#101522',
+          700: '#151B29',
+        },
+        pulse: {
+          purple: '#8B5CF6',
+          violet: '#7C6CE0',
+          green: '#48E6A1',
+          live: '#48E6A1',
+          warning: '#F59E0B',
+          error: '#EF4444',
+        },
       },
       boxShadow: {
         soft: '0 1px 2px 0 rgb(15 23 42 / 0.05)',

@@ -35,7 +35,7 @@ export default function GoogleCallback() {
     }, [searchParams, navigate, showToast]);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex flex-col items-center justify-center p-4 transition-colors duration-300">
             <div className="relative mb-8">
                 <div className="absolute inset-0 rounded-full border-2 border-violet-500/20 border-t-violet-500 animate-spin w-24 h-24 -m-2"></div>
                 <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-soft border border-slate-200 dark:border-slate-800 relative z-10">

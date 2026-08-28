@@ -197,7 +197,7 @@ export default function Billing() {
                 amount: order.amount,
                 currency: order.currency,
                 name: "WebPulse",
-                description: "Subscription payment for WebPulse analytics services",
+                description: "Subscription payment for WebPulse services",
                 image: "https://example.com/your_logo",
                 order_id: order.id,
                 handler: async function (response) {
@@ -336,7 +336,7 @@ export default function Billing() {
                         <div>
                             <p className="eyebrow mb-2">Current Plan</p>
                             <div className="flex items-center gap-3">
-                                <h2 className="text-3xl font-bold text-slate-900 dark:text-white capitalize">{usageStats.plan} Plan</h2>
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize">{usageStats.plan} Plan</h2>
                                 <span className="badge-slate">Current</span>
                             </div>
                         </div>

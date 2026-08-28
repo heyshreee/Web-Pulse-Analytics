@@ -25,3 +25,13 @@ dist-ssr
 *.sw?
 
 .vite/
+
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Playwright visual regression artifacts
+test-results/

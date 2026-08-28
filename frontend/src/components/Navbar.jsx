@@ -16,10 +16,10 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <Link to="/" className="flex items-center gap-3 group/logo">
-            <div className="bg-blue-600 p-2 rounded-xl shadow-xl shadow-blue-600/20 group-hover/logo:rotate-12 transition-all duration-300">
-              <BarChart2 className="h-5 w-5 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white ring-1 ring-slate-200 shadow-xl shadow-blue-600/20 transition-transform duration-300 group-hover/logo:rotate-12">
+              <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
             </div>
-            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse <span className="text-blue-600">Analytics</span></span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse</span>
           </Link>
 
           <div className="flex items-center gap-4">

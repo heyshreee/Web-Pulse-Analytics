@@ -99,15 +99,20 @@
     @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500;
   }
   .page-title {
-    @apply text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
+    @apply text-2xl sm:text-[1.75rem] font-bold tracking-tight text-slate-900 dark:text-white;
   }
   .page-sub {
     @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
   }
 
-  /* ---- Section / card heading ---- */
+  /* ---- Auth page heading (28–36px, larger than dashboard title) ---- */
+  .auth-title {
+    @apply text-[1.75rem] sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
+  }
+
+  /* ---- Section / card heading (18–20px) ---- */
   .section-title {
-    @apply text-base font-semibold tracking-tight text-slate-900 dark:text-white;
+    @apply text-lg font-semibold tracking-tight text-slate-900 dark:text-white;
   }
 
   /* ---- Page header (standardized across app) ---- */
@@ -158,6 +163,75 @@
   .prose-quiet {
     @apply text-sm leading-relaxed text-slate-600 dark:text-slate-300;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Landing utilities (scoped to the marketing page, theme-aware)
+   --------------------------------------------------------------------------- */
+.btn-signal {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  color: #fff;
+  background: linear-gradient(180deg, #7C6CE0 0%, #8B5CF6 55%, #7C3AED 100%);
+}
+.btn-signal:hover {
+  background: linear-gradient(180deg, #8B7DF0 0%, #9D74F7 55%, #8B5CF6 100%);
+  transform: translateY(-1px);
+}
+.btn-ghost-dark {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40 disabled:opacity-50 disabled:pointer-events-none;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+.dark .btn-ghost-dark {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+.btn-ghost-dark:hover {
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+}
+.dark .btn-ghost-dark:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #a78bfa;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.obs-grid {
+  background-image:
+    linear-gradient(rgba(100, 116, 139, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 116, 139, 0.07) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.dark .obs-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+}
+
+.glass-obs {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.dark .glass-obs {
+  background: rgba(11, 15, 23, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.eyebrow-obs {
+  @apply text-[11px] font-semibold uppercase tracking-[0.22em];
+  color: #8B5CF6;
+}
+.dark .eyebrow-obs {
+  color: #a78bfa;
+}
+
+.metric-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
 }
 
 /* Custom Scrollbar */

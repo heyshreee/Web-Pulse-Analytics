@@ -11,9 +11,15 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.4",
+    "@tsparticles/engine": "^3.9.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.26.1",
+    "gsap": "^3.15.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
+    "motion": "^13.1.1",
     "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -24,6 +30,7 @@
     "react-syntax-highlighter": "^16.1.0",
     "recharts": "^3.6.0",
     "socket.io-client": "^4.8.3",
+    "tailwind-merge": "^3.6.0",
     "three": "^0.183.2"
   },
   "devDependencies": {

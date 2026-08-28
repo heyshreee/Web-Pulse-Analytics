@@ -261,9 +261,9 @@ const NetworkGlobe = ({
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.35;
     controls.enablePan = false;
-    // Disable all mouse-drag interaction (rotate and any drag-zoom) so the
-    // globe only auto-rotates. Zoom is controlled by the on-screen buttons.
-    controls.enableRotate = false;
+    // Allow drag-to-rotate. Auto-rotate pauses while dragging (see handlers
+    // below). Zoom is controlled by the on-screen buttons.
+    controls.enableRotate = true;
     controls.enableZoom = false;
     // Remove any remaining zoom gesture bindings (middle-click / two-finger).
     controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.ROTATE };

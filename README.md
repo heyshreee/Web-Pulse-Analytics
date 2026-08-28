@@ -1,214 +1,199 @@
 # Web Pulse Analytics
 
-A real-time web analytics and monitoring platform that provides comprehensive insights into website performance, user behavior, and traffic patterns. Track key metrics, monitor server health, and gain actionable intelligence about your web applications.
+Web Pulse Analytics is a real-time visitor tracking and web analytics platform. It captures page views, events, and visitor attributes, and streams live activity to the dashboard over WebSockets so you can monitor traffic, performance, and user behavior as it happens.
 
-## 🎯 Features
+## Key Features
 
-- **Real-Time Monitoring**: Track website metrics and user activity in real-time
-- **Performance Analytics**: Monitor page load times, response times, and performance metrics
-- **Traffic Analysis**: Analyze visitor patterns, traffic sources, and user behavior
-- **Custom Dashboards**: Create personalized dashboards to track metrics that matter to you
-- **Alerts & Notifications**: Set up alerts for anomalies and performance issues
-- **Historical Data**: Store and analyze historical data for trend analysis
-- **Export Reports**: Generate and export analytics reports in multiple formats
-- **API Integration**: Integrate with your existing tools and platforms via REST API
-- **User Tracking**: Monitor unique visitors, sessions, and user journeys
-- **Error Tracking**: Capture and analyze application errors and exceptions
+- **Real-time visitor tracking** — live visitor sessions streamed to the dashboard via Socket.IO
+- **Event tracking** — lightweight client-side script and REST endpoint for capturing page views and custom events
+- **Rich analytics** — global overview, per-project stats, traffic breakdowns, page and activity reports
+- **Interactive visualizations** — traffic globe, geographic maps (Leaflet), and analytics charts (Recharts)
+- **Authentication & accounts** — email/password and Google OAuth (JWT-based session management)
+- **Team projects** — manage multiple tracked sites with per-project dashboards and metrics
+- **Plans & billing** — subscription plans with Razorpay payments and usage-based tracking
+- **Notifications** — email and Telegram alerts for account and platform events
+- **Security hardening** — Helmet, rate limiting, CSRF protection, and CORS-restricted tracking endpoints
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend
-- **React** - UI library for building interactive interfaces
-- **Vite** - Fast build tool and dev server
-- **JavaScript** - Primary programming language (99.7% of codebase)
 
-### Backend & Infrastructure
-- **Node.js** - Runtime environment
-- **Express.js** - Web application framework
-- **Database** - Real-time data storage and retrieval
-- **APIs** - RESTful endpoints for data access
+- **React 19** with Vite — single-page application
+- **Tailwind CSS** — utility-first styling
+- **Recharts** — analytics charts
+- **react-globe.gl** & **Leaflet** — geo-visualizations
+- **Framer Motion** — animations
+- **socket.io-client** — real-time updates
 
-### Development Tools
-- **ESLint** - Code quality and style enforcement
-- **HMR (Hot Module Replacement)** - Fast development experience
+### Backend
 
-## 📦 Installation
+- **Node.js** + **Express 5**
+- **Socket.IO** — real-time visitor streaming
+- **Supabase (PostgreSQL)** — data storage and retrieval
+- **JWT** — authentication and session management (Google OAuth supported)
+- **geoip-lite** & **ua-parser-js** — visitor geolocation and device detection
+- **Razorpay** — subscription payments
+- **Cloudinary** — media storage
+- **Resend** — transactional email
+- **Helmet**, **express-rate-limit**, **CSRF** — security middleware
+
+## Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- npm or yarn package manager
 
-### Setup Instructions
+- Node.js 18 or higher
+- npm or yarn
+- A Supabase project (for the database)
+- Optional: Razorpay, Google OAuth, Cloudinary, Resend, and Telegram credentials for full functionality
+
+### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/heyshreee/Web-Pulse-Analytics.git
    cd Web-Pulse-Analytics
    ```
 
-2. **Install dependencies**
+2. **Install backend dependencies**
+
    ```bash
+   cd backend
    npm install
    ```
 
-3. **Navigate to frontend directory**
-   ```bash
-   cd frontend
-   npm install
-   ```
+3. **Configure the backend environment**
 
-4. **Return to root and set up environment variables**
    ```bash
-   cd ..
    cp .env.example .env
    ```
 
-5. **Start the development server**
-   ```bash
-   npm run dev
+   At minimum, set the following required variables:
+
+   ```env
+   PORT=5000
+   JWT_SECRET=your-secret
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_SERVICE_KEY=your-service-key
+   FRONTEND_URL=http://localhost:5173
    ```
 
-6. **Access the application**
-   Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal)
+4. **Install frontend dependencies**
 
-## 🚀 Usage Examples
-
-### Basic Setup
-```javascript
-// Import the analytics module
-import { Analytics } from './analytics';
-
-// Initialize analytics
-const analytics = new Analytics({
-  trackingId: 'your-tracking-id',
-  endpoint: 'https://api.example.com'
-});
-
-// Track page views
-analytics.trackPageView({
-  page: '/dashboard',
-  title: 'Dashboard'
-});
-```
-
-### Track User Events
-```javascript
-// Track custom events
-analytics.trackEvent('user_signup', {
-  method: 'email',
-  timestamp: new Date()
-});
-
-analytics.trackEvent('button_click', {
-  buttonId: 'submit-btn',
-  page: '/form'
-});
-```
-
-### Create Dashboard Widgets
-```javascript
-// Create a custom dashboard
-const dashboard = new Dashboard({
-  name: 'Main Analytics',
-  widgets: [
-    { type: 'traffic', metric: 'pageViews' },
-    { type: 'performance', metric: 'avgLoadTime' },
-    { type: 'users', metric: 'activeUsers' }
-  ]
-});
-
-dashboard.render('#dashboard-container');
-```
-
-### Query Analytics Data
-```javascript
-// Fetch analytics data
-const data = await analytics.query({
-  metric: 'pageViews',
-  startDate: '2026-01-01',
-  endDate: '2026-04-11',
-  groupBy: 'day'
-});
-
-console.log(data);
-```
-
-## 🤝 Contributing
-
-We welcome contributions from the community! To contribute to Web Pulse Analytics:
-
-1. **Fork the repository**
    ```bash
-   git clone https://github.com/yourusername/Web-Pulse-Analytics.git
-   ```
-
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-3. **Make your changes**
-   - Follow the existing code style and conventions
-   - Write clear, descriptive commit messages
-   - Add comments for complex logic
-
-4. **Install and test your changes**
-   ```bash
+   cd ../frontend
    npm install
+   cp .env.example .env
+   ```
+
+   Frontend variables:
+
+   ```env
+   VITE_API_URL=http://localhost:5000
+   VITE_GOOGLE_CLIENT_ID=your-google-client-id
+   VITE_RAZORPAY_KEY_ID=your-razorpay-key-id
+   ```
+
+5. **Start the backend** (from `backend/`)
+
+   ```bash
    npm run dev
    ```
 
-5. **Commit your changes**
+6. **Start the frontend** (from `frontend/`)
+
    ```bash
-   git commit -m "Add your feature description"
+   npm run dev
    ```
 
-6. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+7. **Access the application**
 
-7. **Submit a Pull Request**
-   - Describe your changes clearly
-   - Reference any related issues
-   - Ensure all tests pass
+   Open `http://localhost:5173` in your browser. The API runs on `http://localhost:5000`.
 
-### Code Standards
-- Use ESLint for code quality
-- Follow JavaScript best practices
-- Write meaningful variable and function names
-- Add documentation for new features
+## Project Structure
 
-## 📄 License
+```
+├── backend/            # Express API, Socket.IO, and business logic
+│   └── src/
+│       ├── config/     # Environment and third-party configuration
+│       ├── controllers/# Request handlers
+│       ├── middleware/ # Auth, CSRF, rate limiting, CORS
+│       ├── routes/     # API route definitions
+│       ├── services/   # Business logic (email, plans, usage, etc.)
+│       ├── socket/     # Real-time visitor streams
+│       └── utils/      # Shared helpers
+└── frontend/           # React single-page application
+    └── src/
+        ├── components/ # Reusable UI components
+        ├── context/    # React context providers
+        ├── hooks/      # Custom hooks
+        ├── pages/      # Application routes/views
+        └── utils/      # API client and helpers
+```
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## API Overview
 
-### MIT License Summary
-- ✅ Free to use for personal and commercial projects
-- ✅ You can modify and distribute the code
-- ✅ Must include original copyright and license notice
-- ❌ No warranty or liability provided
+The API is organized under versioned routes in `backend/src/routes`.
 
-For full license text, see the LICENSE file in the repository.
+| Area             | Base path        | Description                                  |
+| ---------------- | ---------------- | -------------------------------------------- |
+| Tracking         | `/api/track`     | Public visitor tracking and count endpoints  |
+| Analytics        | `/api/v1/analytics` | Global and per-project analytics           |
+| Authentication   | `/api/v1/auth`   | Login, registration, and OAuth               |
+| Projects         | `/api/v1/projects` | Project and website management             |
+| Users            | `/api/v1/users`  | User profile and settings                     |
+| Plans & Payments | `/api/v1/plans`, `/api/v1/payment` | Subscriptions and receipts    |
+| Notifications    | `/api/v1/notifications` | Account and alert notifications         |
+| Usage            | `/api/v1/usage`  | Event volume and quota tracking              |
 
----
+### Tracking a visitor
 
-## 📞 Support & Contact
+```http
+POST /api/track/:trackingId
+Content-Type: application/json
 
-For questions, bug reports, or feature requests:
-- Open an issue on GitHub
-- Check existing documentation and FAQs
-- Contact the maintainers
+{
+  "page": "/pricing",
+  "referrer": "https://google.com",
+  "userAgent": "Mozilla/5.0 ..."
+}
+```
 
-## 📈 Roadmap
+### Fetching visitor count
 
-- Enhanced AI-powered insights
-- Machine learning-based anomaly detection
-- Advanced segmentation capabilities
-- Multi-language support
-- Mobile app support
-- Advanced export options
+```http
+GET /api/track/:trackingId
+```
 
----
+Real-time activity is delivered to connected clients over Socket.IO from the backend socket service.
 
-**Built with ❤️ by the Web Pulse Analytics team**
+## Development Scripts
+
+### Backend (`backend/`)
+
+| Command             | Description                |
+| ------------------- | -------------------------- |
+| `npm run dev`       | Start server with nodemon  |
+| `npm start`         | Start the production server |
+
+### Frontend (`frontend/`)
+
+| Command        | Description               |
+| -------------- | ------------------------- |
+| `npm run dev`  | Start the Vite dev server |
+| `npm run build`| Build for production      |
+| `npm run lint` | Run ESLint                |
+| `npm run preview` | Preview the production build |
+
+## Contributing
+
+Contributions are welcome. Please follow these steps:
+
+1. Fork the repository and create a feature branch (`git checkout -b feature/your-feature-name`).
+2. Make your changes and follow the existing code style and conventions.
+3. Run the linter (`npm run lint` in `frontend/`) before committing.
+4. Commit with a clear, descriptive message and open a pull request that references any related issues.
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

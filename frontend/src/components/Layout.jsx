@@ -110,7 +110,7 @@ export default function Layout() {
         try {
             const userData = await apiRequest('/auth/me');
             setUser(userData);
-        } catch (err) {
+        } catch {
             navigate('/login');
         } finally {
             setLoading(false);
@@ -155,7 +155,7 @@ export default function Layout() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070A10]">
                 <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
             </div>
         );
@@ -173,7 +173,7 @@ export default function Layout() {
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
 
     return (
-        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
+        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-[#070A10] flex font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && !isSettingsPage && (
                 <div
@@ -185,17 +185,17 @@ export default function Layout() {
             {/* Sidebar */}
             {!isSettingsPage && (
                 <aside className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out flex flex-col
+            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-space-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out flex flex-col
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
                     {/* Logo */}
                     <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/80">
                         <Link to="/dashboard" className="flex items-center gap-3 group/logo flex-shrink-0">
-                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
-                                <BarChart2 className="h-5 w-5" />
+                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
+                                <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                             </div>
                             <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                                WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                                WebPulse
                             </span>
                         </Link>
                     </div>
@@ -303,7 +303,7 @@ export default function Layout() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Topbar */}
-                <header className="h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-colors duration-300">
+                <header className="h-16 bg-white/80 dark:bg-space-900/75 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-colors duration-300">
                     <div className="flex items-center gap-3">
                         {!isSettingsPage && (
                             <button
@@ -315,11 +315,11 @@ export default function Layout() {
                         )}
                         {isSettingsPage && (
                             <Link to="/dashboard" className="flex items-center gap-2.5 group/logo">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
-                                    <BarChart2 className="h-4 w-4" />
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+                                    <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                                 </div>
                                 <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                                    WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                                    WebPulse
                                 </span>
                             </Link>
                         )}

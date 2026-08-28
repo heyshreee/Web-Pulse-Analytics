@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Mail, Lock, Loader2, Moon, BarChart2, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { setToken } from '../utils/auth';
@@ -80,15 +79,15 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-3 group/logo">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
-                        <BarChart2 className="h-5 w-5" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
+                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                     </div>
                     <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                        WebPulse <span className="text-violet-600 dark:text-violet-300">Analytics</span>
+                        WebPulse
                     </span>
                 </Link>
                 <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
@@ -126,7 +125,7 @@ export default function Login() {
                         ) : (
                             <>
                                 <div className="mb-8">
-                                    <h2 className="page-title">
+                                    <h2 className="auth-title font-display">
                                         Welcome back
                                     </h2>
                                     <p className="page-sub mt-2">Enter your details to access your dashboard.</p>
@@ -233,7 +232,7 @@ export default function Login() {
                 <p className="mb-2 text-sm text-slate-500 dark:text-slate-400">
                     By continuing, you agree to our <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-violet-600 dark:text-violet-400 hover:underline">Privacy Policy</Link>.
                 </p>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics Inc. All rights reserved.</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
             </footer>
         </div>
     );
