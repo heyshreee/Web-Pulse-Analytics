@@ -161,51 +161,67 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Landing "Dark Data Observatory" utilities (scoped to the marketing page)
+   Landing utilities (scoped to the marketing page, theme-aware)
    --------------------------------------------------------------------------- */
 .btn-signal {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 disabled:opacity-50 disabled:pointer-events-none;
-  color: #06101a;
-  background: linear-gradient(180deg, #5fe0ff 0%, #35D7FF 55%, #1fb8e6 100%);
-  box-shadow: 0 0 0 1px rgba(53, 215, 255, 0.35), 0 12px 32px -8px rgba(53, 215, 255, 0.55);
+  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  color: #fff;
+  background: linear-gradient(180deg, #7C6CE0 0%, #8B5CF6 55%, #7C3AED 100%);
 }
 .btn-signal:hover {
-  background: linear-gradient(180deg, #74e6ff 0%, #4bdaff 55%, #2cc2ef 100%);
+  background: linear-gradient(180deg, #8B7DF0 0%, #9D74F7 55%, #8B5CF6 100%);
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(53, 215, 255, 0.5), 0 16px 40px -8px rgba(53, 215, 255, 0.65);
 }
 .btn-ghost-dark {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 disabled:opacity-50 disabled:pointer-events-none;
-  color: #F5F7FA;
-  background: rgba(21, 27, 35, 0.6);
-  border: 1px solid rgba(245, 247, 250, 0.14);
+  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40 disabled:opacity-50 disabled:pointer-events-none;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+.dark .btn-ghost-dark {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 .btn-ghost-dark:hover {
-  border-color: rgba(53, 215, 255, 0.4);
-  background: rgba(21, 27, 35, 0.9);
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+}
+.dark .btn-ghost-dark:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #a78bfa;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .obs-grid {
   background-image:
-    linear-gradient(rgba(53, 215, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(53, 215, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(100, 116, 139, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 116, 139, 0.07) 1px, transparent 1px);
   background-size: 56px 56px;
+}
+.dark .obs-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
 }
 
 .glass-obs {
-  background: rgba(11, 15, 20, 0.55);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(245, 247, 250, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.dark .glass-obs {
+  background: rgba(11, 15, 23, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .eyebrow-obs {
   @apply text-[11px] font-semibold uppercase tracking-[0.22em];
-  color: #35D7FF;
+  color: #8B5CF6;
 }
-
-.text-glow-cyan {
-  text-shadow: 0 0 24px rgba(53, 215, 255, 0.45);
+.dark .eyebrow-obs {
+  color: #a78bfa;
 }
 
 .metric-num {

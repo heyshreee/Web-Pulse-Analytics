@@ -21,6 +21,7 @@ import {
 import CountUp from '../components/landing/CountUp';
 import HeroGlobe from '../components/landing/HeroGlobe';
 import LiveEventStream from '../components/landing/LiveEventStream';
+import ThemeToggle from '../components/ThemeToggle';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,11 +45,11 @@ const HERO_CITIES = [
 ];
 
 const TOP_LOCATIONS = [
-  { label: 'United States', value: '4,218', pct: 33, color: '#35D7FF' },
-  { label: 'India', value: '2,943', pct: 23, color: '#8B7CFF' },
+  { label: 'United States', value: '4,218', pct: 33, color: '#8B5CF6' },
+  { label: 'India', value: '2,943', pct: 23, color: '#A78BFA' },
   { label: 'Germany', value: '1,201', pct: 9, color: '#48E6A1' },
-  { label: 'United Kingdom', value: '984', pct: 7, color: '#35D7FF' },
-  { label: 'Japan', value: '762', pct: 6, color: '#8B7CFF' },
+  { label: 'United Kingdom', value: '984', pct: 7, color: '#8B5CF6' },
+  { label: 'Japan', value: '762', pct: 6, color: '#A78BFA' },
 ];
 
 const FEATURE_SECTIONS = [
@@ -200,25 +201,21 @@ export default function Landing() {
   return (
     <div
       ref={pageRef}
-      className="min-h-screen bg-[#07090D] text-pulse-text font-sans relative overflow-x-clip"
+      className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-100 font-sans relative overflow-x-clip"
     >
-      {/* Layered observatory background */}
+      {/* Layered background */}
       <div className="pointer-events-none fixed inset-0 z-0 obs-grid opacity-70" />
-      <div className="pointer-events-none fixed inset-0 z-0" style={{
-        background:
-          'radial-gradient(60% 45% at 50% 0%, rgba(53,215,255,0.10) 0%, rgba(53,215,255,0) 60%), radial-gradient(45% 40% at 15% 45%, rgba(139,124,255,0.07) 0%, rgba(139,124,255,0) 60%), radial-gradient(45% 40% at 85% 70%, rgba(53,215,255,0.06) 0%, rgba(53,215,255,0) 60%)',
-      }} />
 
       {/* ============ NAVBAR ============ */}
       <header className="fixed top-0 left-0 right-0 z-[60]">
-        <div className="glass-obs backdrop-blur-xl border-b border-white/[0.06]">
+        <div className="bg-white/85 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2.5 group">
               <span className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden"
-                style={{ background: 'linear-gradient(135deg,#35D7FF,#8B7CFF)' }}>
-                <BarChart2 className="h-5 w-5 text-[#07111c]" />
+                style={{ background: 'linear-gradient(135deg,#7C6CE0,#8B5CF6)' }}>
+                <BarChart2 className="h-5 w-5 text-white" />
               </span>
-              <span className="text-lg font-bold tracking-tight text-pulse-text font-display">
+              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">
                 WebPulse
               </span>
             </Link>
@@ -226,20 +223,21 @@ export default function Landing() {
             <div className="hidden md:flex items-center gap-1">
               {navLinks.map((l) => (
                 <Link key={l.label} to={l.to}
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-pulse-text2 hover:text-pulse-text hover:bg-white/[0.04] transition-colors">
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors">
                   {l.label}
                 </Link>
               ))}
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to="/login" className="hidden md:inline-flex text-sm font-medium text-pulse-text2 hover:text-pulse-text transition-colors">
+              <Link to="/login" className="hidden md:inline-flex text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
                 Log in
               </Link>
+              <ThemeToggle />
               <Link to="/register" className="btn-signal btn-md hidden sm:inline-flex">
                 Start Tracking
               </Link>
-              <button className="md:hidden p-2 rounded-lg text-pulse-text2 hover:bg-white/[0.05] transition-colors"
+              <button className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors"
                 onClick={() => setMobileOpen(!mobileOpen)}>
                 {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
@@ -248,14 +246,14 @@ export default function Landing() {
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden bg-[#0B0F14]/95 backdrop-blur-xl border-b border-white/[0.06] px-4 py-4 space-y-1">
+          <div className="md:hidden bg-white/95 dark:bg-space-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07] px-4 py-4 space-y-1">
             {navLinks.map((l) => (
-              <Link key={l.label} to={l.to} className="block px-3 py-2 rounded-lg text-pulse-text2 hover:bg-white/[0.05] hover:text-pulse-text font-medium">
+              <Link key={l.label} to={l.to} className="block px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white font-medium">
                 {l.label}
               </Link>
             ))}
-            <div className="pt-3 mt-2 border-t border-white/[0.06] flex flex-col gap-2">
-              <Link to="/login" className="block px-3 py-2 text-center text-pulse-text2 font-medium">Log in</Link>
+            <div className="pt-3 mt-2 border-t border-slate-200 dark:border-white/[0.07] flex flex-col gap-2">
+              <Link to="/login" className="block px-3 py-2 text-center text-slate-600 dark:text-slate-300 font-medium">Log in</Link>
               <Link to="/register" className="btn-signal btn-md w-full">Start Tracking</Link>
             </div>
           </div>
@@ -271,25 +269,25 @@ export default function Landing() {
               <div className="relative z-10 text-center lg:text-left">
                 <div className="hero-fade inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-obs mb-6">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-pulse-live" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-pulse-green">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
                     Live Data · Real-time telemetry
                   </span>
                 </div>
 
                 <h1 className="hero-line text-5xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.02] font-display">
-                  <span className="text-pulse-text">Your website</span>
+                  <span className="text-slate-900 dark:text-slate-100">Your website</span>
                   <br />
-                  <span className="text-pulse-text">is talking.</span>
+                  <span className="text-slate-900 dark:text-slate-100">is talking.</span>
                   <br />
-                  <span className="text-glow-cyan bg-gradient-to-r from-pulse-cyan via-white to-pulse-violet bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">
                     WebPulse listens.
                   </span>
                 </h1>
 
-                <p className="hero-line mt-6 text-lg sm:text-xl text-pulse-text2 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                <p className="hero-line mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                   Real-time web analytics that shows who is visiting, what they're doing, where they came from, and what matters next.
                 </p>
 
@@ -302,7 +300,7 @@ export default function Landing() {
                   </Link>
                 </div>
 
-                <p className="hero-fade mt-4 text-xs text-pulse-muted">
+                <p className="hero-fade mt-4 text-xs text-slate-500 dark:text-slate-400">
                   No credit card required · Setup in minutes
                 </p>
               </div>
@@ -317,25 +315,25 @@ export default function Landing() {
                   <div ref={heroMetricRef} className="absolute left-3 top-6 z-10 glass-obs rounded-2xl px-4 py-3">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-pulse-live" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                       </span>
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-green">LIVE DATA</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">LIVE DATA</span>
                     </div>
-                    <div className="metric-num text-3xl font-bold text-pulse-text font-display">
+                    <div className="metric-num text-3xl font-bold text-slate-900 dark:text-slate-100 font-display">
                       {REDUCED_MOTION ? STATIC_COUNTS.toLocaleString() : (
                         <CountUp end={STATIC_COUNTS} duration={2.4} />
                       )}
                     </div>
-                    <div className="text-[11px] text-pulse-text2">ACTIVE USERS</div>
-                    <div className="text-[11px] font-semibold text-pulse-green mt-1">▲ +18.4% vs last 24h</div>
+                    <div className="text-[11px] text-slate-600 dark:text-slate-300">ACTIVE USERS</div>
+                    <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">▲ +18.4% vs last 24h</div>
                   </div>
 
                   <div className="absolute bottom-4 right-3 z-10 glass-obs rounded-2xl px-4 py-3 w-[150px]">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-pulse-muted mb-2">Top regions</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-2">Top regions</div>
                     {TOP_LOCATIONS.slice(0, 4).map((l) => (
                       <div key={l.label} className="flex items-center justify-between text-[11px] mb-1">
-                        <span className="text-pulse-text2">{l.label}</span>
+                        <span className="text-slate-600 dark:text-slate-300">{l.label}</span>
                         <span className="metric-num font-semibold" style={{ color: l.color }}>{l.value}</span>
                       </div>
                     ))}
@@ -347,10 +345,10 @@ export default function Landing() {
 
           {/* Announced panel that appears mid-scroll */}
           <div ref={incomingRef} className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 opacity-0 hidden md:block">
-            <div className="glass-obs rounded-full px-5 py-2.5 flex items-center gap-2 text-sm text-pulse-text2">
-              <Activity className="h-4 w-4 text-pulse-cyan" />
+            <div className="glass-obs rounded-full px-5 py-2.5 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+              <Activity className="h-4 w-4 text-violet-600 dark:text-violet-400" />
               Every visitor leaves a signal.
-              <ArrowDown className="h-4 w-4 text-pulse-violet animate-bounce" />
+              <ArrowDown className="h-4 w-4 text-violet-600 dark:text-violet-400 animate-bounce" />
             </div>
           </div>
 
@@ -359,19 +357,19 @@ export default function Landing() {
         </section>
 
         {/* ============ TRUST / CUSTOMERS ============ */}
-        <section className="relative z-10 border-y border-white/[0.06] bg-white/[0.015] py-14">
+        <section className="relative z-10 border-y border-slate-200 dark:border-white/[0.06] bg-slate-100/60 dark:bg-white/[0.015] py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-reveal>
-            <p className="text-xs font-medium text-pulse-muted uppercase tracking-[0.22em] mb-8">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] mb-8">
               Connect WebPulse to your stack
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 text-lg font-bold tracking-tight opacity-80">
-              <span className="text-pulse-text2">Next.js</span>
-              <span className="text-pulse-text2">React</span>
-              <span className="text-pulse-text2">WordPress</span>
-              <span className="text-pulse-text2">Shopify</span>
-              <span className="text-pulse-text2">Vercel</span>
-              <span className="text-pulse-text2">Cloudflare</span>
-              <span className="text-pulse-text2">Node.js</span>
+              <span className="text-slate-600 dark:text-slate-300">Next.js</span>
+              <span className="text-slate-600 dark:text-slate-300">React</span>
+              <span className="text-slate-600 dark:text-slate-300">WordPress</span>
+              <span className="text-slate-600 dark:text-slate-300">Shopify</span>
+              <span className="text-slate-600 dark:text-slate-300">Vercel</span>
+              <span className="text-slate-600 dark:text-slate-300">Cloudflare</span>
+              <span className="text-slate-600 dark:text-slate-300">Node.js</span>
             </div>
           </div>
         </section>
@@ -380,55 +378,53 @@ export default function Landing() {
         <section className="relative z-10 py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16" data-reveal>
             <p className="eyebrow-obs mb-4">The dashboard</p>
-            <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight font-display text-pulse-text">
+            <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
               Everything happening on your site.
               <br />
-              <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">In one view.</span>
+              <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">In one view.</span>
             </h2>
           </div>
 
           {/* Dashboard mockup */}
           <div data-reveal className="relative max-w-6xl mx-auto">
-            <div className="absolute -inset-2 rounded-3xl opacity-40 blur-2xl"
-              style={{ background: 'radial-gradient(60% 60% at 50% 0%, rgba(53,215,255,0.25), transparent 70%)' }} />
-            <div className="relative rounded-2xl border border-white/[0.08] bg-[#0B0F14]/90 overflow-hidden shadow-2xl">
+            <div className="relative rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-800/40 overflow-hidden shadow-2xl dark:shadow-black/40">
               {/* Window header */}
-              <div className="h-11 border-b border-white/[0.06] flex items-center px-4 gap-2 bg-white/[0.02]">
+              <div className="h-11 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-white/[0.02]">
                 <div className="flex gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-pulse-error/60" />
-                  <span className="w-3 h-3 rounded-full bg-pulse-warning/60" />
-                  <span className="w-3 h-3 rounded-full bg-pulse-live/60" />
+                  <span className="w-3 h-3 rounded-full bg-rose-400" />
+                  <span className="w-3 h-3 rounded-full bg-amber-400" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-400" />
                 </div>
-                <div className="ml-4 text-[10px] text-pulse-muted uppercase tracking-[0.22em] font-medium">
+                <div className="ml-4 text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] font-medium">
                   WebPulse Analytics · Panel
                 </div>
-                <div className="ml-auto flex items-center gap-2 text-[10px] text-pulse-green font-semibold uppercase tracking-widest">
+                <div className="ml-auto flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-widest">
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-pulse-live" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                   </span>
                   Live
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-3 gap-px bg-white/[0.04]">
+              <div className="grid lg:grid-cols-3 gap-px bg-slate-200 dark:bg-white/[0.06]">
                 {/* KPI column */}
-                <div className="bg-[#0B0F14] p-6 space-y-5">
-                  <KpiCard label="ACTIVE USERS" value={STATIC_COUNTS} format={true} accent="#35D7FF" />
-                  <KpiCard label="PAGEVIEWS" value={STATIC_VIEWS} format={true} accent="#8B7CFF" />
+                <div className="bg-white dark:bg-space-800 p-6 space-y-5">
+                  <KpiCard label="ACTIVE USERS" value={STATIC_COUNTS} format={true} accent="#8B5CF6" />
+                  <KpiCard label="PAGEVIEWS" value={STATIC_VIEWS} format={true} accent="#A78BFA" />
                   <KpiCard label="BOUNCE RATE" value={`${STATIC_BOUNCE}%`} accent="#48E6A1" />
-                  <KpiCard label="AVG SESSION" value={STATIC_SESSION} accent="#FFB84D" />
+                  <KpiCard label="AVG SESSION" value={STATIC_SESSION} accent="#F59E0B" />
 
                   {/* Live activity */}
-                  <div className="border-t border-white/[0.06] pt-5">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-muted mb-3">Live activity</div>
+                  <div className="border-t border-slate-200 dark:border-white/[0.08] pt-5">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-3">Live activity</div>
                     <LiveEventStream maxItems={4} />
                   </div>
                 </div>
 
                 {/* Chart column */}
-                <div className="bg-[#0B0F14] p-6 lg:col-span-2 space-y-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-muted">Traffic</div>
+                <div className="bg-white dark:bg-space-800 p-6 lg:col-span-2 space-y-5">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Traffic</div>
                   <TrafficWave />
                   <div className="grid sm:grid-cols-2 gap-5 pt-2">
                     <AcquisitionBars />
@@ -454,36 +450,36 @@ export default function Landing() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
             <div data-reveal>
               <p className="eyebrow-obs mb-4">The live feed</p>
-              <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-pulse-text">
+              <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
                 The internet doesn't wait.
                 <br />
-                <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">
                   Neither should your analytics.
                 </span>
               </h2>
-              <p className="mt-6 text-lg text-pulse-text2 leading-relaxed max-w-lg">
+              <p className="mt-6 text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg">
                 See every visitor event the second it happens — page views, checkouts, clicks, and signups from around the world.
               </p>
-              <div className="mt-8 flex items-center gap-3 text-pulse-green font-semibold metric-num">
+              <div className="mt-8 flex items-center gap-3 text-emerald-600 dark:text-emerald-400 font-semibold metric-num">
                 <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-pulse-live" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
                 <span className="text-2xl">12,842</span>
-                <span className="text-sm text-pulse-text2 font-normal">watching live now</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400 font-normal">watching live now</span>
               </div>
             </div>
             <div data-reveal>
-              <div className="rounded-2xl border border-white/[0.08] bg-[#0B0F14]/90 p-5 min-h-[320px] glass-obs">
+              <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/80 p-5 min-h-[320px]">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-pulse-live" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-pulse-green">Live now</span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Live now</span>
                   </div>
-                  <span className="metric-num text-xs text-pulse-muted">12,842</span>
+                  <span className="metric-num text-xs text-slate-500 dark:text-slate-400">12,842</span>
                 </div>
                 <LiveEventStream maxItems={7} />
               </div>
@@ -492,14 +488,14 @@ export default function Landing() {
         </section>
 
         {/* ============ TRACKING SETUP ============ */}
-        <section className="relative z-10 py-28 border-y border-white/[0.06] bg-white/[0.015]">
+        <section className="relative z-10 py-28 border-y border-slate-200 dark:border-white/[0.06] bg-slate-100/60 dark:bg-white/[0.015]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16" data-reveal>
               <p className="eyebrow-obs mb-4">Setup</p>
-              <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-pulse-text">
+              <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
                 From zero to live analytics
                 <br />
-                <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">in minutes.</span>
+                <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">in minutes.</span>
               </h2>
             </div>
 
@@ -507,26 +503,26 @@ export default function Landing() {
               <div className="space-y-8" data-reveal>
                 {TRACKING_STEPS.map((s) => (
                   <div key={s.n} className="flex gap-5">
-                    <div className="text-3xl font-extrabold font-display text-pulse-cyan/70 metric-num">{s.n}</div>
+                    <div className="text-3xl font-extrabold font-display text-violet-600/70 dark:text-violet-400/70 metric-num">{s.n}</div>
                     <div>
-                      <h3 className="text-lg font-bold text-pulse-text mb-1">{s.title}</h3>
-                      <p className="text-pulse-text2">{s.desc}</p>
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">{s.title}</h3>
+                      <p className="text-slate-600 dark:text-slate-300">{s.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className="relative" data-reveal>
-                <div className="rounded-2xl border border-white/[0.08] bg-[#0A0E14] overflow-hidden">
-                  <div className="h-10 border-b border-white/[0.06] flex items-center px-4 gap-2">
+                <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 overflow-hidden">
+                  <div className="h-10 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-space-950">
                     <div className="flex gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-pulse-error/60" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-pulse-warning/60" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-pulse-live/60" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                     </div>
-                    <span className="ml-3 text-[10px] text-pulse-muted uppercase tracking-widest">index.html</span>
+                    <span className="ml-3 text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest">index.html</span>
                   </div>
-                  <pre className="p-5 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto text-slate-200">
+                  <pre className="p-5 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto text-slate-800 dark:text-slate-200">
 {`<script
   src="https://cdn.webpulse.app/script.js"
   data-tracking-id="wp_live_xxxxxxxxx"
@@ -535,19 +531,19 @@ export default function Landing() {
                   </pre>
                 </div>
 
-                <div className="mt-4 glass-obs rounded-2xl p-4">
+                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-pulse-live" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-pulse-green">WebPulse connected</span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">WebPulse connected</span>
                   </div>
-                  <div className="text-xs text-pulse-text2 mb-2">Receiving events...</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-300 mb-2">Receiving events...</div>
                   <ul className="space-y-2">
                     {['Page view', 'Session', 'Device', 'Location', 'Referrer'].map((e) => (
-                      <li key={e} className="flex items-center gap-2 text-sm text-pulse-text2">
-                        <Check className="h-4 w-4 text-pulse-green" /> {e}
+                      <li key={e} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                        <Check className="h-4 w-4 text-emerald-500" /> {e}
                       </li>
                     ))}
                   </ul>
@@ -561,14 +557,14 @@ export default function Landing() {
         <section className="relative z-10 py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14" data-reveal>
             <p className="eyebrow-obs mb-4">Integrations</p>
-            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-pulse-text">
-              Connect WebPulse to <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">your stack.</span>
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
+              Connect WebPulse to <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">your stack.</span>
             </h2>
           </div>
           <div data-reveal className="flex flex-wrap items-center justify-center gap-4 max-w-4xl mx-auto">
             {INTEGRATIONS.map((name, i) => (
               <div key={name}
-                className="glass-obs rounded-full px-5 py-2.5 text-sm font-semibold text-pulse-text2 hover:text-pulse-text hover:border-pulse-cyan/40 transition-colors"
+                className="glass-obs rounded-full px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-500/40 transition-colors"
                 style={{ transitionDelay: `${i * 20}ms` }}>
                 {name}
               </div>
@@ -577,14 +573,14 @@ export default function Landing() {
         </section>
 
         {/* ============ SECURITY ============ */}
-        <section className="relative z-10 py-28 border-y border-white/[0.06] bg-white/[0.015]">
+        <section className="relative z-10 py-28 border-y border-slate-200 dark:border-white/[0.06] bg-slate-100/60 dark:bg-white/[0.015]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-14" data-reveal>
               <p className="eyebrow-obs mb-4">Security & privacy</p>
-              <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-pulse-text">
-                Analytics without <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">compromising trust.</span>
+              <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
+                Analytics without <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">compromising trust.</span>
               </h2>
-              <p className="mt-5 text-pulse-text2 max-w-2xl mx-auto text-lg">
+              <p className="mt-5 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-lg">
                 Tracking data is sensitive. We treat every signal like it belongs to you — because it does.
               </p>
             </div>
@@ -597,13 +593,12 @@ export default function Landing() {
                 { icon: <ShieldCheck className="h-5 w-5" />, t: 'Privacy controls', d: 'Compliance-first settings to respect your visitors and regulations.' },
                 { icon: <Trash2 className="h-5 w-5" />, t: 'Data retention', d: 'Configurable retention windows so you keep only what you need.' },
               ].map((c) => (
-                <div key={c.t} className="glass-obs rounded-2xl p-6 transition-colors hover:border-white/[0.14]">
-                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl"
-                    style={{ background: 'rgba(53,215,255,0.08)', color: '#35D7FF' }}>
+                <div key={c.t} className="glass-obs rounded-2xl p-6 transition-colors hover:border-violet-500/40">
+                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300">
                     {c.icon}
                   </div>
-                  <h3 className="text-base font-bold text-pulse-text mb-2">{c.t}</h3>
-                  <p className="text-sm text-pulse-text2 leading-relaxed">{c.d}</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">{c.t}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{c.d}</p>
                 </div>
               ))}
             </div>
@@ -617,8 +612,8 @@ export default function Landing() {
         <section className="relative z-10 py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14" data-reveal>
             <p className="eyebrow-obs mb-4">Loved by teams</p>
-            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-pulse-text">
-              Real people. <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">Real signals.</span>
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
+              Real people. <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">Real signals.</span>
             </h2>
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
@@ -628,16 +623,16 @@ export default function Landing() {
               { q: 'The cleanest way I\'ve seen to turn raw analytics into a feeling of momentum.', n: 'Amara Osei', r: 'Growth · Fathom Labs' },
             ].map((t) => (
               <div key={t.n} data-reveal className="glass-obs rounded-2xl p-7 flex flex-col">
-                <div className="text-pulse-cyan text-4xl leading-none mb-4">"</div>
-                <p className="text-lg text-pulse-text leading-relaxed flex-1">{t.q}</p>
-                <div className="mt-6 flex items-center gap-3 pt-5 border-t border-white/[0.06]">
-                  <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-[#07111c]"
-                    style={{ background: 'linear-gradient(135deg,#35D7FF,#8B7CFF)' }}>
+                <div className="text-violet-500 dark:text-violet-400 text-4xl leading-none mb-4 font-serif">"</div>
+                <p className="text-lg text-slate-800 dark:text-slate-100 leading-relaxed flex-1">{t.q}</p>
+                <div className="mt-6 flex items-center gap-3 pt-5 border-t border-slate-200 dark:border-white/[0.08]">
+                  <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                    style={{ background: 'linear-gradient(135deg,#7C6CE0,#8B5CF6)' }}>
                     {t.n.split(' ').map(w => w[0]).join('')}
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-pulse-text">{t.n}</div>
-                    <div className="text-xs text-pulse-muted">{t.r}</div>
+                    <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t.n}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{t.r}</div>
                   </div>
                 </div>
               </div>
@@ -646,18 +641,16 @@ export default function Landing() {
         </section>
 
         {/* ============ FINAL CTA ============ */}
-        <section className="relative z-10 py-32 text-center overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 opacity-50"
-            style={{ background: 'radial-gradient(50% 60% at 50% 50%, rgba(53,215,255,0.12), transparent 70%)' }} />
+        <section className="relative z-10 py-32 text-center">
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" data-reveal>
             <h2 className="text-5xl sm:text-7xl font-extrabold tracking-tight font-display leading-[1.02]">
-              <span className="text-pulse-text">Stop guessing.</span>
+              <span className="text-slate-900 dark:text-slate-100">Stop guessing.</span>
               <br />
-              <span className="text-glow-cyan bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">
                 Start seeing.
               </span>
             </h2>
-            <p className="mt-6 text-lg sm:text-xl text-pulse-text2 max-w-xl mx-auto">
+            <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
               Start tracking your website and see what's happening in real time.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -670,18 +663,18 @@ export default function Landing() {
       </main>
 
       {/* ============ FOOTER ============ */}
-      <footer className="relative z-10 border-t border-white/[0.06] py-14 bg-[#07090D]">
+      <footer className="relative z-10 border-t border-slate-200 dark:border-white/[0.07] py-14 bg-white dark:bg-[#070A10]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-5 gap-10 mb-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5 mb-4">
                 <span className="relative flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden"
-                  style={{ background: 'linear-gradient(135deg,#35D7FF,#8B7CFF)' }}>
-                  <BarChart2 className="h-4.5 w-4.5 text-[#07111c]" />
+                  style={{ background: 'linear-gradient(135deg,#7C6CE0,#8B5CF6)' }}>
+                  <BarChart2 className="h-4.5 w-4.5 text-white" />
                 </span>
-                <span className="text-lg font-bold tracking-tight text-pulse-text font-display">WebPulse</span>
+                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">WebPulse</span>
               </div>
-              <p className="text-pulse-text2 text-sm max-w-xs leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-sm max-w-xs leading-relaxed">
                 Analytics for the modern web.
               </p>
             </div>
@@ -692,21 +685,21 @@ export default function Landing() {
               { t: 'Legal', l: [['/privacy', 'Privacy'], ['/terms', 'Terms'], ['/security', 'Security']] },
             ].map((col) => (
               <div key={col.t}>
-                <h4 className="text-sm font-semibold text-pulse-text mb-4">{col.t}</h4>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">{col.t}</h4>
                 <ul className="space-y-3">
                   {col.l.map(([to, label]) => (
-                    <li key={label}><Link to={to} className="text-sm text-pulse-text2 hover:text-pulse-text transition-colors">{label}</Link></li>
+                    <li key={label}><Link to={to} className="text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">{label}</Link></li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <div className="pt-6 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-pulse-muted">© 2026 WebPulse Analytics. All rights reserved.</p>
-            <div className="flex items-center gap-2 text-xs text-pulse-muted">
+          <div className="pt-6 border-t border-slate-200 dark:border-white/[0.07] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-slate-500 dark:text-slate-400">© 2026 WebPulse Analytics. All rights reserved.</p>
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulse-live opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-pulse-live" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               Systems operational
             </div>
@@ -723,8 +716,8 @@ export default function Landing() {
 
 function KpiCard({ label, value, accent, format }) {
   return (
-    <div className="glass-obs rounded-xl p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-pulse-muted mb-1">{label}</div>
+    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
       <div className="metric-num text-2xl font-bold" style={{ color: accent }}>
         {format ? <CountUp end={value} duration={2} /> : value}
       </div>
@@ -735,16 +728,16 @@ function KpiCard({ label, value, accent, format }) {
 function TrafficWave() {
   const pts = 'M0,120 C40,110 60,80 100,85 C140,90 160,55 200,60 C240,65 260,95 300,90 C340,85 360,45 400,50 C440,55 460,80 500,70';
   return (
-    <div className="glass-obs rounded-xl p-4">
+    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
       <svg viewBox="0 0 500 140" className="w-full h-auto">
         <defs>
           <linearGradient id="twFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#35D7FF" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#35D7FF" stopOpacity="0" />
+            <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="twStroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#8B7CFF" />
-            <stop offset="100%" stopColor="#35D7FF" />
+            <stop offset="0%" stopColor="#A78BFA" />
+            <stop offset="100%" stopColor="#8B5CF6" />
           </linearGradient>
         </defs>
         <path d={`${pts} L500,140 L0,140 Z`} fill="url(#twFill)" />
@@ -756,22 +749,22 @@ function TrafficWave() {
 
 function AcquisitionBars() {
   const rows = [
-    { l: 'Google', v: 42, c: '#35D7FF' },
-    { l: 'Direct', v: 26, c: '#8B7CFF' },
+    { l: 'Google', v: 42, c: '#8B5CF6' },
+    { l: 'Direct', v: 26, c: '#A78BFA' },
     { l: 'LinkedIn', v: 14, c: '#48E6A1' },
-    { l: 'YouTube', v: 9, c: '#FFB84D' },
+    { l: 'YouTube', v: 9, c: '#F59E0B' },
   ];
   return (
-    <div className="glass-obs rounded-xl p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-pulse-muted mb-4">Traffic sources</div>
+    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4">Traffic sources</div>
       <div className="space-y-3">
         {rows.map((r, i) => (
           <div key={r.l}>
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-pulse-text2">{r.l}</span>
+              <span className="text-slate-600 dark:text-slate-300">{r.l}</span>
               <span className="metric-num font-semibold" style={{ color: r.c }}>{r.v}%</span>
             </div>
-            <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden" style={{ transform: `translateX(${(i % 2) * 3}px)` }}>
+            <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden" style={{ transform: `translateX(${(i % 2) * 3}px)` }}>
               <div
                 className="h-full rounded-full"
                 style={{ width: `${r.v * 2.2}%`, background: `linear-gradient(90deg, ${r.c}, ${r.c}88)` }}
@@ -786,19 +779,19 @@ function AcquisitionBars() {
 
 function GeoList() {
   const locs = [
-    { l: 'United States', v: '4,218', pct: 33, c: '#35D7FF' },
-    { l: 'India', v: '2,943', pct: 23, c: '#8B7CFF' },
+    { l: 'United States', v: '4,218', pct: 33, c: '#8B5CF6' },
+    { l: 'India', v: '2,943', pct: 23, c: '#A78BFA' },
     { l: 'Germany', v: '1,201', pct: 9, c: '#48E6A1' },
-    { l: 'UK', v: '984', pct: 7, c: '#35D7FF' },
+    { l: 'UK', v: '984', pct: 7, c: '#8B5CF6' },
   ];
   return (
-    <div className="glass-obs rounded-xl p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-pulse-muted mb-4">Live by region</div>
+    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4">Live by region</div>
       <div className="space-y-2.5">
         {locs.map((r) => (
           <div key={r.l} className="flex items-center gap-2 text-xs">
-            <span className="w-24 text-pulse-text2 truncate">{r.l}</span>
-            <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden flex gap-px">
+            <span className="w-24 text-slate-600 dark:text-slate-300 truncate">{r.l}</span>
+            <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden flex gap-px">
               {Array.from({ length: Math.max(1, Math.round(r.pct / 8)) }).map((_, i) => (
                 <span key={i} className="flex-1 rounded-sm" style={{ background: r.c, opacity: 0.5 + (i / 10) }} />
               ))}
@@ -816,15 +809,15 @@ function FeatureRow({ f, flip }) {
     <div className="grid lg:grid-cols-2 gap-12 items-center">
       <div className={flip ? 'lg:order-2' : ''} data-reveal>
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-pulse-cyan/60 font-display font-extrabold text-sm metric-num">{f.index}</span>
-          <span className="h-px w-10 bg-pulse-cyan/30" />
-          <span className="text-xs uppercase tracking-[0.2em] text-pulse-muted">{f.sub}</span>
+          <span className="text-violet-600 dark:text-violet-400/70 font-display font-extrabold text-sm metric-num">{f.index}</span>
+          <span className="h-px w-10 bg-violet-500/40 dark:bg-violet-400/30" />
+          <span className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{f.sub}</span>
         </div>
-        <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-pulse-text mb-5">
+        <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100 mb-5">
           {f.title}
         </h3>
-        <p className="text-pulse-text2 text-lg leading-relaxed max-w-lg">{f.body}</p>
-        <Link to="/features" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-pulse-cyan hover:text-pulse-cyan/80 transition-colors">
+        <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-lg">{f.body}</p>
+        <Link to="/features" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors">
           Learn more <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
@@ -850,16 +843,16 @@ function FeatureVisual({ f }) {
 
 function GeoVisual() {
   return (
-    <div className="glass-obs rounded-2xl p-6">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-muted mb-4">Active visitors by country</div>
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">Active visitors by country</div>
       <div className="space-y-4">
         {TOP_LOCATIONS.map((r) => (
           <div key={r.label}>
             <div className="flex items-center justify-between text-sm mb-1.5">
-              <span className="text-pulse-text">{r.label}</span>
-              <span className="metric-num font-semibold text-pulse-text">{r.value}</span>
+              <span className="text-slate-800 dark:text-slate-100">{r.label}</span>
+              <span className="metric-num font-semibold text-slate-800 dark:text-slate-100">{r.value}</span>
             </div>
-            <div className="h-2.5 rounded-full bg-white/[0.06] overflow-hidden">
+            <div className="h-2.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{ width: `${r.pct * 2.4}%`, background: `linear-gradient(90deg, ${r.color}, ${r.color}55)` }}
@@ -875,21 +868,21 @@ function GeoVisual() {
 function FlowVisual() {
   const levels = ['Landing page', 'Features', 'Pricing', 'Checkout'];
   return (
-    <div className="glass-obs rounded-2xl p-6">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-muted mb-5">Visitor flow</div>
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Visitor flow</div>
       <div className="relative pl-4">
         {levels.map((l, i) => (
           <div key={l} className="relative pb-8 last:pb-0">
             {i < levels.length - 1 && (
-              <span className="absolute left-[13px] top-6 bottom-0 w-px bg-white/[0.12]" />
+              <span className="absolute left-[13px] top-6 bottom-0 w-px bg-slate-300 dark:bg-white/[0.12]" />
             )}
             <span className="absolute left-0 top-1 flex h-3.5 w-3.5 items-center justify-center">
-              <span className="absolute h-2 w-2 rounded-full bg-pulse-cyan/40 animate-pulse" />
-              <span className="relative h-1.5 w-1.5 rounded-full" style={{ background: i === 3 ? '#48E6A1' : '#35D7FF' }} />
+              <span className="absolute h-2 w-2 rounded-full bg-violet-500/40 dark:bg-violet-400/40 animate-pulse" />
+              <span className="relative h-1.5 w-1.5 rounded-full" style={{ background: i === 3 ? '#48E6A1' : '#8B5CF6' }} />
             </span>
             <div className="flex items-center justify-between ml-7">
-              <span className="text-sm text-pulse-text">{l}</span>
-              <span className="metric-num text-xs text-pulse-muted">{70 + i * 8 - i * i * 3}%</span>
+              <span className="text-sm text-slate-800 dark:text-slate-100">{l}</span>
+              <span className="metric-num text-xs text-slate-500 dark:text-slate-400">{70 + i * 8 - i * i * 3}%</span>
             </div>
           </div>
         ))}
@@ -900,19 +893,19 @@ function FlowVisual() {
 
 function AcqVisual() {
   const rows = [
-    { l: 'Google', v: 42, c: '#35D7FF' },
-    { l: 'Direct', v: 26, c: '#8B7CFF' },
+    { l: 'Google', v: 42, c: '#8B5CF6' },
+    { l: 'Direct', v: 26, c: '#A78BFA' },
     { l: 'LinkedIn', v: 14, c: '#48E6A1' },
-    { l: 'YouTube', v: 9, c: '#FFB84D' },
-    { l: 'Other', v: 9, c: '#5F6875' },
+    { l: 'YouTube', v: 9, c: '#F59E0B' },
+    { l: 'Other', v: 9, c: '#94A3B8' },
   ];
   return (
-    <div className="glass-obs rounded-2xl p-6">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-muted mb-5">Where visitors come from</div>
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Where visitors come from</div>
       {rows.map((r) => (
         <div key={r.l} className="flex items-center gap-3 py-2">
-          <span className="w-20 text-sm text-pulse-text">{r.l}</span>
-          <div className="flex-1 h-2 rounded-full bg-white/[0.06] overflow-hidden">
+          <span className="w-20 text-sm text-slate-800 dark:text-slate-100">{r.l}</span>
+          <div className="flex-1 h-2 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden">
             <div
               className="h-full rounded-full"
               style={{ width: `${r.v}%`, background: r.c }}
@@ -928,8 +921,8 @@ function AcqVisual() {
 function PipelineVisual() {
   const steps = ['Visitors', 'Events', 'Patterns', 'Insights', 'Decisions'];
   return (
-    <div className="glass-obs rounded-2xl p-6">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-pulse-muted mb-5">Intelligence pipeline</div>
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Intelligence pipeline</div>
       <div className="flex flex-col items-center gap-1">
         {steps.map((s, i) => (
           <React.Fragment key={s}>
@@ -937,15 +930,15 @@ function PipelineVisual() {
               className="w-full max-w-[260px] rounded-xl px-4 py-3 text-center text-sm font-semibold"
               style={{
                 background: i === steps.length - 1
-                  ? 'linear-gradient(135deg,rgba(72,230,161,0.15),rgba(72,230,161,0.05))'
-                  : 'rgba(53,215,255,0.07)',
-                border: `1px solid ${i === steps.length - 1 ? 'rgba(72,230,161,0.4)' : 'rgba(53,215,255,0.2)'}`,
-                color: i === steps.length - 1 ? '#48E6A1' : '#35D7FF',
+                  ? 'rgba(72,230,161,0.12)'
+                  : 'rgba(139,92,246,0.08)',
+                border: `1px solid ${i === steps.length - 1 ? 'rgba(72,230,161,0.4)' : 'rgba(139,92,246,0.2)'}`,
+                color: i === steps.length - 1 ? '#48E6A1' : '#8B5CF6',
               }}
             >
               {s}
             </div>
-            {i < steps.length - 1 && <ArrowDown className="h-4 w-4 text-pulse-muted my-0.5" />}
+            {i < steps.length - 1 && <ArrowDown className="h-4 w-4 text-slate-400 dark:text-slate-500 my-0.5" />}
           </React.Fragment>
         ))}
       </div>
@@ -963,33 +956,31 @@ function PricingSection() {
     <section className="relative z-10 py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-14" data-reveal>
         <p className="eyebrow-obs mb-4">Pricing</p>
-        <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-pulse-text">
-          Simple plans. <span className="bg-gradient-to-r from-pulse-cyan to-pulse-violet bg-clip-text text-transparent">Serious analytics.</span>
+        <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
+          Simple plans. <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">Serious analytics.</span>
         </h2>
       </div>
       <div className="grid md:grid-cols-3 gap-6 items-center">
         {plans.map((p) => (
           <div key={p.name} data-reveal
             className={`relative rounded-2xl p-8 ${p.pro
-              ? 'bg-[#0E141B] border border-pulse-cyan/40 md:-translate-y-3'
-              : 'glass-obs border border-white/[0.08]'}`}
-            style={p.pro ? { boxShadow: '0 0 0 1px rgba(53,215,255,0.3), 0 20px 60px -20px rgba(53,215,255,0.4)' } : {}}>
+              ? 'bg-white dark:bg-space-800 border-2 border-violet-500 md:-translate-y-3 shadow-lift'
+              : 'glass-obs border border-slate-200 dark:border-white/[0.1]'}`}>
             {p.pro && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest"
-                style={{ background: 'linear-gradient(135deg,#35D7FF,#8B7CFF)', color: '#07111c' }}>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest bg-gradient-to-r from-[#7C6CE0] to-[#8B5CF6] text-white">
                 Most popular
               </div>
             )}
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-pulse-text2 mb-2">{p.name}</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">{p.name}</h3>
             <div className="flex items-baseline gap-1 mb-1">
-              <span className={`text-4xl font-extrabold font-display ${p.pro ? 'text-pulse-cyan' : 'text-pulse-text'}`}>{p.price}</span>
-              <span className="text-pulse-muted text-sm">/mo</span>
+              <span className={`text-4xl font-extrabold font-display ${p.pro ? 'text-violet-600 dark:text-violet-400' : 'text-slate-900 dark:text-slate-100'}`}>{p.price}</span>
+              <span className="text-slate-500 dark:text-slate-400 text-sm">/mo</span>
             </div>
-            <p className="text-sm text-pulse-muted mb-6">{p.tagline}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{p.tagline}</p>
             <ul className="space-y-3 mb-8">
               {p.features.map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-sm text-pulse-text2">
-                  <Check className="h-4 w-4 text-pulse-green shrink-0" /> {f}
+                <li key={f} className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-300">
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
                 </li>
               ))}
             </ul>

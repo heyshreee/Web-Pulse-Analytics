@@ -37,7 +37,7 @@ function makeEvent() {
     device: c.device,
     action: a.action,
     page: a.page,
-    color: Math.random() > 0.7 ? '#8B7CFF' : Math.random() > 0.5 ? '#35D7FF' : '#48E6A1',
+    color: Math.random() > 0.8 ? '#A78BFA' : Math.random() > 0.5 ? '#8B5CF6' : '#48E6A1',
     timestamp: now.getTime(),
   };
 }
@@ -82,11 +82,11 @@ export default function LiveEventStream({ maxItems = 6 }) {
                   {e.country} · {e.device}
                 </span>
               </div>
-              <div className="text-[11px] text-pulse-text2 truncate">
-                {e.action} <span className="font-mono text-pulse-cyan/80">{e.page}</span>
+              <div className="text-[11px] text-slate-600 dark:text-slate-300 truncate">
+                {e.action} <span className="font-mono text-violet-600 dark:text-violet-400">{e.page}</span>
               </div>
             </div>
-            <span className="text-[10px] text-pulse-muted font-mono shrink-0">
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono shrink-0">
               {e.time}
             </span>
           </div>
@@ -94,7 +94,7 @@ export default function LiveEventStream({ maxItems = 6 }) {
       </div>
       <style>{`
         .obs-scroll-thin::-webkit-scrollbar { width: 4px; }
-        .obs-scroll-thin::-webkit-scrollbar-thumb { background: rgba(53,215,255,0.25); border-radius: 4px; }
+        .obs-scroll-thin::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.35); border-radius: 4px; }
         .obs-scroll-thin::-webkit-scrollbar-track { background: transparent; }
         @keyframes eventEnter { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .event-enter { animation: eventEnter 0.5s ease-out both; }

@@ -2,11 +2,11 @@ import React, { useRef, useEffect, useMemo, forwardRef, useImperativeHandle } fr
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-const CYAN = 0x35d7ff;
-const VIOLET = 0x8b7cff;
+const CYAN = 0x8b5cf6;
+const VIOLET = 0xa78bfa;
 const GREEN = 0x48e6a1;
 const GRID = 0x1c2634;
-const BLUE_DOT = 0x6fd7ff;
+const BLUE_DOT = 0xc4b5fd;
 
 const GEOJSON_URL =
   'https://raw.githubusercontent.com/vasturiano/react-globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson';
@@ -300,7 +300,7 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     const arcPos = new Float32Array(arcCount * 3);
     arcGeo.setAttribute('position', new THREE.BufferAttribute(arcPos, 3));
     const arcMat = new THREE.PointsMaterial({
-      color: 0x9be8ff, size: 0.02, transparent: true, opacity: 0.95, depthWrite: false,
+      color: 0xc4b5fd, size: 0.02, transparent: true, opacity: 0.95, depthWrite: false,
     });
     const arcPts = new THREE.Points(arcGeo, arcMat);
     arcPts.visible = false;
