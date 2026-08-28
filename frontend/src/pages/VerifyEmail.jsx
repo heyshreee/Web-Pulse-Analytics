@@ -114,8 +114,8 @@ export default function VerifyEmail() {
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-between mb-8">
                     <Link to="/" className="flex items-center gap-3 group/logo">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
-                            <BarChart2 className="h-5 w-5" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
+                            <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                         </div>
                         <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse</span>
                     </Link>

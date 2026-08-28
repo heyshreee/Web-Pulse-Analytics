@@ -110,7 +110,7 @@ export default function Layout() {
         try {
             const userData = await apiRequest('/auth/me');
             setUser(userData);
-        } catch (err) {
+        } catch {
             navigate('/login');
         } finally {
             setLoading(false);
@@ -191,8 +191,8 @@ export default function Layout() {
                     {/* Logo */}
                     <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/80">
                         <Link to="/dashboard" className="flex items-center gap-3 group/logo flex-shrink-0">
-                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover/logo:scale-105">
-                                <BarChart2 className="h-5 w-5" />
+                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
+                                <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                             </div>
                             <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
                                 WebPulse
@@ -315,8 +315,8 @@ export default function Layout() {
                         )}
                         {isSettingsPage && (
                             <Link to="/dashboard" className="flex items-center gap-2.5 group/logo">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
-                                    <BarChart2 className="h-4 w-4" />
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+                                    <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                                 </div>
                                 <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
                                     WebPulse

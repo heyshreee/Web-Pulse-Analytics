@@ -19,7 +19,6 @@ export default function ShareReport() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState(null);
-    const [timeRange, setTimeRange] = useState('7d');
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
@@ -65,8 +64,8 @@ export default function ShareReport() {
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-8">
                     <div className="flex items-center gap-6">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft">
-                            <Activity className="h-8 w-8" />
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 shadow-soft">
+                            <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                         </div>
                         <div>
                             <div className="eyebrow flex items-center gap-2 mb-1">

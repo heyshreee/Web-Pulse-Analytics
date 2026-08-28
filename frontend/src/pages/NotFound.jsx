@@ -7,8 +7,8 @@ export default function NotFound() {
         <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-300">
             <header className="p-6 md:px-12 md:py-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft">
-                        <BarChart2 className="h-5 w-5" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                     </div>
                     <span className="font-bold tracking-tight text-slate-900 dark:text-white">WebPulse</span>
                 </div>
