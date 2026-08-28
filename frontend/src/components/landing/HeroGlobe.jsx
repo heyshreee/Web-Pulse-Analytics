@@ -186,10 +186,25 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.4;
     controls.enablePan = false;
-    controls.enableRotate = false;
-    controls.enableZoom = false;
-    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.ROTATE };
+    controls.enableZoom = true;
+    controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
     controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.ROTATE };
+
+    // Pause auto-rotation while the user drags, then resume after a pause so
+    // manual dragging feels responsive.
+    let rotateResumeTimer = null;
+    const pauseRotate = () => {
+      controls.autoRotate = false;
+      clearTimeout(rotateResumeTimer);
+    };
+    const resumeRotate = () => {
+      clearTimeout(rotateResumeTimer);
+      rotateResumeTimer = setTimeout(() => {
+        controls.autoRotate = true;
+      }, 2500);
+    };
+    controls.addEventListener('start', pauseRotate);
+    controls.addEventListener('end', resumeRotate);
 
     // --- Globe surface (very subtle) ---
     const surfaceMat = new THREE.MeshPhongMaterial({
@@ -486,6 +501,9 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     return () => {
       cancelAnimationFrame(raf);
       cancelled = true;
+      clearTimeout(rotateResumeTimer);
+      controls.removeEventListener('start', pauseRotate);
+      controls.removeEventListener('end', resumeRotate);
       controls.dispose();
       ro.disconnect();
       container.removeChild(renderer.domElement);
