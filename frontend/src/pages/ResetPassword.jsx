@@ -64,12 +64,12 @@ export default function ResetPassword() {
 
     if (success) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
+            <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
                 <div className="w-full max-w-md card card-pad text-center">
                     <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="h-7 w-7 text-emerald-500" />
                     </div>
-                    <h2 className="page-title !text-2xl mb-2">Password updated</h2>
+                    <h2 className="page-title !text-2xl mb-2 font-display">Password updated</h2>
                     <p className="page-sub mb-8">
                         Your password has been successfully reset.<br />
                         You can now log in with your new password.
@@ -83,7 +83,7 @@ export default function ResetPassword() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-between mb-8">
                     <Link to="/" className="flex items-center gap-3 group/logo">
@@ -99,7 +99,7 @@ export default function ResetPassword() {
 
                 <div className="card card-pad">
                     <div className="text-center mb-8">
-                        <h2 className="page-title !text-2xl mb-2">Create new password</h2>
+                        <h2 className="page-title !text-2xl mb-2 font-display">Create new password</h2>
                         <p className="page-sub">Choose a strong password to secure your account.</p>
                     </div>
 

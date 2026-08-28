@@ -110,7 +110,7 @@ export default function VerifyEmail() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-between mb-8">
                     <Link to="/" className="flex items-center gap-3 group/logo">
@@ -129,7 +129,7 @@ export default function VerifyEmail() {
                         <div className="w-12 h-12 bg-violet-50 dark:bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <Mail className="h-6 w-6 text-violet-500" />
                         </div>
-                        <h2 className="page-title !text-2xl mb-2">Verify your email</h2>
+                        <h2 className="page-title !text-2xl mb-2 font-display">Verify your email</h2>
                         <p className="page-sub">
                             We sent a code to your email address.<br />
                             Enter the 6-digit code below to continue.

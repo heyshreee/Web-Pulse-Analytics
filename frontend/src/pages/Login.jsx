@@ -80,7 +80,7 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-3 group/logo">
@@ -126,7 +126,7 @@ export default function Login() {
                         ) : (
                             <>
                                 <div className="mb-8">
-                                    <h2 className="auth-title">
+                                    <h2 className="auth-title font-display">
                                         Welcome back
                                     </h2>
                                     <p className="page-sub mt-2">Enter your details to access your dashboard.</p>

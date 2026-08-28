@@ -83,7 +83,7 @@ const Section = ({ id, title, children, icon: Icon }) => (
                     <Icon className="h-5 w-5 text-violet-500" />
                 </div>
             )}
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h2>
+            <h2 className="text-2xl font-display font-bold tracking-tight text-slate-900 dark:text-white">{title}</h2>
         </div>
         <div className="space-y-6">
             {children}
@@ -133,9 +133,9 @@ export default function API() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
-            <header className="fixed top-0 w-full z-[60] bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+            <header className="fixed top-0 w-full z-[60] bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
                 <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-10 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button
@@ -465,7 +465,7 @@ export default function API() {
                 </main>
             </div>
 
-            <footer className="border-t border-slate-200 dark:border-slate-800 py-14 bg-white dark:bg-slate-950 flex flex-col items-center gap-8 px-6">
+            <footer className="border-t border-slate-200 dark:border-white/[0.06] py-14 bg-slate-50 dark:bg-[#070A10] flex flex-col items-center gap-8 px-6">
                 <Link to="/" className="flex items-center gap-3 group">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft transition-transform duration-300 group-hover:scale-105">
                         <Activity className="h-5 w-5" />
