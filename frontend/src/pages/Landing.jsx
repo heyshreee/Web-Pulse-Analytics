@@ -95,6 +95,7 @@ const INTEGRATIONS = [
 
 const STATIC_COUNTS = 12842;
 const STATIC_VIEWS = 84392;
+const STATIC_COUNTRIES = 142;
 const STATIC_BOUNCE = 31.8;
 const STATIC_SESSION = '04:21';
 
@@ -285,14 +286,14 @@ export default function Landing() {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
                   <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
-                    Live Data · Real-time telemetry
+                    Real-time web analytics
                   </span>
                 </div>
 
                 <h1 className="hero-line text-5xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.02] font-display">
                   <span className="text-slate-900 dark:text-slate-100">Your website</span>
                   <br />
-                  <span className="text-slate-900 dark:text-slate-100">is talking.</span>
+                  <span className="text-slate-900 dark:text-slate-100">is always talking.</span>
                   <br />
                   <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">
                     WebPulse listens.
@@ -300,7 +301,7 @@ export default function Landing() {
                 </h1>
 
                 <p className="hero-line mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                  Real-time web analytics that shows who is visiting, what they're doing, where they came from, and what matters next.
+                  See where your visitors come from, understand how they move through your website, and measure what matters — in real time.
                 </p>
 
                 <div className="hero-fade mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
@@ -324,21 +325,40 @@ export default function Landing() {
                     <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
                   )}
                   {/* HUD overlay */}
-                  <div ref={heroMetricRef} className="absolute left-3 top-6 z-10 glass-obs rounded-2xl px-4 py-3">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div ref={heroMetricRef} className="absolute left-3 top-6 z-10 glass-obs rounded-2xl px-4 py-3 w-[168px]">
+                    <div className="flex items-center gap-2 mb-2">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                       </span>
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">LIVE DATA</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-400">
+                        Live
+                      </span>
                     </div>
                     <div className="metric-num text-3xl font-bold text-slate-900 dark:text-slate-100 font-display">
                       {REDUCED_MOTION ? STATIC_COUNTS.toLocaleString() : (
                         <AnimatedNumber end={STATIC_COUNTS} duration={2.4} run={countRun} />
                       )}
                     </div>
-                    <div className="text-[11px] text-slate-600 dark:text-slate-300">ACTIVE USERS</div>
-                    <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">▲ +18.4% vs last 24h</div>
+                    <div className="text-[10px] text-slate-600 dark:text-slate-300 mt-0.5">Active visitors</div>
+                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200/70 dark:border-white/[0.08]">
+                      <div>
+                        <div className="metric-num text-base font-bold text-slate-900 dark:text-slate-100">
+                          {REDUCED_MOTION ? STATIC_VIEWS.toLocaleString() : (
+                            <AnimatedNumber end={STATIC_VIEWS} duration={2.4} run={countRun} />
+                          )}
+                        </div>
+                        <div className="text-[10px] text-slate-600 dark:text-slate-300">Events today</div>
+                      </div>
+                      <div>
+                        <div className="metric-num text-base font-bold text-slate-900 dark:text-slate-100">
+                          {REDUCED_MOTION ? STATIC_COUNTRIES : (
+                            <AnimatedNumber end={STATIC_COUNTRIES} duration={2.4} run={countRun} />
+                          )}
+                        </div>
+                        <div className="text-[10px] text-slate-600 dark:text-slate-300">Countries</div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="absolute bottom-4 right-3 z-10 glass-obs rounded-2xl px-4 py-3 w-[150px]">

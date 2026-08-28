@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, useMemo, useState, forwardRef, useImperativeHandle } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -121,6 +121,7 @@ const HeroGlobe = forwardRef(function HeroGlobe(
 ) {
   const containerRef = useRef(null);
   const stateRef = useRef({});
+  const [hover, setHover] = useState(null);
 
   const isLowPower = useMemo(
     () => window.matchMedia?.('(max-width: 768px), (prefers-reduced-motion: reduce)').matches,
@@ -184,7 +185,7 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     controls.minDistance = 1.3;
     controls.maxDistance = 8;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.4;
+    controls.autoRotateSpeed = 0.1;
     controls.enablePan = false;
     controls.enableZoom = true;
     controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
@@ -239,8 +240,8 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     const halo = new THREE.Mesh(new THREE.SphereGeometry(1.34, 48, 48), haloMat);
     sceneGroup.add(halo);
 
-    // --- Starfield ---
-    const starCount = isLowPower ? 160 : 380;
+    // --- Starfield (restrained) ---
+    const starCount = isLowPower ? 140 : 260;
     const starGeo = new THREE.BufferGeometry();
     const starPos = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount; i++) {
@@ -306,8 +307,8 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     arcPts.visible = false;
     sceneGroup.add(arcPts);
 
-    // --- Ambient floaters (traffic particles around globe) ---
-    const ambCount = isLowPower ? 90 : 220;
+    // --- Ambient floaters (restrained, subtle drift) ---
+    const ambCount = isLowPower ? 60 : 140;
     const ambGeo = new THREE.BufferGeometry();
     const ambPos = new Float32Array(ambCount * 3);
     const ambVel = new Float32Array(ambCount);
@@ -435,6 +436,56 @@ const HeroGlobe = forwardRef(function HeroGlobe(
 
     stateRef.current.rebuild = rebuild;
 
+    // --- Pointer hover: surface-relative tooltip for a visitor-dense region ---
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const pointerOverRef = { current: null };
+
+    const updateHover = (clientX, clientY) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+
+      const nodes = stateRef.current._nodes || [];
+      const count = stateRef.current.nodesInst?.count ?? 0;
+      if (!nodes.length || !count) {
+        if (pointerOverRef.current) {
+          pointerOverRef.current = null;
+          setHover(null);
+        }
+        return;
+      }
+
+      const hits = raycaster.intersectObject(stateRef.current.nodesInst, false);
+      if (hits.length) {
+        const instId = hits[0].instanceId;
+        const n = nodes[instId];
+        if (n) {
+          pointerOverRef.current = instId;
+          setHover({
+            id: instId,
+            name: n.name,
+            count: n.count || 0,
+            x: clientX - rect.left,
+            y: clientY - rect.top,
+          });
+        }
+      } else if (pointerOverRef.current !== null) {
+        pointerOverRef.current = null;
+        setHover(null);
+      }
+    };
+
+    const onPointerMove = (e) => updateHover(e.clientX, e.clientY);
+    const onPointerLeave = () => {
+      pointerOverRef.current = null;
+      setHover(null);
+    };
+    renderer.domElement.addEventListener('pointermove', onPointerMove);
+    renderer.domElement.addEventListener('pointerleave', onPointerLeave);
+
     // --- RAF loop ---
     let raf = 0;
     let last = performance.now();
@@ -504,6 +555,8 @@ const HeroGlobe = forwardRef(function HeroGlobe(
       clearTimeout(rotateResumeTimer);
       controls.removeEventListener('start', pauseRotate);
       controls.removeEventListener('end', resumeRotate);
+      renderer.domElement.removeEventListener('pointermove', onPointerMove);
+      renderer.domElement.removeEventListener('pointerleave', onPointerLeave);
       controls.dispose();
       ro.disconnect();
       container.removeChild(renderer.domElement);
@@ -531,7 +584,24 @@ const HeroGlobe = forwardRef(function HeroGlobe(
   }, [normalized]);
 
   return (
-    <div ref={containerRef} className={className ?? 'absolute inset-0'} style={{ cursor: 'grab' }} />
+    <>
+      <div ref={containerRef} className={className ?? 'absolute inset-0'} style={{ cursor: 'grab' }} />
+      {hover && (
+        <div
+          className="pointer-events-none absolute z-20 glass-obs rounded-xl px-3 py-2"
+          style={{
+            left: Math.min(hover.x + 16, window.innerWidth - 170),
+            top: Math.min(hover.y + 16, window.innerHeight - 90),
+          }}
+        >
+          <div className="text-xs font-semibold text-slate-100">{hover.name}</div>
+          <div className="text-[11px] text-slate-400">
+            <span className="metric-num font-semibold text-violet-300">{hover.count.toLocaleString()}</span>{' '}
+            visitors
+          </div>
+        </div>
+      )}
+    </>
   );
 });
 
