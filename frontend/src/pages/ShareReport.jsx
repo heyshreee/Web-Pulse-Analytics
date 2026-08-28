@@ -44,7 +44,7 @@ export default function ShareReport() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300 flex items-center justify-center p-6">
+            <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300 flex items-center justify-center p-6">
                 <div className="card card-pad text-center p-10 sm:p-12 max-w-md">
                     <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-500/10 mx-auto mb-6">
                         <Activity className="h-8 w-8 text-red-600 dark:text-red-500" />
@@ -60,7 +60,7 @@ export default function ShareReport() {
     const { project, stats } = data;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300 p-6 md:p-12">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300 p-6 md:p-12">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-8">

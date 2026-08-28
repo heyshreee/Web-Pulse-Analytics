@@ -2,7 +2,7 @@ import { BarChart2 } from 'lucide-react';
 
 export default function GoogleLoading() {
     return (
-        <div className="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-50 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+        <div className="fixed inset-0 bg-slate-50 dark:bg-[#070A10] z-50 flex flex-col items-center justify-center p-4 transition-colors duration-300">
             <div className="absolute top-8 left-8 flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 dark:bg-violet-500 text-white shadow-soft">
                     <BarChart2 className="h-5 w-5" />

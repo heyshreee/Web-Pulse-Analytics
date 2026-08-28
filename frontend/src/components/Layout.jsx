@@ -155,7 +155,7 @@ export default function Layout() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070A10]">
                 <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
             </div>
         );
@@ -173,7 +173,7 @@ export default function Layout() {
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
 
     return (
-        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
+        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-[#070A10] flex font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && !isSettingsPage && (
                 <div
@@ -185,7 +185,7 @@ export default function Layout() {
             {/* Sidebar */}
             {!isSettingsPage && (
                 <aside className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out flex flex-col
+            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-space-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out flex flex-col
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
                     {/* Logo */}
@@ -303,7 +303,7 @@ export default function Layout() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Topbar */}
-                <header className="h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-colors duration-300">
+                <header className="h-16 bg-white/80 dark:bg-space-900/75 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-colors duration-300">
                     <div className="flex items-center gap-3">
                         {!isSettingsPage && (
                             <button
