@@ -1,157 +1,124 @@
-import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, HelpCircle, ArrowLeft, BarChart2 } from 'lucide-react';
+import { Check, Minus, HelpCircle, ArrowLeft, BarChart2 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 
-export default function Pricing() {
-    const [loading, setLoading] = useState(true);
-    const [plans, setPlans] = useState([
-        {
-            id: 'free',
-            name: 'Free',
-            price_usd: 0,
-            price_inr: 0,
-            description: "For personal projects", color: "slate",
-            features: ['1 Project', '1 Allowed Origin', '1,000 events/mo', '60 sec refresh'],
-            max_projects: 1,
-            allowed_origins: 1,
-            monthly_events: 1000,
-            live_logs: false
-        },
-        {
-            id: 'basic',
-            name: 'Basic',
-            price_usd: 4,
-            price_inr: 299,
-            description: "For serious hobbyists", color: "blue",
-            features: ['5 Projects', '3 Allowed Origins', 'Live Device Stats', '50,000 events/mo', '10 sec refresh'],
-            max_projects: 5,
-            allowed_origins: 3,
-            monthly_events: 50000,
-            live_logs: false
-        },
-        {
-            id: 'pro',
-            name: 'Pro',
-            price_usd: 12,
-            price_inr: 999,
-            description: "For professional creators", color: "indigo",
-            features: ['15 Projects', '10 Allowed Origins', 'Live Activity Logs', '500,000 events/mo', '1 sec refresh'],
-            max_projects: 15,
-            allowed_origins: 10,
-            monthly_events: 500000,
-            live_logs: true
-        },
-        {
-            id: 'business',
-            name: 'Business',
-            price_usd: 39,
-            price_inr: 2999,
-            description: "For scaling teams", color: "purple",
-            features: ['Unlimited Projects', '100 Allowed Origins', '5,000,000 events/mo', 'Real-time / SLA', 'Team access'],
-            max_projects: 100,
-            allowed_origins: 100,
-            monthly_events: 5000000,
-            live_logs: true
-        }
-    ]);
-
-    useEffect(() => {
-        const fetchPlans = async () => {
-            try {
-                const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
-                const res = await fetch(`${API_URL}/v1/payment/plans`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.length > 0) {
-                        setPlans(data);
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching plans:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPlans();
-    }, []);
-
-    // Helper to get plan attribute safely
-    const getPlanAttr = (id, attr, fallback) => {
-        const plan = plans.find(p => p.id === id);
-        if (!plan) return fallback;
-        if (attr === 'price') return plan.price_usd > 0 ? `$${plan.price_usd}` : 'Free';
-        if (attr === 'monthly_events') return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events);
-        if (attr === 'max_projects') return plan.max_projects === 100 ? 'Unlimited*' : plan.max_projects;
-        if (attr === 'allowed_origins') return plan.allowed_origins;
-        if (attr === 'retention_days') return `${plan.retention_days || 30} days`;
-        return plan[attr] || fallback;
+const plans = [
+    {
+        id: 'free',
+        name: 'Free',
+        price: '₹0',
+        tagline: 'For personal projects and experimentation',
+        leadIn: null,
+        items: [
+            '1 project',
+            'Real-time monitoring',
+            'Traffic analytics',
+            'Visitor tracking',
+            'Performance analytics',
+            'Custom dashboard',
+            'Historical analytics',
+            'REST API access'
+        ],
+        cta: 'Start for free',
+        kind: 'secondary'
+    },
+    {
+        id: 'basic',
+        name: 'Basic',
+        price: '₹299',
+        tagline: 'For developers and small websites',
+        leadIn: 'Everything in Free, plus:',
+        items: [
+            'Multiple projects',
+            'Extended analytics usage',
+            'Advanced dashboard views',
+            'Alerts & notifications',
+            'Performance monitoring',
+            'Report export'
+        ],
+        cta: 'Choose Basic',
+        kind: 'secondary'
+    },
+    {
+        id: 'pro',
+        name: 'Pro',
+        price: '₹999',
+        tagline: 'For growing products and high-traffic websites',
+        leadIn: 'Everything in Basic, plus:',
+        items: [
+            'Higher analytics limits',
+            'Advanced monitoring',
+            'Detailed visitor analytics',
+            'Advanced reporting',
+            'Priority support'
+        ],
+        cta: 'Start Pro',
+        kind: 'primary'
+    },
+    {
+        id: 'business',
+        name: 'Business',
+        price: '₹2,999',
+        tagline: 'For teams that need more control',
+        leadIn: 'Everything in Pro, plus:',
+        items: [
+            'Higher usage limits',
+            'Team collaboration',
+            'Advanced access controls',
+            'Custom integrations',
+            'Dedicated support'
+        ],
+        cta: 'Contact Sales',
+        kind: 'secondary'
     }
+];
 
-    const featureRows = [
-        { feature: "Projects", free: getPlanAttr('free', 'max_projects', '1'), basic: getPlanAttr('basic', 'max_projects', '5'), pro: getPlanAttr('pro', 'max_projects', '15'), business: getPlanAttr('business', 'max_projects', 'Unlimited*') },
-        { feature: "Allowed Origins", free: getPlanAttr('free', 'allowed_origins', '1'), basic: getPlanAttr('basic', 'allowed_origins', '3'), pro: getPlanAttr('pro', 'allowed_origins', '10'), business: getPlanAttr('business', 'allowed_origins', '100') },
-        { feature: "Events / month", free: getPlanAttr('free', 'monthly_events', '1,000'), basic: getPlanAttr('basic', 'monthly_events', '50,000'), pro: getPlanAttr('pro', 'monthly_events', '500,000'), business: getPlanAttr('business', 'monthly_events', '5,000,000') },
-        { feature: "Real-time analytics", free: "Basic", basic: "Yes", pro: "Advanced", business: "Advanced" },
-        { feature: "Dashboard refresh rate", free: "60 sec", basic: "10 sec", pro: "1 sec", business: "Real-time (WebSocket)" },
-        { feature: "OBS overlay", free: "Default only", basic: "Custom text & theme", pro: "Fully customizable", business: "Fully customizable" },
-        { feature: "Visitor geolocation", free: "—", basic: "—", pro: "Country-level", business: "Country-level" },
-        { feature: "Device & browser stats", free: "—", basic: "Live", pro: "Yes", business: "Yes" },
-        { feature: "Live Activity Logs", free: "—", basic: "—", pro: "Yes", business: "Yes" },
-        { feature: "Tracking URL + API key", free: "—", basic: "Yes", pro: "Yes", business: "Yes" },
-        { feature: "Team access / roles", free: "—", basic: "—", pro: "—", business: "Yes" },
-        { feature: "Private dashboards", free: "—", basic: "—", pro: "—", business: "Yes" },
-        { feature: "Custom domain tracking", free: "—", basic: "—", pro: "—", business: "Yes" },
-        { feature: "Data retention", free: getPlanAttr('free', 'retention_days', '1 day'), basic: getPlanAttr('basic', 'retention_days', '7 days'), pro: getPlanAttr('pro', 'retention_days', '30 days'), business: getPlanAttr('business', 'retention_days', '90 days') },
-        { feature: "Email support", free: "Community", basic: "Standard", pro: "Priority", business: "Dedicated" },
-    ];
+const tableRows = [
+    { feature: 'Real-time monitoring', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Traffic analytics', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Visitor tracking', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Performance analytics', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Custom dashboards', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Historical data', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Alerts & notifications', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'REST API', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Error tracking', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Report export', free: 'yes', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Multiple projects', free: 'no', basic: 'yes', pro: 'yes', business: 'yes' },
+    { feature: 'Advanced reporting', free: 'no', basic: 'no', pro: 'yes', business: 'yes' },
+    { feature: 'Team access', free: 'no', basic: 'no', pro: 'no', business: 'Planned' }
+];
 
-    const displayPlans = [
-        { id: 'free', name: "Free", price: getPlanAttr('free', 'price', 'Free'), color: "slate" },
-        { id: 'basic', name: "Basic", price: getPlanAttr('basic', 'price', '$4'), color: "blue" },
-        { id: 'pro', name: "Pro", price: getPlanAttr('pro', 'price', '$12'), color: "indigo" },
-        { id: 'business', name: "Business", price: getPlanAttr('business', 'price', '$39'), color: "purple" }
-    ];
+const tableCell = (value) => {
+    if (value === 'yes') {
+        return (
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/15">
+                <Check className="h-3 w-3 text-emerald-500" />
+            </span>
+        );
+    }
+    if (value === 'no') {
+        return <Minus className="h-4 w-4 text-slate-300 dark:text-slate-600" />;
+    }
+    return <span className="text-violet-600 dark:text-violet-400">{value}</span>;
+};
 
-    const cards = [
-        {
-            id: 'free',
-            name: 'Free',
-            inr: '₹0',
-            usd: '$0 / month',
-            desc: 'Trying WebPulse',
-            cta: 'Get Started',
-            kind: 'secondary'
-        },
-        {
-            id: 'basic',
-            name: 'Basic',
-            inr: '₹299',
-            usd: '$4 / month',
-            desc: 'Students & solo devs',
-            cta: 'Choose Basic',
-            kind: 'secondary'
-        },
-        {
-            id: 'pro',
-            name: 'Pro',
-            inr: '₹999',
-            usd: '$12 / month',
-            desc: 'Streamers & growing apps',
-            cta: 'Start Free Trial',
-            kind: 'primary'
-        },
-        {
-            id: 'business',
-            name: 'Business',
-            inr: '₹2,999',
-            usd: '$39 / month',
-            desc: 'Teams & high traffic',
-            cta: 'Contact Sales',
-            kind: 'secondary'
-        },
-    ];
+const faqs = [
+    {
+        q: "Can I upgrade or downgrade?",
+        a: "Yes. Your plan determines the features and usage limits available to your account."
+    },
+    {
+        q: "Is there a free plan?",
+        a: "Yes. WebPulse provides a free starting point for personal projects and experimentation."
+    },
+    {
+        q: "What happens when I reach my usage limit?",
+        a: "We'll notify you when you're approaching your plan's usage limit. Tracking behavior after the limit depends on your plan."
+    }
+];
 
+export default function Pricing() {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
@@ -175,18 +142,18 @@ export default function Pricing() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <p className="eyebrow mb-3">Pricing</p>
-                        <h2 className="page-title !text-4xl font-display">Simple, transparent <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">pricing</span></h2>
+                        <h2 className="page-title !text-4xl font-display">Simple pricing. <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">Start free.</span></h2>
                         <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
-                            Choose the plan that fits your growth stage. No hidden fees, cancel anytime.
+                            Explore WebPulse with the core analytics tools you need to understand your website. Upgrade as the platform grows.
                         </p>
                     </div>
 
                     {/* Pricing Cards */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-24">
-                        {cards.map((c) => {
-                            const isPrimary = c.kind === 'primary';
+                        {plans.map((plan) => {
+                            const isPrimary = plan.kind === 'primary';
                             return (
-                                <div key={c.id} className={`card card-pad flex flex-col relative ${isPrimary
+                                <div key={plan.id} className={`card card-pad flex flex-col relative ${isPrimary
                                     ? 'bg-slate-900 border-slate-900 dark:bg-violet-500 dark:border-violet-500 transform lg:-translate-y-2'
                                     : 'card-hover'
                                     }`}>
@@ -195,20 +162,23 @@ export default function Pricing() {
                                             MOST POPULAR
                                         </div>
                                     )}
-                                    <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isPrimary ? 'text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{c.name}</h3>
+                                    <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${isPrimary ? 'text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{plan.name}</h3>
                                     <div className="flex items-baseline gap-1 mb-1">
-                                        <span className={`text-3xl font-bold ${isPrimary ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{c.inr}</span>
-                                        <span className={isPrimary ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}>/mo</span>
+                                        <span className={`text-3xl font-bold ${isPrimary ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{plan.price}</span>
+                                        <span className={isPrimary ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}>/ month</span>
                                     </div>
-                                    <div className={`text-xs mb-5 font-mono ${isPrimary ? 'text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{c.usd}</div>
-                                    <p className={`text-sm mb-8 min-h-[40px] ${isPrimary ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}>{c.desc}</p>
+                                    <p className={`text-sm mb-6 mt-1 ${isPrimary ? 'text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}>{plan.tagline}</p>
 
-                                    {/* feature summary */}
                                     <ul className="space-y-2.5 mb-8 flex-1">
-                                        {(plans.find(p => p.id === c.id)?.features || []).slice(0, 4).map((f, i) => (
+                                        {plan.leadIn && (
+                                            <li className={`text-sm font-semibold ${isPrimary ? 'text-slate-100' : 'text-slate-800 dark:text-slate-100'}`}>
+                                                {plan.leadIn}
+                                            </li>
+                                        )}
+                                        {plan.items.map((item, i) => (
                                             <li key={i} className={`flex items-center gap-2 text-sm ${isPrimary ? 'text-slate-100' : 'text-slate-600 dark:text-slate-300'}`}>
                                                 <Check className={`h-4 w-4 shrink-0 ${isPrimary ? 'text-emerald-400' : 'text-emerald-500'}`} />
-                                                {f}
+                                                {item}
                                             </li>
                                         ))}
                                     </ul>
@@ -217,7 +187,7 @@ export default function Pricing() {
                                         to="/register"
                                         className={isPrimary ? 'btn-md inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold px-4 py-2.5 w-full bg-white !text-slate-900 dark:!bg-white dark:!text-slate-900 hover:!bg-slate-100 transition-all' : 'btn-secondary btn-md w-full'}
                                     >
-                                        {c.cta}
+                                        {plan.cta}
                                     </Link>
                                 </div>
                             );
@@ -227,58 +197,39 @@ export default function Pricing() {
                     {/* Feature Comparison Table */}
                     <div className="max-w-7xl mx-auto mb-24">
                         <h2 className="page-title text-3xl text-center mb-10">Compare plans</h2>
-                        {loading ? (
-                            <div className="flex justify-center py-10">
-                                <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
-                            </div>
-                        ) : (
-                            <div className="card overflow-x-auto">
-                                <table className="w-full text-left border-collapse min-w-[640px]">
-                                    <thead>
-                                        <tr className="border-b border-slate-200 dark:border-slate-800">
-                                            <th className="py-5 px-6 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.14em]">Feature</th>
-                                            {displayPlans.map((plan) => (
-                                                <th key={plan.id} className="py-5 px-6 text-left">
-                                                    <div className="font-semibold text-slate-900 dark:text-white mb-0.5">{plan.name}</div>
-                                                    <div className="text-xs text-slate-500 dark:text-slate-400">{plan.price}</div>
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                        {featureRows.map((row, index) => (
-                                            <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                                <td className="py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">{row.feature}</td>
-                                                <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">{row.free}</td>
-                                                <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">{row.basic}</td>
-                                                <td className="py-4 px-6 text-sm font-semibold text-slate-900 dark:text-white">{row.pro}</td>
-                                                <td className="py-4 px-6 text-sm font-semibold text-slate-900 dark:text-white">{row.business}</td>
-                                            </tr>
+                        <div className="card overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[640px]">
+                                <thead>
+                                    <tr className="border-b border-slate-200 dark:border-slate-800">
+                                        <th className="py-5 px-6 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.14em]">Feature</th>
+                                        {plans.map((plan) => (
+                                            <th key={plan.id} className="py-5 px-6 text-left">
+                                                <div className="font-semibold text-slate-900 dark:text-white mb-0.5">{plan.name}</div>
+                                                <div className="text-xs text-slate-500 dark:text-slate-400">{plan.price} / month</div>
+                                            </th>
                                         ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {tableRows.map((row, index) => (
+                                        <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                            <td className="py-4 px-6 text-sm font-medium text-slate-700 dark:text-slate-300">{row.feature}</td>
+                                            <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">{tableCell(row.free)}</td>
+                                            <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">{tableCell(row.basic)}</td>
+                                            <td className="py-4 px-6 text-sm font-semibold text-slate-900 dark:text-white">{tableCell(row.pro)}</td>
+                                            <td className="py-4 px-6 text-sm font-semibold text-slate-900 dark:text-white">{tableCell(row.business)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     {/* FAQ */}
                     <div className="max-w-3xl mx-auto">
                         <h2 className="page-title text-3xl text-center mb-10">Frequently asked questions</h2>
                         <div className="space-y-4">
-                            {[
-                                {
-                                    q: "Can I upgrade or downgrade anytime?",
-                                    a: "Yes, you can change your plan at any time. Changes take effect immediately, and we'll prorate any payments."
-                                },
-                                {
-                                    q: "What happens if I exceed my view limit?",
-                                    a: "On the free plan, tracking will pause until the next billing cycle. We'll notify you before this happens so you can upgrade if needed."
-                                },
-                                {
-                                    q: "Do you offer discounts for non-profits?",
-                                    a: "Yes! Contact our sales team with proof of your non-profit status for a 50% discount on all plans."
-                                }
-                            ].map((faq, i) => (
+                            {faqs.map((faq, i) => (
                                 <div key={i} className="card card-pad card-hover">
                                     <h3 className="font-semibold text-slate-900 dark:text-white mb-1.5 flex items-start gap-3">
                                         <HelpCircle className="h-5 w-5 text-violet-500 mt-0.5 shrink-0" />
@@ -294,8 +245,8 @@ export default function Pricing() {
 
             <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
                 <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 dark:bg-violet-500 text-white">
-                        <BarChart2 className="h-4 w-4" />
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                     </div>
                     <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
                 </div>

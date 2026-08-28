@@ -17,7 +17,6 @@ import {
   Activity,
   Fingerprint,
   Trash2,
-  Send,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import HeroGlobe from '../components/landing/HeroGlobe';
@@ -28,6 +27,8 @@ gsap.registerPlugin(ScrollTrigger);
 const REDUCED_MOTION =
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+const REPO_URL = 'https://github.com/heyshreee/Web-Pulse-Analytics';
 
 // A fixed set of "live" city nodes so the hero globe always has traffic, even
 // without a connected backend. Pure marketing illustration.
@@ -90,8 +91,7 @@ const TRACKING_STEPS = [
 ];
 
 const INTEGRATIONS = [
-  'Next.js', 'React', 'WordPress', 'Shopify', 'Webflow',
-  'Google Tag Manager', 'Node.js', 'Python', 'Cloudflare', 'Vercel',
+  'JavaScript', 'React', 'Node.js', 'REST API', 'Custom events', 'Page-view tracking',
 ];
 
 const STATIC_COUNTS = 12842;
@@ -104,8 +104,6 @@ export default function Landing() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sceneDone, setSceneDone] = useState(false);
   const [countRun, setCountRun] = useState(false);
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
 
   const pageRef = useRef(null);
   const heroSceneRef = useRef(null);
@@ -228,10 +226,9 @@ export default function Landing() {
         <div className="bg-white/85 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <span className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden"
-                style={{ background: 'linear-gradient(135deg,#7C6CE0,#8B5CF6)' }}>
-                <BarChart2 className="h-5 w-5 text-white" />
-              </span>
+              <span className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+              <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
+            </span>
               <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">
                 WebPulse
               </span>
@@ -704,9 +701,8 @@ export default function Landing() {
             {/* Left: brand + positioning */}
             <div className="lg:col-span-4 max-w-sm">
               <div className="flex items-center gap-2.5 mb-5">
-                <span className="relative flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden"
-                  style={{ background: 'linear-gradient(135deg,#7C6CE0,#8B5CF6)' }}>
-                  <BarChart2 className="h-4.5 w-4.5 text-white" />
+                <span className="relative flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+                  <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
                 </span>
                 <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">WebPulse</span>
               </div>
@@ -782,27 +778,15 @@ export default function Landing() {
               </h4>
               <ul className="space-y-2.5">
                 <li>
-                  <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                  <a href={REPO_URL} target="_blank" rel="noopener noreferrer"
                     className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
                     GitHub
                   </a>
                 </li>
                 <li>
-                  <a href="https://x.com" target="_blank" rel="noopener noreferrer"
+                  <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer"
                     className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
-                    X / Twitter
-                  </a>
-                </li>
-                <li>
-                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
-                    className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a href="https://discord.com" target="_blank" rel="noopener noreferrer"
-                    className="inline-block text-sm text-slate-600 dark:text-slate-400 transition-all duration-200 hover:text-slate-900 dark:hover:text-white hover:translate-x-0.5">
-                    Discord
+                    Report an issue
                   </a>
                 </li>
                 <li>
@@ -818,42 +802,21 @@ export default function Landing() {
               </ul>
             </nav>
 
-            {/* Subscribe */}
-            <div className="lg:col-span-2" aria-label="Subscribe">
+            <div className="lg:col-span-2">
               <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
-                Stay in the loop
+                Contribute
               </h4>
               <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Product updates and releases, no spam.
+                WebPulse is built in the open. Report issues, suggest features, and follow the project on GitHub.
               </p>
-              <form
-                className="flex flex-col gap-2"
-                onSubmit={(e) => { e.preventDefault(); if (email.trim()) setSubscribed(true); }}
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary btn-md w-full inline-flex items-center justify-center gap-1.5"
               >
-                {subscribed ? (
-                  <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                    <Check className="h-4 w-4" /> Subscribed — thanks!
-                  </span>
-                ) : (
-                  <>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email address"
-                      required
-                      aria-label="Email address"
-                      className="w-full px-3.5 py-2.5 rounded-md text-sm bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.1] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none focus:border-violet-500/70 focus:ring-2 focus:ring-violet-500/20 transition"
-                    />
-                    <button
-                      type="submit"
-                      className="btn-signal btn-md w-full inline-flex items-center justify-center gap-1.5"
-                    >
-                      Subscribe <Send className="h-4 w-4" />
-                    </button>
-                  </>
-                )}
-              </form>
+                Open GitHub <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
 
             {/* Bottom bar */}
@@ -1134,23 +1097,27 @@ function PipelineVisual() {
 
 function PricingSection() {
   const plans = [
-    { name: 'Starter', price: '$0', tagline: 'For personal projects', pro: false, features: ['1 project', '1,000 events/mo', 'Basic analytics', '60s refresh'] },
-    { name: 'Pro', price: '$12', tagline: 'For growing websites', pro: true, features: ['15 projects', '500k events/mo', 'Live activity logs', '1s refresh', 'Priority support'] },
-    { name: 'Business', price: '$39', tagline: 'For serious analytics', pro: false, features: ['Unlimited projects', '5M events/mo', 'Real-time / SLA', 'Team access'] },
+    { name: 'Free', price: '₹0', tagline: 'For personal projects and experimentation', pro: false, features: ['1 project', 'Real-time monitoring', 'Traffic analytics', 'Visitor tracking', 'Performance analytics', 'Custom dashboard'] },
+    { name: 'Basic', price: '₹299', tagline: 'For developers and small websites', pro: false, features: ['Multiple projects', 'Extended analytics usage', 'Advanced dashboard views', 'Alerts & notifications', 'Performance monitoring', 'Report export'] },
+    { name: 'Pro', price: '₹999', tagline: 'For growing products and high-traffic websites', pro: true, features: ['Higher analytics limits', 'Advanced monitoring', 'Detailed visitor analytics', 'Advanced reporting', 'Priority support'] },
+    { name: 'Business', price: '₹2,999', tagline: 'For teams that need more control', pro: false, features: ['Higher usage limits', 'Team collaboration', 'Advanced access controls', 'Custom integrations', 'Dedicated support'] },
   ];
   return (
     <section className="relative z-10 py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-14" data-reveal>
         <p className="eyebrow-obs mb-4">Pricing</p>
         <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
-          Simple plans. <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">Serious analytics.</span>
+          Simple pricing. <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">Start free.</span>
         </h2>
+        <p className="mt-4 text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+          Explore WebPulse with the core analytics tools you need to understand your website. Upgrade as the platform grows.
+        </p>
       </div>
-      <div className="grid md:grid-cols-3 gap-6 items-center">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
         {plans.map((p) => (
           <div key={p.name} data-reveal
             className={`relative rounded-2xl p-8 ${p.pro
-              ? 'bg-white dark:bg-space-800 border-2 border-violet-500 md:-translate-y-3 shadow-lift'
+              ? 'bg-white dark:bg-space-800 border-2 border-violet-500 lg:-translate-y-3 shadow-lift'
               : 'glass-obs border border-slate-200 dark:border-white/[0.1]'}`}>
             {p.pro && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest bg-gradient-to-r from-[#7C6CE0] to-[#8B5CF6] text-white">
@@ -1160,7 +1127,7 @@ function PricingSection() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">{p.name}</h3>
             <div className="flex items-baseline gap-1 mb-1">
               <span className={`text-4xl font-extrabold font-display ${p.pro ? 'text-violet-600 dark:text-violet-400' : 'text-slate-900 dark:text-slate-100'}`}>{p.price}</span>
-              <span className="text-slate-500 dark:text-slate-400 text-sm">/mo</span>
+              <span className="text-slate-500 dark:text-slate-400 text-sm">/ month</span>
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{p.tagline}</p>
             <ul className="space-y-3 mb-8">
@@ -1171,10 +1138,15 @@ function PricingSection() {
               ))}
             </ul>
             <Link to="/register" className={p.pro ? 'btn-signal btn-md w-full' : 'btn-ghost-dark btn-md w-full'}>
-              {p.name === 'Starter' ? 'Get Started' : `Choose ${p.name}`}
+              {p.name === 'Free' ? 'Start free' : p.name === 'Business' ? 'Contact Sales' : `Choose ${p.name}`}
             </Link>
           </div>
         ))}
+      </div>
+      <div className="text-center mt-12" data-reveal>
+        <Link to="/pricing" className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors">
+          See full pricing & comparison <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );
