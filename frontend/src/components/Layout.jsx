@@ -19,6 +19,7 @@ import { apiRequest } from '../utils/api';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 const SOCKET_URL = API_URL.replace(/\/api$/, '').replace(/\/v1$/, '');
@@ -190,14 +191,7 @@ export default function Layout() {
           `}>
                     {/* Logo */}
                     <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/80">
-                        <Link to="/dashboard" className="flex items-center gap-3 group/logo flex-shrink-0">
-                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
-                                <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                            </div>
-                            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                                WebPulse
-                            </span>
-                        </Link>
+                        <Logo to="/dashboard" />
                     </div>
 
                     {/* Main Navigation */}
@@ -314,14 +308,7 @@ export default function Layout() {
                             </button>
                         )}
                         {isSettingsPage && (
-                            <Link to="/dashboard" className="flex items-center gap-2.5 group/logo">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-                                    <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                                </div>
-                                <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                                    WebPulse
-                                </span>
-                            </Link>
+                            <Logo to="/dashboard" />
                         )}
                     </div>
 

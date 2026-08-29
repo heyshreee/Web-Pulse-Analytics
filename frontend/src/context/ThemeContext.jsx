@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const ThemeContext = createContext();
+
+const isDashboardPath = (pathname) =>
+    pathname === '/dashboard' || pathname.startsWith('/dashboard/');
 
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() => {
@@ -10,12 +14,6 @@ export const ThemeProvider = ({ children }) => {
     });
 
     useEffect(() => {
-        const root = window.document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
         localStorage.setItem('theme', theme);
     }, [theme]);
 
@@ -28,6 +26,23 @@ export const ThemeProvider = ({ children }) => {
             {children}
         </ThemeContext.Provider>
     );
+};
+
+export const ThemeSync = () => {
+    const { theme } = useTheme();
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+        const root = window.document.documentElement;
+        const applyDark = isDashboardPath(pathname) ? theme === 'dark' : true;
+        if (applyDark) {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+    }, [theme, pathname]);
+
+    return null;
 };
 
 export const useTheme = () => {

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import Logo from '../../components/Logo';
 import {
     ArrowLeft, Activity, Menu, X, BookOpen, BarChart2, ArrowRight
 } from 'lucide-react';
-import ThemeToggle from '../../components/ThemeToggle';
 import { docsNav } from './docsNav';
 
 export default function DocsLayout() {
@@ -57,7 +57,6 @@ export default function DocsLayout() {
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>
@@ -69,12 +68,7 @@ export default function DocsLayout() {
                     ${sidebarOpen ? 'left-0' : '-left-full lg:left-0'}
                 `}>
                     <div className="p-6">
-                        <Link to="/docs" className="flex items-center gap-2.5 mb-6 group">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 shadow-sm transition-transform duration-300 group-hover:scale-105">
-                                <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                            </div>
-                            <span className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">Documentation</span>
-                        </Link>
+                        <Logo to="/docs" label="Documentation" className="mb-6" />
 
                         <nav className="space-y-6">
                             {docsNav.map((group) => (
@@ -141,10 +135,7 @@ export default function DocsLayout() {
 
             <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
                 <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                    </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
+                    <Logo />
                 </div>
                 <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse · Documentation</p>
             </footer>

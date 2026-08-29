@@ -34,6 +34,8 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const GoogleCallback = lazy(() => import('./pages/GoogleCallback'));
 import { ToastProvider } from './context/ToastContext';
+import { ThemeSync } from './context/ThemeContext';
+import GoogleAuth from './components/GoogleAuth';
 import { isAuthenticated } from './utils/auth';
 import './App.css';
 
@@ -48,16 +50,17 @@ function App() {
                 <BrowserRouter>
                     <div className="min-h-screen">
                         <ScrollToTop />
+                        <ThemeSync />
                         <Suspense fallback={<Spinner />}>
                             <Routes>
                                 {/* Public Routes */}
                                 <Route path="/share/:shareToken" element={<ShareReport />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/register" element={<Register />} />
+                                <Route path="/login" element={<GoogleAuth><Login /></GoogleAuth>} />
+                                <Route path="/register" element={<GoogleAuth><Register /></GoogleAuth>} />
                                 <Route path="/verify-email" element={<VerifyEmail />} />
                                 <Route path="/forgot-password" element={<ForgotPassword />} />
                                 <Route path="/reset-password" element={<ResetPassword />} />
-                                <Route path="/auth/google/callback" element={<GoogleCallback />} />
+                                <Route path="/auth/google/callback" element={<GoogleAuth><GoogleCallback /></GoogleAuth>} />
 
 
 

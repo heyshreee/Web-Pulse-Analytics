@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, LayoutDashboard, BarChart2 } from 'lucide-react';
 import { removeToken } from '../utils/auth';
+import Logo from './Logo';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -15,12 +16,7 @@ export default function Navbar() {
     <nav className="bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <Link to="/" className="flex items-center gap-3 group/logo">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white ring-1 ring-slate-200 shadow-xl shadow-blue-600/20 transition-transform duration-300 group-hover/logo:rotate-12">
-              <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-            </div>
-            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">WebPulse</span>
-          </Link>
+          <Logo />
 
           <div className="flex items-center gap-4">
             {token ? (

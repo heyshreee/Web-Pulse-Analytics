@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
+import Logo from '../components/Logo';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -19,8 +20,13 @@ import {
   Trash2,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
-import HeroGlobe from '../components/landing/HeroGlobe';
-import LiveEventStream from '../components/landing/LiveEventStream';
+import ChartPreview from '../components/landing/ChartPreview';
+
+// Heavy, non-critical visuals are loaded lazily so the hero HTML/LCP is painted
+// before the three.js globe and live stream are fetched. Recharts is not used on
+// the landing page at all — the decorative chart is a lightweight SVG preview.
+const HeroGlobe = lazy(() => import('../components/landing/HeroGlobe'));
+const LiveEventStream = lazy(() => import('../components/landing/LiveEventStream'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -100,10 +106,39 @@ const STATIC_COUNTRIES = 142;
 const STATIC_BOUNCE = 31.8;
 const STATIC_SESSION = '04:21';
 
+const TRAFFIC_RANGES = ['24h', '7d', '30d'];
+
+// Deterministic pseudo-live traffic series for the dashboard mockup. Pure
+// marketing illustration — no backend involved, so never flickers on re-render.
+function makeTrafficData(range) {
+  const isHours = range === '24h';
+  const count = isHours ? 24 : range === '7d' ? 7 : 30;
+  const step = isHours ? 3600000 : 86400000;
+  const now = Date.now();
+  return Array.from({ length: count }, (_, i) => {
+    const date = new Date(now - (count - 1 - i) * step);
+    const t = i / (count - 1 || 1);
+    const wave =
+      2600 +
+      1500 * Math.sin(t * Math.PI * 2) +
+      600 * Math.sin(t * Math.PI * 6 + 1.3) +
+      450 * Math.sin(t * Math.PI * 11 + 4);
+    return {
+      name: isHours
+        ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      views: Math.round(wave),
+    };
+  });
+}
+
 export default function Landing() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sceneDone, setSceneDone] = useState(false);
   const [countRun, setCountRun] = useState(false);
+  const [trafficRange, setTrafficRange] = useState('30d');
+
+  const trafficData = useMemo(() => makeTrafficData(trafficRange), [trafficRange]);
 
   const pageRef = useRef(null);
   const heroSceneRef = useRef(null);
@@ -225,14 +260,7 @@ export default function Landing() {
       <header className="fixed top-0 left-0 right-0 z-[60]">
         <div className="bg-white/85 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <span className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-              <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-            </span>
-              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">
-                WebPulse
-              </span>
-            </Link>
+            <Logo />
 
             <div className="hidden md:flex items-center gap-1">
               {navLinks.map((l) => (
@@ -250,8 +278,11 @@ export default function Landing() {
               <Link to="/register" className="btn-signal btn-md hidden sm:inline-flex">
                 Start Tracking
               </Link>
-              <button className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors"
-                onClick={() => setMobileOpen(!mobileOpen)}>
+              <button
+                className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileOpen}>
                 {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </div>
@@ -322,7 +353,9 @@ export default function Landing() {
               <div ref={globeWrapRef} className="relative order-first lg:order-last">
                 <div className="relative mx-auto w-full max-w-[560px] aspect-square">
                   {sceneDone && (
-                    <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
+                    <Suspense fallback={null}>
+                      <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
+                    </Suspense>
                   )}
                   {/* HUD overlay */}
                   <div ref={heroMetricRef} className="absolute left-3 top-6 z-10 glass-obs rounded-2xl px-4 py-3 w-[168px]">
@@ -450,14 +483,35 @@ export default function Landing() {
                   {/* Live activity */}
                   <div className="border-t border-slate-200 dark:border-white/[0.08] pt-5">
                     <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-3">Live activity</div>
-                    <LiveEventStream maxItems={4} />
+                    <Suspense fallback={null}>
+                      <LiveEventStream maxItems={4} />
+                    </Suspense>
                   </div>
                 </div>
 
                 {/* Chart column */}
                 <div className="bg-white dark:bg-space-800 p-6 lg:col-span-2 space-y-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Traffic</div>
-                  <TrafficWave />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Traffic</div>
+                    <div className="flex items-center gap-1 rounded-full border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-0.5">
+                      {TRAFFIC_RANGES.map((range) => (
+                        <button
+                          key={range}
+                          onClick={() => setTrafficRange(range)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-300 ${
+                            trafficRange === range
+                              ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/30'
+                              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                          }`}
+                        >
+                          {range}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="h-[300px]">
+                    <ChartPreview data={trafficData} dark />
+                  </div>
                   <div className="grid sm:grid-cols-2 gap-5 pt-2">
                     <AcquisitionBars />
                     <GeoList />
@@ -513,7 +567,9 @@ export default function Landing() {
                   </div>
                   <span className="metric-num text-xs text-slate-500 dark:text-slate-400">12,842</span>
                 </div>
-                <LiveEventStream maxItems={7} />
+                <Suspense fallback={null}>
+                  <LiveEventStream maxItems={7} />
+                </Suspense>
               </div>
             </div>
           </div>
@@ -700,12 +756,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-12">
             {/* Left: brand + positioning */}
             <div className="lg:col-span-4 max-w-sm">
-              <div className="flex items-center gap-2.5 mb-5">
-                <span className="relative flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-                  <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                </span>
-                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">WebPulse</span>
-              </div>
+              <Logo />
               <p className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-relaxed">
                 Real-time analytics for the modern web.
               </p>
@@ -717,9 +768,9 @@ export default function Landing() {
 
             {/* Explore */}
             <nav aria-label="Explore" className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Explore
-              </h4>
+              </h2>
               <ul className="space-y-2.5">
                 {[
                   ['/', 'Home'],
@@ -747,9 +798,9 @@ export default function Landing() {
 
             {/* Product */}
             <nav aria-label="Product" className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Product
-              </h4>
+              </h2>
               <ul className="space-y-2.5">
                 {[
                   ['/features', 'Live Analytics'],
@@ -773,9 +824,9 @@ export default function Landing() {
 
             {/* Connect */}
             <nav aria-label="Connect" className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Connect
-              </h4>
+              </h2>
               <ul className="space-y-2.5">
                 <li>
                   <a href={REPO_URL} target="_blank" rel="noopener noreferrer"
@@ -803,9 +854,9 @@ export default function Landing() {
             </nav>
 
             <div className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Contribute
-              </h4>
+              </h2>
               <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 WebPulse is built in the open. Report issues, suggest features, and follow the project on GitHub.
               </p>
@@ -823,14 +874,14 @@ export default function Landing() {
             <div className="lg:col-span-12">
               <div className="pt-8 border-t border-slate-200 dark:border-white/[0.08]">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <p className="text-xs text-slate-500 dark:text-slate-500">
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
                     © 2026 WebPulse
                   </p>
                   <div className="flex items-center gap-5">
                     <nav aria-label="Legal" className="flex items-center gap-5">
-                      <Link to="/privacy" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Privacy</Link>
-                      <Link to="/terms" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Terms</Link>
-                      <Link to="/security" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Security</Link>
+                      <Link to="/privacy" className="text-xs text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white">Privacy</Link>
+                      <Link to="/terms" className="text-xs text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white">Terms</Link>
+                      <Link to="/security" className="text-xs text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white">Security</Link>
                     </nav>
                     <span className="hidden sm:inline text-xs text-slate-400 dark:text-slate-600">·</span>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -853,37 +904,24 @@ export default function Landing() {
 
 function KpiCard({ label, value, accent, format, decimals = 0, suffix = '' }) {
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
-      <div className="metric-num text-2xl font-bold" style={{ color: accent }}>
+    <div className="group cursor-pointer rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 dark:hover:border-violet-400/30 hover:bg-white dark:hover:bg-white/[0.05] hover:shadow-lg hover:shadow-violet-500/[0.08]">
+      <div className="flex items-center justify-between">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
+        <span
+          className="h-1.5 w-1.5 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: accent }}
+        />
+      </div>
+      <div
+        className="metric-num text-2xl font-bold transition-transform duration-300 group-hover:translate-x-0.5"
+        style={{ color: accent }}
+      >
         {format ? (
           <AnimatedNumber end={value} decimals={decimals} suffix={suffix} />
         ) : (
           value
         )}
       </div>
-    </div>
-  );
-}
-
-function TrafficWave() {
-  const pts = 'M0,120 C40,110 60,80 100,85 C140,90 160,55 200,60 C240,65 260,95 300,90 C340,85 360,45 400,50 C440,55 460,80 500,70';
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
-      <svg viewBox="0 0 500 140" className="w-full h-auto">
-        <defs>
-          <linearGradient id="twFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="twStroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#A78BFA" />
-            <stop offset="100%" stopColor="#8B5CF6" />
-          </linearGradient>
-        </defs>
-        <path d={`${pts} L500,140 L0,140 Z`} fill="url(#twFill)" />
-        <path d={pts} fill="none" stroke="url(#twStroke)" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
     </div>
   );
 }
@@ -900,16 +938,19 @@ function AcquisitionBars() {
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4">Traffic sources</div>
       <div className="space-y-3">
         {rows.map((r, i) => (
-          <div key={r.l}>
+          <div
+            key={r.l}
+            className="group cursor-pointer rounded-lg -mx-1.5 px-1.5 py-1 transition-colors duration-300 hover:bg-slate-100/80 dark:hover:bg-white/[0.03]"
+          >
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-slate-600 dark:text-slate-300">{r.l}</span>
-              <span className="metric-num font-semibold" style={{ color: r.c }}>
+              <span className="text-slate-600 dark:text-slate-300 transition-colors group-hover:text-slate-900 dark:group-hover:text-slate-100">{r.l}</span>
+              <span className="metric-num font-semibold transition-transform duration-300 group-hover:scale-110 origin-right" style={{ color: r.c }}>
                 <AnimatedNumber end={r.v} suffix="%" />
               </span>
             </div>
             <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden" style={{ transform: `translateX(${(i % 2) * 3}px)` }}>
               <div
-                className="h-full rounded-full"
+                className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-125 group-hover:shadow-[0_0_10px] group-hover:shadow-violet-500/40"
                 style={{ width: `${r.v * 2.2}%`, background: `linear-gradient(90deg, ${r.c}, ${r.c}88)` }}
               />
             </div>
@@ -932,14 +973,24 @@ function GeoList() {
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4">Live by region</div>
       <div className="space-y-2.5">
         {locs.map((r) => (
-          <div key={r.l} className="flex items-center gap-2 text-xs">
-            <span className="w-24 text-slate-600 dark:text-slate-300 truncate">{r.l}</span>
+          <div
+            key={r.l}
+            className="group cursor-pointer flex items-center gap-2 text-xs rounded-lg -mx-1.5 px-1.5 py-1 transition-colors duration-300 hover:bg-slate-100/80 dark:hover:bg-white/[0.03]"
+          >
+            <span className="w-24 text-slate-600 dark:text-slate-300 truncate transition-colors group-hover:text-slate-900 dark:group-hover:text-slate-100">{r.l}</span>
             <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden flex gap-px">
               {Array.from({ length: Math.max(1, Math.round(r.pct / 8)) }).map((_, i) => (
-                <span key={i} className="flex-1 rounded-sm" style={{ background: r.c, opacity: 0.5 + (i / 10) }} />
+                <span
+                  key={i}
+                  className="flex-1 rounded-sm transition-transform duration-300 group-hover:scale-y-125"
+                  style={{ background: r.c, opacity: 0.5 + (i / 10) }}
+                />
               ))}
             </div>
-            <span className="metric-num font-semibold w-10 text-right" style={{ color: r.c }}>
+            <span
+              className="metric-num font-semibold w-10 text-right transition-transform duration-300 group-hover:scale-110 origin-right"
+              style={{ color: r.c }}
+            >
               <AnimatedNumber end={parseInt(r.v.replace(/,/g, ''), 10)} />
             </span>
           </div>
@@ -963,7 +1014,7 @@ function FeatureRow({ f, flip }) {
         </h3>
         <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-lg">{f.body}</p>
         <Link to="/features" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors">
-          Learn more <ChevronRight className="h-4 w-4" />
+          Explore {f.sub.toLowerCase()}<ChevronRight className="h-4 w-4" />
         </Link>
       </div>
       <div className={flip ? 'lg:order-1' : ''} data-vect>

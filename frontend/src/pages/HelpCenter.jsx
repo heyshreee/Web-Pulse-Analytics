@@ -4,7 +4,7 @@ import {
     ArrowLeft, ArrowRight, Search, ChevronDown, Rocket, Send, Wrench,
     BarChart3, Code2, Folder, User, CreditCard, Shield, LifeBuoy, BarChart2
 } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 
 const API_DOMAIN = 'https://api.webpulse.app';
 
@@ -441,7 +441,6 @@ export default function HelpCenter() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>
@@ -515,10 +514,7 @@ export default function HelpCenter() {
 
             <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
                 <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                    </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
+                    <Logo />
                 </div>
                 <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
             </footer>

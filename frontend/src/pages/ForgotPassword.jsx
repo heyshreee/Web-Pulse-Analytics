@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -56,15 +56,7 @@ export default function ForgotPassword() {
         <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-between mb-8">
-                    <Link to="/" className="flex items-center gap-3 group/logo">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
-                            <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                        </div>
-                        <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse</span>
-                    </Link>
-                    <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
-                        <ThemeToggle />
-                    </div>
+                    <Logo />
                 </div>
 
                 <div className="card card-pad">
