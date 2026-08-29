@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import gsap from 'gsap';
@@ -20,9 +20,12 @@ import {
   Trash2,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
-import HeroGlobe from '../components/landing/HeroGlobe';
-import LiveEventStream from '../components/landing/LiveEventStream';
-import TrafficTrendsChart from '../components/TrafficTrendsChart';
+
+// Heavy, non-critical visuals are loaded lazily so the hero HTML/LCP is painted
+// before the three.js globe, Recharts charts, and live stream are fetched.
+const HeroGlobe = lazy(() => import('../components/landing/HeroGlobe'));
+const LiveEventStream = lazy(() => import('../components/landing/LiveEventStream'));
+const TrafficTrendsChart = lazy(() => import('../components/TrafficTrendsChart'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -274,8 +277,11 @@ export default function Landing() {
               <Link to="/register" className="btn-signal btn-md hidden sm:inline-flex">
                 Start Tracking
               </Link>
-              <button className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors"
-                onClick={() => setMobileOpen(!mobileOpen)}>
+              <button
+                className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileOpen}>
                 {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </div>
@@ -346,7 +352,9 @@ export default function Landing() {
               <div ref={globeWrapRef} className="relative order-first lg:order-last">
                 <div className="relative mx-auto w-full max-w-[560px] aspect-square">
                   {sceneDone && (
-                    <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
+                    <Suspense fallback={null}>
+                      <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
+                    </Suspense>
                   )}
                   {/* HUD overlay */}
                   <div ref={heroMetricRef} className="absolute left-3 top-6 z-10 glass-obs rounded-2xl px-4 py-3 w-[168px]">
@@ -474,7 +482,9 @@ export default function Landing() {
                   {/* Live activity */}
                   <div className="border-t border-slate-200 dark:border-white/[0.08] pt-5">
                     <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-3">Live activity</div>
-                    <LiveEventStream maxItems={4} />
+                    <Suspense fallback={null}>
+                      <LiveEventStream maxItems={4} />
+                    </Suspense>
                   </div>
                 </div>
 
@@ -499,7 +509,9 @@ export default function Landing() {
                     </div>
                   </div>
                   <div className="h-[300px]">
-                    <TrafficTrendsChart data={trafficData} dark />
+                    <Suspense fallback={<div className="h-full w-full animate-pulse rounded-xl bg-slate-100 dark:bg-white/[0.03]" />}>
+                      <TrafficTrendsChart data={trafficData} dark />
+                    </Suspense>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-5 pt-2">
                     <AcquisitionBars />
@@ -556,7 +568,9 @@ export default function Landing() {
                   </div>
                   <span className="metric-num text-xs text-slate-500 dark:text-slate-400">12,842</span>
                 </div>
-                <LiveEventStream maxItems={7} />
+                <Suspense fallback={null}>
+                  <LiveEventStream maxItems={7} />
+                </Suspense>
               </div>
             </div>
           </div>
@@ -755,9 +769,9 @@ export default function Landing() {
 
             {/* Explore */}
             <nav aria-label="Explore" className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Explore
-              </h4>
+              </h2>
               <ul className="space-y-2.5">
                 {[
                   ['/', 'Home'],
@@ -785,9 +799,9 @@ export default function Landing() {
 
             {/* Product */}
             <nav aria-label="Product" className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Product
-              </h4>
+              </h2>
               <ul className="space-y-2.5">
                 {[
                   ['/features', 'Live Analytics'],
@@ -811,9 +825,9 @@ export default function Landing() {
 
             {/* Connect */}
             <nav aria-label="Connect" className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Connect
-              </h4>
+              </h2>
               <ul className="space-y-2.5">
                 <li>
                   <a href={REPO_URL} target="_blank" rel="noopener noreferrer"
@@ -841,9 +855,9 @@ export default function Landing() {
             </nav>
 
             <div className="lg:col-span-2">
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-400">
                 Contribute
-              </h4>
+              </h2>
               <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 WebPulse is built in the open. Report issues, suggest features, and follow the project on GitHub.
               </p>
@@ -861,14 +875,14 @@ export default function Landing() {
             <div className="lg:col-span-12">
               <div className="pt-8 border-t border-slate-200 dark:border-white/[0.08]">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <p className="text-xs text-slate-500 dark:text-slate-500">
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
                     © 2026 WebPulse
                   </p>
                   <div className="flex items-center gap-5">
                     <nav aria-label="Legal" className="flex items-center gap-5">
-                      <Link to="/privacy" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Privacy</Link>
-                      <Link to="/terms" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Terms</Link>
-                      <Link to="/security" className="text-xs text-slate-500 dark:text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white">Security</Link>
+                      <Link to="/privacy" className="text-xs text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white">Privacy</Link>
+                      <Link to="/terms" className="text-xs text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white">Terms</Link>
+                      <Link to="/security" className="text-xs text-slate-600 dark:text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-white">Security</Link>
                     </nav>
                     <span className="hidden sm:inline text-xs text-slate-400 dark:text-slate-600">·</span>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1001,7 +1015,7 @@ function FeatureRow({ f, flip }) {
         </h3>
         <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-lg">{f.body}</p>
         <Link to="/features" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors">
-          Learn more <ChevronRight className="h-4 w-4" />
+          Explore {f.sub.toLowerCase()}<ChevronRight className="h-4 w-4" />
         </Link>
       </div>
       <div className={flip ? 'lg:order-1' : ''} data-vect>
