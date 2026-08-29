@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import ChartPreview from '../components/landing/ChartPreview';
+import CodeSnippet from '../components/landing/CodeSnippet';
 
 // Heavy, non-critical visuals are loaded lazily so the hero HTML/LCP is painted
 // before the three.js globe and live stream are fetched. Recharts is not used on
@@ -610,13 +611,13 @@ export default function Landing() {
                     </div>
                     <span className="ml-3 text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest">index.html</span>
                   </div>
-                  <pre className="p-5 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto text-slate-800 dark:text-slate-200">
-{`<script
+                  <CodeSnippet
+                    code={`<script
   src="https://cdn.webpulse.app/script.js"
   data-tracking-id="wp_live_xxxxxxxxx"
   data-auto="true"
 ></script>`}
-                  </pre>
+                  />
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 p-4">
