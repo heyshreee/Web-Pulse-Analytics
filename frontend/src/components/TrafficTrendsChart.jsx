@@ -7,10 +7,11 @@ import { useTheme } from '../context/ThemeContext';
 
 export default function TrafficTrendsChart({
     data,
-    loading
+    loading,
+    dark
 }) {
     const { theme } = useTheme();
-    const isDark = theme === 'dark';
+    const isDark = dark ?? theme === 'dark';
 
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
     const textColor = isDark ? '#94a3b8' : '#64748b';

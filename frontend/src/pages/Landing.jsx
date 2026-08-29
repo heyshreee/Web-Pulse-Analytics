@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import gsap from 'gsap';
@@ -22,6 +22,7 @@ import {
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import HeroGlobe from '../components/landing/HeroGlobe';
 import LiveEventStream from '../components/landing/LiveEventStream';
+import TrafficTrendsChart from '../components/TrafficTrendsChart';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -101,10 +102,39 @@ const STATIC_COUNTRIES = 142;
 const STATIC_BOUNCE = 31.8;
 const STATIC_SESSION = '04:21';
 
+const TRAFFIC_RANGES = ['24h', '7d', '30d'];
+
+// Deterministic pseudo-live traffic series for the dashboard mockup. Pure
+// marketing illustration — no backend involved, so never flickers on re-render.
+function makeTrafficData(range) {
+  const isHours = range === '24h';
+  const count = isHours ? 24 : range === '7d' ? 7 : 30;
+  const step = isHours ? 3600000 : 86400000;
+  const now = Date.now();
+  return Array.from({ length: count }, (_, i) => {
+    const date = new Date(now - (count - 1 - i) * step);
+    const t = i / (count - 1 || 1);
+    const wave =
+      2600 +
+      1500 * Math.sin(t * Math.PI * 2) +
+      600 * Math.sin(t * Math.PI * 6 + 1.3) +
+      450 * Math.sin(t * Math.PI * 11 + 4);
+    return {
+      name: isHours
+        ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      views: Math.round(wave),
+    };
+  });
+}
+
 export default function Landing() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sceneDone, setSceneDone] = useState(false);
   const [countRun, setCountRun] = useState(false);
+  const [trafficRange, setTrafficRange] = useState('30d');
+
+  const trafficData = useMemo(() => makeTrafficData(trafficRange), [trafficRange]);
 
   const pageRef = useRef(null);
   const heroSceneRef = useRef(null);
@@ -450,8 +480,27 @@ export default function Landing() {
 
                 {/* Chart column */}
                 <div className="bg-white dark:bg-space-800 p-6 lg:col-span-2 space-y-5">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Traffic</div>
-                  <TrafficWave />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Traffic</div>
+                    <div className="flex items-center gap-1 rounded-full border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-0.5">
+                      {TRAFFIC_RANGES.map((range) => (
+                        <button
+                          key={range}
+                          onClick={() => setTrafficRange(range)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-300 ${
+                            trafficRange === range
+                              ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/30'
+                              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                          }`}
+                        >
+                          {range}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="h-[300px]">
+                    <TrafficTrendsChart data={trafficData} dark />
+                  </div>
                   <div className="grid sm:grid-cols-2 gap-5 pt-2">
                     <AcquisitionBars />
                     <GeoList />
@@ -842,37 +891,24 @@ export default function Landing() {
 
 function KpiCard({ label, value, accent, format, decimals = 0, suffix = '' }) {
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
-      <div className="metric-num text-2xl font-bold" style={{ color: accent }}>
+    <div className="group cursor-pointer rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 dark:hover:border-violet-400/30 hover:bg-white dark:hover:bg-white/[0.05] hover:shadow-lg hover:shadow-violet-500/[0.08]">
+      <div className="flex items-center justify-between">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
+        <span
+          className="h-1.5 w-1.5 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: accent }}
+        />
+      </div>
+      <div
+        className="metric-num text-2xl font-bold transition-transform duration-300 group-hover:translate-x-0.5"
+        style={{ color: accent }}
+      >
         {format ? (
           <AnimatedNumber end={value} decimals={decimals} suffix={suffix} />
         ) : (
           value
         )}
       </div>
-    </div>
-  );
-}
-
-function TrafficWave() {
-  const pts = 'M0,120 C40,110 60,80 100,85 C140,90 160,55 200,60 C240,65 260,95 300,90 C340,85 360,45 400,50 C440,55 460,80 500,70';
-  return (
-    <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4">
-      <svg viewBox="0 0 500 140" className="w-full h-auto">
-        <defs>
-          <linearGradient id="twFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="twStroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#A78BFA" />
-            <stop offset="100%" stopColor="#8B5CF6" />
-          </linearGradient>
-        </defs>
-        <path d={`${pts} L500,140 L0,140 Z`} fill="url(#twFill)" />
-        <path d={pts} fill="none" stroke="url(#twStroke)" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
     </div>
   );
 }
@@ -889,16 +925,19 @@ function AcquisitionBars() {
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4">Traffic sources</div>
       <div className="space-y-3">
         {rows.map((r, i) => (
-          <div key={r.l}>
+          <div
+            key={r.l}
+            className="group cursor-pointer rounded-lg -mx-1.5 px-1.5 py-1 transition-colors duration-300 hover:bg-slate-100/80 dark:hover:bg-white/[0.03]"
+          >
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-slate-600 dark:text-slate-300">{r.l}</span>
-              <span className="metric-num font-semibold" style={{ color: r.c }}>
+              <span className="text-slate-600 dark:text-slate-300 transition-colors group-hover:text-slate-900 dark:group-hover:text-slate-100">{r.l}</span>
+              <span className="metric-num font-semibold transition-transform duration-300 group-hover:scale-110 origin-right" style={{ color: r.c }}>
                 <AnimatedNumber end={r.v} suffix="%" />
               </span>
             </div>
             <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden" style={{ transform: `translateX(${(i % 2) * 3}px)` }}>
               <div
-                className="h-full rounded-full"
+                className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-125 group-hover:shadow-[0_0_10px] group-hover:shadow-violet-500/40"
                 style={{ width: `${r.v * 2.2}%`, background: `linear-gradient(90deg, ${r.c}, ${r.c}88)` }}
               />
             </div>
@@ -921,14 +960,24 @@ function GeoList() {
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-4">Live by region</div>
       <div className="space-y-2.5">
         {locs.map((r) => (
-          <div key={r.l} className="flex items-center gap-2 text-xs">
-            <span className="w-24 text-slate-600 dark:text-slate-300 truncate">{r.l}</span>
+          <div
+            key={r.l}
+            className="group cursor-pointer flex items-center gap-2 text-xs rounded-lg -mx-1.5 px-1.5 py-1 transition-colors duration-300 hover:bg-slate-100/80 dark:hover:bg-white/[0.03]"
+          >
+            <span className="w-24 text-slate-600 dark:text-slate-300 truncate transition-colors group-hover:text-slate-900 dark:group-hover:text-slate-100">{r.l}</span>
             <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-white/[0.08] overflow-hidden flex gap-px">
               {Array.from({ length: Math.max(1, Math.round(r.pct / 8)) }).map((_, i) => (
-                <span key={i} className="flex-1 rounded-sm" style={{ background: r.c, opacity: 0.5 + (i / 10) }} />
+                <span
+                  key={i}
+                  className="flex-1 rounded-sm transition-transform duration-300 group-hover:scale-y-125"
+                  style={{ background: r.c, opacity: 0.5 + (i / 10) }}
+                />
               ))}
             </div>
-            <span className="metric-num font-semibold w-10 text-right" style={{ color: r.c }}>
+            <span
+              className="metric-num font-semibold w-10 text-right transition-transform duration-300 group-hover:scale-110 origin-right"
+              style={{ color: r.c }}
+            >
               <AnimatedNumber end={parseInt(r.v.replace(/,/g, ''), 10)} />
             </span>
           </div>
