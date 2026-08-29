@@ -193,7 +193,7 @@ export const calculateProjectUsage = async (projectId) => {
  * Check if a user can still track data
  */
 export const checkLimit = async (userId, type = 'track') => {
-    const usage = await this.calculateUsage(userId);
+    const usage = await calculateUsage(userId);
 
     if (type === 'create_project') {
         const { count } = await supabase
@@ -236,26 +236,35 @@ export const checkLimit = async (userId, type = 'track') => {
 
         return {
             canTrack: projectsOk,
-            reason: !projectsOk ? 'Project limit reached. Upgrade to Pro.' : null,
+            reason: !projectsOk ? `Project limit reached (${count || 0}/${usage.projectLimit} on ${usage.plan} plan). Upgrade your plan to create more projects.` : null,
             usage
         };
     }
 
     if (type === 'share_report') {
-        const shareReportOk = (usage.share_report.used || 0) < usage.share_report.limit;
+        const limit = usage.share_report.limit || 0;
+        const used = usage.share_report.used || 0;
+        const shareReportOk = used < limit;
 
         if (!shareReportOk) {
+            const reason = limit === 0
+                ? 'Your current plan does not include public share reports. Upgrade to a paid plan to share.'
+                : `You have reached the maximum of ${limit} share report(s) for your plan. Upgrade to share more.`;
             await NotificationService.create(
                 userId,
                 'Plan Limit Reached',
-                `You have reached the maximum number of shared reports for your plan. Upgrade to share more.`,
+                reason,
                 'warning'
             );
         }
 
         return {
             canTrack: shareReportOk,
-            reason: !shareReportOk ? 'Shared report limit reached. Upgrade to Pro.' : null,
+            reason: !shareReportOk
+                ? (limit === 0
+                    ? 'Share reports are not included in your current plan. Upgrade to a paid plan.'
+                    : `Share report limit reached (${used}/${limit}). Upgrade your plan to share more.`)
+                : null,
             usage
         };
     }
@@ -268,33 +277,49 @@ export const checkLimit = async (userId, type = 'track') => {
         await NotificationService.create(
             userId,
             'Usage Alert: Near Limit',
-            `You have reached 80% of your monthly tracking limit. Upgrade soon to avoid data gaps.`,
+            `You have reached 80% of your monthly tracking limit (${usage.totalViews.toLocaleString()} of ${usage.monthlyLimit.toLocaleString()} events). Upgrade soon to avoid data gaps.`,
             'system'
         );
     }
 
     // Check for 100% usage
-    if (usage.totalViews >= usage.monthlyLimit) {
+    if (usage.totalViews >= usage.monthlyLimit && viewsOk === false) {
         await NotificationService.create(
             userId,
             'Usage Alert: Limit Reached',
-            `You have reached 100% of your monthly tracking limit. Tracking may be paused.`,
+            `You have reached 100% of your monthly tracking limit (${usage.monthlyLimit.toLocaleString()} events). Tracking is now blocked. Upgrade your plan.`,
             'error'
         );
     }
 
-    if (usage.storageUsed >= usage.storageLimit) {
+    if (usage.storageUsed >= usage.storageLimit && storageOk === false) {
         await NotificationService.create(
             userId,
             'Storage Alert: Full',
-            `You have reached your storage limit. Old data may be deleted or tracking paused.`,
+            `You have reached your storage limit. Tracking is now blocked. Upgrade your plan or clear old data.`,
             'error'
         );
     }
 
+    if (!viewsOk || !storageOk) {
+        let reason;
+        if (!viewsOk && !storageOk) {
+            reason = `Plan limits reached on ${usage.plan}: monthly events (${usage.totalViews.toLocaleString()}/${usage.monthlyLimit.toLocaleString()}) and storage (${(usage.storageUsed / 1024 / 1024 / 1024).toFixed(2)}GB/${(usage.storageLimit / 1024 / 1024 / 1024).toFixed(2)}GB). Upgrade to continue tracking.`;
+        } else if (!viewsOk) {
+            reason = `Monthly event limit reached on ${usage.plan} plan (${usage.totalViews.toLocaleString()}/${usage.monthlyLimit.toLocaleString()}). Upgrade to continue tracking.`;
+        } else {
+            reason = `Storage limit reached on ${usage.plan} plan (${(usage.storageUsed / 1024 / 1024 / 1024).toFixed(2)}GB/${(usage.storageLimit / 1024 / 1024 / 1024).toFixed(2)}GB). Upgrade or clear old data.`;
+        }
+        return {
+            canTrack: false,
+            reason,
+            usage
+        };
+    }
+
     return {
-        canTrack: viewsOk && storageOk,
-        reason: !viewsOk ? 'Monthly view limit reached' : !storageOk ? 'Storage limit reached' : null,
+        canTrack: true,
+        reason: null,
         usage
     };
 };

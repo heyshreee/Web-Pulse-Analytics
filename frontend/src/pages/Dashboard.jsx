@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext, Link } from 'react-router-dom';
-import { Plus, Globe, Code, Activity, ArrowUpRight, TrendingUp, X, MapPin } from 'lucide-react';
+import { useOutletContext, Link, useNavigate } from 'react-router-dom';
+import { Plus, Globe, Code, Activity, ArrowUpRight, TrendingUp, X, MapPin, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
@@ -26,10 +26,13 @@ export default function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [stats, setStats] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [registerDomain, setRegisterDomain] = useState(false);
   const [projectName, setProjectName] = useState('');
+  const [domain, setDomain] = useState('');
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -130,11 +133,87 @@ export default function Dashboard() {
     }
   };
 
+  const cleanUp = () => {
+    setShowModal(false);
+    setRegisterDomain(false);
+    setProjectName('');
+    setDomain('');
+  };
+
+  const handleRegisterDomain = async (e) => {
+    e.preventDefault();
+    if (creating) return;
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(projectName)) {
+      showToast('Project name can only contain letters, numbers, underscores, and hyphens', 'error');
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const project = await apiRequest('/projects', {
+        method: 'POST',
+        body: JSON.stringify({ name: projectName, allowedOrigins: domain }),
+      });
+      cleanUp();
+      showToast('Domain registered successfully!', 'success');
+      loadData();
+      loadUser();
+      if (project?.name) {
+        navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`);
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   if (loading) return <Spinner />;
 
   const totalViewsUsed = stats?.reduce((acc, curr) => acc + curr.views, 0) || 0;
   const viewLimit = usageStats?.monthlyLimit || 1000;
   const viewPercentage = Math.min((totalViewsUsed / viewLimit) * 100, 100);
+
+  const projectsUsed = usageStats?.projectCount ?? projects.length;
+  const projectLimit = usageStats?.projectLimit ?? 5;
+  const projectLimitReached = projectsUsed >= projectLimit;
+
+  const openCreateProject = () => {
+    if (projectLimitReached) {
+      showToast(`Project limit reached (${projectsUsed}/${projectLimit} on ${usageStats?.plan || 'free'} plan). Upgrade your plan to create more.`, 'error', {
+        label: 'Go to Upgrade',
+        icon: <ArrowUpRight className="h-3.5 w-3.5" />,
+        onClick: () => navigate('/dashboard/billing'),
+      });
+      return;
+    }
+    setRegisterDomain(false);
+    setDomain('');
+    setShowModal(true);
+  };
+
+  const openRegisterDomain = () => {
+    if (projectLimitReached) {
+      showToast(`Project limit reached (${projectsUsed}/${projectLimit} on ${usageStats?.plan || 'free'} plan). Delete a project or upgrade your plan to register a new domain.`, 'error', {
+        label: 'Go to Upgrade',
+        icon: <ArrowUpRight className="h-3.5 w-3.5" />,
+        onClick: () => navigate('/dashboard/billing'),
+      });
+      return;
+    }
+    setRegisterDomain(true);
+    setDomain('');
+    setShowModal(true);
+  };
+
+  const openIntegrationGuide = () => {
+    if (projects.length > 0) {
+      navigate(`/dashboard/projects/${encodeURIComponent(projects[0].name)}/integration`);
+    } else {
+      navigate('/dashboard/projects');
+    }
+  };
 
   const { realTimeVisitors, trafficData, sourceData, liveActivity, sparkline } = dashboardStats;
 
@@ -159,10 +238,7 @@ export default function Dashboard() {
             <p className="page-sub">Real-time visitor activity from across all tracked domains.</p>
           </div>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn-primary btn-md"
-        >
+        <button onClick={openCreateProject} className="btn-primary btn-md">
           <Plus className="h-4 w-4" /> New Project
         </button>
       </div>
@@ -471,25 +547,32 @@ export default function Dashboard() {
           <p className={`${muted} text-sm`}>Deploy the global tracker script or integrate new domains in seconds.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
-          <Link to="/dashboard/api-key" className="btn-secondary">
-            <Code className="h-4 w-4" /> Integration Guide
-          </Link>
-          <button onClick={() => setShowModal(true)} className="btn-primary">
-            <Plus className="h-4 w-4" /> Register Domain
-          </button>
+        <button
+          onClick={openIntegrationGuide}
+          className="btn-secondary btn-md"
+        >
+          <Code className="h-4 w-4" /> Integration Guide
+        </button>
+        <button
+          onClick={openRegisterDomain}
+          className="btn-primary btn-md"
+        >
+          <Plus className="h-4 w-4" /> Register Domain
+        </button>
         </div>
       </div>
 
-      {/* Create Project Modal */}
+      {/* Create Project / Register Domain Modal */}
       <Modal
         isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setProjectName('');
-        }}
-        title="Create New Project"
+        onClose={cleanUp}
+        title={registerDomain ? 'Register Domain' : 'Create New Project'}
+        align={registerDomain ? 'bottom' : 'top'}
       >
-        <form onSubmit={handleCreateProject} className="space-y-5">
+        <form
+          onSubmit={registerDomain ? handleRegisterDomain : handleCreateProject}
+          className="space-y-5"
+        >
           <div>
             <label className="label">Project Name</label>
             <input
@@ -498,22 +581,33 @@ export default function Dashboard() {
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="input"
-              placeholder="e.g. My SaaS Platform"
+              placeholder={registerDomain ? "e.g. my-website" : "e.g. My SaaS Platform"}
             />
           </div>
+          {registerDomain && (
+            <div>
+              <label className="label">Domain / Allowed Origin</label>
+              <input
+                type="text"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                className="input font-mono"
+                placeholder="https://example.com"
+              />
+              <p className="field-hint">
+                Comma-separated list of domains allowed to track this project.
+              </p>
+            </div>
+          )}
           <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setShowModal(false);
-                setProjectName('');
-              }}
-              className="btn-ghost btn-md"
-            >
+            <button type="button" onClick={cleanUp} className="btn-ghost btn-md">
               Cancel
             </button>
             <button type="submit" disabled={creating} className="btn-primary btn-md">
-              {creating ? 'Processing...' : 'Deploy Project'}
+              {creating && <Loader2 className="h-4 w-4 animate-spin" />}
+              {creating
+                ? (registerDomain ? 'Registering...' : 'Processing...')
+                : (registerDomain ? 'Register Domain' : 'Deploy Project')}
             </button>
           </div>
         </form>

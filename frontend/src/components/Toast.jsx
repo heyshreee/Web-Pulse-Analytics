@@ -40,7 +40,7 @@ const variants = {
     }
 };
 
-export default function Toast({ message, type = 'info', onClose, duration = 5000 }) {
+export default function Toast({ message, type = 'info', onClose, duration = 5000, action = null }) {
     const [isVisible, setIsVisible] = useState(false);
     const variant = variants[type] || variants.info;
     const Icon = variant.icon;
@@ -74,6 +74,19 @@ export default function Toast({ message, type = 'info', onClose, duration = 5000
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                         {message}
                     </p>
+                    {action && (
+                        <button
+                            onClick={() => {
+                                setIsVisible(false);
+                                setTimeout(onClose, 300);
+                                action.onClick?.();
+                            }}
+                            className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors"
+                        >
+                            {action.icon}
+                            {action.label}
+                        </button>
+                    )}
                 </div>
 
                 {/* Close Button */}

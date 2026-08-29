@@ -44,7 +44,7 @@ export const createProject = asyncHandler(async (req, res) => {
         const allowedOriginsLimit = usage.plan ? usageService.getPlanLimits(usage.plan).allowedOriginsLimit : 1;
 
         if (originsArray.length > allowedOriginsLimit) {
-            throw AppError.limitExceeded(`Your ${usage.plan} plan allows only ${allowedOriginsLimit} allowed origin(s). Upgrade to Pro for unlimited origins.`);
+            throw AppError.limitExceeded(`Domain limit reached on ${usage.plan} plan (${originsArray.length} requested / ${allowedOriginsLimit} allowed). Remove domains or upgrade your plan.`);
         }
     }
 
@@ -264,7 +264,7 @@ export const updateProject = asyncHandler(async (req, res) => {
         const allowedOriginsLimit = usage.plan ? usageService.getPlanLimits(usage.plan).allowedOriginsLimit : 1;
 
         if (originsArray.length > allowedOriginsLimit) {
-            throw AppError.limitExceeded(`Your ${usage.plan} plan allows only ${allowedOriginsLimit} allowed origin(s). Upgrade to Pro for unlimited origins.`);
+            throw AppError.limitExceeded(`Domain limit reached on ${usage.plan} plan (${originsArray.length} requested / ${allowedOriginsLimit} allowed). Remove domains or upgrade your plan.`);
         }
         updates.allowed_origins = allowedOrigins;
     }

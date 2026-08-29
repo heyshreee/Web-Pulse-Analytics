@@ -42,7 +42,7 @@ export const getAllPlans = async () => {
  * @returns {Promise<Object>} Plan limits
  */
 export const getPlanLimits = async (planId) => {
-    const plans = await this.getAllPlans();
+    const plans = await getAllPlans();
     const plan = plans.find(p => p.id === planId);
 
     if (!plan) {
@@ -65,7 +65,6 @@ export const getPlanLimits = async (planId) => {
         emailIntegrity: plan.email_integrity,
         allowedOriginsLimit: plan.allowed_origins,
         share_report: plan.share_report,
-        retentionDays: plan.retention_days,
         retentionDays: plan.retention_days,
         price_inr: plan.price_inr,
         price_usd: plan.price_usd,
