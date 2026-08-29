@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BarChart2, ExternalLink } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 import { apiRequest } from '../utils/api';
 import { LEGAL_POLICIES } from './legal/policies';
 
@@ -250,11 +251,8 @@ export default function Legal({ type }) {
 
             <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
                 <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                    </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
-                </div>
+                <Logo />
+            </div>
                 <div className="flex items-center justify-center gap-5 mb-4">
                     <Link to="/privacy" className="text-xs text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Privacy</Link>
                     <Link to="/terms" className="text-xs text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Terms</Link>

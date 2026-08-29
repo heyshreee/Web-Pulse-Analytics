@@ -12,6 +12,7 @@ import TrafficTrendsChart from '../components/TrafficTrendsChart';
 import Spinner from '../components/Spinner';
 import ThemeToggle from '../components/ThemeToggle';
 import { useTheme } from '../context/ThemeContext';
+import Logo from '../components/Logo';
 import { Tablet, Smartphone } from 'lucide-react';
 
 export default function ShareReport() {
@@ -64,9 +65,7 @@ export default function ShareReport() {
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-8">
                     <div className="flex items-center gap-6">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 shadow-soft">
-                            <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                        </div>
+                        <Logo />
                         <div>
                             <div className="eyebrow flex items-center gap-2 mb-1">
                                 <span>Public Report</span>

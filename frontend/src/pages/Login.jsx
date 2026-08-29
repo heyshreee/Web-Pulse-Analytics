@@ -8,6 +8,7 @@ import { setToken } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
+import Logo from '../components/Logo';
 import OTPVerification from '../components/OTPVerification';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -84,14 +85,7 @@ export default function Login() {
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
-                <Link to="/" className="flex items-center gap-3 group/logo">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
-                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                    </div>
-                    <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                        WebPulse
-                    </span>
-                </Link>
+                <Logo />
                 <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
                     <ThemeToggle />
                 </div>

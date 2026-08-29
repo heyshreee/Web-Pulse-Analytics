@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Logo from '../components/Logo';
 import {
     Terminal, Copy, Check, Shield,
     Zap, Code2, Activity, Menu, X,
@@ -175,12 +176,7 @@ export default function API() {
                         >
                             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </button>
-                        <Link to="/" className="flex items-center gap-3 group/logo">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover/logo:scale-105">
-                                <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                            </div>
-                            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">WebPulse</span>
-                        </Link>
+                        <Logo />
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -567,12 +563,7 @@ export default function API() {
             </div>
 
             <footer className="border-t border-slate-200 dark:border-white/[0.06] py-14 bg-slate-50 dark:bg-[#070A10] flex flex-col items-center gap-8 px-6">
-                <Link to="/" className="flex items-center gap-3 group">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 transition-transform duration-300 group-hover:scale-105">
-                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                    </div>
-                    <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">WebPulse</span>
-                </Link>
+                <Logo />
                 <div className="flex flex-wrap justify-center gap-8 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                     <Link to="/privacy" className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors">Privacy Policy</Link>
                     <Link to="/terms" className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors">Term of Service</Link>

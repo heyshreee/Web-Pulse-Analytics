@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Bug, Compass, Github, Lightbulb, MessageSquareText, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
 
 const REPO_URL = 'https://github.com/heyshreee/Web-Pulse-Analytics';
 const ISSUES_URL = `${REPO_URL}/issues`;
@@ -265,10 +266,7 @@ export default function Community() {
 
             <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
                 <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
-                        <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                    </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">WebPulse</span>
+                    <Logo />
                 </div>
                 <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
             </footer>

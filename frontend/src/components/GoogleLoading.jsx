@@ -1,11 +1,10 @@
+import Logo from './Logo';
+
 export default function GoogleLoading() {
     return (
         <div className="fixed inset-0 bg-slate-50 dark:bg-[#070A10] z-50 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-            <div className="absolute top-8 left-8 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800 shadow-soft">
-                    <img src="/logo-01.png" alt="WebPulse logo" className="h-full w-full object-cover" />
-                </div>
-                <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">WebPulse</span>
+            <div className="absolute top-8 left-8">
+                <Logo />
             </div>
 
             <div className="relative mb-8">
