@@ -20,12 +20,13 @@ import {
   Trash2,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
+import ChartPreview from '../components/landing/ChartPreview';
 
 // Heavy, non-critical visuals are loaded lazily so the hero HTML/LCP is painted
-// before the three.js globe, Recharts charts, and live stream are fetched.
+// before the three.js globe and live stream are fetched. Recharts is not used on
+// the landing page at all — the decorative chart is a lightweight SVG preview.
 const HeroGlobe = lazy(() => import('../components/landing/HeroGlobe'));
 const LiveEventStream = lazy(() => import('../components/landing/LiveEventStream'));
-const TrafficTrendsChart = lazy(() => import('../components/TrafficTrendsChart'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -509,9 +510,7 @@ export default function Landing() {
                     </div>
                   </div>
                   <div className="h-[300px]">
-                    <Suspense fallback={<div className="h-full w-full animate-pulse rounded-xl bg-slate-100 dark:bg-white/[0.03]" />}>
-                      <TrafficTrendsChart data={trafficData} dark />
-                    </Suspense>
+                    <ChartPreview data={trafficData} dark />
                   </div>
                   <div className="grid sm:grid-cols-2 gap-5 pt-2">
                     <AcquisitionBars />
