@@ -4,7 +4,6 @@ import {
     ArrowLeft, ArrowRight, Search, ChevronDown, Rocket, Send, Wrench,
     BarChart3, Code2, Folder, User, CreditCard, Shield, LifeBuoy, BarChart2
 } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 const API_DOMAIN = 'https://api.webpulse.app';
@@ -442,7 +441,6 @@ export default function HelpCenter() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { BarChart2, ArrowLeft, Home } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 export default function NotFound() {
@@ -11,9 +10,6 @@ export default function NotFound() {
                     <Logo />
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
-                        <ThemeToggle />
-                    </div>
                     <Link to="/login" className="btn-secondary btn-sm">Log in</Link>
                 </div>
             </header>

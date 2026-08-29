@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { Mail, Lock, Loader2, Moon, User, BarChart2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Loader2, User, BarChart2, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { setToken } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
@@ -10,7 +10,6 @@ import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
 import Logo from '../components/Logo';
 import OTPVerification from '../components/OTPVerification';
-import ThemeToggle from '../components/ThemeToggle';
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -94,9 +93,6 @@ export default function Register() {
             {/* Header */}
             <header className="w-full max-w-7xl mx-auto p-6 flex justify-between items-center">
                 <Logo />
-                <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
-                    <ThemeToggle />
-                </div>
             </header>
 
             {/* Main Content */}

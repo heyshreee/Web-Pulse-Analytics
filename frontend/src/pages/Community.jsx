@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Bug, Compass, Github, Lightbulb, MessageSquareText, ShieldCheck, Sparkles, Users } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 const REPO_URL = 'https://github.com/heyshreee/Web-Pulse-Analytics';
@@ -64,7 +63,6 @@ export default function Community() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>

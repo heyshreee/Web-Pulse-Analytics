@@ -4,7 +4,6 @@ import {
     ArrowLeft, ArrowRight, BarChart2, CheckCircle2, AlertTriangle,
     Key, Lock, Server, Shield, Users, Radar, ClipboardList, GitBranch
 } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 import { apiRequest } from '../utils/api';
 
@@ -141,7 +140,6 @@ export default function Security() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>

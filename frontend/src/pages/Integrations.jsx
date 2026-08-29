@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ArrowDown, Activity, Braces, Atom, Server, Plug, BarChart2 } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 function FlowDiagram({ steps }) {
@@ -72,7 +71,6 @@ export default function Integrations() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { Check, Minus, HelpCircle, ArrowLeft, BarChart2 } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 const plans = [
@@ -130,7 +129,6 @@ export default function Pricing() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/login" className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                             Log in
                         </Link>

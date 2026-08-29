@@ -3,7 +3,6 @@ import {
     ArrowLeft, ArrowRight, ArrowDown, Activity, Server, Shield,
     Zap, BookOpen, Code2, BarChart2
 } from 'lucide-react';
-import ThemeToggle from '../../components/ThemeToggle';
 import CodeBlock from './CodeBlock';
 import { API_DOMAIN } from './docsContent';
 

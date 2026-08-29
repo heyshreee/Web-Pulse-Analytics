@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Activity, Gauge, Globe, LayoutDashboard, Bell, History, FileDown, Braces, Bug, BarChart2 } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 export default function Features() {
@@ -71,7 +70,6 @@ export default function Features() {
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/pricing" className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</Link>
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>

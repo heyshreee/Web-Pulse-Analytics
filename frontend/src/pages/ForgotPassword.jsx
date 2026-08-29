@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import ThemeToggle from '../components/ThemeToggle';
 import Logo from '../components/Logo';
 
 export default function ForgotPassword() {
@@ -58,9 +57,6 @@ export default function ForgotPassword() {
             <div className="w-full max-w-md">
                 <div className="flex items-center justify-between mb-8">
                     <Logo />
-                    <div className="p-1 bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-200 dark:border-slate-800">
-                        <ThemeToggle />
-                    </div>
                 </div>
 
                 <div className="card card-pad">

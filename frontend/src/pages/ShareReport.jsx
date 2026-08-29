@@ -10,7 +10,6 @@ import {
 import { apiRequest } from '../utils/api';
 import TrafficTrendsChart from '../components/TrafficTrendsChart';
 import Spinner from '../components/Spinner';
-import ThemeToggle from '../components/ThemeToggle';
 import { useTheme } from '../context/ThemeContext';
 import Logo from '../components/Logo';
 import { Tablet, Smartphone } from 'lucide-react';
@@ -79,9 +78,6 @@ export default function ShareReport() {
                         <div className="text-right hidden sm:block">
                             <p className="eyebrow">Timezone</p>
                             <p className="font-semibold text-slate-700 dark:text-slate-200 tracking-tight">{project.timezone}</p>
-                        </div>
-                        <div className="card p-2">
-                            <ThemeToggle />
                         </div>
                     </div>
                 </div>

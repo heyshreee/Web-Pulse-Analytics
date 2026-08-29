@@ -4,7 +4,6 @@ import Logo from '../../components/Logo';
 import {
     ArrowLeft, Activity, Menu, X, BookOpen, BarChart2, ArrowRight
 } from 'lucide-react';
-import ThemeToggle from '../../components/ThemeToggle';
 import { docsNav } from './docsNav';
 
 export default function DocsLayout() {
@@ -58,7 +57,6 @@ export default function DocsLayout() {
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
                     </div>
                 </div>

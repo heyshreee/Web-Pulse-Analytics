@@ -34,6 +34,7 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const GoogleCallback = lazy(() => import('./pages/GoogleCallback'));
 import { ToastProvider } from './context/ToastContext';
+import { ThemeSync } from './context/ThemeContext';
 import { isAuthenticated } from './utils/auth';
 import './App.css';
 
@@ -48,6 +49,7 @@ function App() {
                 <BrowserRouter>
                     <div className="min-h-screen">
                         <ScrollToTop />
+                        <ThemeSync />
                         <Suspense fallback={<Spinner />}>
                             <Routes>
                                 {/* Public Routes */}
