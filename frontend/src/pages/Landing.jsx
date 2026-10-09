@@ -18,6 +18,7 @@ import {
   Activity,
   Fingerprint,
   Trash2,
+  Loader2,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import ChartPreview from '../components/landing/ChartPreview';
@@ -28,6 +29,30 @@ import CodeSnippet from '../components/landing/CodeSnippet';
 // the landing page at all — the decorative chart is a lightweight SVG preview.
 const HeroGlobe = lazy(() => import('../components/landing/HeroGlobe'));
 const LiveEventStream = lazy(() => import('../components/landing/LiveEventStream'));
+
+// Delayed "still working" indicator: stays invisible while chunks load quickly
+// and only fades in when a lazy visual takes noticeably longer than expected.
+function StillWorkingIndicator({ delay = 2000, label = 'Still working…' }) {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShow(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  if (!show) return null;
+
+  return (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
+      <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass-obs">
+        <Loader2 className="h-4 w-4 text-violet-500 animate-spin" />
+        <span className="text-xs font-medium text-slate-600 dark:text-slate-300 animate-pulse">
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -306,6 +331,15 @@ export default function Landing() {
       </header>
 
       <main className="relative z-10 pt-16">
+        {/* ============ CONSTRUCTION BANNER ============ */}
+        <div className="banner-construction relative z-10 w-full">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 text-center">
+            <p className="text-xs sm:text-sm font-semibold tracking-wide text-amber-950 dark:text-amber-100">
+              🚧 UNDER CONSTRUCTION — Our pixels are still figuring things out.
+            </p>
+          </div>
+        </div>
+
         {/* ============ HERO SCENE ============ */}
         <section ref={heroSceneRef} className="relative min-h-screen">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -354,7 +388,7 @@ export default function Landing() {
               <div ref={globeWrapRef} className="relative order-first lg:order-last">
                 <div className="relative mx-auto w-full max-w-[560px] aspect-square">
                   {sceneDone && (
-                    <Suspense fallback={null}>
+                    <Suspense fallback={<StillWorkingIndicator delay={2000} />}>
                       <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
                     </Suspense>
                   )}
