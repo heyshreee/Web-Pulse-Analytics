@@ -1,18 +1,20 @@
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-md' }) {
+export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-md', align = 'center' }) {
   if (!isOpen) return null;
+
+  const alignClass = align === 'bottom' ? 'items-end justify-center pb-6' : align === 'top' ? 'items-start justify-center pt-6' : 'items-center justify-center';
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className={`fixed inset-0 z-50 flex p-4 ${alignClass}`}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-slate-900/50 dark:bg-slate-950/70 backdrop-blur-sm"
+          className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-md"
         />
         <motion.div
           initial={{ opacity: 0, scale: 0.96, y: 12 }}

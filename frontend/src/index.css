@@ -246,6 +246,38 @@
   @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-slate-50 dark:border-slate-950 hover:bg-slate-400 dark:hover:bg-slate-600;
 }
 
+/* Construction banner: infinite amber glow + gentle blink */
+@keyframes banner-glow {
+  0%, 100% {
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
+    opacity: 1;
+  }
+  50% {
+    background: linear-gradient(90deg, #fcd34d 0%, #fbbf24 50%, #fcd34d 100%);
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.55);
+    opacity: 0.82;
+  }
+}
+.banner-construction {
+  animation: banner-glow 1.8s ease-in-out infinite;
+}
+.dark .banner-construction {
+  animation: banner-glow-dark 1.8s ease-in-out infinite;
+}
+@keyframes banner-glow-dark {
+  0%, 100% {
+    background: linear-gradient(90deg, #78350f 0%, #92400e 50%, #78350f 100%);
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
+    opacity: 1;
+  }
+  50% {
+    background: linear-gradient(90deg, #92400e 0%, #b45309 50%, #92400e 100%);
+    box-shadow: 0 0 26px rgba(245, 158, 11, 0.45);
+    opacity: 0.82;
+  }
+}
+
 /* Respect users who prefer reduced motion: collapse CSS animations,
    transitions, and custom scrolling so decorative motion never causes
    unnecessary rendering/CPU work. */
