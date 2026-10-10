@@ -8,48 +8,156 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "SF Mono", "Menlo", "Consolas", "monospace"],
       },
       colors: {
-        space: {
-          950: '#070A10',
-          900: '#0B0F17',
-          800: '#101522',
-          700: '#151B29',
+        /* Semantic tokens resolve through the CSS variables defined in
+           src/styles/theme.css, so every utility follows the active theme. */
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        card: {
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
         },
-        pulse: {
-          purple: '#8B5CF6',
-          violet: '#7C6CE0',
-          green: '#48E6A1',
-          live: '#48E6A1',
-          warning: '#F59E0B',
-          error: '#EF4444',
+        popover: {
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)",
         },
+        primary: {
+          DEFAULT: "var(--primary)",
+          foreground: "var(--primary-foreground)",
+        },
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--secondary-foreground)",
+        },
+        muted: {
+          DEFAULT: "var(--muted)",
+          foreground: "var(--muted-foreground)",
+        },
+        accent: {
+          DEFAULT: "var(--accent)",
+          foreground: "var(--accent-foreground)",
+        },
+        destructive: {
+          DEFAULT: "var(--destructive)",
+          foreground: "var(--destructive-foreground)",
+        },
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
+        success: {
+          DEFAULT: "var(--success)",
+          text: "var(--success-text)",
+          soft: "var(--success-soft)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          text: "var(--warning-text)",
+          soft: "var(--warning-soft)",
+        },
+        error: {
+          DEFAULT: "var(--error)",
+          text: "var(--error-text)",
+          soft: "var(--error-soft)",
+        },
+        info: {
+          DEFAULT: "var(--info)",
+          text: "var(--info-text)",
+          soft: "var(--info-soft)",
+        },
+        live: {
+          DEFAULT: "var(--live)",
+          soft: "var(--live-soft)",
+        },
+        chart: {
+          1: "var(--chart-1)",
+          2: "var(--chart-2)",
+          3: "var(--chart-3)",
+          4: "var(--chart-4)",
+          5: "var(--chart-5)",
+          grid: "var(--chart-grid)",
+          axis: "var(--chart-axis)",
+        },
+        sidebar: "var(--sidebar-bg)",
+        header: "var(--header-bg)",
+      },
+      borderRadius: {
+        sm: "var(--radius-sm)",
+        DEFAULT: "var(--radius-control)",
+        md: "var(--radius-control)",
+        lg: "var(--radius-card)",
+        xl: "var(--radius-card)",
+        "2xl": "var(--radius-card)",
+        pill: "var(--radius-pill)",
       },
       boxShadow: {
-        soft: '0 1px 2px 0 rgb(15 23 42 / 0.05)',
-        lift: '0 8px 30px rgb(0 0 0 / 0.06)',
-        crisp: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
+        xs: "var(--shadow-xs)",
+        sm: "var(--shadow-sm)",
+        DEFAULT: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        key: "var(--shadow-key)",
+      },
+      fontSize: {
+        "2xs": ["11px", "1.45"],
+        xs: ["12px", "1.5"],
+        sm: ["13px", "1.5"],
+        base: ["14px", "1.55"],
+        md: ["15px", "1.55"],
+        lg: ["16px", "1.4"],
+        xl: ["18px", "1.35"],
+        "2xl": ["20px", "1.3"],
+        "3xl": ["24px", "1.25"],
+        "4xl": ["30px", "1.2"],
+        "5xl": ["40px", "1.15"],
+        "6xl": ["52px", "1.1"],
+      },
+      spacing: {
+        sidebar: "var(--sidebar-width)",
+        rail: "var(--sidebar-rail)",
+        header: "var(--header-height)",
+        tap: "var(--tap)",
       },
       maxWidth: {
-        '8xl': '88rem',
+        content: "var(--content-max)",
       },
-      animation: {
-        'fade-up': 'fadeUp 0.5s ease-out both',
-        'fade-in': 'fadeIn 0.4s ease-out both',
+      transitionTimingFunction: {
+        out: "cubic-bezier(0.16, 1, 0.3, 1)",
+        in: "cubic-bezier(0.7, 0, 0.84, 0)",
       },
       keyframes: {
-        fadeUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        spin: {
+          to: { transform: "rotate(360deg)" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in var(--duration) var(--ease-out) both",
+        "slide-up": "slide-up var(--duration-slow) var(--ease-out) both",
+        shimmer: "shimmer 1.5s infinite linear",
       },
     },
   },
   plugins: [],
-}
+};
