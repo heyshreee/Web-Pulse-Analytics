@@ -37,8 +37,10 @@ export const ThemeSync = () => {
         const applyDark = isDashboardPath(pathname) ? theme === 'dark' : true;
         if (applyDark) {
             root.classList.add('dark');
+            root.setAttribute('data-theme', 'dark');
         } else {
             root.classList.remove('dark');
+            root.setAttribute('data-theme', 'light');
         }
     }, [theme, pathname]);
 
