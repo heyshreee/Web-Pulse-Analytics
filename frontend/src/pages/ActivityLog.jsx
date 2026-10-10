@@ -227,13 +227,20 @@ export default function ActivityLog() {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr>
-                                    <td colSpan="10" className="px-4 py-12 text-center">
-                                        <div className="flex justify-center">
-                                            <Spinner fullScreen={false} />
-                                        </div>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-border/50 animate-pulse">
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-20" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-32" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-24" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-24" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-28" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-16" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-12" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-20" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-12" /></td>
+                                        <td className="px-4 py-3 text-right"><div className="skeleton w-16 h-5 rounded-full ml-auto" /></td>
+                                    </tr>
+                                ))
                             ) : logs.length === 0 ? (
                                 <tr>
                                     <td colSpan="10" className="px-4 py-12 text-center">

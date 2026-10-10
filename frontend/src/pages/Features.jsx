@@ -62,16 +62,16 @@ export default function Features() {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
+        <div className="min-h-screen font-sans transition-colors duration-300" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
+            <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-border">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
+                    <Link to="/" className="flex items-center gap-2 hover:underline" style={{ color: 'var(--muted-foreground)' }}>
                         <ArrowLeft className="h-4 w-4" />
                         <span className="font-medium text-sm">Back to Home</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <Link to="/pricing" className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</Link>
-                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
+                        <Link to="/pricing" className="btn btn--ghost btn--sm">Pricing</Link>
+                        <Link to="/register" className="btn btn--primary btn--sm">Get Started</Link>
                     </div>
                 </div>
             </header>
@@ -117,7 +117,7 @@ export default function Features() {
                         <p className="page-sub !text-base mt-3 max-w-xl mx-auto">
                             Start tracking your first project with WebPulse.
                         </p>
-                        <Link to="/register" className="btn-primary btn-lg mt-6">
+                        <Link to="/register" className="btn btn--primary mt-6">
                             Start Tracking
                             <ArrowRight className="h-4 w-4" />
                         </Link>

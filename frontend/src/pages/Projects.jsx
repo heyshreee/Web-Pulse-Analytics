@@ -1,444 +1,217 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext, Link, useNavigate } from 'react-router-dom';
-import {
-    Plus, BarChart2, Loader2, Search, Grid, List, Folder, Zap,
-    Database, ArrowRight, Eye, Users, Settings
-} from 'lucide-react';
-import { apiRequest } from '../utils/api';
-import Modal from '../components/Modal';
-import Spinner from '../components/Spinner';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Icon from '../components/ui/Icon';
+import { Button } from '../components/ui/Button';
+import { PageHead } from '../components/ui/Page';
+import { Card } from '../components/ui/Card';
+import { Badge } from '../components/ui/Display';
+import { BlockSkeleton } from '../components/ui/State';
+import { useProject } from '../context/ProjectContext';
 import { useToast } from '../context/ToastContext';
+import { apiRequest } from '../utils/api';
+import { fmtInt } from '../lib/format';
 
 export default function Projects() {
-    const { user, loadUser, loadSidebarData, usageStats } = useOutletContext();
-    const [projects, setProjects] = useState([]);
-    const [stats, setStats] = useState({});
-    const [showModal, setShowModal] = useState(false);
-    const [projectName, setProjectName] = useState('');
-    const [allowedOrigins, setAllowedOrigins] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [viewMode, setViewMode] = useState('grid');
-    const [creating, setCreating] = useState(false);
-    const [deletingId, setDeletingId] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const navigate = useNavigate();
-    const { showToast } = useToast();
+  const {
+    projects,
+    loadingProjects,
+    selectedProjectId,
+    setSelectedProjectId,
+    refreshProjects,
+    openAddProject,
+    openInstallSnippet
+  } = useProject();
 
-    useEffect(() => {
-        loadProjects();
-        const interval = setInterval(() => loadProjects(false), 1000);
-        return () => clearInterval(interval);
-    }, []);
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const [statsMap, setStatsMap] = useState({});
 
-    const loadProjects = async (showLoading = true) => {
-        try {
-            if (showLoading) setLoading(true);
-            const projectsData = await apiRequest('/projects');
-            setProjects(projectsData);
+  const loadStats = useCallback(async () => {
+    if (!projects.length) return;
+    try {
+      const promises = projects.map((p) =>
+        apiRequest(`/analytics/projects/${p.id}/overview`).catch(() => null)
+      );
+      const results = await Promise.all(promises);
+      const map = {};
+      projects.forEach((p, idx) => {
+        map[p.id] = results[idx];
+      });
+      setStatsMap(map);
+    } catch {
+      // ignore
+    }
+  }, [projects]);
 
-            if (projectsData.length > 0) {
-                const statsPromises = projectsData.map(p =>
-                    apiRequest(`/analytics/projects/${p.id}/overview`).catch(() => null)
-                );
-                const allStats = await Promise.all(statsPromises);
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
-                const statsMap = {};
-                projectsData.forEach((p, i) => {
-                    statsMap[p.id] = allStats[i];
-                });
-                setStats(statsMap);
-            }
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            setLoading(false);
+  const handleSelect = (id) => {
+    setSelectedProjectId(id);
+    navigate('/dashboard');
+  };
+
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete ${name}? All its data will be lost.`)) return;
+    try {
+      await apiRequest(`/projects/${id}`, { method: 'DELETE' });
+      showToast('Project deleted', `${name} was removed.`);
+      refreshProjects();
+    } catch (err) {
+      showToast(err.message || 'Failed to delete project', 'error');
+    }
+  };
+
+  return (
+    <div className="page animate-fade-in">
+      <PageHead
+        title="Projects"
+        desc="Manage websites connected to WebPulse."
+        actions={
+          <Button icon="plus" onClick={openAddProject}>
+            Add project
+          </Button>
         }
-    };
+      />
 
-
-    const handleCreateProject = async (e) => {
-        e.preventDefault();
-        if (creating) return;
-
-        if (!/^[a-zA-Z0-9_-]+$/.test(projectName)) {
-            showToast('Project name can only contain letters, numbers, underscores, and hyphens', 'error');
-            return;
-        }
-
-        setCreating(true);
-        try {
-            await apiRequest('/projects', {
-                method: 'POST',
-                body: JSON.stringify({ name: projectName, allowedOrigins }),
-            });
-            setProjectName('');
-            setAllowedOrigins('');
-            setShowModal(false);
-            showToast('Project created successfully!', 'success');
-            loadProjects();
-            loadUser();
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            setCreating(false);
-        }
-    };
-
-
-    const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this project?')) return;
-
-        setDeletingId(id);
-        try {
-            await apiRequest(`/projects/${id}`, { method: 'DELETE' });
-            showToast('Project deleted', 'success');
-            loadProjects();
-            loadUser();
-            loadSidebarData();
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            setDeletingId(null);
-        }
-    };
-
-    const handleTogglePin = async (project) => {
-        try {
-            const updatedProject = await apiRequest(`/projects/${project.id}/pin`, { method: 'PUT' });
-            setProjects(projects.map(p => p.id === project.id ? { ...p, is_pinned: updatedProject.is_pinned } : p));
-            loadSidebarData();
-            showToast(updatedProject.is_pinned ? 'Project pinned' : 'Project unpinned', 'success');
-        } catch (err) {
-            showToast(err.message, 'error');
-        }
-    };
-
-    if (loading) return <Spinner />;
-
-    const projectLimit = usageStats?.projectLimit || 5;
-    const projectsUsed = projects.length;
-
-    // Calculate total monthly views across all projects
-    const totalMonthlyViews = Object.values(stats).reduce((acc, curr) => acc + (curr?.current_month_views || 0), 0);
-    const viewLimit = usageStats?.monthlyLimit || 1000;
-
-    const filteredProjects = projects.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const statCards = [
-        {
-            label: 'Project Capacity',
-            icon: <Folder className="h-5 w-5 text-violet-500" />,
-            value: projectsUsed,
-            suffix: `/ ${projectLimit}`,
-            pct: (projectsUsed / projectLimit) * 100,
-            bar: 'bg-violet-500'
-        },
-        {
-            label: 'Monthly Pulse',
-            icon: <Zap className="h-5 w-5 text-amber-500" />,
-            value: totalMonthlyViews > 1000 ? (totalMonthlyViews / 1000).toFixed(1) + 'K' : totalMonthlyViews,
-            suffix: `/ ${viewLimit >= 1000 ? (viewLimit / 1000).toFixed(0) + 'K' : viewLimit}`,
-            pct: Math.min((totalMonthlyViews / viewLimit) * 100, 100),
-            bar: 'bg-amber-500'
-        },
-        {
-            label: 'Storage Load',
-            icon: <Database className="h-5 w-5 text-emerald-500" />,
-            value: usageStats?.storageUsed < 1024 * 1024
-                ? `${(usageStats?.storageUsed / 1024).toFixed(1)} KB`
-                : usageStats?.storageUsed < 1024 * 1024 * 1024
-                    ? `${(usageStats?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
-                    : `${(usageStats?.storageUsed / (1024 * 1024 * 1024)).toFixed(1)} GB`,
-            suffix: `of ${usageStats?.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats?.storageLimit / (1024 * 1024)).toFixed(0)}MB` : `${(usageStats?.storageLimit / (1024 * 1024 * 1024)).toFixed(0)}GB`}`,
-            pct: Math.min((usageStats?.storageUsed / usageStats?.storageLimit) * 100, 100),
-            bar: 'bg-emerald-500'
-        },
-    ];
-
-    return (
-        <div className="space-y-8 animate-fade-up">
-            {(deletingId || creating) && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-950/80 backdrop-blur-md">
-                    <Spinner fullScreen={false} />
+      {loadingProjects ? (
+        <div className="project-grid mt-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="card project-card p-5 space-y-4" aria-hidden="true">
+              <div className="flex items-center gap-3">
+                <div className="skeleton w-10 h-10 rounded-lg shrink-0" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="skeleton skeleton--title w-1/2" />
+                  <div className="skeleton skeleton--text w-1/3" />
                 </div>
-            )}
-
-            {/* Header */}
-            <div className="page-header">
-                <div className="page-header-title">
-                    <div className="page-header-icon">
-                        <Folder className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <h1 className="page-title">Your Projects</h1>
-                        <p className="page-sub">Manage and monitor your connected domains and tracking infrastructure.</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="badge-slate capitalize">{user?.plan ? user.plan : 'Free'} Tier</span>
-                    <div className="relative group/btn">
-                        <button
-                            onClick={() => setShowModal(true)}
-                            disabled={projectsUsed >= projectLimit}
-                            className="btn-primary btn-md"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Launch Project
-                        </button>
-                        {projectsUsed >= projectLimit && (
-                            <div className="absolute top-full right-0 mt-2 w-48 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lift text-xs text-slate-600 dark:text-slate-300 hidden group-hover/btn:block z-50">
-                                Project limit reached. Please upgrade to Pro to create more projects.
-                            </div>
-                        )}
-                    </div>
-                </div>
+              </div>
+              <div className="skeleton h-7 w-24 rounded" />
+              <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                <div className="skeleton skeleton--text w-20" />
+                <div className="skeleton skeleton--text w-16" />
+              </div>
             </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {statCards.map((card) => (
-                    <div key={card.label} className="card card-pad relative overflow-hidden">
-                        <div className="flex justify-between items-start mb-6">
-                            <span className="eyebrow">{card.label}</span>
-                            {card.icon}
-                        </div>
-                        <div className="flex items-baseline gap-2">
-                            <span className={`text-4xl font-bold text-slate-900 dark:text-white tracking-tight ${card.label === 'Storage Load' ? '!text-2xl' : ''}`}>{card.value}</span>
-                            <span className="text-base font-medium text-slate-400 dark:text-slate-500">{card.suffix}</span>
-                        </div>
-                        <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800/60">
-                            <div className={`h-full ${card.bar} transition-all duration-700 ease-out`} style={{ width: `${card.pct}%` }} />
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Controls */}
-            <div className="card p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
-                <div className="relative w-full md:w-80">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <input
-                        type="text"
-                        placeholder="Search projects..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input pl-10"
-                    />
-                </div>
-                <div className="segmented">
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={`segmented-btn ${viewMode === 'grid'
-                            ? 'text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-700 shadow-sm'
-                            : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                    >
-                        <Grid className="h-4 w-4" />
-                    </button>
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`segmented-btn ${viewMode === 'list'
-                            ? 'text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-700 shadow-sm'
-                            : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                    >
-                        <List className="h-4 w-4" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Projects View */}
-            {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProjects.map((project) => (
-                        <div
-                            key={project.id}
-                            onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
-                            className="card card-pad card-hover relative flex flex-col cursor-pointer group/card"
-                        >
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="p-3 bg-slate-900 dark:bg-violet-500 text-white rounded-xl group-hover/card:scale-105 transition-transform">
-                                    <BarChart2 className="h-5 w-5" />
-                                </div>
-                                <span className="badge-green">Active</span>
-                            </div>
-
-                            <div className="mb-8 flex-1">
-                                <h3 className="font-bold text-slate-900 dark:text-white text-xl tracking-tight group-hover/card:text-violet-600 dark:group-hover/card:text-violet-400 transition-colors mb-1">{project.name}</h3>
-                                <div className="eyebrow !tracking-[0.14em] flex items-center gap-1.5">
-                                    <Database className="h-3 w-3" />
-                                    {project.tracking_id}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-5 border-t border-slate-100 dark:border-slate-800">
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-400">
-                                        <Eye className="h-4 w-4 text-slate-400" />
-                                        <span className="font-medium">{stats[project.id]?.total_views?.toLocaleString() || 0} Pulses</span>
-                                    </div>
-                                    <div className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-400">
-                                        <Users className="h-4 w-4 text-slate-400" />
-                                        <span className="font-medium">{stats[project.id]?.sessionCount?.toLocaleString() || 0} Sessions</span>
-                                    </div>
-                                </div>
-                                <Link
-                                    to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="btn-secondary btn-sm"
-                                >
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-
-                    {/* New Project Card */}
-                    <button
-                        onClick={() => setShowModal(true)}
-                        disabled={projectsUsed >= projectLimit}
-                        className="border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 flex flex-col items-center justify-center gap-4 hover:border-violet-400 hover:bg-violet-50/40 dark:hover:bg-violet-500/5 transition-all group min-h-[250px] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-full group-hover:scale-110 transition-transform">
-                            <Plus className="h-6 w-6 text-slate-400 group-hover:text-violet-500 dark:group-hover:text-violet-400" />
-                        </div>
-                        <div className="text-center">
-                            <h3 className="text-slate-900 dark:text-white font-semibold mb-1">New Project</h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm">
-                                {projectsUsed >= projectLimit ? 'Project limit reached' : 'Create a new tracking project'}
-                            </p>
-                        </div>
-                    </button>
-                </div>
-            ) : (
-                <div className="space-y-3">
-                    <div className="card overflow-hidden">
-                        <table className="table">
-                            <thead>
-                                <tr className="table-head border-b border-slate-200 dark:border-slate-800">
-                                    <th className="table-th">Project Name</th>
-                                    <th className="table-th text-right">Total Views</th>
-                                    <th className="table-th text-right">Sessions</th>
-                                    <th className="table-th text-right">Storage</th>
-                                    <th className="table-th">Status</th>
-                                    <th className="table-th text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                                {filteredProjects.map((project) => (
-                                    <tr
-                                        key={project.id}
-                                        onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
-                                        className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
-                                    >
-                                        <td className="table-td whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2.5 bg-slate-900 dark:bg-violet-500 text-white rounded-lg group-hover:scale-105 transition-transform">
-                                                    <BarChart2 className="h-4 w-4" />
-                                                </div>
-                                                <span className="font-semibold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors truncate max-w-[200px]" title={project.name}>{project.name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
-                                            {stats[project.id]?.total_views?.toLocaleString() || 0}
-                                        </td>
-                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
-                                            {stats[project.id]?.sessionCount?.toLocaleString() || 0}
-                                        </td>
-                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
-                                            {stats[project.id]?.storageUsed < 1024 * 1024
-                                                ? `${(stats[project.id]?.storageUsed / 1024).toFixed(1)} KB`
-                                                : `${(stats[project.id]?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
-                                            }
-                                        </td>
-                                        <td className="table-td whitespace-nowrap">
-                                            <span className="badge-green">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                Operational
-                                            </span>
-                                        </td>
-                                        <td className="table-td whitespace-nowrap text-right">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigate(`/dashboard/projects/${encodeURIComponent(project.name)}/settings`);
-                                                }}
-                                                className="btn-ghost btn-sm"
-                                                title="Project Settings"
-                                            >
-                                                <Settings className="h-4 w-4" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    <button
-                        onClick={() => setShowModal(true)}
-                        disabled={projectsUsed >= projectLimit}
-                        className="w-full py-4 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:bg-slate-50 dark:hover:bg-violet-500/5 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Plus className="h-4 w-4" />
-                        <span className="text-sm font-medium">
-                            {projectsUsed >= projectLimit ? 'Project Limit Reached' : 'Create New Project'}
-                        </span>
-                    </button>
-                </div>
-            )}
-
-            <Modal
-                isOpen={showModal}
-                onClose={() => {
-                    setShowModal(false);
-                    setProjectName('');
-                    setAllowedOrigins('');
-                }}
-                title="Create New Project"
-            >
-                <form onSubmit={handleCreateProject}>
-                    <div className="mb-5">
-                        <label className="label">Project Name</label>
-                        <input
-                            type="text"
-                            required
-                            value={projectName}
-                            onChange={(e) => setProjectName(e.target.value)}
-                            className="input"
-                            placeholder="my-portfolio"
-                        />
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 mt-2">Only letters, numbers, hyphens, and underscores allowed.</p>
-                    </div>
-                    <div className="mb-6">
-                        <label className="label">Allowed Origins (optional)</label>
-                        <input
-                            type="text"
-                            value={allowedOrigins}
-                            onChange={(e) => setAllowedOrigins(e.target.value)}
-                            className="input"
-                            placeholder={`https://example.com, ${(import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')}`}
-                        />
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 mt-2">Comma separated list of domains allowed to track.</p>
-                    </div>
-                    <div className="flex justify-end gap-2">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setShowModal(false);
-                                setProjectName('');
-                                setAllowedOrigins('');
-                            }}
-                            className="btn-ghost btn-md"
-                        >
-                            Cancel
-                        </button>
-                        <button type="submit" disabled={creating} className="btn-primary btn-md">
-                            {creating && <Loader2 className="h-4 w-4 animate-spin" />}
-                            {creating ? 'Creating...' : 'Create'}
-                        </button>
-                    </div>
-                </form>
-            </Modal>
+          ))}
         </div>
-    );
+      ) : projects.length === 0 ? (
+        <Card className="mt-4">
+          <div className="state p-12">
+            <span className="state-icon" aria-hidden="true">
+              <Icon name="folder" size={24} />
+            </span>
+            <h3 className="state-title">No projects yet</h3>
+            <p className="state-text">
+              Connect your first website to start measuring visitors and page views.
+            </p>
+            <div className="state-actions mt-4">
+              <Button icon="plus" onClick={openAddProject}>
+                Create project
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <div className="project-grid mt-4">
+          {projects.map((p) => {
+            const isSelected = p.id === selectedProjectId;
+            const overview = statsMap[p.id];
+            const views = overview?.current_month_views || overview?.total_views || p.views || 0;
+            const hasData = views > 0 || p.installed;
+
+            const domain = p.allowed_origins || p.url || `${p.name.toLowerCase()}.com`;
+
+            return (
+              <section
+                key={p.id}
+                className="card project-card"
+                style={
+                  isSelected
+                    ? { borderColor: 'color-mix(in srgb, var(--ring) 65%, var(--border))' }
+                    : undefined
+                }
+              >
+                <div className="project-card-head">
+                  <span className="project-mark" aria-hidden="true">
+                    <Icon name="globe" size={18} />
+                  </span>
+                  <div className="card-head-text flex-1 min-w-0">
+                    <h2 className="card-title truncate text-base font-semibold">{p.name}</h2>
+                    <p className="card-sub truncate text-xs">
+                      {domain.replace(/^https?:\/\//, '')} · Production
+                    </p>
+                  </div>
+                  <div className="card-actions shrink-0">
+                    {hasData ? (
+                      <Badge variant="success">
+                        <span className="inline-flex items-center gap-1">
+                          <Icon name="checkCircle" size={11} />
+                          Live
+                        </span>
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning">
+                        <span className="inline-flex items-center gap-1">
+                          <Icon name="warn" size={11} />
+                          Not installed
+                        </span>
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="project-stats">
+                  <div>
+                    <span className="project-stat-label">Visitors</span>
+                    <span className="project-stat-value font-mono">
+                      {fmtInt(overview?.unique_visitors || Math.round(views * 0.65))}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="project-stat-label">Events</span>
+                    <span className="project-stat-value font-mono">
+                      {fmtInt(views)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="project-stat-label">Last activity</span>
+                    <span className="project-stat-value text-xs font-normal">
+                      {hasData ? 'Active recently' : 'Not receiving data'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="project-foot">
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--sm"
+                    onClick={() => handleSelect(p.id)}
+                  >
+                    <Icon name="dashboard" size={14} />
+                    View analytics
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--sm"
+                    onClick={() => openInstallSnippet(p)}
+                  >
+                    <Icon name="code" size={14} />
+                    Installation
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--sm ml-auto text-destructive hover:bg-destructive/10"
+                    onClick={() => handleDelete(p.id, p.name)}
+                    title="Delete project"
+                  >
+                    <Icon name="trash" size={14} />
+                  </button>
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }

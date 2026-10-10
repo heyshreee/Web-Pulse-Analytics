@@ -165,9 +165,9 @@ export default function API() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
+        <div className="min-h-screen font-sans transition-colors duration-300" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
             {/* Header */}
-            <header className="fixed top-0 w-full z-[60] bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
+            <header className="fixed top-0 w-full z-[60] bg-background/80 backdrop-blur-xl border-b border-border">
                 <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-10 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button

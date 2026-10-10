@@ -109,13 +109,13 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
 
     return (
         <div className="w-full">
-            <div className="text-center mb-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-500/10 mx-auto mb-5">
-                    <Mail className="h-6 w-6 text-violet-500" />
+            <div className="text-center mb-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl mx-auto mb-4" style={{ background: 'var(--accent)', color: 'var(--primary)' }}>
+                    <Mail className="h-6 w-6" />
                 </div>
-                <h2 className="page-title !text-2xl mb-2">Verify your email</h2>
-                <p className="page-sub">
-                    We sent a code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>.<br />
+                <h2 className="auth-title !text-2xl mb-2">Verify your email</h2>
+                <p className="auth-desc">
+                    We sent a code to <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{email}</span>.<br />
                     Please enter the 6-digit code below to continue.
                 </p>
             </div>
@@ -127,12 +127,19 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                             key={index}
                             ref={el => inputRefs.current[index] = el}
                             type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             maxLength={1}
                             value={digit}
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             onPaste={handlePaste}
-                            className="w-12 h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-xl font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                            className="w-12 h-14 text-center text-xl font-semibold rounded-xl transition-all"
+                            style={{
+                                background: 'var(--background)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--foreground)'
+                            }}
                         />
                     ))}
                 </div>
@@ -140,26 +147,38 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <button
                     type="submit"
                     disabled={loading || otp.join('').length !== 6}
-                    className="btn-primary btn-lg w-full"
+                    className="btn btn--block"
+                    style={{ minHeight: '44px', fontWeight: 600 }}
                 >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                     {loading ? 'Verifying...' : 'Verify account'}
                 </button>
             </form>
 
-            <div className="mt-6 text-center space-y-4">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-6 text-center space-y-3">
+                <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                     Didn't receive the code?{' '}
-                    <button onClick={handleResend} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline underline-offset-4 transition-colors">
+                    <button
+                        type="button"
+                        onClick={handleResend}
+                        className="font-semibold hover:underline underline-offset-4 transition-colors"
+                        style={{ color: 'var(--primary)' }}
+                    >
                         Resend code
                     </button>
                 </p>
 
                 {onBack && (
-                    <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to login
-                    </button>
+                    <div>
+                        <button
+                            type="button"
+                            onClick={onBack}
+                            className="btn btn--ghost btn--sm"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to login
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

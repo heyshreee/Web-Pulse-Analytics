@@ -18,7 +18,6 @@ import {
   Activity,
   Fingerprint,
   Trash2,
-  Loader2,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import ChartPreview from '../components/landing/ChartPreview';
@@ -30,29 +29,45 @@ import CodeSnippet from '../components/landing/CodeSnippet';
 const HeroGlobe = lazy(() => import('../components/landing/HeroGlobe'));
 const LiveEventStream = lazy(() => import('../components/landing/LiveEventStream'));
 
-// Delayed "still working" indicator: stays invisible while chunks load quickly
-// and only fades in when a lazy visual takes noticeably longer than expected.
-function StillWorkingIndicator({ delay = 2000, label = 'Still working…' }) {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setShow(true), delay);
-    return () => clearTimeout(t);
-  }, [delay]);
-
-  if (!show) return null;
-
-  return (
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
-      <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass-obs">
-        <Loader2 className="h-4 w-4 text-violet-500 animate-spin" />
-        <span className="text-xs font-medium text-slate-600 dark:text-slate-300 animate-pulse">
-          {label}
-        </span>
+const GlobeFallback = () => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+    <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full border border-primary/20 flex items-center justify-center">
+      <div className="absolute inset-4 rounded-full border border-dashed border-primary/25 animate-[spin_30s_linear_infinite]" />
+      <div className="absolute inset-12 rounded-full border border-primary/20" />
+      <div className="absolute inset-20 rounded-full bg-primary/5 animate-pulse" />
+      <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+        <svg className="w-6 h-6 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20" />
+        </svg>
       </div>
     </div>
-  );
-}
+    <span className="mt-4 text-[11px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
+      </span>
+      Streaming globe telemetry…
+    </span>
+  </div>
+);
+
+const EventStreamSkeleton = () => (
+  <div className="space-y-3">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 animate-pulse">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-full bg-muted" />
+          <div className="space-y-1">
+            <div className="w-24 h-3 bg-muted rounded" />
+            <div className="w-16 h-2 bg-muted/60 rounded" />
+          </div>
+        </div>
+        <div className="w-12 h-3 bg-muted rounded" />
+      </div>
+    ))}
+  </div>
+);
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -284,7 +299,7 @@ export default function Landing() {
 
       {/* ============ NAVBAR ============ */}
       <header className="fixed top-0 left-0 right-0 z-[60]">
-        <div className="bg-white/85 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
+        <div className="bg-white/85 dark:bg-[#0B0F17]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Logo />
 
@@ -316,7 +331,7 @@ export default function Landing() {
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden bg-white/95 dark:bg-space-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07] px-4 py-4 space-y-1">
+          <div className="md:hidden bg-white/95 dark:bg-[#0B0F17]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07] px-4 py-4 space-y-1">
             {navLinks.map((l) => (
               <Link key={l.label} to={l.to} className="block px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white font-medium">
                 {l.label}
@@ -388,7 +403,7 @@ export default function Landing() {
               <div ref={globeWrapRef} className="relative order-first lg:order-last">
                 <div className="relative mx-auto w-full max-w-[560px] aspect-square">
                   {sceneDone && (
-                    <Suspense fallback={<StillWorkingIndicator delay={2000} />}>
+                    <Suspense fallback={<GlobeFallback />}>
                       <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
                     </Suspense>
                   )}
@@ -591,7 +606,7 @@ export default function Landing() {
               </div>
             </div>
             <div data-reveal>
-              <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/80 p-5 min-h-[320px]">
+              <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-5 min-h-[320px]">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
@@ -602,7 +617,7 @@ export default function Landing() {
                   </div>
                   <span className="metric-num text-xs text-slate-500 dark:text-slate-400">12,842</span>
                 </div>
-                <Suspense fallback={null}>
+                <Suspense fallback={<EventStreamSkeleton />}>
                   <LiveEventStream maxItems={7} />
                 </Suspense>
               </div>
@@ -636,8 +651,8 @@ export default function Landing() {
               </div>
 
               <div className="relative" data-reveal>
-                <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 overflow-hidden">
-                  <div className="h-10 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-space-950">
+                <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card overflow-hidden">
+                  <div className="h-10 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-card">
                     <div className="flex gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -654,7 +669,7 @@ export default function Landing() {
                   />
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 p-4">
+                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
@@ -1074,7 +1089,7 @@ function FeatureVisual({ f }) {
 
 function GeoVisual() {
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">Active visitors by country</div>
       <div className="space-y-4">
         {TOP_LOCATIONS.map((r) => (
@@ -1101,7 +1116,7 @@ function GeoVisual() {
 function FlowVisual() {
   const levels = ['Landing page', 'Features', 'Pricing', 'Checkout'];
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Visitor flow</div>
       <div className="relative pl-4">
         {levels.map((l, i) => (
@@ -1133,7 +1148,7 @@ function AcqVisual() {
     { l: 'Other', v: 9, c: '#94A3B8' },
   ];
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Where visitors come from</div>
       {rows.map((r) => (
         <div key={r.l} className="flex items-center gap-3 py-2">
@@ -1156,7 +1171,7 @@ function AcqVisual() {
 function PipelineVisual() {
   const steps = ['Visitors', 'Events', 'Patterns', 'Insights', 'Decisions'];
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Intelligence pipeline</div>
       <div className="flex flex-col items-center gap-1">
         {steps.map((s, i) => (
