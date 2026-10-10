@@ -17,5 +17,6 @@ router.put('/:id', projectController.updateProject);
 router.delete('/:id', projectController.deleteProject);
 router.put('/:id/pin', projectController.togglePin);
 router.post('/:id/regenerate-token', projectController.regenerateShareToken);
+router.get('/:id/verify', projectController.verifyProjectInstallation);
 
 export default router;

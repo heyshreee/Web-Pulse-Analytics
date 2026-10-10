@@ -824,6 +824,47 @@ export const getProjectPages = asyncHandler(async (req, res) => {
     res.json(topPages);
 });
 
+export const verifyProjectInstallation = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    let query = supabase.from('projects').select('id, name, tracking_id').eq('user_id', userId);
+    if (isUuid(id)) {
+        query = query.eq('id', id);
+    } else if (id.startsWith('trk_')) {
+        query = query.eq('tracking_id', id);
+    } else {
+        query = query.eq('name', id);
+    }
+
+    const { data: project } = await query.maybeSingle();
+    if (!project) throw AppError.notFound('Project not found');
+
+    const [{ count: viewsCount }, { count: visitorsCount }, { data: lastView }] = await Promise.all([
+        supabase.from('page_views').select('*', { count: 'exact', head: true }).eq('project_id', project.id),
+        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', project.id),
+        supabase.from('page_views').select('created_at').eq('project_id', project.id).order('created_at', { ascending: false }).limit(1).maybeSingle()
+    ]);
+
+    const totalEvents = (viewsCount || 0) + (visitorsCount || 0);
+    const verified = totalEvents > 0;
+
+    res.json({
+        verified,
+        project: {
+            id: project.id,
+            name: project.name,
+            trackingId: project.tracking_id
+        },
+        views: viewsCount || 0,
+        visitors: visitorsCount || 0,
+        lastSeen: lastView?.created_at || null,
+        message: verified
+            ? 'Project is verified and reporting live analytics.'
+            : 'No events received yet. Verify the snippet is added and reload your website.'
+    });
+});
+
 export default {
     createProject,
     getProjects,
@@ -836,5 +877,6 @@ export default {
     getProjectStats,
     togglePin,
     getProjectActivity,
-    getProjectPages
+    getProjectPages,
+    verifyProjectInstallation
 };
