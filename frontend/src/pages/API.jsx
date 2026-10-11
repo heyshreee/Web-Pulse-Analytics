@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import {
     Terminal, Copy, Check, Shield,
-    Zap, Code2, Activity, Menu, X,
+    Zap, Code2, Menu, X,
     ChevronRight, BookOpen, Lock, Server,
-    ArrowRight, ArrowDown, KeyRound
+    ArrowRight, ArrowDown, KeyRound, Globe, ArrowUpRight
 } from 'lucide-react';
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -22,34 +22,34 @@ const CodeBlock = ({ code, language = 'javascript', title }) => {
     };
 
     return (
-        <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 text-white my-8 shadow-lift">
-            <div className="flex items-center justify-between px-4 py-3 bg-slate-800/70 border-b border-slate-700">
+        <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/[0.08] bg-[#0A0E17] text-white my-6 shadow-xl">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900/80 border-b border-white/[0.06]">
                 <div className="flex items-center gap-3">
                     <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
-                        <div className="w-3 h-3 rounded-full bg-amber-500/60"></div>
-                        <div className="w-3 h-3 rounded-full bg-emerald-500/60"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
                     </div>
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-slate-400 ml-2">{title || language}</span>
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-slate-400 ml-1 font-mono">{title || language}</span>
                 </div>
                 <button
                     onClick={handleCopy}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all border border-transparent hover:border-white/10"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-white transition-all text-xs font-medium"
                 >
                     {copied ? (
                         <>
-                            <Check className="h-3.5 w-3.5 text-emerald-400" />
-                            <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">Copied</span>
+                            <Check className="h-3 w-3 text-emerald-400" />
+                            <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">Copied</span>
                         </>
                     ) : (
                         <>
-                            <Copy className="h-3.5 w-3.5" />
-                            <span className="text-[10px] font-semibold uppercase tracking-widest">Copy Code</span>
+                            <Copy className="h-3 w-3" />
+                            <span className="text-[10px] font-semibold uppercase tracking-wider">Copy</span>
                         </>
                     )}
                 </button>
             </div>
-            <div className="p-6 overflow-x-auto bg-slate-900">
+            <div className="p-5 overflow-x-auto bg-[#070A10]">
                 <SyntaxHighlighter
                     language={language}
                     style={atomDark}
@@ -57,8 +57,8 @@ const CodeBlock = ({ code, language = 'javascript', title }) => {
                         background: 'transparent',
                         padding: 0,
                         margin: 0,
-                        fontSize: '14px',
-                        lineHeight: '1.8',
+                        fontSize: '13px',
+                        lineHeight: '1.7',
                         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
                         fontWeight: '500'
                     }}
@@ -72,14 +72,11 @@ const CodeBlock = ({ code, language = 'javascript', title }) => {
 };
 
 const Section = ({ id, title, children, icon: Icon }) => (
-    <section
-        id={id}
-        className="mb-20 scroll-mt-24"
-    >
-        <div className="flex items-center gap-4 mb-8">
+    <section id={id} className="mb-20 scroll-mt-24">
+        <div className="flex items-center gap-3.5 mb-6">
             {Icon && (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                    <Icon className="h-5 w-5 text-violet-500" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 border border-violet-500/20">
+                    <Icon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
                 </div>
             )}
             <h2 className="text-2xl font-display font-bold tracking-tight text-slate-900 dark:text-white">{title}</h2>
@@ -91,10 +88,10 @@ const Section = ({ id, title, children, icon: Icon }) => (
 );
 
 const FlowBox = ({ label, tone = 'light' }) => (
-    <div className={`rounded-xl px-4 py-2.5 text-center text-xs font-semibold border ${
+    <div className={`rounded-xl px-4 py-2 text-center text-xs font-semibold border ${
         tone === 'dark'
-            ? 'bg-slate-900 dark:bg-violet-500 border-slate-800 dark:border-violet-400 text-white'
-            : 'bg-violet-50 dark:bg-violet-500/10 border-violet-100 dark:border-violet-500/20 text-violet-600 dark:text-violet-400'
+            ? 'bg-slate-900 text-white border-slate-800'
+            : 'bg-violet-500/10 border-violet-500/20 text-violet-700 dark:text-violet-300'
     }`}>
         {label}
     </div>
@@ -113,21 +110,18 @@ const navItems = [
     { id: 'auth', label: 'Authentication', icon: Lock },
     { id: 'endpoints', label: 'API Endpoints', icon: Server },
     { id: 'track-events', label: 'Track Events', icon: ChevronRight, nested: true },
-    { id: 'analytics', label: 'Analytics', icon: ChevronRight, nested: true },
-    { id: 'tracker', label: 'Tracker', icon: Code2 },
-    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'analytics', label: 'Analytics API', icon: ChevronRight, nested: true },
+    { id: 'tracker', label: 'Client Tracker', icon: Code2 },
+    { id: 'security', label: 'Security & Origins', icon: Shield },
 ];
 
 export default function API() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('overview');
-    const [indicator, setIndicator] = useState(null);
-    const navRef = useRef(null);
-    const itemRefs = useRef({});
 
     useEffect(() => {
         const handleScroll = () => {
-            const cutoff = 140;
+            const cutoff = 150;
             let current = 'overview';
             navItems.forEach((item) => {
                 const el = document.getElementById(item.id);
@@ -143,19 +137,6 @@ export default function API() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useLayoutEffect(() => {
-        const btn = itemRefs.current[activeSection];
-        const nav = navRef.current;
-        if (btn && nav) {
-            const navRect = nav.getBoundingClientRect();
-            const btnRect = btn.getBoundingClientRect();
-            setIndicator({
-                top: btnRect.top - navRect.top,
-                height: btnRect.height
-            });
-        }
-    }, [activeSection]);
-
     const scrollTo = (id) => {
         const el = document.getElementById(id);
         if (el) {
@@ -165,411 +146,332 @@ export default function API() {
     };
 
     return (
-        <div className="min-h-screen font-sans transition-colors duration-300" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
-            {/* Header */}
-            <header className="fixed top-0 w-full z-[60] bg-background/80 backdrop-blur-xl border-b border-border">
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-10 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 relative selection:bg-violet-500/30 selection:text-violet-200">
+            {/* Ambient Background Grid & Glow */}
+            <div className="pointer-events-none fixed inset-0 z-0 obs-grid opacity-70" />
+            <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-violet-600/10 via-fuchsia-600/5 to-transparent blur-3xl -z-10" />
+
+            {/* Navigation Header */}
+            <header className="fixed top-0 w-full z-50 bg-white/85 dark:bg-[#0B0F17]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="lg:hidden p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg"
                         >
-                            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                         </button>
                         <Logo />
+                        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+                            <Link to="/features" className="hover:text-slate-900 dark:hover:text-white transition-colors">Features</Link>
+                            <Link to="/integrations" className="hover:text-slate-900 dark:hover:text-white transition-colors">Integrations</Link>
+                            <Link to="/api" className="text-violet-600 dark:text-violet-400 font-semibold">API</Link>
+                            <Link to="/docs" className="hover:text-slate-900 dark:hover:text-white transition-colors">Docs</Link>
+                            <Link to="/pricing" className="hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</Link>
+                            <Link to="/blog" className="hover:text-slate-900 dark:hover:text-white transition-colors">Blog</Link>
+                        </nav>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="hidden md:flex items-center gap-2 badge-green">
+                    <div className="flex items-center gap-3">
+                        <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold font-mono">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest">API Operational</span>
+                            API Operational
                         </div>
-                        <Link to="/dashboard" className="btn-secondary btn-md">
-                            Go to Console
+                        <Link to="/dashboard" className="btn-signal btn-md">
+                            Console
                         </Link>
                     </div>
                 </div>
             </header>
 
-            <div className="max-w-[1400px] mx-auto flex">
-                {/* Sidebar */}
+            <div className="max-w-[1400px] mx-auto flex relative z-10">
+                {/* Sticky Sidebar Navigation */}
                 <aside className={`
-                    fixed lg:sticky top-16 h-[calc(100vh-64px)] w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 z-50 transition-all duration-500
-                    ${sidebarOpen ? 'left-0' : '-left-full lg:left-0'}
+                    fixed lg:sticky top-16 h-[calc(100vh-64px)] w-72 border-r border-slate-200/80 dark:border-white/[0.08] bg-white/95 dark:bg-[#070A10]/95 backdrop-blur-xl z-40 transition-all duration-300
+                    ${sidebarOpen ? 'left-0 shadow-2xl' : '-left-full lg:left-0'}
                 `}>
-                    <div className="p-6 h-full flex flex-col overflow-y-auto">
-                        <nav ref={navRef} className="relative flex-1 space-y-1.5">
-                            {indicator && (
-                                <span
-                                    className="absolute left-0 right-0 rounded-xl bg-slate-900 dark:bg-violet-500 shadow-sm pointer-events-none transition-all duration-300 ease-out"
-                                    style={{ top: indicator.top, height: indicator.height }}
-                                />
-                            )}
+                    <div className="p-6 h-full flex flex-col justify-between overflow-y-auto">
+                        <nav className="space-y-1">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 px-3">
+                                API Reference
+                            </p>
                             {navItems.map((item) => {
                                 const Icon = item.icon;
                                 const isActive = activeSection === item.id;
-                                const isGroupActive = item.id === 'endpoints' && (activeSection === 'track-events' || activeSection === 'analytics');
                                 return (
                                     <button
                                         key={item.id}
-                                        ref={(el) => { itemRefs.current[item.id] = el; }}
                                         onClick={() => scrollTo(item.id)}
-                                        className={`relative z-10 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
-                                            item.nested ? 'ml-5 !px-3 text-[13px]' : ''
+                                        className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+                                            item.nested ? 'ml-4 !w-[calc(100%-1rem)] !text-[11px]' : ''
                                         } ${
                                             isActive
-                                            ? 'text-white'
-                                            : isGroupActive
-                                                ? 'text-violet-600 dark:text-violet-400 font-semibold'
-                                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                                                ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/30'
+                                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04]'
                                         }`}
                                     >
-                                        <Icon className={`h-5 w-5 transition-colors ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
+                                        <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                                         {item.label}
-                                        {isActive && (
-                                            <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white"></span>
-                                        )}
+                                        {isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />}
                                     </button>
                                 );
                             })}
                         </nav>
-                        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-                            <Link to="/docs/api" className="group flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
-                                <BookOpen className="h-5 w-5 text-slate-400 dark:text-slate-500 group-hover:text-violet-500 transition-colors" />
-                                Read the API docs
-                                <ChevronRight className="h-4 w-4 ml-auto text-slate-400" />
+
+                        <div className="pt-6 border-t border-slate-100 dark:border-white/[0.06] space-y-2">
+                            <Link to="/docs" className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.03]">
+                                <span className="flex items-center gap-2">
+                                    <BookOpen className="h-3.5 w-3.5 text-violet-500" /> Guides &amp; Tutorials
+                                </span>
+                                <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
-                            <Link to="/docs/getting-started" className="group flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
-                                <Zap className="h-5 w-5 text-slate-400 dark:text-slate-500 group-hover:text-violet-500 transition-colors" />
-                                Getting started guide
+                            <Link to="/dashboard/api-key" className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.03]">
+                                <span className="flex items-center gap-2">
+                                    <KeyRound className="h-3.5 w-3.5 text-emerald-500" /> Manage API Keys
+                                </span>
+                                <ChevronRight className="h-3.5 w-3.5" />
                             </Link>
                         </div>
                     </div>
                 </aside>
 
-                {/* Main Content */}
-                <main className="flex-1 min-w-0 pt-28 pb-24 px-6 sm:px-12 lg:px-24 max-w-5xl">
+                {/* Main Content Area */}
+                <main className="flex-1 min-w-0 pt-28 pb-24 px-6 sm:px-12 lg:px-20 max-w-4xl">
                     {/* Hero */}
-                    <div className="mb-20">
-                        <p className="eyebrow mb-3">WebPulse API</p>
-                        <h1 className="page-title !text-4xl font-display mb-4">Build with your <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">analytics data</span>.</h1>
-                        <p className="page-sub !text-base mt-3 max-w-2xl mb-8">
-                            Send events to WebPulse, retrieve analytics programmatically, and connect real-time website activity to your own applications and workflows.
+                    <div className="mb-16">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/20 bg-violet-500/10 text-violet-700 dark:text-violet-300 text-xs font-semibold mb-4">
+                            <Terminal className="h-3.5 w-3.5" />
+                            v1 REST API Specifications
+                        </div>
+                        <h1 className="text-4xl sm:text-5xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white">
+                            Build with your <br />
+                            <span className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-indigo-500 dark:from-violet-400 dark:via-fuchsia-300 dark:to-indigo-300 bg-clip-text text-transparent">
+                                real-time analytics data.
+                            </span>
+                        </h1>
+                        <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Programmatically ingest client actions, query timeseries metrics, and wire WebPulse observability directly into your serverless microservices.
                         </p>
-                        <Link to="/dashboard" className="btn-primary btn-md inline-flex items-center gap-2">
-                            Go to Console <ArrowRight className="h-4 w-4" />
-                        </Link>
                     </div>
 
-                    <Section id="overview" title="Analytics you can build on." icon={BookOpen}>
-                        <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-300 mb-10 font-medium tracking-tight">
-                            WebPulse provides APIs for collecting website activity and accessing analytics data from your projects.
+                    <Section id="overview" title="Architecture & Ingestion Pipeline" icon={BookOpen}>
+                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            WebPulse exposes lightweight JSON REST endpoints optimized for high-velocity telemetry. All incoming requests are verified via bearer tokens or tracking identifiers, rate-limited at edge proxies, and queued for instant stream delivery.
                         </p>
 
-                        <div className="card card-pad mb-8">
-                            <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Use the API to:</h4>
-                            <ul className="space-y-3">
+                        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#0B0F17]/80 backdrop-blur-xl p-6 shadow-sm">
+                            <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-4">Core API Capabilities:</h4>
+                            <div className="grid sm:grid-cols-2 gap-3">
                                 {[
-                                    'Send page-view events',
-                                    'Send custom events',
-                                    'Retrieve analytics',
-                                    'Integrate tracking into your application',
-                                    'Build internal analytics tools',
-                                    'Connect WebPulse with your existing backend'
+                                    'Sub-second pageview & custom event ingestion',
+                                    'Granular time-series query endpoints with URL filters',
+                                    'Serverless Node, Python, and Go integration',
+                                    'Origin protection & automatic bot sanitization',
+                                    'Export raw metrics for external data warehouses',
+                                    'Custom dashboard widgets and CLI tools'
                                 ].map((item) => (
-                                    <li key={item} className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-300">
-                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/15 shrink-0">
-                                            <Check className="h-3 w-3 text-emerald-500" />
-                                        </span>
-                                        {item}
-                                    </li>
+                                    <div key={item} className="flex items-center gap-2.5 text-xs text-slate-600 dark:text-slate-300">
+                                        <div className="h-4 w-4 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                            <Check className="h-2.5 w-2.5" />
+                                        </div>
+                                        <span>{item}</span>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
 
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">How WebPulse fits into your application</h3>
-                        <div className="flex flex-col items-center gap-0 max-w-xs mx-auto mb-4">
-                            <FlowBox label="Visitor" />
-                            <FlowArrow />
-                            <FlowBox label="Your Website" />
-                            <FlowArrow label="tracking event" />
-                            <FlowBox label="WebPulse Collector" />
-                            <FlowArrow />
-                            <FlowBox label="Analytics Data" />
-                        </div>
-                        <div className="flex justify-center gap-4">
-                            <div className="flex flex-col items-center gap-1">
-                                <ArrowDown className="h-4 w-4 text-slate-300 dark:text-slate-600" />
-                                <FlowBox label="Dashboard" />
-                            </div>
-                            <div className="flex flex-col items-center gap-1">
-                                <ArrowDown className="h-4 w-4 text-slate-300 dark:text-slate-600" />
-                                <FlowBox label="REST API" />
+                        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/50 dark:bg-white/[0.02] p-6 text-center max-w-sm mx-auto">
+                            <div className="flex flex-col items-center gap-1.5">
+                                <FlowBox label="Client Browser / App" />
+                                <FlowArrow />
+                                <FlowBox label="WebPulse Edge Proxy (< 15ms)" tone="dark" />
+                                <FlowArrow label="validated payload" />
+                                <FlowBox label="Time-Series Streaming Engine" />
                             </div>
                         </div>
                     </Section>
 
-                    <Section id="quickstart" title="Start collecting analytics in three steps." icon={Zap}>
-                        <div className="space-y-10">
-                            <div className="flex gap-5">
-                                <div className="flex-none h-10 w-10 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 flex items-center justify-center text-sm font-semibold text-violet-600 dark:text-violet-300">01</div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">Create a project</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Create a project from your WebPulse console. Your project provides the credentials and tracking configuration required to send analytics data.</p>
-                                    <Link to="/register" className="inline-flex items-center gap-1 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors mt-3">
-                                        Create a project <ChevronRight className="h-3.5 w-3.5" />
-                                    </Link>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-5">
-                                <div className="flex-none h-10 w-10 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 flex items-center justify-center text-sm font-semibold text-violet-600 dark:text-violet-300">02</div>
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">Add tracking</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">Add the WebPulse tracking script to your website.</p>
-                                    <CodeBlock
-                                        language="html"
-                                        title="Tracking Snippet"
-                                        code={`<script src="${API_DOMAIN}/api/v1/track/script.js"></script>\n<script>\n  tracker('init', 'YOUR_TRACKING_ID');\n  tracker('track', 'page_view');\n</script>`}
-                                    />
-                                    <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 flex gap-3 items-start">
-                                        <Terminal className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                            Replace <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">{API_DOMAIN}</code> with your actual deployed API/CDN URL.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-5">
-                                <div className="flex-none h-10 w-10 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 flex items-center justify-center text-sm font-semibold text-violet-600 dark:text-violet-300">03</div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">View your analytics</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Once events are received, they become available through your WebPulse analytics dashboard and API.</p>
-                                    <Link to="/dashboard" className="inline-flex items-center gap-1 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors">
-                                        Open Console <ChevronRight className="h-3.5 w-3.5" />
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </Section>
-
-                    <Section id="auth" title="Protect your API credentials." icon={Lock}>
-                        <p className="prose-quiet text-base">
-                            Sending tracking events and querying view counts use your project's <strong>tracking ID</strong>, sent in the <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">x-api-key</code> header.
-                        </p>
-
-                        <CodeBlock
-                            language="bash"
-                            title="Header Example"
-                            code={`GET ${API_DOMAIN}/api/v1/analytics/count\nx-api-key: YOUR_TRACKING_ID`}
-                        />
-
-                        <div className="p-6 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 flex gap-4 items-start">
-                            <Lock className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                            <div>
-                                <h4 className="text-sm font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-widest mb-1">Security warning</h4>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    Never expose console credentials in browser-side JavaScript, public repositories, or client applications.
-                                    For browser tracking, use the tracking ID / public tracking mechanism intended for the client-side tracker.
-                                    Keep console and server credentials on your server.
-                                </p>
-                            </div>
-                        </div>
-
-                        <p className="prose-quiet text-sm">
-                            Protected analytics endpoints (such as <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">/api/v1/analytics/overview</code>) require an authenticated console session.
-                        </p>
-                    </Section>
-
-                    <Section id="endpoints" title="API Endpoints" icon={Server}>
-                        <div className="space-y-12">
-                            <div id="track-events" className="scroll-mt-24">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-between gap-4">
-                                    Track an event
-                                    <span className="badge-green uppercase">POST</span>
-                                </h3>
-                                <p className="prose-quiet mb-6">
-                                    Send a page view or custom event to WebPulse.
-                                </p>
-                                <CodeBlock
-                                    language="bash"
-                                    title="Endpoint"
-                                    code={`POST ${API_DOMAIN}/api/v1/track/events\nContent-Type: application/json`}
-                                />
-                                <CodeBlock
-                                    language="json"
-                                    title="Request Body"
-                                    code={`{\n  "event": "page_view",\n  "url": "https://example.com/pricing",\n  "referrer": "https://google.com"\n}`}
-                                />
-                                <div className="card card-pad mt-4">
-                                    <h5 className="eyebrow mb-4">Parameters</h5>
-                                    <div className="grid grid-cols-[1fr_1.5fr_3fr] gap-x-6 gap-y-3 text-sm">
-                                        <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Parameter</div>
-                                        <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Type</div>
-                                        <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Description</div>
-                                        {[
-                                            ['event', 'string', 'Event name'],
-                                            ['url', 'string', 'Page URL'],
-                                            ['referrer', 'string', 'Referring URL'],
-                                            ['title', 'string', 'Page title']
-                                        ].map(([param, type, desc]) => (
-                                            <div key={param} className="contents">
-                                                <div className="font-mono font-medium text-slate-800 dark:text-slate-200">{param}</div>
-                                                <div className="text-slate-500 dark:text-slate-400">{type}</div>
-                                                <div className="text-slate-500 dark:text-slate-400 leading-snug">{desc}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <p className="prose-quiet text-xs mt-4">
-                                        Fields beyond these are accepted but not persisted — only the documented fields are stored.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="h-px bg-slate-200 dark:bg-slate-800"></div>
-
-                            <div id="analytics" className="scroll-mt-24">
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-between gap-4">
-                                    Get analytics
-                                    <span className="badge-green uppercase">GET</span>
-                                </h3>
-                                <p className="prose-quiet mb-6">
-                                    Retrieve view-count data for your project. Include <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">?url=/pricing</code> to filter to a specific page path.
-                                </p>
-                                <CodeBlock
-                                    language="bash"
-                                    title="Endpoint"
-                                    code={`GET ${API_DOMAIN}/api/v1/analytics/count?url=/pricing\nx-api-key: YOUR_TRACKING_ID`}
-                                />
-                                <div className="card card-pad mt-4">
-                                    <h5 className="eyebrow mb-4">Response Sample</h5>
-                                    <CodeBlock
-                                        language="json"
-                                        title="Response"
-                                        code={`{\n  "count": 1284\n}`}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </Section>
-
-                    <Section id="tracker" title="Lightweight website tracking" icon={Code2}>
-                        <p className="prose-quiet text-base">
-                            The WebPulse tracker provides a simple client-side interface for initializing a project and sending events.
-                            It sends events with <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">navigator.sendBeacon</code> when available and falls back to <code className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">fetch</code>.
+                    <Section id="quickstart" title="Quick Start Integration" icon={Zap}>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                            Start streaming website telemetry in three straightforward steps.
                         </p>
 
                         <div className="space-y-6">
-                            <div className="card card-pad">
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-violet-500"></span>
-                                    Method: init
-                                </h3>
-                                <p className="prose-quiet mb-4">Initialize your project tracking ID. This must be called before tracking any events.</p>
-                                <CodeBlock
-                                    language="javascript"
-                                    code={`tracker('init', 'YOUR_TRACKING_ID');`}
-                                />
+                            <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17]">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="h-6 w-6 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold flex items-center justify-center">1</span>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">Obtain Your Tracking ID</h4>
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 pl-9">
+                                    Create a project in the WebPulse console. Every project receives a unique <code className="font-mono text-violet-600 dark:text-violet-400">trk_••••••••</code> identifier.
+                                </p>
                             </div>
 
-                            <div className="card card-pad">
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-violet-500"></span>
-                                    Method: track
-                                </h3>
-                                <p className="prose-quiet mb-4">Record an event such as a page view.</p>
-                                <CodeBlock
-                                    language="javascript"
-                                    code={`tracker('track', 'page_view');`}
-                                />
+                            <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17]">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="h-6 w-6 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold flex items-center justify-center">2</span>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">Embed Tracking Snippet</h4>
+                                </div>
+                                <div className="pl-9">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                                        Paste this lightweight script before the closing <code className="font-mono text-slate-700 dark:text-slate-300">&lt;/head&gt;</code> tag of your website:
+                                    </p>
+                                    <CodeBlock
+                                        language="html"
+                                        title="Script Tag"
+                                        code={`<script src="${API_DOMAIN}/api/v1/track/script.js" async></script>\n<script>\n  window.tracker = window.tracker || function() { (tracker.q = tracker.q || []).push(arguments) };\n  tracker('init', 'YOUR_TRACKING_ID');\n  tracker('track', 'page_view');\n</script>`}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="card card-pad mt-8">
-                            <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Real-time analytics</h4>
-                            <p className="prose-quiet">
-                                Track activity as it arrives and explore the resulting analytics from your WebPulse dashboard.
-                            </p>
+                            <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17]">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="h-6 w-6 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold flex items-center justify-center">3</span>
+                                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">Verify Activity Stream</h4>
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 pl-9">
+                                    Visit your website. Open the WebPulse dashboard — your pageview will appear in the Live Activity stream instantaneously.
+                                </p>
+                            </div>
                         </div>
                     </Section>
 
-                    <Section id="security" title="Keep your analytics integration secure." icon={Shield}>
-                        <div className="card card-pad">
-                            <h4 className="font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                                <KeyRound className="h-5 w-5 text-violet-500" />
-                                Use the correct credential
-                            </h4>
-                            <div className="grid sm:grid-cols-2 gap-5">
-                                <div>
-                                    <p className="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-widest mb-2">Tracking ID</p>
-                                    <p className="prose-quiet text-sm mb-3">Designed for client-side tracking in the browser.</p>
-                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                        <ArrowRight className="h-4 w-4 text-slate-400" /> Client-side tracking
-                                    </div>
+                    <Section id="auth" title="Authentication & Keys" icon={Lock}>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                            WebPulse distinguishes between client tracking identifiers and secret programmatic API tokens.
+                        </p>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17]">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400 px-2 py-0.5 rounded bg-violet-500/10">Public</span>
+                                <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-2 mb-1">Project Tracking ID</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Safe to embed in client-side HTML and frontend bundles. Only grants permission to ingest events.</p>
+                                <code className="text-xs font-mono px-2 py-1 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-800 dark:text-slate-200">x-api-key: trk_91af••••</code>
+                            </div>
+
+                            <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17]">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded bg-amber-500/10">Secret</span>
+                                <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-2 mb-1">Server Bearer Token</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Keep strictly server-side. Grants programmatic read access to query analytics counts.</p>
+                                <code className="text-xs font-mono px-2 py-1 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-800 dark:text-slate-200">Authorization: Bearer wp_live_••••</code>
+                            </div>
+                        </div>
+                    </Section>
+
+                    <Section id="endpoints" title="API Endpoints" icon={Server}>
+                        {/* Track Events Endpoint */}
+                        <div id="track-events" className="scroll-mt-24 p-6 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17] shadow-sm">
+                            <div className="flex items-center justify-between gap-4 mb-3">
+                                <div className="flex items-center gap-2.5">
+                                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono">POST</span>
+                                    <code className="text-sm font-bold font-mono text-slate-900 dark:text-white">/api/v1/track/events</code>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-widest mb-2">Console credentials</p>
-                                    <p className="prose-quiet text-sm mb-3">For protected server/API requests from your backend.</p>
-                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                                        <ArrowRight className="h-4 w-4 text-slate-400" /> Protected server/API requests
+                                <span className="text-xs text-slate-400">Ingest Client Event</span>
+                            </div>
+
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">
+                                Ingests a new pageview or custom client interaction. Accepts standard JSON or Beacon payloads.
+                            </p>
+
+                            <CodeBlock
+                                language="bash"
+                                title="cURL Example"
+                                code={`curl -X POST "${API_DOMAIN}/api/v1/track/events" \\\n  -H "Content-Type: application/json" \\\n  -H "x-api-key: trk_YOUR_TRACKING_ID" \\\n  -d '{\n    "event": "page_view",\n    "url": "https://example.com/pricing",\n    "referrer": "https://google.com",\n    "title": "Pricing & Plans"\n  }'`}
+                            />
+
+                            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.06]">
+                                <h5 className="text-xs font-bold text-slate-900 dark:text-white mb-2">Parameters:</h5>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between py-1 border-b border-slate-100 dark:border-white/[0.04]">
+                                        <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">event <span className="text-rose-500">*</span></span>
+                                        <span className="text-slate-500">string (e.g. "page_view", "checkout_completed")</span>
+                                    </div>
+                                    <div className="flex justify-between py-1 border-b border-slate-100 dark:border-white/[0.04]">
+                                        <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">url <span className="text-rose-500">*</span></span>
+                                        <span className="text-slate-500">string (Full page URL or path)</span>
+                                    </div>
+                                    <div className="flex justify-between py-1">
+                                        <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">referrer</span>
+                                        <span className="text-slate-500">string (Acquisition source document.referrer)</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="card card-pad">
-                            <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Never put console credentials inside:</h4>
-                            <div className="grid sm:grid-cols-2 gap-3">
-                                {['React source', 'Browser JavaScript', 'GitHub repository', 'Public HTML', 'localStorage'].map((item) => (
-                                    <div key={item} className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-300">
-                                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/15 shrink-0">
-                                            <X className="h-3 w-3 text-rose-500" />
-                                        </span>
-                                        {item}
-                                    </div>
-                                ))}
+                        {/* Analytics Query Endpoint */}
+                        <div id="analytics" className="scroll-mt-24 p-6 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17] shadow-sm">
+                            <div className="flex items-center justify-between gap-4 mb-3">
+                                <div className="flex items-center gap-2.5">
+                                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 font-mono">GET</span>
+                                    <code className="text-sm font-bold font-mono text-slate-900 dark:text-white">/api/v1/analytics/count</code>
+                                </div>
+                                <span className="text-xs text-slate-400">Query Aggregates</span>
+                            </div>
+
+                            <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">
+                                Returns aggregated view and session counts for a project or specific path.
+                            </p>
+
+                            <CodeBlock
+                                language="bash"
+                                title="cURL Request"
+                                code={`curl -X GET "${API_DOMAIN}/api/v1/analytics/count?url=/pricing" \\\n  -H "x-api-key: trk_YOUR_TRACKING_ID"`}
+                            />
+
+                            <CodeBlock
+                                language="json"
+                                title="Response (200 OK)"
+                                code={`{\n  "success": true,\n  "url": "/pricing",\n  "count": 4820,\n  "unique_visitors": 2190,\n  "period": "30d"\n}`}
+                            />
+                        </div>
+                    </Section>
+
+                    <Section id="tracker" title="JavaScript Tracker SDK" icon={Code2}>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                            The WebPulse client SDK is tiny (&lt; 1.2 KB gzipped) and uses <code className="font-mono text-violet-600 dark:text-violet-400">navigator.sendBeacon</code> to guarantee delivery without freezing page navigation.
+                        </p>
+
+                        <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17] space-y-4">
+                            <div>
+                                <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Custom Event Tracking:</h4>
+                                <CodeBlock
+                                    language="javascript"
+                                    title="Custom Event"
+                                    code={`// Record high-value conversion points\ntracker('track', 'demo_requested', {\n  plan: 'pro',\n  source: 'features_hero'\n});`}
+                                />
                             </div>
                         </div>
+                    </Section>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="card card-pad">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-500/10 mb-4">
-                                    <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                                </div>
-                                <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Restrict allowed origins</h4>
-                                <p className="prose-quiet">
-                                    Restrict browser-based tracking to approved domains to reduce unauthorized use of your tracking configuration.
-                                </p>
-                                <p className="prose-quiet text-sm mt-3">
-                                    Allowed origins are an abuse-control mechanism, not authentication.
-                                </p>
-                            </div>
-                            <div className="card card-pad">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10 mb-4">
-                                    <Terminal className="h-5 w-5 text-violet-500" />
-                                </div>
-                                <h4 className="font-semibold text-slate-900 dark:text-white mb-2">Use HTTPS & keep secrets server-side</h4>
-                                <p className="prose-quiet mb-3">
-                                    Production API requests and tracking traffic should use HTTPS.
-                                </p>
-                                <p className="prose-quiet">
-                                    Use environment variables or a server-side secret manager for API keys.
-                                </p>
-                            </div>
+                    <Section id="security" title="Security & Allowed Origins" icon={Shield}>
+                        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0B0F17] p-6 space-y-4">
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white">Domain Restrictions &amp; Origin Whitelisting</h4>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Prevent unauthorized domains from submitting spoofed telemetry. Configure allowed origins in your project settings (e.g., <code className="font-mono text-slate-700 dark:text-slate-300">https://yourdomain.com</code>). Requests originating from non-whitelisted domains are rejected with HTTP 403 Forbidden.
+                            </p>
                         </div>
                     </Section>
                 </main>
             </div>
 
-            <footer className="border-t border-slate-200 dark:border-white/[0.06] py-14 bg-slate-50 dark:bg-[#070A10] flex flex-col items-center gap-8 px-6">
-                <Logo />
-                <div className="flex flex-wrap justify-center gap-8 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                    <Link to="/privacy" className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors">Privacy Policy</Link>
-                    <Link to="/terms" className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors">Term of Service</Link>
-                    <Link to="/community" className="hover:text-violet-600 dark:hover:text-violet-300 transition-colors">Community</Link>
+            {/* Standard Footer */}
+            <footer className="border-t border-slate-200/80 dark:border-white/[0.06] py-12 bg-white dark:bg-[#070A10] text-center relative z-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                        <Logo />
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 mb-6 font-medium">
+                        <Link to="/features" className="hover:text-violet-600 dark:hover:text-white transition-colors">Features</Link>
+                        <Link to="/integrations" className="hover:text-violet-600 dark:hover:text-white transition-colors">Integrations</Link>
+                        <Link to="/api" className="hover:text-violet-600 dark:hover:text-white transition-colors">API</Link>
+                        <Link to="/docs" className="hover:text-violet-600 dark:hover:text-white transition-colors">Docs</Link>
+                        <Link to="/pricing" className="hover:text-violet-600 dark:hover:text-white transition-colors">Pricing</Link>
+                        <Link to="/blog" className="hover:text-violet-600 dark:hover:text-white transition-colors">Blog</Link>
+                        <Link to="/community" className="hover:text-violet-600 dark:hover:text-white transition-colors">Community</Link>
+                        <Link to="/help" className="hover:text-violet-600 dark:hover:text-white transition-colors">Help</Link>
+                    </div>
+                    <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse Analytics. Real-time web observability.</p>
                 </div>
-                <p className="text-xs font-medium text-slate-400 dark:text-slate-600">© 2026 WebPulse</p>
             </footer>
         </div>
     );
