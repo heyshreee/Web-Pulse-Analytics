@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useOutletContext, Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Icon from '../components/ui/Icon';
 import { Button } from '../components/ui/Button';
 import { PageHead, PageToolbar } from '../components/ui/Page';
@@ -22,18 +22,17 @@ const RANGES = [
 ];
 
 const METRICS = [
-  { id: 'pageViews', label: 'Page views' },
   { id: 'visitors', label: 'Visitors' },
+  { id: 'pageViews', label: 'Page views' },
   { id: 'sessions', label: 'Sessions' }
 ];
 
 export default function Dashboard() {
-  const { currentProject, selectedProjectId, openAddProject, openInstallSnippet } = useProject();
+  const { currentProject, selectedProjectId, openAddProject } = useProject();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
   const [range, setRange] = useState('24h');
-  const [metric, setMetric] = useState('pageViews');
+  const [metric, setMetric] = useState('visitors');
   const [compare, setCompare] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
@@ -72,7 +71,7 @@ export default function Dashboard() {
         Views: p.views,
         Visitors: p.visitors,
         AvgTime: p.avg,
-        BounceRate: `${p.bounce}%`
+        BounceRate: p.bounce == null ? '—' : `${p.bounce}%`
       }))
     );
     downloadFile(`webpulse-analytics-${range}.csv`, csv, 'text/csv');
@@ -84,9 +83,16 @@ export default function Dashboard() {
     return data.trafficData.map((d) => ({
       name: d.name,
       views: d.views,
+      visitors: d.visitors,
+      sessions: d.sessions,
       compare: d.compare
     }));
   }, [data]);
+
+  const metricKey = metric === 'pageViews' ? 'views' : metric;
+
+  const browserTop = data?.browsers?.[0];
+  const browserTotal = (data?.browsers || []).reduce((a, b) => a + b.value, 0);
 
   const pageColumns = useMemo(
     () => [
@@ -122,7 +128,23 @@ export default function Dashboard() {
         key: 'bounce',
         label: 'Bounce',
         align: 'right',
-        render: (r) => <span className="font-mono">{fmtPct(r.bounce)}</span>
+        render: (r) => <span className="font-mono">{r.bounce == null ? '—' : fmtPct(r.bounce)}</span>
+      },
+      {
+        key: 'delta',
+        label: 'Change',
+        align: 'right',
+        render: (r) => {
+          if (r.delta == null) return <span className="text-muted-foreground">—</span>;
+          const positive = r.delta >= 0;
+          return (
+            <span className={`trend ${positive ? 'trend--up' : 'trend--down'}`}>
+              <Icon name={positive ? 'upRight' : 'downRight'} size={13} />
+              {positive ? '+' : ''}
+              {r.delta}%
+            </span>
+          );
+        }
       }
     ],
     []
@@ -147,12 +169,6 @@ export default function Dashboard() {
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <LiveChip live={data?.installed || currentProject?.installed} label={data?.installed ? 'Live' : 'Not receiving data'} />
             <span className="text-muted-foreground">Updated just now</span>
-            {data?.sampleData ? (
-              <span className="sample-flag">
-                <Icon name="info" size={12} />
-                Preview data
-              </span>
-            ) : null}
             <button
               type="button"
               className="btn btn--ghost btn--sm"
@@ -239,10 +255,10 @@ export default function Dashboard() {
             ) : (
               <TrafficChart
                 data={chartSeries}
-                dataKey="views"
+                dataKey={metricKey}
                 compare={compare}
-                height={280}
-                seriesLabel={METRICS.find((m) => m.id === metric)?.label || 'Views'}
+                height={260}
+                seriesLabel={METRICS.find((m) => m.id === metric)?.label || 'Page views'}
               />
             )}
           </CardBody>
@@ -415,8 +431,8 @@ export default function Dashboard() {
               ) : (
                 <Donut
                   data={data?.browsers || []}
-                  centerValue={data?.browsers?.[0]?.name || 'Chrome'}
-                  centerLabel={`${data?.browsers?.[0]?.value || 62}% share`}
+                  centerValue={browserTop?.name || '—'}
+                  centerLabel={`${browserTotal ? Math.round((browserTop.value / browserTotal) * 100) : 0}% share`}
                 />
               )}
             </CardBody>
