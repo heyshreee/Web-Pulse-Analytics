@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
     Search, Download, ChevronLeft, ChevronRight,
     Key, Shield, AlertTriangle, Settings, Lock, Activity
@@ -9,7 +9,6 @@ import { useToast } from '../context/ToastContext';
 import Spinner from '../components/Spinner';
 
 export default function ActivityLog() {
-    const { idOrName } = useParams();
     const { project, socket, usageStats } = useOutletContext();
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -20,6 +19,29 @@ export default function ActivityLog() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalLogs, setTotalLogs] = useState(0);
     const { showToast } = useToast();
+
+    const loadLogs = useCallback(async () => {
+        if (!project?.id) return;
+        setLoading(true);
+        try {
+            const query = new URLSearchParams({
+                page,
+                limit: 10,
+                search,
+                type: eventType,
+                days: timeRange
+            });
+
+            const data = await apiRequest(`/activity/${project.id}?${query.toString()}`);
+            setLogs(data.logs);
+            setTotalPages(data.totalPages);
+            setTotalLogs(data.total);
+        } catch {
+            showToast('Failed to load activity logs', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }, [project?.id, page, search, eventType, timeRange, showToast]);
 
     useEffect(() => {
         if (project?.id && socket && usageStats?.liveLogs) {
@@ -49,29 +71,7 @@ export default function ActivityLog() {
         } else if (project?.id) {
             loadLogs();
         }
-    }, [project?.id, page, search, eventType, timeRange, socket, usageStats?.liveLogs]);
-
-    const loadLogs = async () => {
-        setLoading(true);
-        try {
-            const query = new URLSearchParams({
-                page,
-                limit: 10,
-                search,
-                type: eventType,
-                days: timeRange
-            });
-
-            const data = await apiRequest(`/activity/${project.id}?${query.toString()}`);
-            setLogs(data.logs);
-            setTotalPages(data.totalPages);
-            setTotalLogs(data.total);
-        } catch (err) {
-            showToast('Failed to load activity logs', 'error');
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [project?.id, page, socket, usageStats?.liveLogs, loadLogs]);
 
     const getIcon = (action) => {
         if (action.includes('API Key')) return <Key className="h-4 w-4 text-blue-500" />;
@@ -227,13 +227,20 @@ export default function ActivityLog() {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr>
-                                    <td colSpan="10" className="px-4 py-12 text-center">
-                                        <div className="flex justify-center">
-                                            <Spinner fullScreen={false} />
-                                        </div>
-                                    </td>
-                                </tr>
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-border/50 animate-pulse">
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-20" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-32" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-24" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-24" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-28" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-16" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-12" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-20" /></td>
+                                        <td className="px-4 py-3"><div className="skeleton skeleton--text w-12" /></td>
+                                        <td className="px-4 py-3 text-right"><div className="skeleton w-16 h-5 rounded-full ml-auto" /></td>
+                                    </tr>
+                                ))
                             ) : logs.length === 0 ? (
                                 <tr>
                                     <td colSpan="10" className="px-4 py-12 text-center">
@@ -334,7 +341,13 @@ export default function ActivityLog() {
                 {/* Pagination */}
                 <div className="px-4 py-5 border-t border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Showing <span className="text-slate-900 dark:text-white font-semibold">{logs.length > 0 ? (page - 1) * 10 + 1 : 0}</span> to <span className="text-slate-900 dark:text-white font-semibold">{Math.min(page * 10, totalLogs)}</span> of <span className="text-slate-900 dark:text-white font-semibold">{totalLogs}</span> entries
+                        {loading ? (
+                            'Loading activity…'
+                        ) : (
+                            <>
+                                Showing <span className="text-slate-900 dark:text-white font-semibold">{logs.length > 0 ? (page - 1) * 10 + 1 : 0}</span> to <span className="text-slate-900 dark:text-white font-semibold">{Math.min(page * 10, totalLogs)}</span> of <span className="text-slate-900 dark:text-white font-semibold">{totalLogs}</span> entries
+                            </>
+                        )}
                     </p>
                     <div className="flex gap-2">
                         <button

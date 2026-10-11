@@ -24,7 +24,7 @@
   <meta name="twitter:description" content="Real-time web analytics that helps you understand visitors, traffic, sessions, and website performance as it happens." />
   <meta name="twitter:image" content="https://obs-real-time-tracker.vercel.app/logo-512.png" />
 
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://grainy-gradients.vercel.app https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com https://lh3.googleusercontent.com; font-src 'self' https://fonts.gstatic.com; frame-src https://accounts.google.com; connect-src 'self' ws: http://localhost:* https://obs-real-time-tracker.vercel.app https://*.vercel.app https://accounts.google.com https://*.googleapis.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com https://raw.githubusercontent.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://grainy-gradients.vercel.app https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com https://lh3.googleusercontent.com https://*.supabase.co https://brjltpxgthgjiaufycvc.supabase.co; font-src 'self' https://fonts.gstatic.com; frame-src https://accounts.google.com; connect-src 'self' ws: wss: http://localhost:* https://localhost:* https://brjltpxgthgjiaufycvc.supabase.co wss://brjltpxgthgjiaufycvc.supabase.co https://*.supabase.co wss://*.supabase.co https://*.supabase.in wss://*.supabase.in https://*.supabase.net wss://*.supabase.net https://obs-real-time-tracker.vercel.app https://*.vercel.app https://accounts.google.com https://*.googleapis.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://unpkg.com https://raw.githubusercontent.com https://api.ipify.org http://ip-api.com https://ipapi.co;">
   <title>WebPulse — Real-time web analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,78 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <style>
+      .app-preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #0c0e14;
+        color: #f1f5f9;
+        font-family: 'Inter', system-ui, sans-serif;
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not(.dark) .app-preloader {
+          background-color: #f8fafc;
+          color: #0f172a;
+        }
+      }
+      .preloader-emblem {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        margin-bottom: 16px;
+        animation: pulsePreloader 1.8s ease-in-out infinite;
+      }
+      @keyframes pulsePreloader {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.88; }
+      }
+      .preloader-track {
+        width: 140px;
+        height: 4px;
+        background: rgba(148, 163, 184, 0.2);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+        margin-top: 14px;
+      }
+      .preloader-bar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        background: #4f46e5;
+        border-radius: 999px;
+        animation: shimmerPreloader 1.2s infinite ease-in-out;
+      }
+      @keyframes shimmerPreloader {
+        0% { transform: translateX(-60px); }
+        100% { transform: translateX(140px); }
+      }
+    </style>
+    <div class="app-preloader">
+      <div class="preloader-emblem">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+        </svg>
+      </div>
+      <div style="font-weight: 700; font-size: 15px; letter-spacing: -0.01em;">WebPulse</div>
+      <div class="preloader-track"><div class="preloader-bar"></div></div>
+    </div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

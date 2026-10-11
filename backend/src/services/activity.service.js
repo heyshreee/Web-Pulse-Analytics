@@ -14,12 +14,17 @@ class ActivityLogService {
      */
     static async log(projectId, userId, action, details, status = 'success', ip = null, metadata = {}) {
         try {
+            const ALLOWED_STATUSES = ['success', 'warning', 'failure'];
+            const normalizedStatus = ALLOWED_STATUSES.includes(status)
+                ? status
+                : (status === 'error' || status === 'blocked' || status === 'fail' ? 'failure' : 'success');
+
             const logEntry = {
                 project_id: projectId,
                 user_id: userId,
                 action,
                 details,
-                status,
+                status: normalizedStatus,
                 ip_address: ip,
                 session_id: metadata.session_id,
                 resource: metadata.resource,
@@ -51,7 +56,7 @@ class ActivityLogService {
                             user_id: userId,
                             action,
                             details,
-                            status,
+                            status: normalizedStatus,
                             ip_address: ip,
                             created_at: new Date().toISOString()
                         });

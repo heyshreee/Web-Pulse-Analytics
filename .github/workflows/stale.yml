@@ -1,0 +1,36 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Mark inactive issues and PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stale
+        uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 60
+          days-before-issue-close: 21
+          days-before-pr-stale: 30
+          days-before-pr-close: -1
+          stale-issue-label: stale
+          stale-pr-label: stale
+          stale-issue-message: >
+            This issue has been inactive for 60 days and is now marked as stale.
+            Add a comment if it is still relevant, otherwise it will be closed in 21 days.
+          stale-pr-message: >
+            This pull request has been inactive for 30 days and is now marked as stale.
+            Add a comment if it is still in progress.
+          # Never auto-close security reports or active roadmap work.
+          exempt-issue-labels: 'security,good first issue,help wanted,roadmap,v1-stabilization,v2-ui,pinned'
+          exempt-pr-labels: 'security,pinned,work-in-progress'
+          exempt-all-milestones: true
+          remove-stale-when-updated: true

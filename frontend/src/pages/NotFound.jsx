@@ -1,44 +1,50 @@
 import { Link } from 'react-router-dom';
-import { BarChart2, ArrowLeft, Home } from 'lucide-react';
+import { Home, ArrowLeft } from 'lucide-react';
 import Logo from '../components/Logo';
+import { Button } from '../components/ui/Button';
 
 export default function NotFound() {
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-300">
+        <div
+            className="min-h-screen flex flex-col font-sans transition-colors duration-300"
+            style={{ background: 'var(--background)', color: 'var(--foreground)' }}
+        >
             <header className="p-6 md:px-12 md:py-6 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Logo />
-                </div>
-                <div className="flex items-center gap-3">
-                    <Link to="/login" className="btn-secondary btn-sm">Log in</Link>
+                <Logo />
+                <div className="flex items-center gap-2">
+                    <Link to="/login" className="btn btn--outline btn--sm">
+                        Sign in
+                    </Link>
                 </div>
             </header>
 
             <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 text-center">
-                <div className="text-[9rem] md:text-[12rem] font-bold leading-none tracking-tighter text-slate-900/[0.05] dark:text-white/[0.05] select-none">
+                <div
+                    className="text-[8rem] md:text-[11rem] font-bold leading-none tracking-tighter select-none opacity-10"
+                    style={{ color: 'var(--foreground)' }}
+                >
                     404
                 </div>
-                <h2 className="page-title -mt-10 mb-3 font-display">Page not found</h2>
-                <p className="page-sub max-w-lg mx-auto mb-10">
-                    The page you're looking for doesn't exist or has been moved.
-                    Let's get you back on track.
+                <h1 className="page-title -mt-8 mb-3">Page not found</h1>
+                <p className="page-desc max-w-md mx-auto mb-8">
+                    The page you are looking for does not exist, has been moved, or is temporarily unavailable.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <Link to="/dashboard" className="btn-primary btn-md">
+                    <Link to="/dashboard" className="btn btn--primary">
                         <Home className="h-4 w-4" />
                         Back to dashboard
                     </Link>
-                    <Link to="/" className="btn-secondary btn-md">
+                    <Link to="/" className="btn btn--outline">
                         <ArrowLeft className="h-4 w-4" />
-                        Go home
+                        Go to homepage
                     </Link>
                 </div>
             </main>
 
-            <footer className="p-6 md:px-12 md:py-6 text-center">
-                <p className="text-slate-400 dark:text-slate-600 text-xs">
-                    © 2026 WebPulse
+            <footer className="p-6 md:px-12 md:py-6 text-center border-t" style={{ borderColor: 'var(--border)' }}>
+                <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                    © 2026 WebPulse Analytics. All rights reserved.
                 </p>
             </footer>
         </div>

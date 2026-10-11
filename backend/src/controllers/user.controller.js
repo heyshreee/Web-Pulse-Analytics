@@ -45,7 +45,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
         userId,
         'user.profile_update',
         'Updated profile details',
-        'info',
+        'success',
         req.ip
     );
 
@@ -86,7 +86,7 @@ export const updateAvatar = asyncHandler(async (req, res) => {
         userId,
         'user.avatar_update',
         'Updated profile picture',
-        'info',
+        'success',
         req.ip
     );
 

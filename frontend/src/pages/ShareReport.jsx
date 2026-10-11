@@ -38,7 +38,7 @@ export default function ShareReport() {
     }, [shareToken]);
 
     if (loading) {
-        return <Spinner />;
+        return <Spinner label="Loading shared analytics report…" subLabel="Decrypting shared telemetry access" />;
     }
 
     if (error) {

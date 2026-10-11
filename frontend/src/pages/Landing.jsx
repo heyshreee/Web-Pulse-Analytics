@@ -18,7 +18,6 @@ import {
   Activity,
   Fingerprint,
   Trash2,
-  Loader2,
 } from 'lucide-react';
 import AnimatedNumber from '../components/landing/AnimatedNumber';
 import ChartPreview from '../components/landing/ChartPreview';
@@ -30,29 +29,45 @@ import CodeSnippet from '../components/landing/CodeSnippet';
 const HeroGlobe = lazy(() => import('../components/landing/HeroGlobe'));
 const LiveEventStream = lazy(() => import('../components/landing/LiveEventStream'));
 
-// Delayed "still working" indicator: stays invisible while chunks load quickly
-// and only fades in when a lazy visual takes noticeably longer than expected.
-function StillWorkingIndicator({ delay = 2000, label = 'Still working…' }) {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setShow(true), delay);
-    return () => clearTimeout(t);
-  }, [delay]);
-
-  if (!show) return null;
-
-  return (
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
-      <div className="flex items-center gap-2.5 px-4 py-2 rounded-full glass-obs">
-        <Loader2 className="h-4 w-4 text-violet-500 animate-spin" />
-        <span className="text-xs font-medium text-slate-600 dark:text-slate-300 animate-pulse">
-          {label}
-        </span>
+const GlobeFallback = () => (
+  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+    <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full border border-primary/20 flex items-center justify-center">
+      <div className="absolute inset-4 rounded-full border border-dashed border-primary/25 animate-[spin_30s_linear_infinite]" />
+      <div className="absolute inset-12 rounded-full border border-primary/20" />
+      <div className="absolute inset-20 rounded-full bg-primary/5 animate-pulse" />
+      <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+        <svg className="w-6 h-6 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20" />
+        </svg>
       </div>
     </div>
-  );
-}
+    <span className="mt-4 text-[11px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
+      </span>
+      Streaming globe telemetry…
+    </span>
+  </div>
+);
+
+const EventStreamSkeleton = () => (
+  <div className="space-y-3">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 animate-pulse">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-full bg-muted" />
+          <div className="space-y-1">
+            <div className="w-24 h-3 bg-muted rounded" />
+            <div className="w-16 h-2 bg-muted/60 rounded" />
+          </div>
+        </div>
+        <div className="w-12 h-3 bg-muted rounded" />
+      </div>
+    ))}
+  </div>
+);
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -284,7 +299,7 @@ export default function Landing() {
 
       {/* ============ NAVBAR ============ */}
       <header className="fixed top-0 left-0 right-0 z-[60]">
-        <div className="bg-white/85 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
+        <div className="bg-white/85 dark:bg-[#0B0F17]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Logo />
 
@@ -316,7 +331,7 @@ export default function Landing() {
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden bg-white/95 dark:bg-space-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07] px-4 py-4 space-y-1">
+          <div className="md:hidden bg-white/95 dark:bg-[#0B0F17]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.07] px-4 py-4 space-y-1">
             {navLinks.map((l) => (
               <Link key={l.label} to={l.to} className="block px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white font-medium">
                 {l.label}
@@ -388,7 +403,7 @@ export default function Landing() {
               <div ref={globeWrapRef} className="relative order-first lg:order-last">
                 <div className="relative mx-auto w-full max-w-[560px] aspect-square">
                   {sceneDone && (
-                    <Suspense fallback={<StillWorkingIndicator delay={2000} />}>
+                    <Suspense fallback={<GlobeFallback />}>
                       <HeroGlobe ref={globeRef} cities={HERO_CITIES} className="absolute inset-0" />
                     </Suspense>
                   )}
@@ -487,70 +502,99 @@ export default function Landing() {
 
           {/* Dashboard mockup */}
           <div data-reveal className="relative max-w-6xl mx-auto">
-            <div className="relative rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-800/40 overflow-hidden shadow-2xl dark:shadow-black/40">
+            {/* Ambient glowing aura matching the landing dark background canvas */}
+            <div className="absolute -inset-3 sm:-inset-6 bg-gradient-to-r from-violet-600/30 via-fuchsia-600/20 to-emerald-500/20 rounded-[2.5rem] blur-3xl opacity-60 dark:opacity-80 pointer-events-none -z-10" />
+
+            <div className="relative rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-white/[0.12] bg-white/95 dark:bg-[#0B0F17]/95 backdrop-blur-2xl overflow-hidden shadow-2xl dark:shadow-2xl dark:shadow-violet-950/40">
               {/* Window header */}
-              <div className="h-11 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-white/[0.02]">
+              <div className="h-12 border-b border-slate-200 dark:border-white/[0.08] flex items-center px-4 sm:px-6 gap-3 bg-slate-50/90 dark:bg-white/[0.02]">
                 <div className="flex gap-1.5">
                   <span className="w-3 h-3 rounded-full bg-rose-400" />
                   <span className="w-3 h-3 rounded-full bg-amber-400" />
                   <span className="w-3 h-3 rounded-full bg-emerald-400" />
                 </div>
-                <div className="ml-4 text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-[0.22em] font-medium">
-                  WebPulse · Panel
+                <div className="flex items-center gap-2 ml-2 sm:ml-4 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <span className="inline-block w-2 h-2 rounded-full bg-violet-500" />
+                  <span className="hidden sm:inline font-mono text-[11px] text-slate-400">production ·</span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-200">my-website.com</span>
                 </div>
-                <div className="ml-auto flex items-center gap-2 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-widest">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-                  </span>
-                  Live
+                <div className="ml-auto flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    <span className="tabular-nums font-bold">12,842</span>
+                    <span className="hidden sm:inline font-normal text-emerald-600/80 dark:text-emerald-400/80">Active now</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-3 gap-px bg-slate-200 dark:bg-white/[0.06]">
-                {/* KPI column */}
-                <div className="bg-white dark:bg-space-800 p-6 space-y-5">
-                  <KpiCard label="ACTIVE USERS" value={STATIC_COUNTS} format={true} accent="#8B5CF6" />
-                  <KpiCard label="PAGEVIEWS" value={STATIC_VIEWS} format={true} accent="#A78BFA" />
-                  <KpiCard label="BOUNCE RATE" value={STATIC_BOUNCE} format={true} decimals={1} suffix="%" accent="#48E6A1" />
-                  <KpiCard label="AVG SESSION" value={STATIC_SESSION} accent="#F59E0B" />
+              {/* Main Mockup Body */}
+              <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+                {/* Top 4 KPI Grid (matching Project Overview & demo) */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <KpiCard label="ACTIVE USERS" value={STATIC_COUNTS} format={true} accent="#10B981" trend="+14.2%" trendUp={true} sub="vs. previous hour" />
+                  <KpiCard label="PAGEVIEWS" value={STATIC_VIEWS} format={true} accent="#8B5CF6" trend="+8.1%" trendUp={true} sub="across 142 routes" />
+                  <KpiCard label="BOUNCE RATE" value={STATIC_BOUNCE} format={true} decimals={1} suffix="%" accent="#06B6D4" trend="-3.4%" trendUp={true} sub="lower than avg" />
+                  <KpiCard label="AVG SESSION" value={STATIC_SESSION} accent="#F59E0B" trend="+24s" trendUp={true} sub="session duration" />
+                </div>
 
-                  {/* Live activity */}
-                  <div className="border-t border-slate-200 dark:border-white/[0.08] pt-5">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-3">Live activity</div>
-                    <Suspense fallback={null}>
-                      <LiveEventStream maxItems={4} />
-                    </Suspense>
+                {/* Chart + Side Widget */}
+                <div className="grid lg:grid-cols-3 gap-6">
+                  {/* Main Chart */}
+                  <div className="lg:col-span-2 rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/60 dark:bg-white/[0.02] p-5 sm:p-6 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Traffic velocity</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Real-time pulses over selected period</p>
+                      </div>
+                      <div className="flex items-center gap-1 self-start sm:self-auto rounded-full border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] p-0.5">
+                        {TRAFFIC_RANGES.map((range) => (
+                          <button
+                            key={range}
+                            onClick={() => setTrafficRange(range)}
+                            className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide transition-all duration-300 ${
+                              trafficRange === range
+                                ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/30'
+                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+                            }`}
+                          >
+                            {range}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="h-[260px] sm:h-[300px]">
+                      <ChartPreview data={trafficData} dark />
+                    </div>
+                  </div>
+
+                  {/* Real-time Ingress / Activity widget */}
+                  <div className="rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/60 dark:bg-white/[0.02] p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Live stream</span>
+                        <span className="flex items-center gap-1 text-[11px] text-emerald-500 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Streaming
+                        </span>
+                      </div>
+                      <Suspense fallback={null}>
+                        <LiveEventStream maxItems={4} />
+                      </Suspense>
+                    </div>
+                    <div className="mt-5 pt-4 border-t border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                      <span>Telemetry latency</span>
+                      <span className="font-mono text-emerald-500 font-semibold">&lt; 14ms</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Chart column */}
-                <div className="bg-white dark:bg-space-800 p-6 lg:col-span-2 space-y-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Traffic</div>
-                    <div className="flex items-center gap-1 rounded-full border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-0.5">
-                      {TRAFFIC_RANGES.map((range) => (
-                        <button
-                          key={range}
-                          onClick={() => setTrafficRange(range)}
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-300 ${
-                            trafficRange === range
-                              ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/30'
-                              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                          }`}
-                        >
-                          {range}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="h-[300px]">
-                    <ChartPreview data={trafficData} dark />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-5 pt-2">
-                    <AcquisitionBars />
-                    <GeoList />
-                  </div>
+                {/* Lower Row: Traffic sources and Geography */}
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <AcquisitionBars />
+                  <GeoList />
                 </div>
               </div>
             </div>
@@ -591,7 +635,7 @@ export default function Landing() {
               </div>
             </div>
             <div data-reveal>
-              <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/80 p-5 min-h-[320px]">
+              <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-5 min-h-[320px]">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
@@ -602,7 +646,7 @@ export default function Landing() {
                   </div>
                   <span className="metric-num text-xs text-slate-500 dark:text-slate-400">12,842</span>
                 </div>
-                <Suspense fallback={null}>
+                <Suspense fallback={<EventStreamSkeleton />}>
                   <LiveEventStream maxItems={7} />
                 </Suspense>
               </div>
@@ -636,8 +680,8 @@ export default function Landing() {
               </div>
 
               <div className="relative" data-reveal>
-                <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 overflow-hidden">
-                  <div className="h-10 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-space-950">
+                <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card overflow-hidden">
+                  <div className="h-10 border-b border-slate-200 dark:border-white/[0.07] flex items-center px-4 gap-2 bg-slate-50 dark:bg-card">
                     <div className="flex gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -654,7 +698,7 @@ export default function Landing() {
                   />
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900 p-4">
+                <div className="mt-4 rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
@@ -937,18 +981,18 @@ export default function Landing() {
    Section sub-components
 --------------------------------------------------------------------------- */
 
-function KpiCard({ label, value, accent, format, decimals = 0, suffix = '' }) {
+function KpiCard({ label, value, accent, format, decimals = 0, suffix = '', trend = null, trendUp = true, sub = null }) {
   return (
-    <div className="group cursor-pointer rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 dark:hover:border-violet-400/30 hover:bg-white dark:hover:bg-white/[0.05] hover:shadow-lg hover:shadow-violet-500/[0.08]">
-      <div className="flex items-center justify-between">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 mb-1">{label}</div>
+    <div className="group cursor-pointer rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 dark:hover:border-violet-400/30 hover:shadow-xl hover:shadow-violet-500/[0.08]">
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{label}</div>
         <span
-          className="h-1.5 w-1.5 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="h-2 w-2 rounded-full"
           style={{ background: accent }}
         />
       </div>
       <div
-        className="metric-num text-2xl font-bold transition-transform duration-300 group-hover:translate-x-0.5"
+        className="metric-num text-2xl sm:text-3xl font-extrabold font-display transition-transform duration-300 group-hover:translate-x-0.5 tracking-tight text-slate-900 dark:text-white"
         style={{ color: accent }}
       >
         {format ? (
@@ -957,6 +1001,16 @@ function KpiCard({ label, value, accent, format, decimals = 0, suffix = '' }) {
           value
         )}
       </div>
+      {(trend || sub) && (
+        <div className="mt-2.5 flex items-center justify-between gap-1 text-[11px] pt-2 border-t border-slate-100 dark:border-white/[0.05]">
+          {trend && (
+            <span className={`font-semibold inline-flex items-center gap-0.5 ${trendUp ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+              {trend}
+            </span>
+          )}
+          {sub && <span className="text-slate-400 dark:text-slate-500 truncate">{sub}</span>}
+        </div>
+      )}
     </div>
   );
 }
@@ -1074,7 +1128,7 @@ function FeatureVisual({ f }) {
 
 function GeoVisual() {
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-4">Active visitors by country</div>
       <div className="space-y-4">
         {TOP_LOCATIONS.map((r) => (
@@ -1101,7 +1155,7 @@ function GeoVisual() {
 function FlowVisual() {
   const levels = ['Landing page', 'Features', 'Pricing', 'Checkout'];
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Visitor flow</div>
       <div className="relative pl-4">
         {levels.map((l, i) => (
@@ -1133,7 +1187,7 @@ function AcqVisual() {
     { l: 'Other', v: 9, c: '#94A3B8' },
   ];
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Where visitors come from</div>
       {rows.map((r) => (
         <div key={r.l} className="flex items-center gap-3 py-2">
@@ -1156,7 +1210,7 @@ function AcqVisual() {
 function PipelineVisual() {
   const steps = ['Visitors', 'Events', 'Patterns', 'Insights', 'Decisions'];
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-space-900/60 p-6">
+    <div className="rounded-2xl border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-card p-6">
       <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-5">Intelligence pipeline</div>
       <div className="flex flex-col items-center gap-1">
         {steps.map((s, i) => (
@@ -1182,15 +1236,48 @@ function PipelineVisual() {
 }
 
 function PricingSection() {
+  const [annual, setAnnual] = useState(false);
   const plans = [
-    { name: 'Free', price: '₹0', tagline: 'For personal projects and experimentation', pro: false, features: ['1 project', 'Real-time monitoring', 'Traffic analytics', 'Visitor tracking', 'Performance analytics', 'Custom dashboard'] },
-    { name: 'Basic', price: '₹299', tagline: 'For developers and small websites', pro: false, features: ['Multiple projects', 'Extended analytics usage', 'Advanced dashboard views', 'Alerts & notifications', 'Performance monitoring', 'Report export'] },
-    { name: 'Pro', price: '₹999', tagline: 'For growing products and high-traffic websites', pro: true, features: ['Higher analytics limits', 'Advanced monitoring', 'Detailed visitor analytics', 'Advanced reporting', 'Priority support'] },
-    { name: 'Business', price: '₹2,999', tagline: 'For teams that need more control', pro: false, features: ['Higher usage limits', 'Team collaboration', 'Advanced access controls', 'Custom integrations', 'Dedicated support'] },
+    {
+      name: 'Free',
+      price: '₹0',
+      period: 'forever',
+      tagline: 'For personal projects and experimentation',
+      pro: false,
+      features: ['1 project', 'Real-time monitoring', 'Traffic analytics', 'Visitor tracking', 'Performance analytics', 'Custom dashboard']
+    },
+    {
+      name: 'Basic',
+      price: annual ? '₹239' : '₹299',
+      period: '/ month',
+      sub: annual ? 'billed annually' : 'billed monthly',
+      tagline: 'For developers and small websites',
+      pro: false,
+      features: ['Multiple projects', 'Extended analytics usage', 'Advanced dashboard views', 'Alerts & notifications', 'Performance monitoring', 'Report export']
+    },
+    {
+      name: 'Pro',
+      price: annual ? '₹799' : '₹999',
+      period: '/ month',
+      sub: annual ? 'billed annually' : 'billed monthly',
+      tagline: 'For growing products and high-traffic websites',
+      pro: true,
+      features: ['Higher analytics limits', 'Advanced monitoring', 'Detailed visitor analytics', 'Advanced reporting', 'Priority support', 'Webhooks & API access']
+    },
+    {
+      name: 'Business',
+      price: annual ? '₹2,399' : '₹2,999',
+      period: '/ month',
+      sub: annual ? 'billed annually' : 'billed monthly',
+      tagline: 'For teams that need more control',
+      pro: false,
+      features: ['Higher usage limits', 'Team collaboration', 'Advanced access controls', 'Custom integrations', 'Dedicated support', '99.9% uptime SLA']
+    },
   ];
+
   return (
     <section className="relative z-10 py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-14" data-reveal>
+      <div className="text-center mb-10" data-reveal>
         <p className="eyebrow-obs mb-4">Pricing</p>
         <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-slate-900 dark:text-slate-100">
           Simple pricing. <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">Start free.</span>
@@ -1198,40 +1285,92 @@ function PricingSection() {
         <p className="mt-4 text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           Explore WebPulse with the core analytics tools you need to understand your website. Upgrade as the platform grows.
         </p>
+
+        {/* Monthly / Annual Toggle */}
+        <div className="mt-8 inline-flex items-center gap-3 p-1.5 rounded-full border border-slate-200 dark:border-white/[0.08] bg-slate-100/80 dark:bg-white/[0.03]">
+          <button
+            type="button"
+            onClick={() => setAnnual(false)}
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              !annual
+                ? 'bg-white dark:bg-white/[0.1] text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Monthly billing
+          </button>
+          <button
+            type="button"
+            onClick={() => setAnnual(true)}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              annual
+                ? 'bg-violet-600 text-white shadow-sm shadow-violet-500/30'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Annual billing
+            <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-[10px] font-bold">
+              SAVE 20%
+            </span>
+          </button>
+        </div>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
         {plans.map((p) => (
-          <div key={p.name} data-reveal
-            className={`relative rounded-2xl p-8 ${p.pro
-              ? 'bg-white dark:bg-space-800 border-2 border-violet-500 lg:-translate-y-3 shadow-lift'
-              : 'glass-obs border border-slate-200 dark:border-white/[0.1]'}`}>
+          <div
+            key={p.name}
+            data-reveal
+            className={`relative rounded-3xl p-7 flex flex-col justify-between transition-all duration-300 ${
+              p.pro
+                ? 'bg-white dark:bg-[#0D111A] border-2 border-violet-500 dark:border-violet-400 shadow-2xl shadow-violet-500/15 lg:-translate-y-3'
+                : 'glass-obs border border-slate-200 dark:border-white/[0.08] hover:border-slate-300 dark:hover:border-white/[0.16]'
+            }`}
+          >
             {p.pro && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest bg-gradient-to-r from-[#7C6CE0] to-[#8B5CF6] text-white">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md shadow-violet-500/30">
                 Most popular
               </div>
             )}
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">{p.name}</h3>
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className={`text-4xl font-extrabold font-display ${p.pro ? 'text-violet-600 dark:text-violet-400' : 'text-slate-900 dark:text-slate-100'}`}>{p.price}</span>
-              <span className="text-slate-500 dark:text-slate-400 text-sm">/ month</span>
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{p.name}</h3>
+                {p.pro && <span className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />}
+              </div>
+              <div className="flex items-baseline gap-1.5 mb-1">
+                <span className={`text-4xl font-extrabold font-display tracking-tight ${p.pro ? 'text-violet-600 dark:text-violet-400' : 'text-slate-900 dark:text-slate-100'}`}>
+                  {p.price}
+                </span>
+                <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">{p.period}</span>
+              </div>
+              {p.sub && <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-2">{p.sub}</p>}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">{p.tagline}</p>
+
+              <div className="h-px w-full bg-slate-200/70 dark:bg-white/[0.07] mb-6" />
+
+              <ul className="space-y-3 mb-8">
+                {p.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300 leading-snug">
+                    <Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{p.tagline}</p>
-            <ul className="space-y-3 mb-8">
-              {p.features.map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-300">
-                  <Check className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
-                </li>
-              ))}
-            </ul>
-            <Link to="/register" className={p.pro ? 'btn-signal btn-md w-full' : 'btn-ghost-dark btn-md w-full'}>
-              {p.name === 'Free' ? 'Start free' : p.name === 'Business' ? 'Contact Sales' : `Choose ${p.name}`}
+
+            <Link
+              to="/register"
+              className={p.pro ? 'btn-signal btn-md w-full justify-center' : 'btn-ghost-dark btn-md w-full justify-center'}
+            >
+              {p.name === 'Free' ? 'Start for free' : p.name === 'Business' ? 'Contact Sales' : `Get ${p.name}`}
             </Link>
           </div>
         ))}
       </div>
+
       <div className="text-center mt-12" data-reveal>
         <Link to="/pricing" className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors">
-          See full pricing & comparison <ArrowRight className="h-4 w-4" />
+          See full plan comparison matrix <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </section>

@@ -1,6 +1,8 @@
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const Motion = motion;
+
 export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-md', align = 'center' }) {
   if (!isOpen) return null;
 
@@ -9,14 +11,14 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
   return (
     <AnimatePresence>
       <div className={`fixed inset-0 z-50 flex p-4 ${alignClass}`}>
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
           className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-md"
         />
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
@@ -35,7 +37,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
           <div className="p-5">
             {children}
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
     </AnimatePresence>
   );

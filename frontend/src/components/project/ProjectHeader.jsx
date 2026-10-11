@@ -1,7 +1,7 @@
 import React from 'react';
-import { Share2 } from 'lucide-react';
+import { Share2, Settings2 } from 'lucide-react';
 
-export default function ProjectHeader({ project, onShowShare }) {
+export default function ProjectHeader({ project, onShowShare, onOpenSettings }) {
   if (!project) return null;
 
   return (
@@ -21,13 +21,22 @@ export default function ProjectHeader({ project, onShowShare }) {
           </span>
         </div>
       </div>
-      <button
-        onClick={onShowShare}
-        className="btn-secondary btn-md"
-      >
-        <Share2 className="h-4 w-4 text-violet-500" />
-        Share
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onShowShare}
+          className="btn-secondary btn-md"
+        >
+          <Share2 className="h-4 w-4 text-violet-500" />
+          Share
+        </button>
+        <button
+          onClick={onOpenSettings}
+          className="btn-secondary btn-md"
+        >
+          <Settings2 className="h-4 w-4 text-violet-500" />
+          Settings
+        </button>
+      </div>
     </div>
   );
 }

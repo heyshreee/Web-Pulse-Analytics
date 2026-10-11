@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { X, MapPin, TrendingUp, RefreshCw, Loader2, Globe, Plus, Minus } from 'lucide-react';
+import { MapPin, RefreshCw, Loader2, Globe, Plus, Minus } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Shared constants
@@ -147,6 +147,12 @@ const NetworkGlobe = ({
   onSelectLocation,
   realTimeVisitors = 0,
   isDark = true,
+  metricLabel = 'Active visitors',
+  statusLabel = 'Active now',
+  loadingLabel = 'Loading visitor data',
+  emptyTitle = 'Waiting for visitor activity',
+  emptyText = 'Connect your tracker to see visitors appear in real time.',
+  liveLabel,
 }) => {
   const containerRef = useRef(null);
   const bgRef = useRef(null);
@@ -192,8 +198,8 @@ const NetworkGlobe = ({
         });
       }
       const c = clusters.get(key);
-      c.count += 1;
-      c.ids.push(d.id);
+      c.count += Number(d.count) > 0 ? Number(d.count) : 1;
+      c.ids.push(d.id || d.visitor_id || key);
       // Prefer most recent / non-empty location display
       if (!d.location || d.location === 'Unknown Location') {
         c.location = d.location || c.location;
@@ -800,7 +806,7 @@ const NetworkGlobe = ({
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
           <Loader2 className="h-8 w-8 text-violet-500 animate-spin mb-4" />
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 font-semibold">
-            Loading visitor data
+            {loadingLabel}
           </p>
         </div>
       )}
@@ -830,9 +836,9 @@ const NetworkGlobe = ({
             <span className="block h-1.5 w-1.5 rounded-full bg-current" />
             <span className="block h-1.5 w-1.5 rounded-full bg-current" />
           </div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Waiting for visitor activity</h3>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">{emptyTitle}</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[240px]">
-            Connect your tracker to see visitors appear in real time.
+            {emptyText}
           </p>
         </div>
       )}
@@ -856,7 +862,7 @@ const NetworkGlobe = ({
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="text-slate-500 dark:text-slate-400">Active visitors</span>
+                <span className="text-slate-500 dark:text-slate-400">{metricLabel}</span>
                 <span className="font-bold text-violet-600 dark:text-violet-400 tabular-nums">
                   {tooltip.node.count.toLocaleString()}
                 </span>
@@ -880,7 +886,7 @@ const NetworkGlobe = ({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
-                Active now
+                {statusLabel}
               </div>
             </div>
           </div>
@@ -908,7 +914,7 @@ const NetworkGlobe = ({
               : error
                 ? 'Unavailable'
                 : hasData
-                  ? `Live · ${realTimeVisitors.toLocaleString()} visitors`
+                  ? (liveLabel || `Live · ${realTimeVisitors.toLocaleString()} visitors`)
                   : 'Idle'}
           </span>
         </div>

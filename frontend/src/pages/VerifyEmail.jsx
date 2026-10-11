@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2, Sparkles, ShieldCheck } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import Logo from '../components/Logo';
+import { Button } from '../components/ui/Button';
+import { LiveChip } from '../components/ui/Display';
 
 export default function VerifyEmail() {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -21,7 +23,6 @@ export default function VerifyEmail() {
         }
     }, [email, navigate, showToast]);
 
-    // Focus first input on mount
     useEffect(() => {
         if (inputRefs.current[0]) {
             inputRefs.current[0].focus();
@@ -29,25 +30,21 @@ export default function VerifyEmail() {
     }, []);
 
     const handleChange = (index, value) => {
-        // Allow only numbers
         if (!/^\d*$/.test(value)) return;
 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
-        // Move to next input if value is entered
         if (value && index < 5) {
-            inputRefs.current[index + 1].focus();
+            inputRefs.current[index + 1]?.focus();
         }
     };
 
     const handleKeyDown = (index, e) => {
-        // Move to previous input on backspace if current is empty
         if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            inputRefs.current[index - 1].focus();
+            inputRefs.current[index - 1]?.focus();
         }
-        // Handle Enter key
         if (e.key === 'Enter') {
             e.preventDefault();
             if (otp.join('').length === 6) {
@@ -67,13 +64,12 @@ export default function VerifyEmail() {
         });
         setOtp(newOtp);
 
-        // Focus last filled input or the next empty one
         const lastIndex = Math.min(pastedData.length, 5);
-        inputRefs.current[lastIndex].focus();
+        inputRefs.current[lastIndex]?.focus();
     };
 
     const handleVerify = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         const code = otp.join('');
         if (code.length !== 6) {
             showToast('Please enter the complete 6-digit code', 'error');
@@ -82,7 +78,6 @@ export default function VerifyEmail() {
 
         setLoading(true);
         try {
-            // Real API call
             await apiRequest('/auth/verify-email', {
                 method: 'POST',
                 body: JSON.stringify({ code, email })
@@ -110,21 +105,32 @@ export default function VerifyEmail() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
-            <div className="w-full max-w-md">
-                <div className="flex items-center justify-between mb-8">
-                    <Logo />
-                </div>
+        <div className="auth-layout">
+            <div className="auth-panel">
+                <div className="auth-inner">
+                    <div className="mb-6 flex items-center justify-between">
+                        <Logo />
+                        <Link
+                            to="/login"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
+                            style={{ color: 'var(--muted-foreground)' }}
+                        >
+                            <ArrowLeft className="h-3.5 w-3.5" />
+                            Back to login
+                        </Link>
+                    </div>
 
-                <div className="card card-pad">
-                    <div className="text-center mb-8">
-                        <div className="w-12 h-12 bg-violet-50 dark:bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <Mail className="h-6 w-6 text-violet-500" />
+                    <div className="text-center mb-6">
+                        <div
+                            className="flex h-12 w-12 items-center justify-center rounded-2xl mx-auto mb-4"
+                            style={{ background: 'var(--accent)', color: 'var(--primary)' }}
+                        >
+                            <Mail className="h-6 w-6" />
                         </div>
-                        <h2 className="page-title !text-2xl mb-2 font-display">Verify your email</h2>
-                        <p className="page-sub">
-                            We sent a code to your email address.<br />
-                            Enter the 6-digit code below to continue.
+                        <h1 className="auth-title !text-2xl mb-2">Verify your email</h1>
+                        <p className="auth-desc">
+                            We sent a 6-digit code to <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{email}</span>.<br />
+                            Please enter it below to activate your account.
                         </p>
                     </div>
 
@@ -135,39 +141,61 @@ export default function VerifyEmail() {
                                     key={index}
                                     ref={el => inputRefs.current[index] = el}
                                     type="text"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
                                     maxLength={1}
                                     value={digit}
                                     onChange={(e) => handleChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
                                     onPaste={handlePaste}
-                                    className="w-12 h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-xl font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                                    className="w-12 h-14 text-center text-xl font-semibold rounded-xl transition-all"
+                                    style={{
+                                        background: 'var(--background)',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--foreground)'
+                                    }}
                                 />
                             ))}
                         </div>
 
-                        <button
+                        <Button
                             type="submit"
-                            disabled={loading || otp.join('').length !== 6}
-                            className="btn-primary btn-lg w-full"
+                            size="lg"
+                            block
+                            loading={loading}
+                            disabled={otp.join('').length !== 6}
                         >
-                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                            {loading ? 'Verifying...' : 'Verify account'}
-                        </button>
+                            Verify Account
+                        </Button>
                     </form>
 
-                    <div className="mt-8 text-center space-y-6">
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    <div className="mt-6 text-center space-y-3">
+                        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                             Didn't receive the code?{' '}
-                            <button onClick={handleResend} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline underline-offset-4 transition-colors">
+                            <button
+                                type="button"
+                                onClick={handleResend}
+                                className="font-semibold hover:underline underline-offset-4 transition-colors"
+                                style={{ color: 'var(--primary)' }}
+                            >
                                 Resend code
                             </button>
                         </p>
-
-                        <Link to="/login" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to login
-                        </Link>
                     </div>
+                </div>
+            </div>
+
+            <div className="auth-aside">
+                <div style={{ maxWidth: 440 }}>
+                    <div className="mb-4">
+                        <LiveChip label="Account Activation" />
+                    </div>
+                    <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.2, color: 'var(--foreground)' }}>
+                        One step away from your live pulse dashboard.
+                    </h2>
+                    <p className="mt-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-base)', lineHeight: 'var(--leading-relaxed)' }}>
+                        Verifying your email ensures that your real-time alerts, weekly digests, and usage threshold warnings arrive promptly.
+                    </p>
                 </div>
             </div>
         </div>

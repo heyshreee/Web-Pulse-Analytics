@@ -1,0 +1,32 @@
+# CODEOWNERS
+#
+# Reviewers are required for sensitive areas. Replace the placeholder handle
+# (@heyshreee) with the actual maintainers for each area as the team grows.
+#
+# Syntax: <path pattern> <@owner> ...
+
+# Default owner for everything not matched below
+*                                   @heyshreee
+
+# ---- Security-sensitive areas (explicit review required) ----
+
+# Backend authorization, auth flows, and middleware
+/backend/src/middleware/            @heyshreee
+/backend/src/controllers/auth.controller.js   @heyshreee
+/backend/src/utils/jwt.js           @heyshreee
+
+# Tracking ingestion (untrusted public input)
+/backend/src/controllers/visitor.controller.js   @heyshreee
+/backend/src/routes/v1/track.routes.js           @heyshreee
+/backend/src/middleware/trackingCors.js          @heyshreee
+
+# Database schema, policies, and migrations
+/supabase/                          @heyshreee
+
+# CI, release, and security workflows
+/.github/workflows/                 @heyshreee
+/.github/CODEOWNERS                 @heyshreee
+/SECURITY.md                        @heyshreee
+
+# Deployment and environment templates
+/.env.example                       @heyshreee

@@ -19,7 +19,6 @@ import ProjectTabs from '../components/project/ProjectTabs';
 import OverviewTab from '../components/project/tabs/OverviewTab';
 import AnalyticsTab from '../components/project/tabs/AnalyticsTab';
 import IntegrationTab from '../components/project/tabs/IntegrationTab';
-import SettingsTab from '../components/project/tabs/SettingsTab';
 
 // Modals
 import DeleteModal from '../components/project/modals/DeleteModal';
@@ -44,10 +43,9 @@ export default function ProjectDetail() {
   // Custom Data Hook
   const {
     project, stats, overviewStats, loading, loadingChart, saving, deleting,
-    projectName, setProjectName, allowedOrigins, setAllowedOrigins,
-    targetUrl, setTargetUrl, isActive, setIsActive, timezone, setTimezone,
-    notifications, setNotifications, shareToken, setShareToken,
-    loadData, loadStats, handleSaveSettings, handleDelete, handleLiveUpdate
+    allowedOrigins, setAllowedOrigins,
+    isActive, shareToken, setShareToken,
+    loadStats, handleSaveSettings, handleDelete, handleLiveUpdate
   } = useProjectData(idOrName, timeRange);
 
   // WebSocket Hook
@@ -60,7 +58,6 @@ export default function ProjectDetail() {
   const [showPagesModal, setShowPagesModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [editingSecurity, setEditingSecurity] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   // Modal Data States
   const [activityData, setActivityData] = useState([]);
@@ -166,11 +163,8 @@ export default function ProjectDetail() {
 
   const onSaveSecurity = () => handleSaveSettings();
 
-  const handleSaveSettingsWrapper = async () => {
-    const success = await handleSaveSettings();
-    if (success) {
-      setEditing(false);
-    }
+  const handleOpenSettings = () => {
+    navigate(`/dashboard/settings?project=${project.id}`);
   };
 
   const onDeleteConfirm = async (name) => {
@@ -196,6 +190,7 @@ export default function ProjectDetail() {
       <ProjectHeader 
         project={project} 
         onShowShare={() => setShowShareModal(true)} 
+        onOpenSettings={handleOpenSettings}
       />
 
       <ProjectTabs 
@@ -242,27 +237,6 @@ export default function ProjectDetail() {
           saving={saving}
           usageStats={usageStats}
           onSaveSecurity={onSaveSecurity}
-        />
-      )}
-
-      {activeTab === 'settings' && (
-        <SettingsTab 
-          project={project}
-          projectName={projectName}
-          setProjectName={setProjectName}
-          targetUrl={targetUrl}
-          setTargetUrl={setTargetUrl}
-          isActive={isActive}
-          onToggleActive={handleToggleActiveWrapper}
-          onDelete={() => setShowDeleteModal(true)}
-          onSave={handleSaveSettingsWrapper}
-          saving={saving}
-          timezone={timezone}
-          setTimezone={setTimezone}
-          notifications={notifications}
-          setNotifications={setNotifications}
-          editing={editing}
-          setEditing={setEditing}
         />
       )}
 

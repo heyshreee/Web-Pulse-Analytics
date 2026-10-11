@@ -1,0 +1,43 @@
+name: Security report (redirect)
+description: Do NOT disclose vulnerabilities in a public issue — read this first
+title: '[Security]: '
+labels: ['security']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ⚠️ Stop — do not report vulnerabilities here
+
+        Public issues are indexed and visible to everyone, which puts users at risk.
+        If you believe you have found a security vulnerability in Web Pulse Analytics,
+        please report it **privately**.
+
+        ### How to report privately
+
+        1. Use GitHub's **private vulnerability reporting**:
+           [Security → Report a vulnerability](https://github.com/heyshreee/Web-Pulse-Analytics/security/advisories/new)
+        2. Full instructions and response expectations are in
+           [SECURITY.md](https://github.com/heyshreee/Web-Pulse-Analytics/blob/development/SECURITY.md).
+
+        Please do **not** include exploit details, proof-of-concept code, secrets, or
+        affected user data in a public issue. If a public issue already contains a
+        vulnerability, delete the sensitive content and report it privately instead.
+
+        You can use the field below only to note that a *public* issue needs urgent
+        moderation — **without** describing the vulnerability.
+
+  - type: checkboxes
+    id: acknowledgement
+    attributes:
+      label: Acknowledgement
+      options:
+        - label: I understand I must report the vulnerability privately and have not included exploit details here.
+          required: true
+
+  - type: input
+    id: tracking
+    attributes:
+      label: Private report reference (optional)
+      description: If you already opened a private advisory, you can link its reference here.
+    validations:
+      required: false
