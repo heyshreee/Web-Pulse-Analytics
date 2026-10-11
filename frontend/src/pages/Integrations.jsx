@@ -2,53 +2,52 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../components/ui/Icon';
 import { PageHead } from '../components/ui/Page';
-import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Display';
 import { useToast } from '../context/ToastContext';
 
 const INITIAL_INTEGRATIONS = [
   {
+    id: 'next',
+    name: 'Next.js',
+    initials: 'N',
+    desc: 'Send route changes and server events from a Next.js application.',
+    connected: true
+  },
+  {
     id: 'vercel',
     name: 'Vercel',
-    initials: 'VC',
-    desc: 'Automatically inject tracking snippets and sync deployment environments.',
-    connected: true,
-    route: '/dashboard/settings'
+    initials: '▲',
+    desc: 'Zero-config deployment events and live traffic from a Vercel project.',
+    connected: true
   },
   {
     id: 'gtm',
     name: 'Google Tag Manager',
-    initials: 'GM',
-    desc: 'Deploy WebPulse tags and custom event triggers through your GTM container.',
+    initials: 'G',
+    desc: 'Mirror WebPulse events into an existing GTM container.',
     connected: false
   },
   {
     id: 'slack',
-    name: 'Slack Alerts',
-    initials: 'SL',
-    desc: 'Receive real-time spike notifications and daily digests in your team channels.',
-    connected: true
-  },
-  {
-    id: 'webhooks',
-    name: 'Custom Webhooks',
-    initials: 'WH',
-    desc: 'Stream raw event payloads directly into your data warehouse or serverless functions.',
+    name: 'Slack',
+    initials: 'S',
+    desc: 'Post traffic spikes and alert thresholds to a channel.',
     connected: false
   },
   {
-    id: 'segment',
-    name: 'Segment',
-    initials: 'SG',
-    desc: 'Forward Customer Data Platform (CDP) identities and events into WebPulse.',
+    id: 'webflow',
+    name: 'Webflow',
+    initials: 'W',
+    desc: 'Track published site traffic with a custom snippet.',
     connected: false
   },
   {
-    id: 'zapier',
-    name: 'Zapier',
-    initials: 'ZP',
-    desc: 'Trigger automations across 5,000+ apps when traffic anomalies occur.',
-    connected: false
+    id: 'docs',
+    name: 'Documentation',
+    initials: '?',
+    desc: 'Read the tracking guide, API reference, and SDK options.',
+    connected: false,
+    route: '/docs'
   }
 ];
 
@@ -70,37 +69,37 @@ export default function Integrations() {
     <div className="page animate-fade-in">
       <PageHead
         title="Integrations"
-        desc="Connect WebPulse to the tools and platforms you already use."
+        desc="Connect WebPulse to the tools you already use."
       />
 
-      <div className="integration-grid mt-6">
+      <div className="integration-grid">
         {items.map((it) => (
-          <section key={it.id} className="card integration-card flex flex-col justify-between">
-            <div>
-              <div className="integration-head">
-                <span className="integration-mark" aria-hidden="true">
-                  {it.initials}
-                </span>
-                <div className="card-head-text flex-1">
-                  <h2 className="card-title text-base font-semibold">{it.name}</h2>
-                  {it.connected ? (
-                    <Badge variant="success" className="mt-1">
-                      <span className="inline-flex items-center gap-1">
-                        <Icon name="checkCircle" size={11} />
-                        Connected
-                      </span>
-                    </Badge>
-                  ) : null}
-                </div>
+          <section key={it.id} className="card integration-card">
+            <div className="integration-head">
+              <span className="integration-mark" aria-hidden="true">
+                {it.initials}
+              </span>
+              <div className="card-head-text">
+                <h2 className="card-title" style={{ fontSize: 'var(--text-md)' }}>
+                  {it.name}
+                </h2>
+                {it.connected ? (
+                  <Badge variant="success">
+                    <span className="inline-flex items-center gap-1">
+                      <Icon name="checkCircle" size={11} />
+                      Connected
+                    </span>
+                  </Badge>
+                ) : null}
               </div>
-
-              <p className="integration-desc text-xs text-muted-foreground mt-3">{it.desc}</p>
             </div>
 
-            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
+            <p className="integration-desc">{it.desc}</p>
+
+            <div className="row-2">
               {it.route ? (
                 <Link to={it.route} className="btn btn--outline btn--sm">
-                  Configure
+                  Open
                   <Icon name="chevronRight" size={14} />
                 </Link>
               ) : it.connected ? (
@@ -108,13 +107,13 @@ export default function Integrations() {
                   <button
                     type="button"
                     className="btn btn--outline btn--sm"
-                    onClick={() => showToast(`Configuring ${it.name}`)}
+                    onClick={() => showToast(`Configuring ${it.name}`, 'Project settings updated.')}
                   >
                     Configure
                   </button>
                   <button
                     type="button"
-                    className="btn btn--ghost btn--sm text-destructive hover:bg-destructive/10"
+                    className="btn btn--ghost btn--sm"
                     onClick={() => handleToggleConnect(it)}
                   >
                     Disconnect
