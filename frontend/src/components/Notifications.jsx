@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bell, X, Check, Trash2, Info, AlertTriangle, CheckCircle, AlertCircle, Shield, Activity, Settings, ChevronRight } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
@@ -10,6 +10,16 @@ export default function Notifications() {
     const [activeTab, setActiveTab] = useState('all');
     const dropdownRef = useRef(null);
     const { showToast, notificationSpotlight, triggerNotificationSpotlight } = useToast();
+
+    const loadNotifications = useCallback(async () => {
+        try {
+            const data = await apiRequest('/notifications');
+            setNotifications(data);
+            setUnreadCount(data.filter(n => !n.is_read).length);
+        } catch (err) {
+            console.error('Failed to load notifications:', err);
+        }
+    }, []);
 
     useEffect(() => {
         loadNotifications();
@@ -32,7 +42,7 @@ export default function Notifications() {
             clearInterval(interval);
             window.removeEventListener('notification_received', handleNewNotification);
         };
-    }, []);
+    }, [loadNotifications, showToast, triggerNotificationSpotlight]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -46,16 +56,6 @@ export default function Notifications() {
         }
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen]);
-
-    const loadNotifications = async () => {
-        try {
-            const data = await apiRequest('/notifications');
-            setNotifications(data);
-            setUnreadCount(data.filter(n => !n.is_read).length);
-        } catch (err) {
-            console.error('Failed to load notifications:', err);
-        }
-    };
 
     const markAsRead = async (id) => {
         try {

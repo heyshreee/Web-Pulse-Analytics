@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Sheet } from '../ui/Overlay';
 import Icon from '../ui/Icon';
 import { apiRequest } from '../../utils/api';
@@ -58,11 +58,7 @@ export default function NotificationsSheet({ open, onClose, onCountChange }) {
 
   const { showToast } = useToast();
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       const data = await apiRequest('/notifications');
       if (Array.isArray(data) && data.length > 0) {
@@ -79,7 +75,11 @@ export default function NotificationsSheet({ open, onClose, onCountChange }) {
     } catch {
       // keep fallback
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
 
   const unreadCount = useMemo(() => notifications.filter((n) => n.unread).length, [notifications]);
 
