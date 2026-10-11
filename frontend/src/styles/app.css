@@ -318,6 +318,7 @@
     align-items: center;
     gap: var(--space-2);
     min-width: 0;
+    transition: gap var(--duration-slow) var(--ease-out);
   }
 
   .brand-mark {
@@ -366,7 +367,10 @@
     cursor: pointer;
     text-align: left;
     transition: background var(--duration-fast) var(--ease-out),
-      border-color var(--duration-fast) var(--ease-out);
+      border-color var(--duration-fast) var(--ease-out),
+      width var(--duration-slow) var(--ease-out),
+      padding var(--duration-slow) var(--ease-out),
+      gap var(--duration-slow) var(--ease-out);
   }
 
   .project-switch:hover {
@@ -455,6 +459,8 @@
     letter-spacing: var(--tracking-eyebrow);
     text-transform: uppercase;
     text-align: left;
+    transition: padding var(--duration-slow) var(--ease-out),
+      gap var(--duration-slow) var(--ease-out);
   }
 
   .nav-group-head:hover {
@@ -493,7 +499,9 @@
     width: 100%;
     text-align: left;
     transition: background var(--duration-fast) var(--ease-out),
-      color var(--duration-fast) var(--ease-out);
+      color var(--duration-fast) var(--ease-out),
+      padding var(--duration-slow) var(--ease-out),
+      gap var(--duration-slow) var(--ease-out);
   }
 
   .nav-item-label {
@@ -570,7 +578,9 @@
     background: transparent;
     cursor: pointer;
     text-align: left;
-    transition: background var(--duration-fast) var(--ease-out);
+    transition: background var(--duration-fast) var(--ease-out),
+      padding var(--duration-slow) var(--ease-out),
+      gap var(--duration-slow) var(--ease-out);
   }
 
   .user-card:hover {
@@ -627,21 +637,45 @@
     font-size: var(--text-sm);
   }
 
+  .brand-text,
+  .nav-item-label,
+  .nav-trailing,
+  .nav-group-head > span,
+  .user-meta,
+  .project-switch-text,
+  .project-switch-caret {
+    overflow: hidden;
+    max-width: 260px;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity var(--duration-slow) var(--ease-out),
+      max-width var(--duration-slow) var(--ease-out);
+  }
+
   .app[data-nav="collapsed"] .brand-text,
   .app[data-nav="collapsed"] .nav-item-label,
   .app[data-nav="collapsed"] .nav-trailing,
-  .app[data-nav="collapsed"] .nav-group-head span,
-  .app[data-nav="collapsed"] .user-meta {
-    display: none;
+  .app[data-nav="collapsed"] .nav-group-head > span,
+  .app[data-nav="collapsed"] .user-meta,
+  .app[data-nav="collapsed"] .project-switch-text,
+  .app[data-nav="collapsed"] .project-switch-caret {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  .app[data-nav="collapsed"] .nav-trailing {
+    margin-left: 0;
   }
 
   .app[data-nav="collapsed"] .brand {
     justify-content: center;
+    gap: 0;
   }
 
   .app[data-nav="collapsed"] .nav-item {
     justify-content: center;
     padding-inline: 0;
+    gap: 0;
   }
 
   .app[data-nav="collapsed"] .nav-group-head {
@@ -652,11 +686,13 @@
   .app[data-nav="collapsed"] .user-card {
     justify-content: center;
     padding-inline: 0;
+    gap: 0;
   }
 
   .app[data-nav="collapsed"] .project-switch {
     justify-content: center;
     padding-inline: 0;
+    gap: 0;
     width: 38px;
     margin-inline: auto;
   }
@@ -3799,28 +3835,39 @@
     .app[data-nav="collapsed"] .brand-text,
     .app[data-nav="collapsed"] .nav-item-label,
     .app[data-nav="collapsed"] .nav-trailing,
-    .app[data-nav="collapsed"] .nav-group-head span,
-    .app[data-nav="collapsed"] .user-meta {
-      display: revert;
+    .app[data-nav="collapsed"] .nav-group-head > span,
+    .app[data-nav="collapsed"] .user-meta,
+    .app[data-nav="collapsed"] .project-switch-text,
+    .app[data-nav="collapsed"] .project-switch-caret {
+      max-width: 260px;
+      opacity: 1;
+    }
+
+    .app[data-nav="collapsed"] .nav-trailing {
+      margin-left: auto;
     }
 
     .app[data-nav="collapsed"] .brand {
       justify-content: flex-start;
+      gap: var(--space-2);
     }
 
     .app[data-nav="collapsed"] .nav-item {
       justify-content: flex-start;
       padding-inline: 8px;
+      gap: 10px;
     }
 
     .app[data-nav="collapsed"] .nav-group-head {
       justify-content: flex-start;
       padding-inline: 8px;
+      gap: 4px;
     }
 
     .app[data-nav="collapsed"] .user-card {
       justify-content: flex-start;
       padding-inline: 6px;
+      gap: 10px;
     }
 
     .app[data-nav="collapsed"] .project-switch {
@@ -3828,6 +3875,7 @@
       margin-inline: 0;
       padding-inline: 10px 8px;
       justify-content: flex-start;
+      gap: var(--space-2);
     }
 
     .app-header {

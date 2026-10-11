@@ -36,7 +36,7 @@ const NAV_GROUPS = [
     items: [
       { route: '/dashboard/projects', label: 'Projects', icon: 'folder' },
       { route: '/dashboard/api-key', label: 'API Keys', icon: 'key' },
-      { route: '/integrations', label: 'Integrations', icon: 'link' }
+      { route: '/dashboard/integrations', label: 'Integrations', icon: 'link' }
     ]
   },
   {
@@ -58,9 +58,17 @@ export default function Sidebar({ user, onLogout }) {
 
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState({});
 
   const projectSwitchRef = useRef(null);
   const userCardRef = useRef(null);
+
+  const toggleGroup = (groupLabel) => {
+    setCollapsedGroups((prev) => ({
+      ...prev,
+      [groupLabel]: !prev[groupLabel]
+    }));
+  };
 
   const initials = user?.name
     ? user.name
@@ -69,7 +77,7 @@ export default function Sidebar({ user, onLogout }) {
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : 'WP';
+    : 'AR';
 
   const handleSelectProject = (id) => {
     setSelectedProjectId(id);
@@ -107,10 +115,10 @@ export default function Sidebar({ user, onLogout }) {
             style={{ background: currentProject?.installed ? 'var(--success)' : 'var(--warning)' }}
           />
           <span className="project-switch-text">
-            <span className="project-switch-name">{currentProject?.name || 'All Projects'}</span>
+            <span className="project-switch-name">{currentProject?.name || 'My Website'}</span>
             <span className="project-switch-env">{currentProject?.env || 'Production'}</span>
           </span>
-          <span aria-hidden="true" style={{ color: 'var(--muted-foreground)' }}>
+          <span className="project-switch-caret" aria-hidden="true" style={{ color: 'var(--muted-foreground)' }}>
             <Icon name="chevronDown" size={14} />
           </span>
         </button>
@@ -118,7 +126,7 @@ export default function Sidebar({ user, onLogout }) {
         <Popover
           open={projectMenuOpen}
           onClose={() => setProjectMenuOpen(false)}
-          anchorEl={projectSwitchRef.current}
+          anchorRef={projectSwitchRef}
           align="left"
           className="w-64"
         >
@@ -154,44 +162,64 @@ export default function Sidebar({ user, onLogout }) {
       </div>
 
       <nav className="sidebar-scroll" aria-label="Main">
-        {NAV_GROUPS.map((group) => (
-          <div className="nav-group" key={group.label} data-group={group.label}>
-            <div className="nav-group-head">
-              <span>{group.label}</span>
-            </div>
-            <div className="nav-group-items">
-              {group.items.map((item) => {
-                const isActive = item.end
-                  ? location.pathname === item.route
-                  : location.pathname.startsWith(item.route);
+        {NAV_GROUPS.map((group) => {
+          const isCollapsed = Boolean(collapsedGroups[group.label]);
+          return (
+            <div className="nav-group" key={group.label} data-group={group.label}>
+              <button
+                type="button"
+                className="nav-group-head"
+                onClick={() => toggleGroup(group.label)}
+                aria-expanded={!isCollapsed}
+              >
+                <span>{group.label}</span>
+                <span className="chev">
+                  <Icon
+                    name="chevronDown"
+                    size={13}
+                    style={{
+                      transform: isCollapsed ? 'rotate(-90deg)' : 'none',
+                      transition: 'transform 0.15s ease'
+                    }}
+                  />
+                </span>
+              </button>
+              {!isCollapsed && (
+                <div className="nav-group-items">
+                  {group.items.map((item) => {
+                    const isActive = item.end
+                      ? location.pathname === item.route
+                      : location.pathname.startsWith(item.route);
 
-                return (
-                  <NavLink
-                    key={item.route}
-                    to={item.route}
-                    className={`nav-item ${isActive ? 'is-active' : ''}`}
-                    title={item.label}
-                  >
-                    <span className="nav-icon">
-                      <Icon name={item.icon} size={16} />
-                    </span>
-                    <span className="nav-item-label">{item.label}</span>
-                    {item.live ? (
-                      <span className="nav-trailing">
-                        <span className="live-dot" aria-hidden="true" />
-                      </span>
-                    ) : null}
-                    {item.count ? (
-                      <span className="nav-trailing">
-                        <span className="nav-count">{item.count}</span>
-                      </span>
-                    ) : null}
-                  </NavLink>
-                );
-              })}
+                    return (
+                      <NavLink
+                        key={item.route}
+                        to={item.route}
+                        className={`nav-item ${isActive ? 'is-active' : ''}`}
+                        title={item.label}
+                      >
+                        <span className="nav-icon">
+                          <Icon name={item.icon} size={16} />
+                        </span>
+                        <span className="nav-item-label">{item.label}</span>
+                        {item.live ? (
+                          <span className="nav-trailing">
+                            <span className="live-dot" aria-hidden="true" />
+                          </span>
+                        ) : null}
+                        {item.count ? (
+                          <span className="nav-trailing">
+                            <span className="nav-count">{item.count}</span>
+                          </span>
+                        ) : null}
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
 
       <div className="sidebar-foot">
@@ -219,7 +247,7 @@ export default function Sidebar({ user, onLogout }) {
         <Popover
           open={userMenuOpen}
           onClose={() => setUserMenuOpen(false)}
-          anchorEl={userCardRef.current}
+          anchorRef={userCardRef}
           align="left"
           className="w-60"
         >
