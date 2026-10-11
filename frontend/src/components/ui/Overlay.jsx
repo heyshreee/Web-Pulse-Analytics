@@ -147,23 +147,29 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
  * Anchored dropdown. Positions against the trigger with viewport flipping so it
  * never renders off-screen, and closes on outside click, Escape, scroll, or resize.
  */
-export function Popover({ open, onClose, trigger, children, align = 'end', width = 240, className }) {
-  const anchorRef = useRef(null);
+export function Popover({ open, onClose, trigger, anchorRef: externalAnchorRef, children, align = 'end', width = 240, className }) {
+  const internalAnchorRef = useRef(null);
   const panelRef = useRef(null);
   const [pos, setPos] = useState(null);
 
   const place = useCallback(() => {
-    const a = anchorRef.current;
+    const a = externalAnchorRef?.current || internalAnchorRef.current;
     if (!a) return;
-    const r = a.getBoundingClientRect();
-    const left = align === 'end' ? r.right - width : r.left;
+    // The default trigger wrapper uses `display: contents`, which has no box of
+    // its own (getBoundingClientRect returns 0,0,0,0). Fall back to the trigger
+    // element itself so the panel anchors to what the user actually clicked.
+    let r = a.getBoundingClientRect();
+    if (!r.width && !r.height && a.firstElementChild) {
+      r = a.firstElementChild.getBoundingClientRect();
+    }
+    const left = (align === 'start' || align === 'left') ? r.left : (align === 'end' || align === 'right') ? r.right - width : r.left;
     const flipUp = r.bottom + 260 > window.innerHeight && r.top > 300;
     setPos({
       left: Math.max(8, Math.min(left, window.innerWidth - width - 8)),
       top: flipUp ? undefined : r.bottom + 6,
       bottom: flipUp ? window.innerHeight - r.top + 6 : undefined,
     });
-  }, [align, width]);
+  }, [align, width, externalAnchorRef]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -172,7 +178,8 @@ export function Popover({ open, onClose, trigger, children, align = 'end', width
     const raf = requestAnimationFrame(place);
 
     const onDown = (e) => {
-      if (anchorRef.current?.contains(e.target) || panelRef.current?.contains(e.target)) return;
+      const a = externalAnchorRef?.current || internalAnchorRef.current;
+      if (a?.contains(e.target) || panelRef.current?.contains(e.target)) return;
       onClose?.();
     };
     const onKey = (e) => {
@@ -191,13 +198,15 @@ export function Popover({ open, onClose, trigger, children, align = 'end', width
       window.removeEventListener('scroll', place, true);
       window.removeEventListener('resize', place);
     };
-  }, [open, onClose, place]);
+  }, [open, onClose, place, externalAnchorRef]);
 
   return (
     <>
-      <span ref={anchorRef} className="contents">
-        {trigger}
-      </span>
+      {trigger ? (
+        <span ref={internalAnchorRef} className="contents">
+          {trigger}
+        </span>
+      ) : null}
       {open
         ? createPortal(
             <div className="overlay-anchor" role="presentation">

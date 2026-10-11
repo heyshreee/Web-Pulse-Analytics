@@ -16,9 +16,11 @@ const ROUTE_NAMES = {
   '/dashboard/alerts': 'Alerts',
   '/dashboard/projects': 'Projects',
   '/dashboard/api-key': 'API Keys',
+  '/dashboard/api-keys': 'API Keys',
   '/dashboard/billing': 'Billing',
   '/dashboard/settings': 'Settings',
   '/dashboard/activity': 'Activity Log',
+  '/dashboard/integrations': 'Integrations',
   '/integrations': 'Integrations',
   '/docs': 'Documentation'
 };
@@ -163,7 +165,7 @@ export default function Header({
         <Popover
           open={userMenuOpen}
           onClose={() => setUserMenuOpen(false)}
-          anchorEl={avatarRef.current}
+          anchorRef={avatarRef}
           align="right"
           className="w-56"
         >
