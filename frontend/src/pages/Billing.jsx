@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import Icon from '../components/ui/Icon';
 import { Button } from '../components/ui/Button';
@@ -6,13 +6,12 @@ import { PageHead } from '../components/ui/Page';
 import { Card, CardHead, CardTitle, CardSub, CardBody } from '../components/ui/Card';
 import { Badge } from '../components/ui/Display';
 import { useToast } from '../context/ToastContext';
-import { apiRequest } from '../utils/api';
 import { fmtInt, downloadFile } from '../lib/format';
 
 const PLANS = [
   {
     name: 'Free',
-    amount: 0,
+    amount: '₹0',
     period: 'forever',
     desc: 'For personal projects and testing.',
     feats: ['1,000 monthly events', '1 website project', '24h data retention', 'Community support'],
@@ -20,31 +19,46 @@ const PLANS = [
     current: true
   },
   {
-    name: 'Pro',
-    amount: 29,
+    name: 'Basic',
+    amount: '₹299',
     period: 'per month',
-    desc: 'For growing websites and indie makers.',
+    desc: 'For developers and small websites.',
     feats: [
-      '100,000 monthly events',
-      'Unlimited websites',
-      '12-month data retention',
-      'Real-time alerts & webhook integration',
+      '50,000 monthly events',
+      'Multiple projects',
+      'Extended analytics usage',
+      'Advanced dashboard views',
+      'Report export'
+    ],
+    cta: 'Upgrade to Basic',
+    current: false
+  },
+  {
+    name: 'Pro',
+    amount: '₹999',
+    period: 'per month',
+    desc: 'For growing products and high-traffic websites.',
+    feats: [
+      '500,000 monthly events',
+      'Unlimited projects',
+      'Detailed visitor analytics',
+      'Webhooks & API access',
       'Priority support'
     ],
     cta: 'Upgrade to Pro',
     current: false
   },
   {
-    name: 'Enterprise',
-    amount: 99,
+    name: 'Business',
+    amount: '₹2,999',
     period: 'per month',
-    desc: 'For high-scale apps and teams.',
+    desc: 'For teams that need more control and scale.',
     feats: [
-      'Unlimited events',
+      '5,000,000 monthly events',
+      'Team collaboration & RBAC',
       'Custom retention windows',
-      'Team members & RBAC',
-      'Dedicated IP and uptime SLA',
-      '24/7 dedicated support'
+      'Dedicated support',
+      '99.9% uptime SLA'
     ],
     cta: 'Contact Sales',
     current: false
@@ -52,10 +66,10 @@ const PLANS = [
 ];
 
 export default function Billing() {
-  const { user, usageStats, loadUser } = useOutletContext();
+  const { user, usageStats } = useOutletContext();
   const { showToast } = useToast();
-  const [plans, setPlans] = useState(PLANS);
-  const [invoices, setInvoices] = useState([
+  const plans = PLANS;
+  const [invoices] = useState([
     { id: 'inv_3', month: 'Sep 2026', desc: 'Free plan · no charge', amount: '$0.00' },
     { id: 'inv_2', month: 'Aug 2026', desc: 'Free plan · no charge', amount: '$0.00' },
     { id: 'inv_1', month: 'Jul 2026', desc: 'Free plan · no charge', amount: '$0.00' }
@@ -169,7 +183,7 @@ export default function Billing() {
                     </div>
 
                     <div className="plan-price my-3">
-                      <span className="plan-amount text-3xl font-bold font-mono">${p.amount}</span>
+                      <span className="plan-amount text-3xl font-bold font-mono">{p.amount}</span>
                       <span className="plan-period text-xs text-muted-foreground ml-1.5">{p.period}</span>
                     </div>
 
