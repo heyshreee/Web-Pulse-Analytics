@@ -5,7 +5,6 @@ import Icon from '../ui/Icon';
 import { useTheme } from '../../context/ThemeContext';
 import { useProject } from '../../context/ProjectContext';
 import { useToast } from '../../context/ToastContext';
-import { copyText } from '../../lib/clipboard';
 
 export default function CommandPalette({ open, onClose, onToggleNav, onMarkAllRead }) {
   const [query, setQuery] = useState('');
@@ -17,8 +16,6 @@ export default function CommandPalette({ open, onClose, onToggleNav, onMarkAllRe
   const { theme, toggleTheme } = useTheme();
   const { currentProject, openAddProject, openInstallSnippet } = useProject();
   const { showToast } = useToast();
-
-  const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent || '');
 
   const allCommands = useMemo(
     () => [

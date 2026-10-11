@@ -47,7 +47,6 @@ export default function Layout() {
     closeAddProject,
     installSnippetTarget,
     closeInstallSnippet,
-    refreshProjects
   } = useProject();
 
   const navigate = useNavigate();
