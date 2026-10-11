@@ -216,6 +216,14 @@ function App() {
                       }
                     />
                     <Route
+                      path="/dashboard/api-keys"
+                      element={
+                        <PrivateRoute>
+                          <APIKeys />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
                       path="/dashboard/billing"
                       element={
                         <PrivateRoute>
@@ -255,7 +263,9 @@ function App() {
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/features" element={<Features />} />
                   <Route path="/api" element={<API />} />
-                  <Route path="/integrations" element={<Integrations />} />
+                  <Route path="/api-keys" element={<Navigate to="/dashboard/api-key" replace />} />
+                  <Route path="/api-key" element={<Navigate to="/dashboard/api-key" replace />} />
+                  <Route path="/integrations" element={<Navigate to="/dashboard/integrations" replace />} />
                   <Route path="/docs" element={<DocsLayout />}>
                     <Route index element={<DocsIndex />} />
                     <Route path="getting-started" element={<DocPage slug="getting-started" />} />
