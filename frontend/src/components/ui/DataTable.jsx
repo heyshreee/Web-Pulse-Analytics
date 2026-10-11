@@ -200,12 +200,26 @@ export default function DataTable({
           <tbody>
             {loading ? (
               Array.from({ length: Math.min(pageSize || 6, 8) }).map((_, r) => (
-                <tr key={r} className="animate-pulse">
-                  {cols.map((c) => (
-                    <td key={c.key} className={cn(c.align === 'right' && 'num')}>
-                      <div className={cn("skeleton skeleton--text h-3.5 my-1", c.align === 'right' ? 'w-16 ml-auto' : 'w-3/4')} />
-                    </td>
-                  ))}
+                <tr key={r}>
+                  {cols.map((c, ci) => {
+                    const isAction = c.key === '_action' || c.label === '';
+                    return (
+                      <td key={c.key} className={cn(c.align === 'right' && 'num')}>
+                        {isAction ? (
+                          <div className="skeleton h-6 w-16 rounded-md ml-auto" />
+                        ) : ci === 0 ? (
+                          <div className="flex flex-col gap-1.5 py-0.5">
+                            <div className="skeleton skeleton--text h-3.5 w-3/4" />
+                            <div className="skeleton skeleton--text h-2.5 w-1/2" />
+                          </div>
+                        ) : c.align === 'right' ? (
+                          <div className="skeleton skeleton--text h-3.5 my-1 w-12 ml-auto" />
+                        ) : (
+                          <div className="skeleton skeleton--text h-3.5 my-1 w-24" />
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             ) : (

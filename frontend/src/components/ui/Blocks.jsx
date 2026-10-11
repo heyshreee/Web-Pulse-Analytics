@@ -45,16 +45,16 @@ export function Kpi({ label, value, format, delta, invert, icon, compare, classN
 
 export function KpiGrid({ items, compare, loading, count, children, className }) {
   if (loading) {
-    const skeletonCount = count || (Array.isArray(items) && items.length > 0 ? items.length : 4);
+    const skeletonCount = count || 6;
     return (
       <div className={cn('kpi-grid', className)} aria-hidden="true">
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <div key={i} className="kpi">
             <div className="kpi-head justify-between">
-              <div className="skeleton skeleton--text w-24" />
+              <div className="skeleton skeleton--text w-20" />
               <div className="skeleton w-4 h-4 rounded-full" />
             </div>
-            <div className="skeleton h-8 w-28 my-1" />
+            <div className="skeleton h-7 w-24 my-1.5" />
             <div className="kpi-foot">
               <div className="skeleton skeleton--text w-16" />
             </div>
@@ -123,7 +123,7 @@ export function Bars({ items = [], rows, emptyText = 'No data in this range.', c
 const PALETTE = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-4)', 'var(--chart-5)', 'var(--chart-3)'];
 
 export function Donut({ items = [], data, size = 132, thickness = 14, centerLabel = 'Total', centerValue, colors, className }) {
-  const list = items && items.length > 0 ? items : (data || []);
+  const list = useMemo(() => (items && items.length > 0 ? items : (data || [])), [items, data]);
   const palette = colors || PALETTE;
   const total = list.reduce((sum, i) => sum + (Number(i.value) || 0), 0);
   const r = (size - thickness) / 2;
