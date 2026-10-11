@@ -958,7 +958,7 @@ export const updateProjectSettings = asyncHandler(async (req, res) => {
         userId,
         'project.settings_update',
         'Privacy and retention settings were updated',
-        'info',
+        'success',
         req.ip
     );
 

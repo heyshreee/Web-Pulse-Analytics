@@ -110,7 +110,7 @@ export default function Layout() {
     if (!API_URL.includes('vercel.app')) {
       const socket = io(SOCKET_URL, {
         withCredentials: true,
-        transports: ['websocket', 'polling'],
+        transports: ['polling', 'websocket'],
         reconnectionAttempts: 5
       });
       socketRef.current = socket;

@@ -17,7 +17,7 @@ const limiter = rateLimit({
                 userId,
                 'rate_limit.hit',
                 'Rate limit exceeded',
-                'blocked',
+                'warning',
                 ip,
                 {
                     resource: req.originalUrl,
