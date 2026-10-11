@@ -25,21 +25,32 @@ const AXIS = {
 
 function ChartTooltip({ active, payload, label, unit }) {
   if (!active || !payload?.length) return null;
+  // Anchor the panel directly above the hovered data point (Recharts positions
+  // the wrapper at the active point; the transform lifts the panel above it).
   return (
-    <div className="chart-tip" data-open="true" style={{ transform: 'translate(-50%, -110%)' }}>
+    <div
+      className="chart-tip"
+      data-open="true"
+      style={{ position: 'relative', top: 'auto', left: 'auto', transform: 'none' }}
+    >
       <div className="chart-tip-label">{label}</div>
       {payload.map((p) => (
-        <div key={p.dataKey} className="chart-tip-value" style={{ color: p.color }}>
+        <div className="chart-tip-value" key={p.dataKey ?? p.name}>
           {fmtInt(p.value)}
-          {unit || ''}
+          {unit ? ` ${unit}` : ''}
         </div>
       ))}
-      {payload[1] ? (
-        <div className="chart-tip-compare">prev: {fmtInt(payload[1].value)}</div>
+      {payload.length > 1 ? (
+        <div className="chart-tip-compare">
+          {payload[1].name || 'Previous'}: {fmtInt(payload[1].value)}
+        </div>
       ) : null}
     </div>
   );
 }
+
+// Shared styling for the dot that marks the currently hovered data point.
+const ACTIVE_DOT = { r: 4, fill: 'var(--chart-1)', stroke: 'var(--card)', strokeWidth: 2 };
 
 function Legend({ series }) {
   return (
@@ -93,7 +104,8 @@ export function TrafficChart({
             <YAxis {...AXIS} width={38} tickFormatter={compact} />
             <Tooltip
               content={<ChartTooltip />}
-              cursor={{ stroke: 'var(--chart-grid)', strokeWidth: 1 }}
+              wrapperStyle={{ position: 'absolute', zIndex: 20 }}
+              cursor={{ stroke: 'var(--chart-1)', strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
               type="monotone"
@@ -102,17 +114,19 @@ export function TrafficChart({
               strokeWidth={2}
               fill="url(#wpAreaFill)"
               dot={false}
-              activeDot={{ r: 3.5, strokeWidth: 2, stroke: 'var(--card)' }}
+              activeDot={ACTIVE_DOT}
               isAnimationActive={false}
             />
             {compare ? (
               <Line
                 type="monotone"
                 dataKey="compare"
+                name="Previous period"
                 stroke="var(--chart-series-compare)"
                 strokeWidth={1.5}
                 strokeDasharray="4 3"
                 dot={false}
+                activeDot={{ r: 3, fill: 'var(--chart-series-compare)', stroke: 'var(--card)', strokeWidth: 2 }}
                 isAnimationActive={false}
               />
             ) : null}
@@ -134,7 +148,11 @@ export function DistributionChart({ data = [], dataKey = 'views', height = 200, 
           <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
           <XAxis dataKey="name" {...AXIS} minTickGap={16} />
           <YAxis {...AXIS} width={34} tickFormatter={compact} />
-          <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--hover-tint)' }} />
+          <Tooltip
+            content={<ChartTooltip />}
+            wrapperStyle={{ position: 'absolute' }}
+            cursor={{ fill: 'var(--hover-tint)' }}
+          />
           <Bar dataKey={dataKey} radius={[4, 4, 0, 0]} isAnimationActive={false}>
             {data.map((d, i) => (
               <Cell key={d.name ?? i} fill={palette[i % palette.length]} />
@@ -155,13 +173,18 @@ export function TrendChart({ data = [], dataKey = 'views', compareKey, height = 
           <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
           <XAxis dataKey="name" {...AXIS} minTickGap={20} />
           <YAxis {...AXIS} width={34} tickFormatter={compact} />
-          <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'var(--chart-grid)' }} />
+          <Tooltip
+            wrapperStyle={{ position: 'absolute' }}
+            content={<ChartTooltip />}
+            cursor={{ stroke: 'var(--chart-1)', strokeWidth: 1, strokeDasharray: '3 3' }}
+          />
           <Line
             type="monotone"
             dataKey={dataKey}
             stroke="var(--chart-1)"
             strokeWidth={2}
             dot={false}
+            activeDot={ACTIVE_DOT}
             isAnimationActive={false}
           />
           {compareKey ? (
