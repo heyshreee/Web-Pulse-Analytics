@@ -1,7 +1,7 @@
 /**
  * Utility to generate tracking snippets for various frameworks and languages.
  */
-export const getSnippets = ({ trackingId, trackingUrl, user, project }) => {
+export const getSnippets = ({ trackingId, trackingUrl, _user, project }) => {
   const apiBaseUrl = trackingUrl.replace(new RegExp(`/track/${trackingId}$`), '');
   const scriptUrl = `${apiBaseUrl}/track/script.js`;
   const eventsUrl = `${apiBaseUrl}/track/events`;

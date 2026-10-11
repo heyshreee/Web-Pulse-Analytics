@@ -1,0 +1,73 @@
+name: Feature request
+description: Suggest an idea or improvement for Web Pulse Analytics
+title: '[Feature]: '
+labels: ['feature', 'needs-triage']
+body:
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checks
+      options:
+        - label: I searched existing issues and discussions; this is not a duplicate.
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Dashboard UI
+        - Marketing / docs site
+        - Tracking script
+        - API
+        - Real-time (Socket.IO)
+        - Database / Supabase
+        - Billing / plans
+        - Tooling / CI
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: release-line
+    attributes:
+      label: Release line
+      description: V1 must stay stable; new UI work is tracked separately under v2-ui.
+      options:
+        - v1-stabilization (keep the current release stable)
+        - v2-ui (new interface work)
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem does this solve? Why is it valuable?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or design you would like.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you weighed.
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, references, related issues.
+    validations:
+      required: false
