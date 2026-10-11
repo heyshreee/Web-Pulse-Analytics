@@ -3,11 +3,14 @@ import { Button } from '../components/ui/Button';
 import { PageHead, PageToolbar } from '../components/ui/Page';
 import { Card, CardHead, CardTitle, CardSub, CardBody } from '../components/ui/Card';
 import { Bars } from '../components/ui/Blocks';
+import NetworkGlobe from '../components/dashboard/NetworkGlobe';
 import DataTable from '../components/ui/DataTable';
 import { BlockSkeleton } from '../components/ui/State';
 import { useProject } from '../context/ProjectContext';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 import { fetchAnalyticsData } from '../lib/dataService';
+import { countryCentroid } from '../lib/countryGeo';
 import { fmtInt, fmtPct, toCsv, downloadFile } from '../lib/format';
 
 const RANGES = [
@@ -20,6 +23,7 @@ const RANGES = [
 export default function Geography() {
   const { selectedProjectId } = useProject();
   const { showToast } = useToast();
+  const { theme } = useTheme();
 
   const [range, setRange] = useState('24h');
   const [loading, setLoading] = useState(true);
@@ -51,13 +55,35 @@ export default function Geography() {
         Country: g.name,
         Visitors: g.visitors,
         Sessions: g.sessions,
-        BounceRate: `${g.bounce}%`,
+        BounceRate: g.bounce == null ? '—' : `${g.bounce}%`,
         Share: `${g.share}%`
       }))
     );
     downloadFile(`geography-${range}.csv`, csv, 'text/csv');
     showToast('Export complete', 'Geography report downloaded');
   };
+
+  const globeData = useMemo(() => {
+    const geo = data?.geography || [];
+    return geo
+      .map((g) => {
+        const c = countryCentroid(g.name);
+        if (!c) return null;
+        return {
+          id: c.iso2 || g.name,
+          lat: c.lat,
+          lng: c.lng,
+          location: `${g.flag ? `${g.flag} ` : ''}${g.name}`,
+          count: g.visitors || 0
+        };
+      })
+      .filter(Boolean);
+  }, [data]);
+
+  const liveVisitors = useMemo(
+    () => (data?.geography || []).reduce((acc, g) => acc + (g.visitors || 0), 0),
+    [data]
+  );
 
   const columns = useMemo(
     () => [
@@ -87,7 +113,7 @@ export default function Geography() {
         key: 'bounce',
         label: 'Bounce',
         align: 'right',
-        render: (r) => <span className="font-mono">{fmtPct(r.bounce)}</span>
+        render: (r) => <span className="font-mono">{r.bounce == null ? '—' : fmtPct(r.bounce)}</span>
       },
       {
         key: 'share',
@@ -110,7 +136,7 @@ export default function Geography() {
     <div className="page animate-fade-in">
       <PageHead
         title="Geography"
-        desc="Visitors by country and geographic region."
+        desc="Visitors by country and region."
         actions={
           <Button variant="outline" icon="download" onClick={handleExport}>
             Export
@@ -134,6 +160,31 @@ export default function Geography() {
       </PageToolbar>
 
       <div className="space-y-4 mt-4">
+        {/* Global network map */}
+        <Card>
+          <CardHead>
+            <div>
+              <CardTitle>Visitor network</CardTitle>
+              <CardSub>Live geography of recent visitors across countries</CardSub>
+            </div>
+          </CardHead>
+          <CardBody>
+            <div className="h-[360px]">
+              <NetworkGlobe
+                activityData={globeData}
+                loading={loading}
+                isDark={theme === 'dark'}
+                realTimeVisitors={liveVisitors}
+                metricLabel="Visitors"
+                statusLabel="Tracked"
+                loadingLabel="Loading geography"
+                emptyTitle="No location data yet"
+                emptyText="We'll plot countries here as soon as visitors arrive."
+              />
+            </div>
+          </CardBody>
+        </Card>
+
         {/* Visitors by country chart */}
         <Card>
           <CardHead>
