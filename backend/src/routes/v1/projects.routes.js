@@ -15,6 +15,8 @@ router.get('/', projectController.getProjects);
 router.get('/:id', projectController.getProject);
 router.put('/:id', projectController.updateProject);
 router.delete('/:id', projectController.deleteProject);
+router.get('/:id/settings', projectController.getProjectSettings);
+router.put('/:id/settings', projectController.updateProjectSettings);
 router.put('/:id/pin', projectController.togglePin);
 router.post('/:id/regenerate-token', projectController.regenerateShareToken);
 router.get('/:id/verify', projectController.verifyProjectInstallation);

@@ -17,8 +17,10 @@ export async function apiRequest(endpoint, options = {}) {
   // Token is now handled via HttpOnly cookie
   const token = getToken();
 
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'Pragma': 'no-cache',
     'Expires': '0',

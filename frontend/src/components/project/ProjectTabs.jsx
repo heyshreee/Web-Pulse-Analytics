@@ -4,8 +4,7 @@ export default function ProjectTabs({ activeTab, onTabChange }) {
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'analytics', label: 'Project Analytics' },
-    { id: 'integration', label: 'Integration' },
-    { id: 'settings', label: 'Settings' }
+    { id: 'integration', label: 'Integration' }
   ];
 
   return (

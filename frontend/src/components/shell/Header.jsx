@@ -25,6 +25,17 @@ const ROUTE_NAMES = {
   '/docs': 'Documentation'
 };
 
+const SETTINGS_SECTION_NAMES = {
+  general: 'General',
+  tracking: 'Tracking & Installation',
+  team: 'Team & Permissions',
+  privacy: 'Data & Privacy',
+  alerts: 'Alerts & Notifications',
+  integrations: 'Integrations & API',
+  account: 'Account & Security',
+  danger: 'Danger Zone'
+};
+
 export default function Header({
   isMobile,
   onToggleNav,
@@ -70,7 +81,7 @@ export default function Header({
   } else if (path.startsWith('/dashboard/settings/') && path.length > '/dashboard/settings/'.length) {
     const tab = path.replace('/dashboard/settings/', '');
     crumbs.push({ label: 'Settings', to: '/dashboard/settings' });
-    crumbs.push({ label: tab.charAt(0).toUpperCase() + tab.slice(1) });
+    crumbs.push({ label: SETTINGS_SECTION_NAMES[tab] || tab.charAt(0).toUpperCase() + tab.slice(1) });
   } else {
     crumbs.push({ label: ROUTE_NAMES[path] || 'Dashboard' });
   }

@@ -69,6 +69,11 @@ export const createProject = asyncHandler(async (req, res) => {
         count: 0
     });
 
+    // Initialize project settings with sane defaults
+    await supabase
+        .from('project_settings')
+        .upsert({ project_id: project.id }, { onConflict: 'project_id', ignoreDuplicates: true });
+
     // Notify user
     await NotificationService.create(
         userId,
@@ -233,7 +238,7 @@ export const deleteProject = asyncHandler(async (req, res) => {
 
 export const updateProject = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { name, allowedOrigins, targetUrl, isActive, timezone, notifications } = req.body;
+    const { name, allowedOrigins, targetUrl, isActive, timezone, notifications, environment, description } = req.body;
     const userId = req.user.id;
 
     let projectId = id;
@@ -273,6 +278,8 @@ export const updateProject = asyncHandler(async (req, res) => {
     if (isActive !== undefined) updates.is_active = isActive;
     if (timezone) updates.timezone = timezone;
     if (notifications) updates.notifications = notifications;
+    if (environment !== undefined) updates.environment = environment;
+    if (description !== undefined) updates.description = description;
 
     const { data: updatedProject, error } = await supabase
         .from('projects')
@@ -865,6 +872,99 @@ export const verifyProjectInstallation = asyncHandler(async (req, res) => {
     });
 });
 
+const SETTINGS_DEFAULTS = {
+    tracking_enabled: true,
+    anonymize_ip: true,
+    respect_dnt: true,
+    session_timeout_minutes: 30,
+    retention_days: 365
+};
+
+async function resolveOwnedProject(id, userId) {
+    let query = supabase.from('projects').select('id, name').eq('user_id', userId);
+    if (isUuid(id)) {
+        query = query.eq('id', id);
+    } else if (id.startsWith('trk_')) {
+        query = query.eq('tracking_id', id);
+    } else {
+        query = query.eq('name', id);
+    }
+    const { data: project } = await query.maybeSingle();
+    if (!project) throw AppError.notFound('Project not found');
+    return project;
+}
+
+export const getProjectSettings = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const project = await resolveOwnedProject(id, userId);
+
+    const { data, error } = await supabase
+        .from('project_settings')
+        .select('*')
+        .eq('project_id', project.id)
+        .maybeSingle();
+
+    if (error) throw error;
+
+    res.json({ projectId: project.id, ...SETTINGS_DEFAULTS, ...(data || {}) });
+});
+
+export const updateProjectSettings = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const {
+        tracking_enabled,
+        anonymize_ip,
+        respect_dnt,
+        session_timeout_minutes,
+        retention_days
+    } = req.body;
+
+    const project = await resolveOwnedProject(id, userId);
+
+    const updates = { project_id: project.id, updated_at: new Date().toISOString() };
+    if (tracking_enabled !== undefined) updates.tracking_enabled = !!tracking_enabled;
+    if (anonymize_ip !== undefined) updates.anonymize_ip = !!anonymize_ip;
+    if (respect_dnt !== undefined) updates.respect_dnt = !!respect_dnt;
+
+    if (session_timeout_minutes !== undefined) {
+        const timeout = Number(session_timeout_minutes);
+        if (!Number.isInteger(timeout) || timeout < 1 || timeout > 1440) {
+            throw AppError.badRequest('Session timeout must be between 1 and 1440 minutes');
+        }
+        updates.session_timeout_minutes = timeout;
+    }
+
+    if (retention_days !== undefined) {
+        const retention = Number(retention_days);
+        if (!Number.isInteger(retention) || retention < 1 || retention > 3650) {
+            throw AppError.badRequest('Retention must be between 1 and 3650 days');
+        }
+        updates.retention_days = retention;
+    }
+
+    const { data, error } = await supabase
+        .from('project_settings')
+        .upsert(updates, { onConflict: 'project_id' })
+        .select()
+        .single();
+
+    if (error) throw error;
+
+    await ActivityLogService.log(
+        project.id,
+        userId,
+        'project.settings_update',
+        'Privacy and retention settings were updated',
+        'info',
+        req.ip
+    );
+
+    res.json(data);
+});
+
 export default {
     createProject,
     getProjects,
@@ -878,5 +978,7 @@ export default {
     togglePin,
     getProjectActivity,
     getProjectPages,
-    verifyProjectInstallation
+    verifyProjectInstallation,
+    getProjectSettings,
+    updateProjectSettings
 };
