@@ -5,6 +5,7 @@ import { PageHead } from '../components/ui/Page';
 import { Card, CardHead, CardTitle, CardSub, CardBody } from '../components/ui/Card';
 import { Dialog } from '../components/ui/Overlay';
 import { Badge } from '../components/ui/Display';
+import { EmptyState } from '../components/ui/State';
 import { useToast } from '../context/ToastContext';
 import { useProject } from '../context/ProjectContext';
 import { getAlerts, createAlert, deleteAlert } from '../lib/supabase/alerts';
@@ -151,9 +152,16 @@ export default function Alerts() {
                 ))}
               </div>
             ) : alerts.length === 0 ? (
-              <div className="p-12 text-center text-muted-foreground text-sm">
-                No alerts configured yet. Click &quot;Add alert&quot; to create your first threshold.
-              </div>
+              <EmptyState
+                icon="flag"
+                title="No alerts configured"
+                text="Create thresholds to get notified when traffic spikes, conversions drop, or errors increase."
+                actions={
+                  <Button icon="plus" onClick={() => setDialogOpen(true)}>
+                    Add alert
+                  </Button>
+                }
+              />
             ) : (
               <div className="divide-y divide-border">
                 {alerts.map((a) => (

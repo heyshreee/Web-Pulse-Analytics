@@ -58,8 +58,8 @@ export default function Pages() {
         Views: p.views,
         Visitors: p.visitors,
         AvgTime: p.avg,
-        Bounce: `${p.bounce}%`,
-        Change: `${p.delta}%`
+        Bounce: p.bounce == null ? '—' : `${p.bounce}%`,
+        Change: p.delta == null ? '—' : `${p.delta}%`
       }))
     );
     downloadFile(`pages-${range}.csv`, csv, 'text/csv');
@@ -100,13 +100,14 @@ export default function Pages() {
         key: 'bounce',
         label: 'Bounce',
         align: 'right',
-        render: (r) => <span className="font-mono">{fmtPct(r.bounce)}</span>
+        render: (r) => <span className="font-mono">{r.bounce == null ? '—' : fmtPct(r.bounce)}</span>
       },
       {
         key: 'delta',
         label: 'Change',
         align: 'right',
         render: (r) => {
+          if (r.delta == null) return <span className="text-muted-foreground">—</span>;
           const positive = r.delta >= 0;
           return (
             <span className={`trend ${positive ? 'trend--up' : 'trend--down'}`}>
@@ -173,7 +174,7 @@ export default function Pages() {
       </PageToolbar>
 
       {/* KPI Grid */}
-      <KpiGrid loading={loading} items={data?.kpis?.slice(0, 4) || []} compare={compare} />
+      <KpiGrid loading={loading} items={data?.kpis || []} compare={compare} />
 
       <div className="space-y-4 mt-4">
         {/* Page Views Chart */}
@@ -264,7 +265,7 @@ export default function Pages() {
               </div>
               <div className="dl-item">
                 <span className="dl-label">Bounce rate</span>
-                <span className="dl-value font-mono">{fmtPct(activePage.bounce)}</span>
+                <span className="dl-value font-mono">{activePage.bounce == null ? '—' : fmtPct(activePage.bounce)}</span>
               </div>
             </div>
 

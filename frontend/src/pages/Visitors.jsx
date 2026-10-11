@@ -12,7 +12,7 @@ import { BlockSkeleton } from '../components/ui/State';
 import { useProject } from '../context/ProjectContext';
 import { useToast } from '../context/ToastContext';
 import { fetchAnalyticsData } from '../lib/dataService';
-import { fmtInt, toCsv, downloadFile } from '../lib/format';
+import { toCsv, downloadFile } from '../lib/format';
 
 const RANGES = [
   { id: '24h', label: 'Last 24 hours' },
@@ -194,11 +194,7 @@ export default function Visitors() {
       </PageToolbar>
 
       {/* KPI Grid */}
-      {loading ? (
-        <BlockSkeleton height={100} />
-      ) : (
-        <KpiGrid items={data?.kpis?.slice(0, 4) || []} compare={compare} />
-      )}
+      <KpiGrid loading={loading} items={data?.kpis || []} compare={compare} />
 
       <div className="space-y-4 mt-4">
         {/* Visitors Chart */}

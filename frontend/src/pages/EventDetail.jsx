@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Icon from '../components/ui/Icon';
 import { Button } from '../components/ui/Button';
@@ -7,7 +7,7 @@ import { Card, CardHead, CardTitle, CardSub, CardBody } from '../components/ui/C
 import { KpiGrid } from '../components/ui/Blocks';
 import { TrafficChart } from '../components/ui/Charts';
 import { useToast } from '../context/ToastContext';
-import { fmtInt, toCsv, downloadFile } from '../lib/format';
+import { toCsv, downloadFile } from '../lib/format';
 
 export default function EventDetail() {
   const { name } = useParams();
@@ -78,7 +78,7 @@ export default function EventDetail() {
       </div>
 
       <PageHead
-        title={`Event: ${eventName}`}
+        title="Event detail"
         desc="Occurrences, properties, and conversion for this event."
         actions={
           <Button variant="outline" icon="download" onClick={handleExport}>
@@ -116,9 +116,9 @@ export default function EventDetail() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Property</th>
-                    <th>Latest Value</th>
-                    <th style={{ width: '38%' }}>14-day Frequency</th>
+                    <th className="sortable"><span className="th-inner">Property</span></th>
+                    <th className="num"><span className="th-inner">Value</span></th>
+                    <th className="num"><span className="th-inner">Last 14 days</span></th>
                   </tr>
                 </thead>
                 <tbody>

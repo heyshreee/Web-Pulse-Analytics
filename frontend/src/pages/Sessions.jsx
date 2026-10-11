@@ -269,7 +269,9 @@ export default function Sessions() {
             <div>
               <CardTitle>Session recordings</CardTitle>
               <CardSub>
-                Showing {filteredSessions.length} active and completed sessions
+                {loading
+                  ? 'Loading session recordings…'
+                  : `Showing ${filteredSessions.length} active and completed sessions`}
               </CardSub>
             </div>
           </CardHead>
