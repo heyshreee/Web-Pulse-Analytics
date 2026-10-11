@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # Frontend (React + Vite)
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - frontend
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      frontend-minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+
+  # Backend (Express + Socket.IO)
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - backend
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      backend-minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: 'chore(ci)'
