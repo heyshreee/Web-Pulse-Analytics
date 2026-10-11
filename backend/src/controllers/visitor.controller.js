@@ -580,49 +580,74 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .gte('created_at', prevStartStr)
         .lt('created_at', startDateStr);
 
-    const { data: dailyViews } = await scope('page_views', 'created_at')
+    const { data: dailyViews } = await scope('page_views', 'created_at, visitor_id, session_id')
         .gte('created_at', startDateStr)
         .limit(50000);
 
-    const trafficMap = {};
+    const { data: prevDailyViews } = await scope('page_views', 'created_at')
+        .gte('created_at', prevStartStr)
+        .lt('created_at', startDateStr)
+        .limit(50000);
 
+    const bucketKey = (iso) => (range === '24h' ? iso.slice(0, 13) + ':00:00.000Z' : iso.split('T')[0]);
+    const bucketLabel = (iso) => (range === '24h'
+        ? new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+    const trafficKeys = [];
     if (range === '24h') {
         for (let i = 23; i >= 0; i--) {
             const d = new Date();
             d.setHours(d.getHours() - i);
-            const hourStr = d.toISOString().slice(0, 13) + ':00:00.000Z';
-            trafficMap[hourStr] = 0;
+            trafficKeys.push(d.toISOString().slice(0, 13) + ':00:00.000Z');
         }
     } else {
         for (let i = days - 1; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
-            trafficMap[dateStr] = 0;
+            trafficKeys.push(d.toISOString().split('T')[0]);
         }
     }
 
-    dailyViews?.forEach(v => {
-        let key;
-        if (range === '24h') {
-            key = v.created_at.slice(0, 13) + ':00:00.000Z';
-        } else {
-            key = v.created_at.split('T')[0];
-        }
-        if (trafficMap[key] !== undefined) {
-            trafficMap[key]++;
-        }
+    const trafficBuckets = trafficKeys.map(key => ({
+        key,
+        name: bucketLabel(key),
+        views: 0,
+        visitors: new Set(),
+        sessions: new Set(),
+        compare: 0
+    }));
+    const bucketIndex = new Map(trafficKeys.map((k, i) => [k, i]));
+
+    (dailyViews || []).forEach(v => {
+        const idx = bucketIndex.get(bucketKey(v.created_at));
+        if (idx === undefined) return;
+        const b = trafficBuckets[idx];
+        b.views++;
+        if (v.visitor_id) b.visitors.add(v.visitor_id);
+        if (v.session_id) b.sessions.add(v.session_id);
     });
 
-    const trafficData = Object.keys(trafficMap).map(key => {
-        let name;
-        if (range === '24h') {
-            name = new Date(key).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            name = new Date(key).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        }
-        return { name, views: trafficMap[key], fullDate: key };
+    // Previous-period counts aligned to the same bucket index for the compare series
+    const prevBucketIndex = new Map();
+    trafficKeys.forEach((k, i) => {
+        const d = new Date(k);
+        d.setTime(d.getTime() - spanMs);
+        prevBucketIndex.set(bucketKey(d.toISOString()), i);
     });
+    (prevDailyViews || []).forEach(v => {
+        const idx = prevBucketIndex.get(bucketKey(v.created_at));
+        if (idx !== undefined) trafficBuckets[idx].compare++;
+    });
+
+    const trafficData = trafficBuckets.map(b => ({
+        name: b.name,
+        views: b.views,
+        visitors: b.visitors.size,
+        sessions: b.sessions.size,
+        fullDate: b.key,
+        compare: b.compare
+    }));
 
     const { data: sources } = await scope('visitors', 'referrer')
         .gte('last_seen', startDateStr)
@@ -753,12 +778,14 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-    const { data: pages } = await scope('page_views', 'page_url, title')
+    const { data: pages } = await scope('page_views', 'page_url, title, visitor_id, session_id')
         .gte('created_at', startDateStr)
         .limit(50000);
 
     const pageMap = {};
+    const uniqueVisitorIds = new Set();
     pages?.forEach(p => {
+        if (p.visitor_id) uniqueVisitorIds.add(p.visitor_id);
         let path = '/';
         try {
             const url = new URL(p.page_url);
@@ -767,24 +794,80 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
             path = p.page_url || '/';
         }
         if (!pageMap[path]) {
-            pageMap[path] = { views: 0, title: p.title || path };
+            pageMap[path] = { views: 0, title: p.title || path, visitors: new Set(), sessions: new Set() };
         }
         pageMap[path].views++;
+        if (p.visitor_id) pageMap[path].visitors.add(p.visitor_id);
+        if (p.session_id) pageMap[path].sessions.add(p.session_id);
         if (p.title && p.title !== 'Unknown Page' && p.title !== path) {
             pageMap[path].title = p.title;
         }
     });
 
     const topPages = Object.entries(pageMap)
-        .map(([url, data]) => ({ url, views: data.views, title: data.title }))
+        .map(([url, data]) => ({
+            url,
+            views: data.views,
+            title: data.title,
+            unique_visitors: data.visitors.size,
+            sessions: data.sessions.size
+        }))
         .sort((a, b) => b.views - a.views)
         .slice(0, 10);
 
+    const uniqueVisitors = uniqueVisitorIds.size;
     const viewsTotal = trafficData.reduce((acc, d) => acc + d.views, 0);
+
+    const { data: userProjects } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('user_id', userId);
+    const projectIds = projectId ? [projectId] : (userProjects || []).map(p => p.id);
+
+    let eventsSummary = [];
+    let sessionsList = [];
+    if (projectIds.length) {
+        const [eventsRes, sessionsRes] = await Promise.all([
+            supabase
+                .from('events')
+                .select('event_name, visitor_id, occurred_at')
+                .in('project_id', projectIds)
+                .gte('occurred_at', startDateStr)
+                .limit(50000),
+            supabase
+                .from('sessions')
+                .select('*')
+                .in('project_id', projectIds)
+                .gte('last_activity_at', startDateStr)
+                .order('last_activity_at', { ascending: false })
+                .limit(50)
+        ]);
+
+        const eventMap = new Map();
+        (eventsRes.data || []).forEach(e => {
+            const name = e.event_name || 'custom_event';
+            if (!eventMap.has(name)) eventMap.set(name, { occurrences: 0, visitors: new Set(), last: null });
+            const entry = eventMap.get(name);
+            entry.occurrences += 1;
+            if (e.visitor_id) entry.visitors.add(e.visitor_id);
+            if (e.occurred_at && (!entry.last || e.occurred_at > entry.last)) entry.last = e.occurred_at;
+        });
+        eventsSummary = Array.from(eventMap.entries())
+            .map(([name, v]) => ({ name, occurrences: v.occurrences, visitors: v.visitors.size, last: v.last }))
+            .sort((a, b) => b.occurrences - a.occurrences);
+
+        sessionsList = sessionsRes.data || [];
+    }
+
+    const { data: visitorsList } = await scope('visitors', '*')
+        .gte('last_seen', startDateStr)
+        .order('last_seen', { ascending: false })
+        .limit(50);
 
     res.json({
         realTimeVisitors: realTimeVisitors || 0,
         viewsTotal,
+        uniqueVisitors,
         prevViews: prevViews || 0,
         sessions,
         prevSessions: prevTotals.sessions,
@@ -801,6 +884,9 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         osStats,
         countryStats,
         topPages,
+        eventsSummary,
+        sessionsList,
+        visitorsList: visitorsList || [],
         range
     });
 });
