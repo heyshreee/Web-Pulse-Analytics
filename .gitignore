@@ -1,2 +1,14 @@
 sample/
 /tmp
+todos/
+demo/
+/supabase/
+
+HANDOFF.md
+REDESIGN-HANDOFF.md
+
+# Ignore agent files
+Agentfile.md
+REFLECT.md
+DEBUG.md
+PRONOUNCIATION-GUIDE.md
