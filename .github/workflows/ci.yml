@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main, development, v1, v1-stabilization, v2, v2-ui]
+  pull_request:
+    branches: [main, development, v1, v1-stabilization, v2, v2-ui]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build (production)
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+          if-no-files-found: error
+
+  backend:
+    name: Backend (install + syntax + tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check all source files
+        run: find src -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Run tests (if a real test script exists)
+        run: |
+          if grep -q '"test"' package.json && ! grep -q 'no test specified' package.json; then
+            npm test
+          else
+            echo "No test script configured yet — skipping."
+          fi
+
+  ci:
+    name: CI
+    needs: [frontend, backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All required checks passed
+        run: echo "Frontend and backend checks passed."

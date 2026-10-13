@@ -1,4 +1,10 @@
-# Web Pulse Analytics
+# Web Pulse Analytics (v1)
+
+[![CI](https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml/badge.svg?branch=v1)](https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml/badge.svg?branch=v1)](https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml)
+[![Security](https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml/badge.svg?branch=v1)](https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version: v1.0.0](https://img.shields.io/badge/version-v1.0.0-blue.svg)](CHANGELOG.md)
 
 Web Pulse Analytics is a real-time visitor tracking and web analytics platform. It captures page views, events, and visitor attributes, and streams live activity to the dashboard over WebSockets so you can monitor traffic, performance, and user behavior as it happens.
 
@@ -185,15 +191,36 @@ Real-time activity is delivered to connected clients over Socket.IO from the bac
 | `npm run lint` | Run ESLint                |
 | `npm run preview` | Preview the production build |
 
-## Contributing
+## Documentation Directory
 
-Contributions are welcome. Please follow these steps:
+Explore the complete technical and operational documentation for Web Pulse Analytics v1:
 
-1. Fork the repository and create a feature branch (`git checkout -b feature/your-feature-name`).
-2. Make your changes and follow the existing code style and conventions.
-3. Run the linter (`npm run lint` in `frontend/`) before committing.
-4. Commit with a clear, descriptive message and open a pull request that references any related issues.
+- 📖 [Getting Started Guide](docs/getting-started.md) — Step-by-step local setup, environment configuration, and verification.
+- 🏗️ [Architecture Deep Dive](docs/architecture.md) — System architecture, data flow, Socket.IO streaming, and branching strategy.
+- 📡 [API Reference](docs/api-reference.md) — Comprehensive guide to REST endpoints, schemas, authentication, and error responses.
+- 🔍 [Tracking Guide](docs/tracking-guide.md) — Script installation, event tracking payloads, and CORS/origin verification.
+- 💾 [Database Schema](docs/database-schema.md) — Supabase PostgreSQL schema, tables, indexes, RPC functions, and RLS policies.
+- 🔒 [Security & Hardening](docs/security.md) — Security posture, Helmet headers, CSRF protection, rate limiting, and private reporting.
+- 🚀 [Deployment Guide](docs/deployment.md) — Production deployment instructions for backend and frontend.
+- 🛠️ [Troubleshooting Guide](docs/troubleshooting.md) — Diagnostic steps and solutions for common setup and runtime issues.
+- 🗺️ [Roadmap](docs/roadmap.md) — Priorities, v1 stabilization objectives, and future milestones.
+
+## Security & Compliance
+
+Security is a foundational pillar of Web Pulse Analytics:
+- **Strict Content Security Policy:** Dynamic CSP headers via Helmet guarding against unauthorized scripts and connections.
+- **Row Level Security (RLS):** Strict Supabase database policies preventing cross-tenant data leaks.
+- **Automated Security Pipelines:** CodeQL static analysis, Gitleaks secret detection, and Dependabot automated vulnerability updates.
+- **Private Disclosure:** If you uncover a security vulnerability, please review our [Security Policy](SECURITY.md) to report it privately.
+
+## Contributing & Community
+
+Contributions are welcome! Please follow these guidelines:
+- Read our [Contributing Guide](CONTRIBUTING.md) to set up your environment and workflow.
+- Adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
+- Check the [Support Guide](SUPPORT.md) for reporting issues and getting help.
+- Track updates in the [Changelog](CHANGELOG.md).
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** (Created on January 17, 2026) — see the [LICENSE](LICENSE) file for details.
