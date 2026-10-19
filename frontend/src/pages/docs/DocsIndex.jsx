@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import {
-    ArrowLeft, ArrowRight, ArrowDown, Activity, Server, Shield,
-    Zap, BookOpen, Code2, BarChart2
+    ArrowRight, ArrowDown, Activity, Server, Shield,
+    Zap, Code2
 } from 'lucide-react';
 import CodeBlock from './CodeBlock';
-import { API_DOMAIN } from './docsContent';
+import Reveal from '../../components/marketing/Reveal';
 
 const FlowStep = ({ label }) => (
-    <div className="rounded-xl px-4 py-2.5 text-center text-xs font-semibold border bg-violet-50 dark:bg-violet-500/10 border-violet-100 dark:border-violet-500/20 text-violet-600 dark:text-violet-400">
+    <div className="whitespace-nowrap rounded-xl border border-violet-400/20 bg-violet-500/10 px-4 py-2.5 text-center text-xs font-semibold text-violet-300">
         {label}
     </div>
 );
 
-const FlowArrowRight = () => <ArrowRight className="h-4 w-4 text-slate-300 dark:text-slate-600 hidden md:block" />;
-const FlowArrowDown = () => <ArrowDown className="h-4 w-4 text-slate-300 dark:text-slate-600 md:hidden" />;
+const FlowArrowRight = () => <ArrowRight className="hidden h-4 w-4 text-slate-600 md:block" aria-hidden="true" />;
+const FlowArrowDown = () => <ArrowDown className="h-4 w-4 text-slate-600 md:hidden" aria-hidden="true" />;
 
 const primaryCards = [
     {
@@ -64,77 +64,85 @@ const guideLinks = [
 export default function DocsIndex() {
     return (
         <div>
-            <div className="text-center mb-16">
-                <p className="eyebrow mb-3">Documentation</p>
-                <h1 className="page-title !text-4xl font-display text-center">Everything you need to <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">build with WebPulse</span>.</h1>
-                <p className="page-sub !text-base mt-4 max-w-2xl mx-auto">
+            <Reveal className="mb-16 text-center">
+                <p className="mkt-eyebrow mb-4">Documentation</p>
+                <h1 className="mkt-h1 !text-3xl sm:!text-4xl">
+                    Everything you need to{' '}
+                    <span className="mkt-accent-text">build with WebPulse</span>.
+                </h1>
+                <p className="mkt-lead mx-auto mt-4 max-w-2xl">
                     Set up tracking, send events, query analytics, and integrate WebPulse into your application.
                 </p>
-                <div className="flex flex-wrap justify-center gap-4 mt-8">
-                    <Link to="/docs/getting-started" className="btn-primary btn-md">
-                        Read the guides <ArrowRight className="h-4 w-4" />
+                <div className="mt-8 flex flex-wrap justify-center gap-3">
+                    <Link to="/docs/getting-started" className="mkt-btn mkt-btn-primary mkt-btn-md">
+                        Read the guides <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
-                    <Link to="/docs/api" className="btn-secondary btn-md">
+                    <Link to="/docs/api" className="mkt-btn mkt-btn-secondary mkt-btn-md">
                         API reference
                     </Link>
                 </div>
-            </div>
+            </Reveal>
 
-            <div className="card card-pad mb-16 bg-white/70 dark:bg-slate-900/60">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 tracking-tight flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-violet-500" /> Start tracking in minutes
-                </h3>
-                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-2">
-                    {flowSteps.map((step, i) => (
-                        <div key={step} className="flex md:flex-1 flex-col md:flex-row items-center gap-3 md:gap-2 w-full">
-                            {i > 0 && (
-                                <>
-                                    <FlowArrowDown />
-                                    <FlowArrowRight />
-                                </>
-                            )}
-                            <FlowStep label={step} />
-                        </div>
-                    ))}
+            <Reveal className="mb-16">
+                <div className="mkt-panel p-6">
+                    <h2 className="mb-6 flex items-center gap-2 text-lg font-bold tracking-tight text-slate-100">
+                        <Zap className="h-5 w-5 text-violet-300" aria-hidden="true" /> Start tracking in minutes
+                    </h2>
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2">
+                        {flowSteps.map((step, i) => (
+                            <div key={step} className="flex w-full flex-col items-center gap-3 md:flex-1 md:flex-row md:gap-2">
+                                {i > 0 && (
+                                    <>
+                                        <FlowArrowDown />
+                                        <FlowArrowRight />
+                                    </>
+                                )}
+                                <FlowStep label={step} />
+                            </div>
+                        ))}
+                    </div>
+                    <p className="mt-6 text-sm text-slate-400">
+                        From project creation to live analytics —{' '}
+                        <Link to="/docs/getting-started" className="font-semibold text-violet-300 transition-colors hover:text-violet-200">
+                            follow the quick start →
+                        </Link>
+                    </p>
                 </div>
-                <p className="prose-quiet text-sm mt-6">
-                    From project creation to live analytics — <Link to="/docs/getting-started" className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors">follow the quick start →</Link>
-                </p>
-            </div>
+            </Reveal>
 
-            <div className="mb-20">
-                <div className="grid md:grid-cols-2 gap-6">
-                    {primaryCards.map((card) => {
-                        const Icon = card.icon;
-                        return (
-                            <Link key={card.to} to={card.to} className="card card-pad card-hover group block">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10 group-hover:scale-105 transition-transform duration-300">
-                                        <Icon className="h-6 w-6 text-violet-500" />
+            <div className="mb-20 grid gap-6 md:grid-cols-2">
+                {primaryCards.map((card, i) => {
+                    const Icon = card.icon;
+                    return (
+                        <Reveal key={card.to} delay={(i % 2) * 70}>
+                            <Link to={card.to} className="mkt-card mkt-card-hover group block p-6">
+                                <div className="mb-4 flex items-center gap-4">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10 transition-transform duration-300 group-hover:scale-105">
+                                        <Icon className="h-6 w-6 text-violet-300" aria-hidden="true" />
                                     </div>
-                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{card.eyebrow}</p>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{card.eyebrow}</p>
                                 </div>
-                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white tracking-tight mb-5 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">{card.title}</h3>
-                                <span className="inline-flex items-center gap-1.5 text-violet-600 dark:text-violet-400 font-medium text-sm">
-                                    {card.cta} <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                <h2 className="mb-5 text-lg font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-violet-300">{card.title}</h2>
+                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-300">
+                                    {card.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                                 </span>
                             </Link>
-                        );
-                    })}
-                </div>
+                        </Reveal>
+                    );
+                })}
             </div>
 
-            <div className="mb-20">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">JavaScript</p>
-                <div className="card card-pad">
-                    <div className="grid lg:grid-cols-2 gap-8 items-center">
+            <Reveal className="mb-20">
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">JavaScript</p>
+                <div className="mkt-panel p-6">
+                    <div className="grid items-center gap-8 lg:grid-cols-2">
                         <div>
-                            <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3 tracking-tight">JavaScript Tracker</h3>
-                            <p className="prose-quiet mb-6">
+                            <h2 className="mb-3 font-display text-2xl font-bold tracking-tight text-slate-100">JavaScript Tracker</h2>
+                            <p className="mb-6 text-slate-400">
                                 Integrate WebPulse into your website using the lightweight JavaScript tracking module.
                             </p>
-                            <Link to="/docs/javascript" className="text-violet-600 dark:text-violet-400 font-medium flex items-center gap-1.5 text-sm hover:text-violet-500 transition-colors">
-                                View tracker documentation <ArrowRight className="h-4 w-4" />
+                            <Link to="/docs/javascript" className="mkt-link inline-flex items-center gap-1.5">
+                                View tracker documentation <ArrowRight className="h-4 w-4" aria-hidden="true" />
                             </Link>
                         </div>
                         <CodeBlock
@@ -144,43 +152,51 @@ export default function DocsIndex() {
                         />
                     </div>
                 </div>
-            </div>
+            </Reveal>
 
-            <div className="mb-20">
-                <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">Developer Guides</p>
-                    <Link to="/docs/guides" className="text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors flex items-center gap-1">
-                        Browse guides <ArrowRight className="h-4 w-4" />
+            <Reveal className="mb-20">
+                <div className="mb-4 flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Developer Guides</p>
+                    <Link to="/docs/guides" className="mkt-link inline-flex items-center gap-1">
+                        Browse guides <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid gap-4 sm:grid-cols-2">
                     {guideLinks.map((link) => (
-                        <Link key={link.label} to={link.to} className="card card-pad card-hover group/li block">
-                            <span className="font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 group-hover/li:text-violet-600 dark:group-hover/li:text-violet-400 transition-colors">
-                                <Code2 className="h-4 w-4 text-violet-500 shrink-0" />
+                        <Link key={link.label} to={link.to} className="mkt-card mkt-card-hover group/li block p-5">
+                            <span className="flex items-center gap-2 font-semibold tracking-tight text-slate-100 transition-colors group-hover/li:text-violet-300">
+                                <Code2 className="h-4 w-4 shrink-0 text-violet-400" aria-hidden="true" />
                                 {link.label}
-                                <ArrowRight className="h-4 w-4 text-violet-500 shrink-0 ml-auto group-hover/li:translate-x-1 transition-transform" />
+                                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-violet-400 transition-transform group-hover/li:translate-x-1" aria-hidden="true" />
                             </span>
-                            <p className="prose-quiet text-sm mt-1.5">{link.desc}</p>
+                            <p className="mt-1.5 text-sm text-slate-400">{link.desc}</p>
                         </Link>
                     ))}
                 </div>
-            </div>
+            </Reveal>
 
-            <div className="card card-pad text-center bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/5 border-violet-100 dark:border-white/[0.06]">
-                <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">Ready to build?</h3>
-                <p className="prose-quiet mb-6 max-w-xl mx-auto">
-                    Start a project and add WebPulse tracking to your site in a few minutes.
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                    <Link to="/register" className="btn-primary btn-lg">
-                        Get Started <ArrowRight className="h-4 w-4" />
-                    </Link>
-                    <Link to="/docs/api" className="btn-secondary btn-lg">
-                        View the API
-                    </Link>
+            <Reveal>
+                <div className="mkt-panel relative overflow-hidden px-6 py-12 text-center">
+                    <div
+                        aria-hidden="true"
+                        className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                    />
+                    <div className="relative">
+                        <h2 className="mkt-h3 !text-2xl">Ready to build?</h2>
+                        <p className="mkt-body mx-auto mt-3 max-w-xl">
+                            Start a project and add WebPulse tracking to your site in a few minutes.
+                        </p>
+                        <div className="mt-7 flex flex-wrap justify-center gap-3">
+                            <Link to="/register" className="mkt-btn mkt-btn-primary mkt-btn-lg">
+                                Get Started <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                            </Link>
+                            <Link to="/docs/api" className="mkt-btn mkt-btn-secondary mkt-btn-lg">
+                                View the API
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </Reveal>
         </div>
     );
 }

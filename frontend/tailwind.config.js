@@ -36,8 +36,9 @@ export default {
         '8xl': '88rem',
       },
       animation: {
-        'fade-up': 'fadeUp 0.5s ease-out both',
+        'fade-up': 'fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
         'fade-in': 'fadeIn 0.4s ease-out both',
+        'loading-bar': 'loadingBar 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite',
       },
       keyframes: {
         fadeUp: {
@@ -47,6 +48,10 @@ export default {
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        loadingBar: {
+          '0%': { transform: 'translateX(-200%)' },
+          '100%': { transform: 'translateX(200%)' },
         },
       },
     },

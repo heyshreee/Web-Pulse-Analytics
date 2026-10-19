@@ -1,4 +1,5 @@
 import { verifyToken } from '../utils/jwt.js';
+import supabase from '../config/supabase.js';
 
 import cookie from 'cookie';
 
@@ -41,10 +42,27 @@ export default (io) => {
             }
         }, 5 * 60 * 1000);
 
-        // Project rooms
-        socket.on('join_project', (projectId) => {
-            socket.join(`project_${projectId}`);
-            console.log(`User ${socket.user.id} joined room project_${projectId}`);
+        // Project rooms — verify ownership before joining so a user can never
+        // subscribe to another tenant's live activity stream.
+        socket.on('join_project', async (projectId) => {
+            try {
+                const { data: project } = await supabase
+                    .from('projects')
+                    .select('id')
+                    .eq('id', projectId)
+                    .eq('user_id', socket.user.id)
+                    .maybeSingle();
+
+                if (!project) {
+                    console.warn(`User ${socket.user.id} denied join for project_${projectId}`);
+                    return;
+                }
+
+                socket.join(`project_${projectId}`);
+                console.log(`User ${socket.user.id} joined room project_${projectId}`);
+            } catch (err) {
+                console.error('join_project failed:', err.message);
+            }
         });
 
         socket.on('leave_project', (projectId) => {

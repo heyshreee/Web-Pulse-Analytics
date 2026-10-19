@@ -404,7 +404,15 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 
     const sourceMap = {};
     sources?.forEach(s => {
-        const ref = s.referrer ? new URL(s.referrer).hostname : 'Direct';
+        let ref = 'Direct';
+        if (s.referrer) {
+            try {
+                ref = new URL(s.referrer).hostname;
+            } catch {
+                // Malformed referrer values must never break the dashboard.
+                ref = 'Direct';
+            }
+        }
         sourceMap[ref] = (sourceMap[ref] || 0) + 1;
     });
 
@@ -845,12 +853,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
     }
 
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const { count: realTimeVisitors } = await supabase
-        .from('visitors')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', project.id)
-        .eq('is_active', true)
-        .gte('last_seen', fiveMinutesAgo);
 
     const range = req.query.range || '7d';
     let timezone = req.query.timezone || 'UTC';
@@ -868,11 +870,26 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
     else startDate.setDate(startDate.getDate() - 6);
     const startDateStr = startDate.toISOString();
 
-    const { data: dailyViews } = await supabase
-        .from('page_views')
-        .select('created_at')
-        .eq('project_id', project.id)
-        .gte('created_at', startDateStr);
+    // The remaining reads are all independent for the same project — fire
+    // them concurrently. Sequential Supabase round-trips are otherwise the
+    // dominant cost of this endpoint (~1-2s each in some environments).
+    const [realTimeRes, dailyViewsRes, recentActivityRes, sourcesRes, uniqueVisitorsRes, devicesRes, pagesRes] = await Promise.all([
+        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', project.id).eq('is_active', true).gte('last_seen', fiveMinutesAgo),
+        supabase.from('page_views').select('created_at').eq('project_id', project.id).gte('created_at', startDateStr),
+        supabase.from('page_views').select('*, visitors(ip_address, device_type, city, country)').eq('project_id', project.id).order('created_at', { ascending: false }).limit(parseInt(req.query.limit) || 5),
+        supabase.from('visitors').select('referrer').eq('project_id', project.id).gte('last_seen', startDateStr),
+        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', project.id).gte('last_seen', startDateStr),
+        supabase.from('visitors').select('device_type').eq('project_id', project.id).gte('last_seen', startDateStr),
+        supabase.from('page_views').select('page_url, title').eq('project_id', project.id).gte('created_at', startDateStr)
+    ]);
+
+    const realTimeVisitors = realTimeRes.count;
+    const dailyViews = dailyViewsRes.data;
+    const recentActivity = recentActivityRes.data;
+    const sources = sourcesRes.data;
+    const uniqueVisitors = uniqueVisitorsRes.count;
+    const devices = devicesRes.data;
+    const pages = pagesRes.data;
 
     const trafficMap = {};
     if (range === '24h') {
@@ -911,13 +928,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         return { name, views: trafficMap[key], fullDate: key };
     }).sort((a, b) => a.fullDate.localeCompare(b.fullDate));
 
-    const { data: recentActivity } = await supabase
-        .from('page_views')
-        .select('*, visitors(ip_address, device_type, city, country)')
-        .eq('project_id', project.id)
-        .order('created_at', { ascending: false })
-        .limit(parseInt(req.query.limit) || 5);
-
     const activityList = await Promise.all((recentActivity || []).map(async v => {
         const visitor = v.visitors || {};
         const location = [visitor.city, visitor.country].filter(c => c && c !== 'Unknown').join(', ') || 'Unknown Location';
@@ -935,12 +945,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         return { id: v.id, type: 'view', location, ip: visitor.ip_address, lat, lng, path, title: v.title, timestamp: v.created_at, device: visitor.device_type };
     }));
 
-    const { data: sources } = await supabase
-        .from('visitors')
-        .select('referrer')
-        .eq('project_id', project.id)
-        .gte('last_seen', startDateStr);
-
     const sourceMap = {};
     sources?.forEach(s => {
         let ref = 'Direct';
@@ -954,18 +958,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         .slice(0, 5)
         .map((s, i) => ({ ...s, color: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'][i] || '#CBD5E1' }));
 
-    const { count: uniqueVisitors } = await supabase
-        .from('visitors')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', project.id)
-        .gte('last_seen', startDateStr);
-
-    const { data: devices } = await supabase
-        .from('visitors')
-        .select('device_type')
-        .eq('project_id', project.id)
-        .gte('last_seen', startDateStr);
-
     const deviceMap = {};
     devices?.forEach(d => {
         const type = d.device_type || 'desktop';
@@ -977,12 +969,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         value: deviceMap[key],
         color: key === 'desktop' ? '#3B82F6' : key === 'mobile' ? '#10B981' : '#F59E0B'
     }));
-
-    const { data: pages } = await supabase
-        .from('page_views')
-        .select('page_url, title')
-        .eq('project_id', project.id)
-        .gte('created_at', startDateStr);
 
     const pageMap = {};
     pages?.forEach(p => {
@@ -1040,7 +1026,12 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
     };
 
     if (navigator.sendBeacon) {
-      navigator.sendBeacon("${apiBaseUrl}/track/events", JSON.stringify(payload));
+      // sendBeacon cannot set request headers, so send JSON via a Blob and
+      // carry the API key in the payload (accepted by the server as fallback).
+      navigator.sendBeacon(
+        "${apiBaseUrl}/track/events",
+        new Blob([JSON.stringify({ ...payload, apiKey })], { type: "application/json" })
+      );
     } else {
       fetch("${apiBaseUrl}/track/events", {
         method: "POST",
@@ -1088,10 +1079,12 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
  * Uses x-api-key header for authentication.
  */
 export const trackEvent = asyncHandler(async (req, res) => {
-    const apiKey = req.headers['x-api-key'];
+    // The public SDK cannot always set headers (navigator.sendBeacon), so the
+    // key is accepted from the x-api-key header, the body, or the query string.
+    const apiKey = req.headers['x-api-key'] || req.body?.apiKey || req.query?.apiKey;
     if (!apiKey) throw AppError.unauthorized('Missing API key');
 
-    const { event, url, referrer, title, userAgent: bodyUA, ...customData } = req.body;
+    const { event, url, referrer, title, userAgent: bodyUA, apiKey: _ignoredApiKey, ...customData } = req.body;
     const userAgent = bodyUA || req.headers['user-agent'] || '';
     const ip = getClientIp(req);
 

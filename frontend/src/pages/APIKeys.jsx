@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 import { Copy, Key, Shield } from 'lucide-react';
+import Reveal from '../components/Reveal';
 import { useToast } from '../context/ToastContext';
 
 export default function APIKeys() {
@@ -36,7 +37,7 @@ export default function APIKeys() {
     );
 
     return (
-        <div className="space-y-8 animate-fade-up">
+        <div className="space-y-8">
             {/* Header */}
             <div className="page-header">
                 <div className="page-header-title">
@@ -72,7 +73,7 @@ export default function APIKeys() {
             </div>
 
             {/* Project Tracking IDs */}
-            <div className="card card-pad">
+            <Reveal delay={60} className="card card-pad">
                 <h2 className="section-title mb-6">Project Tracking IDs</h2>
 
                 <div className="space-y-3">
@@ -115,7 +116,7 @@ export default function APIKeys() {
                         </div>
                     )}
                 </div>
-            </div>
+            </Reveal>
         </div>
     );
 }

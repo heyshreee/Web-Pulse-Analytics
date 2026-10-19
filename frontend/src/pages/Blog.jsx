@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, BarChart2 } from 'lucide-react';
-import Logo from '../components/Logo';
+import { ArrowRight } from 'lucide-react';
+import MarketingShell from '../components/marketing/MarketingShell';
+import SectionHead from '../components/marketing/SectionHead';
+import Reveal from '../components/marketing/Reveal';
 
 const posts = [
     {
@@ -89,6 +91,18 @@ const categories = ['All', 'Product', 'Analytics', 'Engineering', 'Developers', 
 
 const [featured, ...latest] = posts;
 
+function ReadOnDevTo() {
+    return (
+        <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-violet-300 transition-colors group-hover:text-violet-200">
+            Read on dev.to
+            <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+            />
+        </span>
+    );
+}
+
 export default function Blog() {
     const [activeCategory, setActiveCategory] = useState('All');
 
@@ -97,127 +111,173 @@ export default function Blog() {
     );
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
-                        <span className="font-medium text-sm">Back to Home</span>
-                    </Link>
-                    <div className="flex items-center gap-2">
-                        <Link to="/features" className="hidden sm:block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Features</Link>
-                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
-                    </div>
-                </div>
-            </header>
+        <MarketingShell>
+            <section className="mkt-section">
+                <div className="mkt-container">
+                    <SectionHead
+                        eyebrow="Blog"
+                        title={
+                            <>
+                                Building WebPulse{' '}
+                                <span className="mkt-accent-text">in public</span>
+                            </>
+                        }
+                        description="Engineering notes, product updates, analytics concepts, and lessons from building a real-time web analytics platform."
+                    />
 
-            <main className="pt-28 pb-20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <p className="eyebrow mb-3">Blog</p>
-                        <h2 className="page-title !text-4xl font-display">Building WebPulse <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">in public</span></h2>
-                        <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
-                            Engineering notes, product updates, analytics concepts, and lessons from building a real-time web analytics platform.
+                    {/* Featured post */}
+                    <Reveal className="mt-16">
+                        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            Featured
                         </p>
-                    </div>
-
-                    <div className="mb-14">
-                        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">Featured</p>
-                        <a href={featured.url} target="_blank" rel="noopener noreferrer" className="card card-hover overflow-hidden group block">
-                            <div className="overflow-hidden">
-                                <img
-                                    src={featured.image}
-                                    alt={featured.title}
-                                    className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                                />
-                            </div>
-                            <div className="p-6 sm:p-8">
-                                <p className="text-sm font-semibold text-violet-600 dark:text-violet-400 mb-3">{featured.number} — {featured.category}</p>
-                                <h3 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 dark:text-white mb-3 tracking-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">{featured.title}</h3>
-                                <p className="text-lg font-medium text-slate-800 dark:text-slate-100 mb-3">{featured.headline}</p>
-                                <p className="prose-quiet mb-2">{featured.description}</p>
-                                <p className="prose-quiet mb-6">{featured.body}</p>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-slate-600 dark:text-slate-300">WebPulse Team · {featured.category}</span>
-                                    <span className="text-violet-600 dark:text-violet-400 font-medium flex items-center gap-1 text-sm">
-                                        Read on dev.to <ArrowRight className="h-4 w-4" />
-                                    </span>
+                        <a
+                            href={featured.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mkt-card mkt-card-hover group block overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        >
+                            <div className="lg:grid lg:grid-cols-[1.05fr_1.5fr]">
+                                <div className="overflow-hidden">
+                                    {/* Artwork is left-aligned; anchor the crop left so the
+                                        banner text is never cut when the column is narrow. */}
+                                    <img
+                                        src={featured.image}
+                                        alt={featured.title}
+                                        className="aspect-[1200/630] w-full object-cover object-left transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-auto lg:h-full lg:min-h-[20rem]"
+                                    />
+                                </div>
+                                <div className="p-6 sm:p-8 lg:p-10">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-300/90">
+                                        {featured.number} — {featured.category}
+                                    </p>
+                                    <h3 className="mkt-h3 mt-3 transition-colors group-hover:text-violet-200">
+                                        {featured.title}
+                                    </h3>
+                                    <p className="mt-3 text-base font-medium text-slate-200">
+                                        {featured.headline}
+                                    </p>
+                                    <p className="mkt-body mt-2">{featured.description}</p>
+                                    <p className="mkt-body mt-2">{featured.body}</p>
+                                    <div className="mt-7 border-t border-white/[0.06] pt-5">
+                                        <div className="flex flex-wrap items-center justify-between gap-3">
+                                            <span className="text-sm text-slate-400">
+                                                WebPulse Team · {featured.category}
+                                            </span>
+                                            <ReadOnDevTo />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </a>
-                    </div>
+                    </Reveal>
 
-                    <div className="mb-14">
-                        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">Latest</p>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filtered.map((post) => (
-                                <a href={post.url} target="_blank" rel="noopener noreferrer" className="card card-hover flex flex-col group overflow-hidden block">
-                                    <div className="overflow-hidden">
-                                        <img
-                                            src={post.image}
-                                            alt={post.title}
-                                            className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                                        />
-                                    </div>
-                                    <div className="p-6 flex flex-col flex-1">
-                                        <p className="text-sm font-semibold text-violet-600 dark:text-violet-400 mb-3">{post.number} — {post.category}</p>
-                                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 tracking-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">{post.title}</h3>
-                                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100 mb-2">{post.headline}</p>
-                                        <p className="prose-quiet mb-2">{post.description}</p>
-                                        {post.body && <p className="prose-quiet mb-5">{post.body}</p>}
-                                        <div className="mt-auto flex items-center justify-between pt-4">
-                                            <span className="text-sm text-slate-600 dark:text-slate-300">WebPulse Team · {post.category}</span>
-                                            <span className="text-violet-600 dark:text-violet-400 font-medium flex items-center gap-1 text-sm">
-                                                Read on dev.to <ArrowRight className="h-4 w-4" />
-                                            </span>
+                    {/* Latest + topic filter */}
+                    <div className="mt-24">
+                        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                Latest
+                            </p>
+                            <div className="lg:max-w-2xl">
+                                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Explore by topic
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {categories.map((category) => {
+                                        const isActive = activeCategory === category;
+                                        return (
+                                            <button
+                                                key={category}
+                                                type="button"
+                                                onClick={() => setActiveCategory(category)}
+                                                aria-pressed={isActive}
+                                                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                                    isActive
+                                                        ? 'border-violet-400/40 bg-violet-600 text-white'
+                                                        : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-violet-400/30 hover:text-slate-100'
+                                                }`}
+                                            >
+                                                {category}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            {filtered.map((post, i) => (
+                                <Reveal key={post.number} delay={(i % 3) * 70} className="h-full">
+                                    <a
+                                        href={post.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="mkt-card mkt-card-hover group flex h-full flex-col overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                    >
+                                        <div className="overflow-hidden">
+                                            <img
+                                                src={post.image}
+                                                alt={post.title}
+                                                className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                                            />
                                         </div>
-                                    </div>
-                                </a>
+                                        <div className="flex flex-1 flex-col p-6">
+                                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-300/90">
+                                                {post.number} — {post.category}
+                                            </p>
+                                            <h3 className="mt-3 text-lg font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-violet-200">
+                                                {post.title}
+                                            </h3>
+                                            <p className="mt-2 text-sm font-medium text-slate-200">
+                                                {post.headline}
+                                            </p>
+                                            <p className="mkt-body mt-2">{post.description}</p>
+                                            {post.body && (
+                                                <p className="mkt-body mt-2">{post.body}</p>
+                                            )}
+                                            <div className="mt-auto pt-6">
+                                                <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-4">
+                                                    <span className="text-xs text-slate-400">
+                                                        WebPulse Team · {post.category}
+                                                    </span>
+                                                    <ReadOnDevTo />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </Reveal>
                             ))}
                         </div>
+
                         {filtered.length === 0 && (
-                            <p className="prose-quiet text-center mt-10">
+                            <p className="mkt-body mt-10 text-center">
                                 No published articles in this topic yet — it's on our building-in-public roadmap.
                             </p>
                         )}
                     </div>
 
-                    <div className="mb-20">
-                        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-500">Explore by topic</p>
-                        <div className="flex flex-wrap gap-2">
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    type="button"
-                                    onClick={() => setActiveCategory(category)}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                                        activeCategory === category
-                                            ? 'bg-violet-600 text-white border-violet-600'
-                                            : 'bg-white dark:bg-space-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/[0.08] hover:text-violet-600 dark:hover:text-violet-400'
-                                    }`}
+                    {/* Closing CTA */}
+                    <Reveal className="mt-24">
+                        <div className="mkt-panel relative overflow-hidden px-6 py-12 text-center sm:px-12">
+                            <div
+                                aria-hidden="true"
+                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                            />
+                            <div className="relative">
+                                <h2 className="mkt-h3 !text-2xl sm:!text-3xl">
+                                    Want to see WebPulse in action?
+                                </h2>
+                                <Link
+                                    to="/register"
+                                    className="mkt-btn mkt-btn-primary mkt-btn-lg mt-7"
                                 >
-                                    {category}
-                                </button>
-                            ))}
+                                    Start Tracking
+                                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                                </Link>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="card card-pad text-center bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/5 border-violet-100 dark:border-white/[0.06]">
-                        <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">Want to see WebPulse in action?</h3>
-                        <Link to="/register" className="btn-primary btn-lg mt-6">
-                            Start Tracking
-                            <ArrowRight className="h-4 w-4" />
-                        </Link>
-                    </div>
+                    </Reveal>
                 </div>
-            </main>
-
-            <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
-                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <Logo />
-                </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
-            </footer>
-        </div>
+            </section>
+        </MarketingShell>
     );
 }

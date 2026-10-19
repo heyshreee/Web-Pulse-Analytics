@@ -1,0 +1,132 @@
+<svg viewBox="0 0 440 880" width="440" height="880" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ivmTitle">
+  <title id="ivmTitle">Illustrative analytics panels: visitors with a period comparison, bounce rate, average session duration and custom event counts</title>
+
+  <defs>
+    <linearGradient id="ivmArea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A78BFA" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#A78BFA" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="ivmBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    text { font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    .ivm-fade { animation: ivmFade 0.7s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+    @keyframes ivmFade { from { opacity: 0; transform: translateY(10px); } }
+    .ivm-f1 { animation-delay: 0.05s; }
+    .ivm-f2 { animation-delay: 0.15s; }
+    .ivm-f3 { animation-delay: 0.25s; }
+    .ivm-f4 { animation-delay: 0.35s; }
+
+    .ivm-draw {
+      stroke-dasharray: 380;
+      stroke-dashoffset: 380;
+      animation: ivmDraw 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+    }
+    @keyframes ivmDraw { to { stroke-dashoffset: 0; } }
+
+    .ivm-sweep {
+      stroke-dasharray: 38 62;
+      stroke-dashoffset: 38;
+      animation: ivmSweep 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+    }
+    @keyframes ivmSweep { to { stroke-dashoffset: 0; } }
+
+    .ivm-grow {
+      transform-box: fill-box;
+      transform-origin: left center;
+      animation: ivmGrow 1.1s cubic-bezier(0.16, 0.84, 0.44, 1) both;
+    }
+    @keyframes ivmGrow { from { transform: scaleX(0); } }
+    .ivm-g1 { animation-delay: 0.35s; }
+    .ivm-g2 { animation-delay: 0.5s; }
+    .ivm-g3 { animation-delay: 0.65s; }
+    .ivm-g4 { animation-delay: 0.55s; }
+    .ivm-g5 { animation-delay: 0.7s; }
+    .ivm-g6 { animation-delay: 0.85s; }
+
+    .ivm-pulse { transform-box: fill-box; transform-origin: center; animation: ivmPulse 2.4s ease-in-out infinite; }
+    @keyframes ivmPulse { 0%, 100% { opacity: 0.65; } 50% { opacity: 1; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ivm-fade, .ivm-grow, .ivm-pulse { animation: none !important; }
+      .ivm-draw, .ivm-sweep { animation: none !important; stroke-dashoffset: 0 !important; }
+    }
+  </style>
+
+  <!-- Card A — visitors -->
+  <g class="ivm-fade ivm-f1">
+    <rect x="30" y="40" width="380" height="184" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
+    <text x="54" y="76" font-size="13" font-weight="600" letter-spacing="2" fill="#64748B">VISITORS</text>
+    <text x="386" y="76" font-size="11" letter-spacing="1.4" fill="#475569" text-anchor="end">SAMPLE DATA</text>
+    <text x="54" y="124" font-size="34" font-weight="700" fill="#F1F5F9">24,183</text>
+    <rect x="54" y="140" width="206" height="28" rx="14" fill="#48E6A1" fill-opacity="0.12" stroke="#48E6A1" stroke-opacity="0.3"/>
+    <path d="M70 161.5l7-9 7 9z" fill="#48E6A1"/>
+    <text x="90" y="160" font-size="12" fill="#48E6A1">12.4% vs previous period</text>
+
+    <path d="M54 208H386" stroke="#94A3B8" stroke-opacity="0.12" stroke-dasharray="3 5"/>
+    <path d="M54 186H386" stroke="#94A3B8" stroke-opacity="0.12" stroke-dasharray="3 5"/>
+    <path d="M54 201 84 194 114 197 145 186 175 190 205 179 235 182 266 172 296 177 326 167 356 170 386 164 386 208 54 208Z" fill="url(#ivmArea)"/>
+    <path
+      d="M54 201 84 194 114 197 145 186 175 190 205 179 235 182 266 172 296 177 326 167 356 170 386 164"
+      stroke="#A78BFA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="ivm-draw"
+    />
+    <circle cx="386" cy="164" r="3.6" fill="#48E6A1" class="ivm-pulse"/>
+  </g>
+
+  <!-- Card B — bounce rate -->
+  <g class="ivm-fade ivm-f2">
+    <rect x="30" y="246" width="380" height="184" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
+    <text x="54" y="282" font-size="13" font-weight="600" letter-spacing="2" fill="#64748B">BOUNCE RATE</text>
+
+    <g transform="rotate(-90 100 350)">
+      <circle cx="100" cy="350" r="40" stroke="#1E2536" stroke-width="10" pathLength="100"/>
+      <circle cx="100" cy="350" r="40" stroke="#8B5CF6" stroke-width="10" stroke-linecap="round" pathLength="100" class="ivm-sweep"/>
+    </g>
+    <text x="100" y="357" font-size="22" font-weight="700" fill="#F1F5F9" text-anchor="middle">38%</text>
+
+    <text x="158" y="340" font-size="12.5" fill="#64748B">Sessions that ended</text>
+    <text x="158" y="360" font-size="12.5" fill="#64748B">on the first page</text>
+    <path d="M158 378l6-8 6 8z" fill="#48E6A1" transform="rotate(180 164 374)"/>
+    <text x="180" y="384" font-size="12" fill="#48E6A1">41% previous period</text>
+
+    <path d="M54 410h332" stroke="#94A3B8" stroke-opacity="0.12" stroke-dasharray="3 5"/>
+  </g>
+
+  <!-- Card C — average session -->
+  <g class="ivm-fade ivm-f3">
+    <rect x="30" y="452" width="380" height="184" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
+    <text x="54" y="488" font-size="13" font-weight="600" letter-spacing="2" fill="#64748B">AVG. SESSION</text>
+    <text x="54" y="530" font-size="30" font-weight="700" fill="#F1F5F9">2m 41s</text>
+    <text x="54" y="552" font-size="12.5" fill="#64748B">Average time spent per session</text>
+
+    <rect x="54" y="576" width="332" height="10" rx="5" fill="#94A3B8" fill-opacity="0.14"/>
+    <rect x="54" y="576" width="206" height="10" rx="5" fill="url(#ivmBar)" class="ivm-grow ivm-g4"/>
+    <text x="54" y="612" font-size="12" fill="#64748B">2m 18s previous period</text>
+  </g>
+
+  <!-- Card D — custom events -->
+  <g class="ivm-fade ivm-f4">
+    <rect x="30" y="658" width="380" height="184" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
+    <text x="54" y="694" font-size="13" font-weight="600" letter-spacing="2" fill="#64748B">CUSTOM EVENTS</text>
+
+    <text x="54" y="726" font-size="13.5" fill="#CBD5E1">click</text>
+    <text x="386" y="726" font-size="12.5" fill="#94A3B8" text-anchor="end">3,918</text>
+    <rect x="54" y="734" width="332" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.12"/>
+    <rect x="54" y="734" width="280" height="7" rx="3.5" fill="#8B5CF6" class="ivm-grow ivm-g1"/>
+
+    <text x="54" y="764" font-size="13.5" fill="#CBD5E1">signup</text>
+    <text x="386" y="764" font-size="12.5" fill="#94A3B8" text-anchor="end">412</text>
+    <rect x="54" y="772" width="332" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.12"/>
+    <rect x="54" y="772" width="182" height="7" rx="3.5" fill="#A78BFA" class="ivm-grow ivm-g2"/>
+
+    <text x="54" y="802" font-size="13.5" fill="#CBD5E1">purchase</text>
+    <text x="386" y="802" font-size="12.5" fill="#94A3B8" text-anchor="end">228</text>
+    <rect x="54" y="810" width="332" height="7" rx="3.5" fill="#94A3B8" fill-opacity="0.12"/>
+    <rect x="54" y="810" width="100" height="7" rx="3.5" fill="#48E6A1" class="ivm-grow ivm-g3"/>
+  </g>
+</svg>

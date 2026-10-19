@@ -1,0 +1,152 @@
+<svg viewBox="0 0 1200 340" width="1200" height="340" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tfTitle">
+  <title id="tfTitle">Two script tags on a website reach the WebPulse tracker, which sends page views, sessions, custom events, referrers, devices and location to the dashboard</title>
+
+  <defs>
+    <radialGradient id="tfGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8B5CF6" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="tfArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#A78BFA" fill-opacity="0.75"/>
+    </marker>
+    <pattern id="tfDots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="1.2" fill="#94A3B8" fill-opacity="0.12"/>
+    </pattern>
+  </defs>
+
+  <style>
+    text { font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .tf-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .tf-march { stroke-dasharray: 5 9; animation: tfMarch 1.4s linear infinite; }
+    @keyframes tfMarch { to { stroke-dashoffset: -28; } }
+
+    .tf-travel { animation: tfTravel 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+    @keyframes tfTravel {
+      0%   { transform: translate(0, 0); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translate(var(--tx), 0); opacity: 0; }
+    }
+    .tf-d1 { --tx: 86px; animation-delay: -0.1s; }
+    .tf-d2 { --tx: 86px; animation-delay: -1.2s; }
+    .tf-d3 { --tx: 104px; animation-delay: -0.5s; }
+    .tf-d4 { --tx: 104px; animation-delay: -1.7s; }
+
+    .tf-row { animation: tfRow 0.7s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+    @keyframes tfRow { from { opacity: 0; transform: translateX(10px); } }
+    .tf-r1 { animation-delay: 0.15s; }
+    .tf-r2 { animation-delay: 0.28s; }
+    .tf-r3 { animation-delay: 0.41s; }
+    .tf-r4 { animation-delay: 0.54s; }
+    .tf-r5 { animation-delay: 0.67s; }
+    .tf-r6 { animation-delay: 0.8s; }
+
+    .tf-pulse { transform-box: fill-box; transform-origin: center; animation: tfPulse 2.6s ease-out infinite; }
+    @keyframes tfPulse {
+      0%   { transform: scale(0.8); opacity: 0.5; }
+      70%  { transform: scale(1.45); opacity: 0; }
+      100% { transform: scale(1.45); opacity: 0; }
+    }
+
+    .tf-fade { animation: tfFade 0.9s ease-out both; }
+    @keyframes tfFade { from { opacity: 0; } }
+    .tf-f1 { animation-delay: 0.05s; }
+    .tf-f2 { animation-delay: 0.2s; }
+    .tf-f3 { animation-delay: 0.35s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tf-march, .tf-row, .tf-pulse, .tf-fade { animation: none !important; }
+      .tf-travel { animation: none !important; opacity: 0 !important; }
+    }
+  </style>
+
+  <rect width="1200" height="340" fill="url(#tfDots)" opacity="0.7"/>
+  <!-- Soft glow behind the flow, elliptical so it has no hard edges. -->
+  <ellipse cx="640" cy="170" rx="360" ry="130" fill="url(#tfGlow)"/>
+
+  <!-- Stage captions -->
+  <text x="48" y="46" font-size="11" font-weight="600" letter-spacing="2.6" fill="#64748B">YOUR SITE</text>
+  <text x="520" y="46" font-size="11" font-weight="600" letter-spacing="2.6" fill="#64748B">TRACKER</text>
+  <text x="880" y="46" font-size="11" font-weight="600" letter-spacing="2.6" fill="#64748B">EVENTS ARRIVING</text>
+
+  <!-- 1. Browser card -->
+  <g class="tf-fade tf-f1">
+    <rect x="48" y="64" width="360" height="212" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.18"/>
+    <path d="M48 98h360" stroke="#94A3B8" stroke-opacity="0.16"/>
+    <circle cx="72" cy="81" r="3.2" fill="#94A3B8" fill-opacity="0.5"/>
+    <circle cx="86" cy="81" r="3.2" fill="#94A3B8" fill-opacity="0.5"/>
+    <circle cx="100" cy="81" r="3.2" fill="#94A3B8" fill-opacity="0.5"/>
+    <rect x="126" y="71" width="198" height="20" rx="10" fill="#94A3B8" fill-opacity="0.1"/>
+    <text x="138" y="85" font-size="10.5" fill="#94A3B8">your-site.com</text>
+
+    <rect x="72" y="116" width="312" height="136" rx="12" fill="#8B5CF6" fill-opacity="0.08" stroke="#8B5CF6" stroke-opacity="0.24"/>
+    <text x="90" y="142" font-size="10.5" class="tf-mono" fill="#C4B5FD">&lt;script src="api.webpulse.app/track.js"&gt;</text>
+    <text x="90" y="166" font-size="10.5" class="tf-mono" fill="#C4B5FD">tracker('init', 'YOUR_TRACKING_ID')</text>
+    <text x="90" y="190" font-size="10.5" class="tf-mono" fill="#C4B5FD">tracker('track', 'page_view')</text>
+    <text x="90" y="222" font-size="10.5" class="tf-mono" fill="#64748B">// no build step, no dependencies</text>
+  </g>
+
+  <!-- 2. Tracker node -->
+  <g class="tf-fade tf-f2">
+    <circle cx="568" cy="170" r="26" fill="none" stroke="#8B5CF6" stroke-opacity="0.45" class="tf-pulse"/>
+    <rect x="520" y="112" width="240" height="116" rx="18" fill="#101522" stroke="#8B5CF6" stroke-opacity="0.32"/>
+    <rect x="548" y="140" width="40" height="40" rx="12" fill="#8B5CF6" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.4"/>
+    <g transform="translate(558,150) scale(0.83)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>
+    </g>
+    <text x="604" y="158" font-size="12.5" font-weight="600" fill="#E2E8F0">WebPulse tracker</text>
+    <text x="604" y="176" font-size="10" fill="#64748B">dependency-free function</text>
+    <text x="548" y="212" font-size="10.5" fill="#94A3B8">Loaded from your page</text>
+  </g>
+
+  <!-- 3. Events panel -->
+  <g class="tf-fade tf-f3">
+    <rect x="880" y="64" width="272" height="212" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.18"/>
+    <circle cx="906" cy="89" r="4" fill="#48E6A1"/>
+    <text x="920" y="93" font-size="10.5" font-weight="600" letter-spacing="1.6" fill="#48E6A1">RECEIVING EVENTS</text>
+
+    <g class="tf-row tf-r1">
+      <circle cx="913" cy="126" r="8" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M909.5 126.5l2.6 2.6 4.4-5" stroke="#48E6A1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="932" y="130" font-size="11.5" fill="#CBD5E1">Page views</text>
+    </g>
+    <g class="tf-row tf-r2">
+      <circle cx="913" cy="154" r="8" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M909.5 154.5l2.6 2.6 4.4-5" stroke="#48E6A1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="932" y="158" font-size="11.5" fill="#CBD5E1">Sessions</text>
+    </g>
+    <g class="tf-row tf-r3">
+      <circle cx="913" cy="182" r="8" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M909.5 182.5l2.6 2.6 4.4-5" stroke="#48E6A1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="932" y="186" font-size="11.5" fill="#CBD5E1">Custom events</text>
+    </g>
+    <g class="tf-row tf-r4">
+      <circle cx="913" cy="210" r="8" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M909.5 210.5l2.6 2.6 4.4-5" stroke="#48E6A1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="932" y="214" font-size="11.5" fill="#CBD5E1">Referrers</text>
+    </g>
+    <g class="tf-row tf-r5">
+      <circle cx="913" cy="238" r="8" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M909.5 238.5l2.6 2.6 4.4-5" stroke="#48E6A1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="932" y="242" font-size="11.5" fill="#CBD5E1">Devices</text>
+    </g>
+    <g class="tf-row tf-r6">
+      <circle cx="913" cy="266" r="8" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M909.5 266.5l2.6 2.6 4.4-5" stroke="#48E6A1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="932" y="270" font-size="11.5" fill="#CBD5E1">Location</text>
+    </g>
+  </g>
+
+  <!-- Connectors -->
+  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfArrow)">
+    <line x1="408" y1="170" x2="516" y2="170" class="tf-march"/>
+    <line x1="760" y1="170" x2="876" y2="170" class="tf-march"/>
+  </g>
+  <g fill="#48E6A1">
+    <circle class="tf-travel tf-d1" cx="416" cy="170" r="3.4"/>
+    <circle class="tf-travel tf-d2" cx="416" cy="170" r="3.4"/>
+    <circle class="tf-travel tf-d3" cx="768" cy="170" r="3.4"/>
+    <circle class="tf-travel tf-d4" cx="768" cy="170" r="3.4"/>
+  </g>
+</svg>

@@ -192,7 +192,7 @@ export default function ProjectDetail() {
   );
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-8">
       <ProjectHeader 
         project={project} 
         onShowShare={() => setShowShareModal(true)} 

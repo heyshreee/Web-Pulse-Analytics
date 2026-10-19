@@ -1,59 +1,72 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+/**
+ * Illustrative live activity feed used in marketing previews.
+ *
+ * Country codes are rendered as two-letter chips instead of emoji flags so the
+ * feed looks identical on every platform (Windows/Linux font stacks do not
+ * render regional-indicator emoji). This component is presentation-only and is
+ * always paired with an "illustrative sample data" label.
+ */
 const COUNTRIES = [
-  { flag: '🇺🇸', name: 'United States', device: 'Chrome' },
-  { flag: '🇮🇳', name: 'India', device: 'Chrome' },
-  { flag: '🇩🇪', name: 'Germany', device: 'Firefox' },
-  { flag: '🇬🇧', name: 'United Kingdom', device: 'Safari' },
-  { flag: '🇯🇵', name: 'Japan', device: 'Edge' },
-  { flag: '🇫🇷', name: 'France', device: 'Chrome' },
-  { flag: '🇧🇷', name: 'Brazil', device: 'Safari' },
-  { flag: '🇨🇦', name: 'Canada', device: 'Chrome' },
+  { code: 'US', name: 'United States', browser: 'Chrome' },
+  { code: 'IN', name: 'India', browser: 'Chrome' },
+  { code: 'DE', name: 'Germany', browser: 'Firefox' },
+  { code: 'GB', name: 'United Kingdom', browser: 'Safari' },
+  { code: 'JP', name: 'Japan', browser: 'Edge' },
+  { code: 'FR', name: 'France', browser: 'Chrome' },
+  { code: 'BR', name: 'Brazil', browser: 'Safari' },
+  { code: 'CA', name: 'Canada', browser: 'Chrome' },
 ];
 
 const ACTIONS = [
   { action: 'Viewed', page: '/pricing' },
   { action: 'Viewed', page: '/features' },
-  { action: 'Viewed', page: '/blog/security' },
-  { action: 'Started checkout', page: '/checkout' },
-  { action: 'Clicked "Start Tracking"', page: '/' },
-  { action: 'Viewed', page: '/live' },
+  { action: 'Viewed', page: '/blog' },
+  { action: 'Started signup', page: '/register' },
+  { action: 'Clicked “Start tracking”', page: '/' },
+  { action: 'Viewed', page: '/docs/getting-started' },
   { action: 'Signed up', page: '/register' },
-  { action: 'Viewed', page: '/analytics' },
+  { action: 'Viewed', page: '/integrations' },
 ];
+
+const ACCENTS = ['#8B5CF6', '#A78BFA', '#48E6A1'];
 
 let idCounter = 0;
 function makeEvent() {
   const c = COUNTRIES[Math.floor(Math.random() * COUNTRIES.length)];
   const a = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
   const now = new Date();
-  const mm = String(now.getMinutes()).padStart(2, '0');
-  const ss = String(now.getSeconds()).padStart(2, '0');
+  const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(
+    now.getSeconds()
+  ).padStart(2, '0')}`;
   return {
     id: idCounter++,
-    time: `${mm}:${ss}`,
-    flag: c.flag,
+    time,
+    code: c.code,
     country: c.name,
-    device: c.device,
+    browser: c.browser,
     action: a.action,
     page: a.page,
-    color: Math.random() > 0.8 ? '#A78BFA' : Math.random() > 0.5 ? '#8B5CF6' : '#48E6A1',
-    timestamp: now.getTime(),
+    accent: ACCENTS[idCounter % ACCENTS.length],
   };
 }
 
-export default function LiveEventStream({ maxItems = 6 }) {
-  const [events, setEvents] = useState(() =>
-    Array.from({ length: 5 }, () => makeEvent())
-  );
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+export default function LiveEventStream({ maxItems = 6, seedCount = 5 }) {
+  const [events, setEvents] = useState(() => Array.from({ length: seedCount }, () => makeEvent()));
   const listRef = useRef(null);
+  const reduced = useMemo(() => prefersReducedMotion(), []);
 
   useEffect(() => {
+    if (reduced) return undefined;
     const interval = setInterval(() => {
       setEvents((prev) => [...prev.slice(-(maxItems - 1)), makeEvent()]);
     }, 4000);
     return () => clearInterval(interval);
-  }, [maxItems]);
+  }, [maxItems, reduced]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -61,47 +74,38 @@ export default function LiveEventStream({ maxItems = 6 }) {
   }, [events]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <div
-        ref={listRef}
-        className="h-full overflow-y-auto space-y-2 pr-1 obs-scroll-thin"
-      >
-        {events.map((e) => (
-          <div
-            key={e.id}
-            className="event-enter glass-obs rounded-xl px-3.5 py-2.5 flex items-center gap-3"
+    <ul
+      ref={listRef}
+      aria-label="Illustrative live activity feed"
+      className="mkt-feed-scroll h-full space-y-2 overflow-y-auto pr-1"
+    >
+      {events.slice(-maxItems).map((e) => (
+        <li
+          key={e.id}
+          className="mkt-feed-item flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5"
+        >
+          <span
+            className="flex h-7 w-8 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.03] text-[10px] font-bold tracking-wide text-slate-300"
+            aria-hidden="true"
           >
-            <div className="text-lg leading-none">{e.flag}</div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-white"
-                  style={{ color: e.color }}
-                >
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: e.color }} />
-                  {e.country} · {e.device}
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-600 dark:text-slate-300 truncate">
-                {e.action} <span className="font-mono text-violet-600 dark:text-violet-400">{e.page}</span>
-              </div>
-            </div>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono shrink-0">
-              {e.time}
-            </span>
+            {e.code}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[11.5px] font-medium text-slate-200">
+              <span className="sr-only">{e.country} · </span>
+              {e.country} <span className="text-slate-500">·</span>{' '}
+              <span className="text-slate-400">{e.browser}</span>
+            </p>
+            <p className="truncate text-[11px] text-slate-500">
+              {e.action}{' '}
+              <span className="font-mono" style={{ color: e.accent }}>
+                {e.page}
+              </span>
+            </p>
           </div>
-        ))}
-      </div>
-      <style>{`
-        .obs-scroll-thin::-webkit-scrollbar { width: 4px; }
-        .obs-scroll-thin::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.35); border-radius: 4px; }
-        .obs-scroll-thin::-webkit-scrollbar-track { background: transparent; }
-        @keyframes eventEnter { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .event-enter { animation: eventEnter 0.5s ease-out both; }
-        @media (prefers-reduced-motion: reduce) {
-          .event-enter { animation: none; }
-        }
-      `}</style>
-    </div>
+          <span className="metric-num shrink-0 text-[10px] text-slate-500">{e.time}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -153,7 +153,7 @@ export default function ProjectActivity() {
     };
 
     return (
-        <div className="space-y-8 animate-fade-up">
+        <div className="space-y-8">
             {/* Header */}
             <div className="page-header">
                 <div className="page-header-title">

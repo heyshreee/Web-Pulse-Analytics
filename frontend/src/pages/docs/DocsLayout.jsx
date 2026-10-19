@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import Logo from '../../components/Logo';
-import {
-    ArrowLeft, Activity, Menu, X, BookOpen, BarChart2, ArrowRight
-} from 'lucide-react';
+import MarketingShell from '../../components/marketing/MarketingShell';
+import PageTransition from '../../components/PageTransition';
 import { docsNav } from './docsNav';
 
 export default function DocsLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
     const { pathname, hash } = location;
-    const mainRef = useRef(null);
 
     useEffect(() => {
         let raf;
@@ -38,60 +37,61 @@ export default function DocsLayout() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
-            <header className="fixed top-0 w-full z-[60] bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-10 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="lg:hidden p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg"
-                        >
-                            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
-                        <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                            <ArrowLeft className="h-4 w-4" />
-                            <span className="font-medium text-sm">Back to Home</span>
-                        </Link>
-                        <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                            <BookOpen className="h-3.5 w-3.5" /> Documentation
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
-                    </div>
-                </div>
-            </header>
+        <MarketingShell grid={false} transition={false}>
+            {/* Mobile drawer backdrop */}
+            {sidebarOpen && (
+                <button
+                    type="button"
+                    aria-label="Close documentation menu"
+                    onClick={() => setSidebarOpen(false)}
+                    className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden"
+                />
+            )}
 
-            <div className="max-w-[1400px] mx-auto flex">
-                <aside className={`
-                    fixed lg:sticky top-16 h-[calc(100vh-64px)] w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 z-50 transition-all duration-500 overflow-y-auto
-                    ${sidebarOpen ? 'left-0' : '-left-full lg:left-0'}
-                `}>
+            <div className="mx-auto flex max-w-[1400px]">
+                <aside
+                    id="docs-sidebar"
+                    className={`
+                        fixed left-0 top-0 z-[70] h-full w-72 overflow-y-auto border-r border-white/[0.07] bg-[#0B0F17]
+                        transition-transform duration-300 lg:sticky lg:top-16 lg:z-0 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:bg-transparent
+                        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    `}
+                >
                     <div className="p-6">
-                        <Logo to="/docs" label="Documentation" className="mb-6" />
+                        <div className="mb-6 flex items-center justify-between gap-4">
+                            <Logo to="/docs" label="Documentation" />
+                            <button
+                                type="button"
+                                onClick={() => setSidebarOpen(false)}
+                                aria-label="Close documentation menu"
+                                className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 lg:hidden"
+                            >
+                                <X className="h-5 w-5" aria-hidden="true" />
+                            </button>
+                        </div>
 
-                        <nav className="space-y-6">
+                        <nav aria-label="Documentation" className="space-y-6">
                             {docsNav.map((group) => (
                                 <div key={group.label}>
-                                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{group.label}</p>
+                                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">{group.label}</p>
                                     <div className="space-y-0.5">
                                         {group.items.map((item) => {
                                             const active = isItemActive(item.to);
                                             return (
-                                                <button
+                                                <Link
                                                     key={item.label}
+                                                    to={item.to}
                                                     onClick={() => setSidebarOpen(false)}
-                                                    className={`block w-full text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+                                                    aria-current={active ? 'page' : undefined}
+                                                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
                                                         active
-                                                            ? 'bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-300'
-                                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                                                            ? 'bg-violet-500/15 text-violet-300'
+                                                            : 'text-slate-400 hover:bg-white/[0.05] hover:text-slate-100'
                                                     }`}
                                                 >
-                                                    <Link to={item.to} className="flex items-center gap-2">
-                                                        {item.label}
-                                                        {active && <span className="ml-auto h-1 w-1 rounded-full bg-violet-500"></span>}
-                                                    </Link>
-                                                </button>
+                                                    {item.label}
+                                                    {active && <span className="ml-auto h-1 w-1 rounded-full bg-violet-400"></span>}
+                                                </Link>
                                             );
                                         })}
                                     </div>
@@ -101,44 +101,50 @@ export default function DocsLayout() {
                     </div>
                 </aside>
 
-                <main ref={mainRef} className="flex-1 min-w-0 pt-28 pb-24 px-6 sm:px-12 lg:px-16">
+                <div className="min-w-0 flex-1 px-5 pb-24 pt-10 sm:px-8 lg:px-12">
                     <div className="mx-auto max-w-3xl">
-                        <div className="lg:hidden mb-8">
+                        <div className="mb-8 lg:hidden">
                             <button
+                                type="button"
                                 onClick={() => setSidebarOpen(true)}
-                                className="inline-flex items-center gap-2 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors"
+                                aria-expanded={sidebarOpen}
+                                aria-controls="docs-sidebar"
+                                className="mkt-btn mkt-btn-secondary mkt-btn-sm"
                             >
-                                <Menu className="h-4 w-4" /> Browse documentation
+                                {sidebarOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
+                                Browse documentation
                             </button>
                         </div>
-                        <Outlet />
+                        <PageTransition>
+                            <Outlet />
+                        </PageTransition>
                     </div>
 
-                    <div className="mx-auto max-w-3xl mt-20">
-                        <div className="card card-pad text-center bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/5 border-violet-100 dark:border-white/[0.06]">
-                            <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">Still exploring?</h3>
-                            <p className="prose-quiet mb-6 max-w-xl mx-auto">
-                                Browse the full documentation hub, read the developer guides, or jump straight into building.
-                            </p>
-                            <div className="flex flex-wrap justify-center gap-4">
-                                <Link to="/docs/getting-started" className="btn-primary btn-md">
-                                    Getting Started <ArrowRight className="h-4 w-4" />
-                                </Link>
-                                <Link to="/docs/api" className="btn-secondary btn-md">
-                                    API Reference
-                                </Link>
+                    <div className="mx-auto mt-20 max-w-3xl">
+                        <div className="mkt-panel relative overflow-hidden px-6 py-10 text-center">
+                            <div
+                                aria-hidden="true"
+                                className="mkt-glow left-1/2 top-[-140px] h-[280px] w-[480px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                            />
+                            <div className="relative">
+                                <h2 className="mkt-h3 !text-2xl">Still exploring?</h2>
+                                <p className="mkt-body mx-auto mt-3 max-w-xl">
+                                    Browse the full documentation hub, read the developer guides, or jump straight into building.
+                                </p>
+                                <div className="mt-7 flex flex-wrap justify-center gap-3">
+                                    <Link to="/docs/getting-started" className="mkt-btn mkt-btn-primary mkt-btn-md">
+                                        Getting Started
+                                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                                    </Link>
+                                    <Link to="/docs/api" className="mkt-btn mkt-btn-secondary mkt-btn-md">
+                                        API Reference
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </main>
-            </div>
-
-            <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
-                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <Logo />
                 </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse · Documentation</p>
-            </footer>
-        </div>
+            </div>
+        </MarketingShell>
     );
 }

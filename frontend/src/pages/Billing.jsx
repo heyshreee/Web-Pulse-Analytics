@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import Spinner from '../components/Spinner';
+import Reveal from '../components/Reveal';
 
 export default function Billing() {
     const { user, loadUser } = useOutletContext();
@@ -288,7 +289,7 @@ export default function Billing() {
     if (pageLoading) return <Spinner />;
 
     return (
-        <div className="space-y-8 animate-fade-up">
+        <div className="space-y-8">
             {/* Header */}
             <div className="page-header">
                 <div className="page-header-title">
@@ -420,7 +421,7 @@ export default function Billing() {
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Reveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {plans.map((plan) => {
                             const isCurrentPlan = usageStats.plan === plan.id;
                             const isFree = plan.id === 'free';
@@ -523,7 +524,7 @@ export default function Billing() {
                                 </div>
                             );
                         })}
-                    </div>
+                    </Reveal>
                 )}
 
             </div>

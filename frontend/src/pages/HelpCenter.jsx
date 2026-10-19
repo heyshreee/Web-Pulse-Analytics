@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    ArrowLeft, ArrowRight, Search, ChevronDown, Rocket, Send, Wrench,
-    BarChart3, Code2, Folder, User, CreditCard, Shield, LifeBuoy, BarChart2
+    ArrowRight, Search, ChevronDown, Rocket, Send, Wrench,
+    BarChart3, Code2, Folder, User, CreditCard, Shield, LifeBuoy
 } from 'lucide-react';
-import Logo from '../components/Logo';
+import MarketingShell from '../components/marketing/MarketingShell';
+import SectionHead from '../components/marketing/SectionHead';
+import Reveal from '../components/marketing/Reveal';
+import CodeSnippet from '../components/marketing/CodeSnippet';
 
 const API_DOMAIN = 'https://api.webpulse.app';
 
@@ -12,7 +15,7 @@ const Inline = ({ text }) => {
     const parts = String(text).split(/(`[^`]+`)/g).filter(Boolean);
     return parts.map((part, i) =>
         part.startsWith('`') && part.endsWith('`') ? (
-            <code key={i} className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">{part.slice(1, -1)}</code>
+            <code key={i} className="rounded-md bg-white/[0.06] px-1.5 py-0.5 font-mono text-[13px] text-violet-300">{part.slice(1, -1)}</code>
         ) : (
             <span key={i}>{part}</span>
         )
@@ -361,18 +364,18 @@ function CategoryCard({ category }) {
     const [open, setOpen] = useState(null);
 
     return (
-        <section id={category.id} className="card card-pad scroll-mt-24">
-            <div className="flex items-center gap-4 mb-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                    <category.icon className="h-6 w-6 text-violet-500" />
+        <section id={category.id} className="mkt-card scroll-mt-24 p-6">
+            <div className="mb-5 flex items-center gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
+                    <category.icon className="h-5 w-5 text-violet-300" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">{category.title}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{category.subtitle}</p>
+                    <h3 className="text-base font-semibold tracking-tight text-slate-100">{category.title}</h3>
+                    <p className="mt-0.5 text-xs text-slate-500">{category.subtitle}</p>
                 </div>
             </div>
 
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            <div className="divide-y divide-white/[0.06]">
                 {category.items.map((item) => {
                     const isOpen = open === item.q;
                     return (
@@ -380,24 +383,27 @@ function CategoryCard({ category }) {
                             <button
                                 type="button"
                                 onClick={() => setOpen(isOpen ? null : item.q)}
-                                className="w-full flex items-center justify-between gap-3 py-3 text-left group/q"
+                                aria-expanded={isOpen}
+                                className="group/q flex w-full items-center justify-between gap-3 py-3.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
                             >
-                                <span className={`text-sm transition-colors ${isOpen ? 'text-violet-600 dark:text-violet-400 font-medium' : 'text-slate-600 dark:text-slate-300 group-hover/q:text-violet-600 dark:group-hover/q:text-violet-400'}`}>
+                                <span className={`text-sm transition-colors ${isOpen ? 'font-medium text-violet-300' : 'text-slate-300 group-hover/q:text-violet-200'}`}>
                                     {item.q}
                                 </span>
-                                <ChevronDown className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                <ChevronDown className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                             </button>
                             {isOpen && (
                                 <div className="pb-4">
-                                    <p className="prose-quiet text-sm border-l-2 border-violet-200 dark:border-violet-500/40 pl-3 leading-relaxed">
+                                    <p className="border-l-2 border-violet-400/40 pl-3 text-sm leading-relaxed text-slate-400">
                                         <Inline text={item.a} />
                                     </p>
                                     {item.code && (
-                                        <pre className="mt-3 ml-3 rounded-xl bg-slate-900 dark:bg-slate-900 text-slate-200 p-4 overflow-x-auto text-xs font-mono leading-relaxed">{item.code}</pre>
+                                        <div className="mkt-panel ml-3 mt-3">
+                                            <CodeSnippet code={item.code} />
+                                        </div>
                                     )}
                                     {item.link && (
-                                        <Link to={item.link.to} className="mt-3 pl-3 inline-flex items-center gap-1 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors">
-                                            {item.link.label} <ArrowRight className="h-3.5 w-3.5" />
+                                        <Link to={item.link.to} className="mkt-link ml-3 mt-3 text-xs">
+                                            {item.link.label} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                                         </Link>
                                     )}
                                 </div>
@@ -433,91 +439,88 @@ export default function HelpCenter() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
-            <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
-                        <span className="font-medium text-sm">Back to Home</span>
-                    </Link>
-                    <div className="flex items-center gap-2">
-                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
-                    </div>
-                </div>
-            </header>
+        <MarketingShell>
+            <section className="mkt-section">
+                <div className="mkt-container">
+                    <SectionHead
+                        eyebrow="Help Center"
+                        title={
+                            <>
+                                How can we <span className="mkt-accent-text">help?</span>
+                            </>
+                        }
+                        description="Find answers about setting up WebPulse, tracking visitors, using your analytics, and managing your account."
+                    />
 
-            <main className="pt-28 pb-20">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-10">
-                        <p className="eyebrow mb-3">Help Center</p>
-                        <h2 className="page-title !text-4xl font-display">How can we <span className="bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:from-violet-400 dark:to-fuchsia-300 bg-clip-text text-transparent">help?</span></h2>
-                        <p className="page-sub !text-base mt-3 max-w-2xl mx-auto">
-                            Find answers about setting up WebPulse, tracking visitors, using your analytics, and managing your account.
-                        </p>
-                    </div>
+                    <Reveal className="mx-auto mt-12 max-w-xl">
+                        <label htmlFor="help-search" className="mkt-label sr-only">Search WebPulse help</label>
+                        <div className="relative">
+                            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
+                            <input
+                                id="help-search"
+                                type="text"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="Search WebPulse help..."
+                                className="mkt-field !py-3 !pl-11"
+                            />
+                        </div>
+                    </Reveal>
 
-                    <div className="relative max-w-xl mx-auto mb-10">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
-                        <input
-                            type="text"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search WebPulse help..."
-                            className="input pl-11 py-3"
-                        />
-                    </div>
+                    <Reveal className="mt-8">
+                        <div className="flex flex-wrap justify-center gap-2">
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    type="button"
+                                    onClick={() => scrollTo(category.id)}
+                                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-violet-400/30 hover:bg-violet-500/10 hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                >
+                                    {category.title}
+                                </button>
+                            ))}
+                        </div>
+                    </Reveal>
 
-                    <div className="flex flex-wrap justify-center gap-2 mb-14">
-                        {categories.map((category) => (
-                            <button
-                                key={category.id}
-                                type="button"
-                                onClick={() => scrollTo(category.id)}
-                                className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-space-800 text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
-                            >
-                                {category.title}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="space-y-8">
+                    <div className="mx-auto mt-12 max-w-4xl space-y-6">
                         {results.map((category) => (
                             <CategoryCard key={category.id} category={category} />
                         ))}
                         {results.length === 0 && (
-                            <div className="card card-pad text-center">
-                                <p className="prose-quiet">No help topics match &quot;{query}&quot;.</p>
-                                <p className="prose-quiet text-sm mt-2">Try a shorter phrase, or check the documentation and API reference below.</p>
+                            <div className="mkt-card p-8 text-center">
+                                <p className="text-sm text-slate-300">No help topics match &quot;{query}&quot;.</p>
+                                <p className="mt-2 text-sm text-slate-500">Try a shorter phrase, or check the documentation and API reference below.</p>
                             </div>
                         )}
                     </div>
 
-                    <div className="mt-16 pt-10 border-t border-slate-100 dark:border-slate-800">
-                        <div className="card card-pad text-center bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/5 border-violet-100 dark:border-white/[0.06]">
-                            <LifeBuoy className="h-8 w-8 text-violet-500 mx-auto mb-4" />
-                            <h2 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">Can&apos;t find what you&apos;re looking for?</h2>
-                            <p className="prose-quiet mb-6 max-w-md mx-auto">
-                                The documentation covers setup, tracking, the API, and security in depth.
-                            </p>
-                            <div className="flex flex-col sm:flex-row justify-center gap-3">
-                                <Link to="/docs" className="btn-primary btn-md">
-                                    Documentation <ArrowRight className="h-4 w-4" />
-                                </Link>
-                                <Link to="/docs/api" className="btn-secondary btn-md">
-                                    API Documentation <ArrowRight className="h-4 w-4" />
-                                </Link>
+                    <Reveal className="mx-auto mt-20 max-w-4xl">
+                        <div className="mkt-panel relative overflow-hidden px-6 py-12 text-center sm:px-12">
+                            <div
+                                aria-hidden="true"
+                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                            />
+                            <div className="relative">
+                                <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
+                                    <LifeBuoy className="h-6 w-6 text-violet-300" aria-hidden="true" />
+                                </div>
+                                <h2 className="mkt-h3 !text-2xl sm:!text-3xl">Can&apos;t find what you&apos;re looking for?</h2>
+                                <p className="mkt-body mx-auto mt-3 max-w-md">
+                                    The documentation covers setup, tracking, the API, and security in depth.
+                                </p>
+                                <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+                                    <Link to="/docs" className="mkt-btn mkt-btn-primary mkt-btn-lg">
+                                        Documentation <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                                    </Link>
+                                    <Link to="/docs/api" className="mkt-btn mkt-btn-secondary mkt-btn-lg">
+                                        API Documentation <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Reveal>
                 </div>
-            </main>
-
-            <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
-                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <Logo />
-                </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse</p>
-            </footer>
-        </div>
+            </section>
+        </MarketingShell>
     );
 }

@@ -289,10 +289,14 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-    const { token, password } = req.body;
+    const { token, password } = req.body || {};
 
     if (!token) {
         throw AppError.badRequest('Token is required');
+    }
+
+    if (!validatePassword(password)) {
+        throw AppError.badRequest('Password must be at least 6 characters');
     }
 
     // Verify token

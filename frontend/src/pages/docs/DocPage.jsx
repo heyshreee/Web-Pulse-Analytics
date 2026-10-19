@@ -9,11 +9,11 @@ const Inline = ({ text }) => {
     const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
     return parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-semibold text-slate-800 dark:text-slate-100">{part.slice(2, -2)}</strong>;
+            return <strong key={i} className="font-semibold text-slate-100">{part.slice(2, -2)}</strong>;
         }
         if (part.startsWith('`') && part.endsWith('`')) {
             return (
-                <code key={i} className="bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-300 px-1.5 py-0.5 rounded-md font-mono text-[13px]">{part.slice(1, -1)}</code>
+                <code key={i} className="rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[13px] text-violet-300">{part.slice(1, -1)}</code>
             );
         }
         return <span key={i}>{part}</span>;
@@ -21,15 +21,15 @@ const Inline = ({ text }) => {
 };
 
 const Paragraph = ({ text }) => (
-    <p className="prose-quiet text-[15px] leading-relaxed">{Inline({ text })}</p>
+    <p className="text-[15px] leading-relaxed text-slate-400">{Inline({ text })}</p>
 );
 
 const ListBlock = ({ items }) => (
     <ul className="space-y-3">
         {items.map((item, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-300">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/15 shrink-0 mt-0.5">
-                    <Check className="h-3 w-3 text-emerald-500" />
+            <li key={i} className="flex items-start gap-2.5 text-sm text-slate-300">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
+                    <Check className="h-3 w-3 text-emerald-300" aria-hidden="true" />
                 </span>
                 <span>{Inline({ text: item })}</span>
             </li>
@@ -41,12 +41,12 @@ const StepsBlock = ({ items }) => (
     <div className="space-y-8">
         {items.map((step, i) => (
             <div key={i} className="flex gap-5">
-                <div className="flex-none h-10 w-10 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 flex items-center justify-center text-sm font-semibold text-violet-600 dark:text-violet-300">
+                <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-violet-400/20 bg-violet-500/10 text-sm font-semibold text-violet-300">
                     {String(i + 1).padStart(2, '0')}
                 </div>
                 <div className="flex-1">
-                    <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">{Inline({ text: step.title })}</h4>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{Inline({ text: step.desc })}</p>
+                    <h4 className="mb-1.5 text-base font-bold tracking-tight text-slate-100">{Inline({ text: step.title })}</h4>
+                    <p className="text-sm leading-relaxed text-slate-400">{Inline({ text: step.desc })}</p>
                     {step.code && (
                         <div className="mt-4">
                             <CodeBlock
@@ -62,19 +62,19 @@ const StepsBlock = ({ items }) => (
 );
 
 const CalloutBlock = ({ tone, title, text }) => (
-    <div className={`p-5 rounded-2xl border flex gap-4 items-start ${
+    <div className={`flex items-start gap-4 rounded-2xl border p-5 ${
         tone === 'warning'
-            ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20'
-            : 'bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/20'
+            ? 'border-amber-400/20 bg-amber-400/[0.07]'
+            : 'border-violet-400/20 bg-violet-500/[0.07]'
     }`}>
         {tone === 'warning' ? (
-            <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" aria-hidden="true" />
         ) : (
-            <Info className="h-5 w-5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-violet-300" aria-hidden="true" />
         )}
         <div>
-            {title && <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-widest mb-1">{title}</h4>}
-            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{Inline({ text })}</p>
+            {title && <h4 className="mb-1 text-sm font-semibold uppercase tracking-widest text-slate-100">{title}</h4>}
+            <p className="text-sm leading-relaxed text-slate-400">{Inline({ text })}</p>
         </div>
     </div>
 );
@@ -84,25 +84,25 @@ const CodeBlockItem = ({ lang, title, code }) => (
 );
 
 const TableBlock = ({ headers, rows }) => (
-    <div className="card card-pad !p-0 overflow-hidden">
+    <div className="mkt-panel overflow-hidden">
         <div className="overflow-x-auto">
             <table className="w-full text-sm">
                 <thead>
-                    <tr className="text-left text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                    <tr className="border-b border-white/[0.07] text-left text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                         {headers.map((h, i) => (
-                            <th key={i} className="px-5 py-3 bg-slate-50 dark:bg-slate-900/60">{h}</th>
+                            <th key={i} scope="col" className="bg-white/[0.02] px-5 py-3">{h}</th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
                     {rows.map((row, i) => (
-                        <tr key={i} className="border-t border-slate-100 dark:border-slate-800">
+                        <tr key={i} className="border-t border-white/[0.05]">
                             {row.map((cell, j) => (
-                                <td key={j} className="px-5 py-3 text-slate-600 dark:text-slate-300 align-top">
+                                <td key={j} className="px-5 py-3 align-top text-slate-300">
                                     {j === 0 && /^(GET|POST|PUT|PATCH|DELETE)$/.test(cell) ? (
-                                        <span className="font-mono font-semibold text-violet-600 dark:text-violet-400">{cell}</span>
+                                        <span className="font-mono font-semibold text-violet-300">{cell}</span>
                                     ) : /^\//.test(cell) ? (
-                                        <code className="font-mono text-[13px] text-slate-800 dark:text-slate-200">{cell}</code>
+                                        <code className="font-mono text-[13px] text-slate-200">{cell}</code>
                                     ) : (
                                         <span>{Inline({ text: cell })}</span>
                                     )}
@@ -117,14 +117,14 @@ const TableBlock = ({ headers, rows }) => (
 );
 
 const LinksBlock = ({ items }) => (
-    <div className="grid sm:grid-cols-2 gap-4">
+    <div className="grid gap-4 sm:grid-cols-2">
         {items.map((item, i) => (
-            <Link key={i} to={item.to} className="card card-pad card-hover group/li block">
-                <span className="font-semibold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 group-hover/li:text-violet-600 dark:group-hover/li:text-violet-400 transition-colors">
+            <Link key={i} to={item.to} className="mkt-card mkt-card-hover group/li block p-5">
+                <span className="flex items-center gap-2 font-semibold tracking-tight text-slate-100 transition-colors group-hover/li:text-violet-300">
                     {item.label}
-                    <ArrowRight className="h-4 w-4 text-violet-500 shrink-0" />
+                    <ArrowRight className="h-4 w-4 shrink-0 text-violet-400" aria-hidden="true" />
                 </span>
-                <p className="prose-quiet text-sm mt-1.5">{item.desc}</p>
+                <p className="mt-1.5 text-sm text-slate-400">{item.desc}</p>
             </Link>
         ))}
     </div>
@@ -149,9 +149,9 @@ export default function DocPage({ slug }) {
     if (!page) {
         return (
             <div className="pt-8">
-                <p className="prose-quiet">This documentation page hasn&apos;t been written yet.</p>
-                <Link to="/docs" className="inline-flex items-center gap-1 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors mt-4">
-                    <BookMarked className="h-4 w-4" /> Back to documentation
+                <p className="text-slate-400">This documentation page hasn&apos;t been written yet.</p>
+                <Link to="/docs" className="mkt-link mt-4 inline-flex items-center gap-1">
+                    <BookMarked className="h-4 w-4" aria-hidden="true" /> Back to documentation
                 </Link>
             </div>
         );
@@ -160,25 +160,23 @@ export default function DocPage({ slug }) {
     return (
         <div>
             <div className="mb-12">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                        <BookMarked className="h-5 w-5 text-violet-500" />
+                <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
+                        <BookMarked className="h-5 w-5 text-violet-300" aria-hidden="true" />
                     </div>
-                    <div>
-                        <p className="eyebrow !mb-0">WebPulse Documentation</p>
-                    </div>
+                    <p className="mkt-eyebrow !mb-0">WebPulse Documentation</p>
                 </div>
-                <h1 className="page-title !text-3xl font-display tracking-tight">{page.title}</h1>
-                <p className="page-sub !text-base mt-2">
+                <h1 className="mkt-h2 !text-3xl">{page.title}</h1>
+                <p className="mkt-lead mt-2 !text-base">
                     {Inline({ text: page.description })}
                 </p>
             </div>
 
             {page.sections.map((section) => (
                 <section key={section.id} id={section.id} className="mb-16 scroll-mt-24">
-                    <div className="flex items-center gap-3 mb-6">
-                        <span className="h-6 w-1 rounded-full bg-violet-500"></span>
-                        <h2 className="text-xl font-display font-bold tracking-tight text-slate-900 dark:text-white">
+                    <div className="mb-6 flex items-center gap-3">
+                        <span className="h-6 w-1 rounded-full bg-violet-500" aria-hidden="true"></span>
+                        <h2 className="font-display text-xl font-bold tracking-tight text-slate-100">
                             {Inline({ text: section.heading })}
                         </h2>
                     </div>
@@ -190,9 +188,9 @@ export default function DocPage({ slug }) {
                 </section>
             ))}
 
-            <div className="mt-16 pt-8 border-t border-slate-200 dark:border-white/[0.06]">
-                <Link to="/docs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors">
-                    <BookMarked className="h-4 w-4" /> Back to documentation home
+            <div className="mt-16 border-t border-white/[0.07] pt-8">
+                <Link to="/docs" className="mkt-link inline-flex items-center gap-1.5">
+                    <BookMarked className="h-4 w-4" aria-hidden="true" /> Back to documentation home
                 </Link>
             </div>
         </div>

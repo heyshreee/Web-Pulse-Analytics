@@ -17,5 +17,8 @@ router.put('/:id', projectController.updateProject);
 router.delete('/:id', projectController.deleteProject);
 router.put('/:id/pin', projectController.togglePin);
 router.post('/:id/regenerate-token', projectController.regenerateShareToken);
+// Aliases used by the dashboard share modal (POST to create, DELETE to revoke)
+router.post('/:id/share-token', projectController.regenerateShareToken);
+router.delete('/:id/share-token', projectController.revokeShareToken);
 
 export default router;

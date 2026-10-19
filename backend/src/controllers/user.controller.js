@@ -5,6 +5,7 @@ import ActivityLogService from '../services/activity.service.js';
 import cloudinaryPkg from 'cloudinary';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
+import { validatePassword } from '../utils/validators.js';
 
 const cloudinary = cloudinaryPkg.v2;
 
@@ -35,7 +36,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
         .from('users')
         .update(updates)
         .eq('id', userId)
-        .select()
+        .select('id, email, name, plan, avatar_url, bio, timezone, language, job_title, notification_preferences')
         .single();
 
     if (error) throw error;
@@ -95,7 +96,11 @@ export const updateAvatar = asyncHandler(async (req, res) => {
 
 export const updatePassword = asyncHandler(async (req, res) => {
     const userId = req.user.id;
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body || {};
+
+    if (!validatePassword(newPassword)) {
+        throw AppError.badRequest('New password must be at least 6 characters');
+    }
 
     // Verify current password
     const { data: user } = await supabase
