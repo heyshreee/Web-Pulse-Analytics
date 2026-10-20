@@ -18,9 +18,9 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 0,
             price_inr: 0,
             interval: 'month',
-            description: 'Trying WebPulse',
-            features: ['1 Project', '1 Allowed Origin', '1,000 events/mo', '60 sec refresh'],
-            buttonText: 'Get Started',
+            description: 'For learning, prototypes, and personal projects.',
+            features: ['1 project', '1 allowed domain per project', '1,000 tracked events / month', '60-second dashboard refresh'],
+            buttonText: 'Start for free',
             limits: {
                 monthlyViews: 1000,
                 projectLimit: 1
@@ -33,8 +33,8 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 4,
             price_inr: 299,
             interval: 'month',
-            description: 'Students & solo devs',
-            features: ['5 Projects', '3 Allowed Origins', 'Live Device Stats', '50,000 events/mo', '10 sec refresh'],
+            description: 'For independent developers running a few small websites.',
+            features: ['5 projects', '3 allowed domains per project', '50,000 tracked events / month', '10-second dashboard refresh'],
             buttonText: 'Choose Basic',
             limits: {
                 monthlyViews: 50000,
@@ -48,8 +48,8 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 12,
             price_inr: 999,
             interval: 'month',
-            description: 'Streamers & growing apps',
-            features: ['15 Projects', '10 Allowed Origins', 'Live Activity Logs', '500,000 events/mo', '1 sec refresh'],
+            description: 'For growing products that need live activity logs and public reports.',
+            features: ['15 projects', '10 allowed domains per project', '500,000 tracked events / month', '1-second dashboard refresh', 'Live activity logs', '5 public reports'],
             buttonText: 'Choose Pro',
             popular: true,
             limits: {
@@ -64,9 +64,9 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 39,
             price_inr: 2999,
             interval: 'month',
-            description: 'Teams & high traffic',
-            features: ['Unlimited Projects', '100 Allowed Origins', '5,000,000 events/mo', 'Real-time / SLA', 'Team access'],
-            buttonText: 'Contact Sales',
+            description: 'For high-traffic sites tracking millions of events across many projects.',
+            features: ['100 projects', '100 allowed domains per project', '5,000,000 tracked events / month', '1-second dashboard refresh', '100 public reports', 'Team access (planned)'],
+            buttonText: 'Choose Business',
             limits: {
                 monthlyViews: 5000000,
                 projectLimit: 100
