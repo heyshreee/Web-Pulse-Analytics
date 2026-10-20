@@ -16,13 +16,16 @@ export default function LiveMap() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <p className="mkt-eyebrow mb-4">Geography</p>
-            <h2 className="mkt-h2">Every visitor has a place on the map.</h2>
+            <h2 className="mkt-h2">Where your visitors are, at a glance.</h2>
             <p className="mkt-lead mt-5">
-              Country and city are recorded with each event, so your analytics read like a map of
-              your audience instead of a single anonymous total.
+              Country and city are estimated from each request, so you can see which markets
+              your site reaches — and where it has room to grow.
             </p>
 
-            <ul className="mt-8 space-y-5">
+            <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              Top countries · 30 days
+            </p>
+            <ul className="mt-4 space-y-5">
               {SAMPLE_COUNTRIES.slice(0, 4).map((c) => (
                 <li key={c.label}>
                   <div className="mb-1.5 flex items-center justify-between text-sm">
@@ -40,7 +43,7 @@ export default function LiveMap() {
             </ul>
 
             <Link to="/features" className="mkt-link mt-8">
-              See audience analytics
+              Explore geography analytics
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Reveal>
@@ -50,7 +53,7 @@ export default function LiveMap() {
               <div className="mkt-panel relative aspect-square sm:aspect-[4/3.4] lg:aspect-square">
                 <div className="absolute left-4 top-4 z-10 flex flex-col gap-1.5">
                   <span className="mkt-chip !border-white/[0.08] !bg-black/30 !text-[10px] uppercase tracking-[0.14em] backdrop-blur-sm">
-                    Live map
+                    Visitor map · 30 days
                   </span>
                   <span className="text-[10px] text-slate-500">Illustrative sample data</span>
                 </div>

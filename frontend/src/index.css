@@ -273,7 +273,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -313,7 +313,7 @@
   text-wrap: pretty;
 }
 .mkt-body {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.7;
   color: var(--mkt-text-3);
 }
@@ -385,7 +385,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--mkt-brand-3);
   transition: color 0.18s ease, gap 0.18s ease;

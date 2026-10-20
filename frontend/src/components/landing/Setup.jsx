@@ -7,18 +7,18 @@ import CodeSnippet from '../marketing/CodeSnippet';
 const STEPS = [
   {
     n: '01',
-    title: 'Create a project',
-    desc: 'Sign up, create a project, and get its tracking ID. Each project keeps its own events, analytics, and allowed origins.',
+    title: 'Create your project',
+    desc: 'Sign up, create a project, and copy its tracking ID. Each project keeps its own events, analytics, and allowed origins.',
   },
   {
     n: '02',
-    title: 'Add the tracker',
-    desc: 'Paste two script tags into your site. The tracker is a small dependency-free function — no build step required.',
+    title: 'Install the tracker',
+    desc: 'Add the tracker script to your site. It is a small dependency-free function — no build step or SDK required.',
   },
   {
     n: '03',
-    title: 'Watch activity arrive',
-    desc: 'Page views, sessions, and custom events appear in your dashboard as they are received.',
+    title: 'Verify incoming events',
+    desc: 'Confirm that page views and custom events appear in the dashboard before you rely on the numbers.',
   },
 ];
 
@@ -30,7 +30,7 @@ const SNIPPET = `<script
   tracker('track', 'page_view');
 </script>`;
 
-const RECEIVING = ['Page views', 'Sessions', 'Custom events', 'Referrers', 'Devices', 'Location'];
+const CAPTURED = ['Page views', 'Sessions', 'Custom events', 'Referrers', 'Devices', 'Approximate location'];
 
 export default function Setup() {
   return (
@@ -38,8 +38,8 @@ export default function Setup() {
       <div className="mkt-container">
         <SectionHead
           eyebrow="Setup"
-          title="Live analytics in three short steps."
-          description="WebPulse is a script tag and a tracking ID. If your site can load JavaScript, it can send analytics."
+          title="From installation to insight in three steps."
+          description="WebPulse is a tracker script and a tracking ID. If your site can load JavaScript, it can send analytics."
         />
 
         <div className="mt-16 grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
@@ -83,19 +83,23 @@ export default function Setup() {
 
               <div className="border-t border-white/[0.07] px-5 py-5">
                 <div className="mb-3 flex items-center gap-2">
-                  <span className="mkt-live-dot !h-1.5 !w-1.5" aria-hidden="true" />
+                  <Check className="h-3.5 w-3.5 text-emerald-400/80" aria-hidden="true" />
                   <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
-                    Receiving events
+                    Captured automatically
                   </span>
                 </div>
                 <ul className="grid grid-cols-2 gap-2">
-                  {RECEIVING.map((r) => (
+                  {CAPTURED.map((r) => (
                     <li key={r} className="flex items-center gap-2 text-xs text-slate-400">
                       <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400/80" aria-hidden="true" />
                       {r}
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4 border-t border-white/[0.06] pt-3 text-[11px] leading-relaxed text-slate-500">
+                  Replace <span className="font-mono text-slate-400">YOUR_TRACKING_ID</span> with the
+                  ID shown in your project settings.
+                </p>
               </div>
             </div>
           </Reveal>

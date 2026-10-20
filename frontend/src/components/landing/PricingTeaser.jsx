@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Clock } from 'lucide-react';
 import SectionHead from '../marketing/SectionHead';
 import Reveal from '../marketing/Reveal';
-import { plans } from '../../data/plans';
+import { plans, formatINR } from '../../data/plans';
 
 /**
  * Compact pricing summary on the landing page. Full comparison lives at
@@ -10,12 +10,12 @@ import { plans } from '../../data/plans';
  */
 export default function PricingTeaser() {
   return (
-    <section className="mkt-section" id="pricing">
+    <section className="mkt-section scroll-mt-24" id="pricing">
       <div className="mkt-container">
         <SectionHead
           eyebrow="Pricing"
           title="Start free. Upgrade when the traffic does."
-          description="Every plan includes real-time analytics. Higher tiers raise your usage limits and add reporting, team, and support features."
+          description="Start with 1,000 tracked events per month. Higher tiers raise your event, project, and domain limits; Pro and Business add live activity logs and public reports."
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -36,42 +36,71 @@ export default function PricingTeaser() {
                   </h3>
                   {highlighted && (
                     <span className="rounded-full border border-violet-400/30 bg-violet-500/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-200">
-                      Popular
+                      Most popular
                     </span>
                   )}
                 </div>
 
                 <p className="flex items-baseline gap-1.5">
                   <span className="metric-num mkt-h3 !text-[2rem] !font-extrabold !text-white">
-                    {plan.price}
+                    {formatINR(plan.amount)}
                   </span>
                   <span className="text-sm text-slate-500">/ month</span>
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">{plan.tagline}</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-400">{plan.description}</p>
 
-                <ul className="mt-6 flex-1 space-y-2.5">
-                  {(plan.items.slice(0, 4)).map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-[13px] text-slate-300">
-                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/80" aria-hidden="true" />
-                      {item}
+                <dl className="mt-5 grid grid-cols-2 gap-x-3 gap-y-3 border-y border-white/[0.06] py-4">
+                  {plan.limits.map((limit) => (
+                    <div key={limit.label}>
+                      <dt className="text-[11px] leading-tight text-slate-500">{limit.label}</dt>
+                      <dd className="metric-num mt-1 text-sm font-semibold text-slate-200">
+                        {limit.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <ul className="mt-5 flex-1 space-y-2.5">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2 text-sm text-slate-300">
+                      <Check
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400/80"
+                        aria-hidden="true"
+                      />
+                      {feature}
                     </li>
                   ))}
                 </ul>
 
+                {plan.plannedNote && (
+                  <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-slate-500">
+                    <Clock
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400/80"
+                      aria-hidden="true"
+                    />
+                    {plan.plannedNote}
+                  </p>
+                )}
+
                 <Link
-                  to="/register"
+                  to={`/register?plan=${plan.id}`}
                   className={`mkt-btn mkt-btn-md mt-7 w-full ${
-                    highlighted ? 'mkt-btn-primary' : 'mkt-btn-secondary'
+                    highlighted ? 'mkt-btn-primary border border-transparent' : 'mkt-btn-secondary'
                   }`}
                 >
-                  {plan.id === 'free' ? 'Start free' : plan.id === 'business' ? 'Contact sales' : `Choose ${plan.name}`}
+                  {plan.cta}
                 </Link>
               </Reveal>
             );
           })}
         </div>
 
-        <Reveal className="mt-10 text-center">
+        <Reveal className="mt-10 flex flex-col items-center gap-3 text-center">
+          <p className="max-w-3xl text-xs leading-relaxed text-slate-500">
+            Prices are in INR per month of allowance. Paid plans are one-time orders with no
+            subscription and no automatic renewal; the plan stays active until you change it, and
+            amounts exclude applicable taxes. The Free plan does not require a credit card.
+          </p>
           <Link to="/pricing" className="mkt-link">
             Compare all plans and limits
             <ArrowRight className="h-4 w-4" aria-hidden="true" />

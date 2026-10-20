@@ -103,7 +103,7 @@ export default function ChartPreview({ data = [], dark }) {
         {geometry.maxLabel}k
       </span>
 
-      <div className="pointer-events-none absolute inset-x-3 bottom-0 flex justify-between text-[10px]"
+      <div className="pointer-events-none absolute inset-x-3 bottom-0 flex justify-between text-[11px]"
         style={{ color: labelColor }}>
         {xTicks.map((t, i) => (
           <span key={i}>{t}</span>

@@ -13,7 +13,7 @@ function KpiTile({ label, value, accent, decimals = 0, suffix = '' }) {
   const isNumeric = typeof value === 'number';
   return (
     <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
       <p className="metric-num mt-1.5 text-xl font-bold sm:text-2xl" style={{ color: accent }}>
         {isNumeric ? (
           <AnimatedNumber end={value} decimals={decimals} suffix={suffix} duration={1.6} />
@@ -38,7 +38,7 @@ export default function Hero() {
       />
 
       <div className="mkt-container relative">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-5xl text-center">
           <p className="mkt-chip mx-auto">
             <span className="mkt-live-dot" aria-hidden="true" />
             Real-time web analytics
@@ -51,8 +51,8 @@ export default function Hero() {
           </h1>
 
           <p className="mkt-lead mx-auto mt-6 max-w-2xl">
-            See where your visitors come from, how they move through your website, and what
-            they do while they are there — streamed to your dashboard as it happens.
+            Understand your traffic, follow visitor activity, and discover which pages bring
+            people in. All from one real-time analytics dashboard built for developers.
           </p>
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -60,9 +60,12 @@ export default function Hero() {
               Start tracking free
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to="/features" className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full sm:w-auto">
-              See how it works
-            </Link>
+            <a
+              href="#product-preview"
+              className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full sm:w-auto"
+            >
+              Explore the preview
+            </a>
           </div>
 
           <p className="mt-5 text-xs text-slate-500">
@@ -71,7 +74,7 @@ export default function Hero() {
         </div>
 
         {/* Product preview — presentation-only, clearly labelled as sample data. */}
-        <Reveal className="mx-auto mt-14 max-w-5xl lg:mt-16">
+        <Reveal id="product-preview" className="mx-auto mt-14 max-w-5xl scroll-mt-24 lg:mt-16">
           <PreviewFrame title="WebPulse · Dashboard" note="Illustrative sample data">
             <DashboardPreview>
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -83,7 +86,7 @@ export default function Hero() {
               <div className="grid gap-3 lg:grid-cols-[1.6fr_1fr]">
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                       Traffic momentum
                     </p>
                     <div className="flex items-center gap-0.5 rounded-full border border-white/[0.08] bg-white/[0.03] p-0.5">
@@ -110,13 +113,13 @@ export default function Hero() {
                 </div>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                  <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     Referral sources
                   </p>
                   <ul className="space-y-3">
                     {SAMPLE_REFERRERS.map((r) => (
                       <li key={r.label}>
-                        <div className="mb-1.5 flex items-center justify-between text-[11px]">
+                        <div className="mb-1.5 flex items-center justify-between text-xs">
                           <span className="text-slate-400">{r.label}</span>
                           <span className="metric-num font-semibold" style={{ color: r.accent }}>
                             {r.value}%
@@ -136,10 +139,10 @@ export default function Hero() {
 
               <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     Live activity
                   </p>
-                  <span className="text-[10px] text-slate-600">Visitors arriving now</span>
+                  <span className="text-[11px] text-slate-600">Visitors arriving now</span>
                 </div>
                 <div className="h-[168px]">
                   <LiveEventStream maxItems={4} seedCount={4} />
@@ -147,6 +150,37 @@ export default function Hero() {
               </div>
             </DashboardPreview>
           </PreviewFrame>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              {
+                label: 'Traffic',
+                text: 'Page views and sessions across 24 hours, 7 days, or 30 days.',
+              },
+              {
+                label: 'Visitor activity',
+                text: 'Events as visitors move through your site, labeled with page and time.',
+              },
+              {
+                label: 'Acquisition',
+                text: 'The channels and referrers that brought those visitors in.',
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-left"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-300">
+                  {item.label}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-400">{item.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-3 text-center text-xs text-slate-500">
+            The dashboard above uses illustrative sample data — not customer data or live traffic.
+          </p>
         </Reveal>
       </div>
     </section>

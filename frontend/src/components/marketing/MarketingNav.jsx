@@ -28,7 +28,10 @@ export default function MarketingNav() {
   const isActive = (to) => pathname === to || pathname.startsWith(`${to}/`);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#070A10]/80 backdrop-blur-xl">
+    <header
+      data-marketing-nav=""
+      className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#070A10]/80 backdrop-blur-xl"
+    >
       <div className="mkt-container flex h-16 items-center justify-between gap-4">
         {/* Logo renders its own home <Link>; wrapping it in another link would nest anchors. */}
         <Logo className="shrink-0" />

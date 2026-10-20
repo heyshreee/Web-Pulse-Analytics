@@ -63,6 +63,13 @@ export const SAMPLE_DEVICES = [
   { label: 'Tablet', value: 8 },
 ];
 
+export const SAMPLE_BROWSERS = [
+  { label: 'Chrome', value: 62 },
+  { label: 'Safari', value: 18 },
+  { label: 'Edge', value: 11 },
+  { label: 'Firefox', value: 9 },
+];
+
 export const SAMPLE_PAGES = [
   { path: '/', views: 12480, share: 100 },
   { path: '/pricing', views: 8420, share: 67 },

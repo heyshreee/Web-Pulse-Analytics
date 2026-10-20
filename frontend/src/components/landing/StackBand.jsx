@@ -3,7 +3,6 @@ import Reveal from '../marketing/Reveal';
 const CHIPS = [
   'JavaScript',
   'React',
-  'Node.js',
   'REST API',
   'Custom events',
   'Page views',
@@ -19,10 +18,10 @@ export default function StackBand() {
     <section className="border-y border-white/[0.06] bg-white/[0.012]">
       <div className="mkt-container py-10">
         <Reveal className="flex flex-col items-center gap-6 lg:flex-row lg:justify-between">
-          <p className="max-w-md text-center text-sm text-slate-400 lg:text-left">
-            <span className="font-semibold text-slate-200">One script tag, any stack.</span> The
-            tracker is a standalone function with no dependencies — it works with plain
-            JavaScript, React, or anything else that runs in a browser.
+          <p className="max-w-lg text-center text-sm text-slate-400 lg:text-left">
+            <span className="font-semibold text-slate-200">Your stack. Your data. One small tracker.</span>{' '}
+            Add WebPulse to your existing site and start sending page views and custom events —
+            no heavy analytics SDK, no build step.
           </p>
           <ul className="flex flex-wrap items-center justify-center gap-2">
             {CHIPS.map((chip) => (

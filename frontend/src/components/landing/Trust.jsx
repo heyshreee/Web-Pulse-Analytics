@@ -31,14 +31,14 @@ const ITEMS = [
   {
     icon: Globe2,
     title: 'Origin-restricted tracking',
-    body: 'Each project stores the domains allowed to send browser events, so a tracking ID cannot be reused from an unapproved site.',
+    body: 'You can restrict browser tracking to specific domains per project. When allowed origins are set, events from other origins are rejected. Tracking IDs are public identifiers, not secrets.',
     to: '/docs/security',
-    cta: 'How tracking keys work',
+    cta: 'How allowed origins work',
   },
   {
     icon: Lock,
     title: 'Authenticated console',
-    body: 'Dashboard access uses session tokens delivered as HttpOnly cookies. Passwords are hashed, and active sessions can be reviewed and revoked from settings.',
+    body: 'Dashboard sign-in uses a signed session token delivered in an HttpOnly cookie. Passwords are hashed before storage, and the security guide documents current controls and known gaps.',
     to: '/security',
     cta: 'Security overview',
   },
@@ -57,8 +57,8 @@ export default function Trust() {
       <div className="mkt-container">
         <SectionHead
           eyebrow="Trust & transparency"
-          title="Analytics you can verify, not just believe."
-          description="WebPulse is an early-stage, open-source product. Everything below is something you can inspect in the repository or in the documentation today."
+          title="Open source. Open about how it works."
+          description="Inspect the implementation, explore the API, and understand the data your website sends. WebPulse is built for developers who want visibility into their analytics, not a black box."
         />
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2">
@@ -87,7 +87,7 @@ export default function Trust() {
                   <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
                 </span>
                 <h3 className="mkt-h4">{item.title}</h3>
-                <p className="mkt-body mt-2 text-sm">{item.body}</p>
+                <p className="mkt-body mt-2 text-[0.9375rem]">{item.body}</p>
                 {link}
               </Reveal>
             );

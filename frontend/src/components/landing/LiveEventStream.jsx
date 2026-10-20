@@ -91,19 +91,19 @@ export default function LiveEventStream({ maxItems = 6, seedCount = 5 }) {
             {e.code}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[11.5px] font-medium text-slate-200">
+            <p className="truncate text-xs font-medium text-slate-200">
               <span className="sr-only">{e.country} · </span>
               {e.country} <span className="text-slate-500">·</span>{' '}
               <span className="text-slate-400">{e.browser}</span>
             </p>
-            <p className="truncate text-[11px] text-slate-500">
+            <p className="truncate text-[11.5px] text-slate-500">
               {e.action}{' '}
               <span className="font-mono" style={{ color: e.accent }}>
                 {e.page}
               </span>
             </p>
           </div>
-          <span className="metric-num shrink-0 text-[10px] text-slate-500">{e.time}</span>
+          <span className="metric-num shrink-0 text-[11px] text-slate-500">{e.time}</span>
         </li>
       ))}
     </ul>

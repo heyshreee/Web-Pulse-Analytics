@@ -46,9 +46,9 @@ export default function DashboardPreview({ children }) {
         <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-5 py-4">
           <div>
             <p className="mkt-h4 !text-[0.9375rem] text-slate-100">Global Insights</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">All projects · last 30 days</p>
+            <p className="mt-0.5 text-xs text-slate-500">All projects · last 30 days</p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-300">
             <span className="mkt-live-dot !h-1.5 !w-1.5" aria-hidden="true" />
             Live
           </span>

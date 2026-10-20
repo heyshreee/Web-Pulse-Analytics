@@ -32,7 +32,7 @@ export default function FinalCta() {
           </div>
 
           <p className="mt-5 text-xs text-slate-500">
-            Free plan · No credit card required · Open source
+            Free plan · No credit card required · Developer-friendly setup · Open source
           </p>
         </Reveal>
       </div>

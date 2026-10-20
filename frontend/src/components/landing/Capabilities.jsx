@@ -1,12 +1,12 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import SectionHead from '../marketing/SectionHead';
 import Reveal from '../marketing/Reveal';
 import ChartPreview from './ChartPreview';
 import LiveEventStream from './LiveEventStream';
-import { useMemo } from 'react';
 import {
-  SAMPLE_COUNTRIES,
+  SAMPLE_BROWSERS,
   SAMPLE_DEVICES,
   SAMPLE_PAGES,
   SAMPLE_REFERRERS,
@@ -21,7 +21,14 @@ import {
 function VisualHeader({ title, meta }) {
   return (
     <div className="mb-4 flex items-center justify-between gap-3">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{title}</p>
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          {title}
+        </p>
+        <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500">
+          Sample data
+        </span>
+      </div>
       {meta}
     </div>
   );
@@ -50,15 +57,20 @@ function TrafficVisual() {
   const series = useMemo(() => makeTrafficSeries('30d'), []);
   return (
     <div className="mkt-card p-5">
-      <VisualHeader title="Traffic momentum" meta={<span className="text-[11px] text-slate-500">30 days</span>} />
+      <VisualHeader
+        title="Traffic momentum"
+        meta={<span className="text-[11px] text-slate-500">30 days</span>}
+      />
       <div className="h-36">
         <ChartPreview data={series} dark />
       </div>
       <div className="mt-5 border-t border-white/[0.06] pt-4">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Top pages</p>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          Top pages
+        </p>
         <ul className="space-y-2.5">
           {SAMPLE_PAGES.slice(0, 4).map((p) => (
-            <li key={p.path} className="flex items-center gap-3 text-[11.5px]">
+            <li key={p.path} className="flex items-center gap-3 text-xs">
               <span className="w-28 truncate font-mono text-slate-300 sm:w-40">{p.path}</span>
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                 <span
@@ -80,7 +92,10 @@ function TrafficVisual() {
 function SourcesVisual() {
   return (
     <div className="mkt-card p-5">
-      <VisualHeader title="Where visitors come from" meta={<span className="text-[11px] text-slate-500">30 days</span>} />
+      <VisualHeader
+        title="Where visitors come from"
+        meta={<span className="text-[11px] text-slate-500">30 days</span>}
+      />
       <ul className="space-y-4">
         {SAMPLE_REFERRERS.map((r) => (
           <li key={r.label}>
@@ -96,7 +111,7 @@ function SourcesVisual() {
           </li>
         ))}
       </ul>
-      <p className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] leading-relaxed text-slate-500">
+      <p className="mt-5 border-t border-white/[0.06] pt-4 text-xs leading-relaxed text-slate-500">
         Sources are derived from the referring document and campaign parameters attached to each
         event.
       </p>
@@ -107,29 +122,35 @@ function SourcesVisual() {
 function AudienceVisual() {
   return (
     <div className="mkt-card p-5">
-      <VisualHeader title="Audience" meta={<span className="text-[11px] text-slate-500">30 days</span>} />
+      <VisualHeader
+        title="Audience"
+        meta={<span className="text-[11px] text-slate-500">30 days</span>}
+      />
       <div className="mb-5 grid grid-cols-3 gap-3">
         {SAMPLE_DEVICES.map((d) => (
           <div key={d.label} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
             <p className="metric-num text-lg font-bold text-slate-100">{d.value}%</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">{d.label}</p>
+            <p className="mt-0.5 text-xs text-slate-500">{d.label}</p>
             <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.06]">
               <div className="h-full rounded-full bg-violet-400/80" style={{ width: `${d.value}%` }} />
             </div>
           </div>
         ))}
       </div>
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-        Top countries
+      <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+        Top browsers
       </p>
       <ul className="space-y-2.5">
-        {SAMPLE_COUNTRIES.slice(0, 4).map((c) => (
-          <li key={c.label} className="flex items-center gap-3 text-[11.5px]">
-            <span className="w-28 truncate text-slate-300 sm:w-32">{c.label}</span>
+        {SAMPLE_BROWSERS.map((b) => (
+          <li key={b.label} className="flex items-center gap-3 text-xs">
+            <span className="w-28 truncate text-slate-300 sm:w-32">{b.label}</span>
             <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
-              <span className="block h-full rounded-full bg-emerald-400/70" style={{ width: `${c.share * 2.6}%` }} />
+              <span
+                className="block h-full rounded-full bg-emerald-400/70"
+                style={{ width: `${b.value}%` }}
+              />
             </span>
-            <span className="metric-num w-12 text-right text-slate-400">{c.value.toLocaleString()}</span>
+            <span className="metric-num w-12 text-right text-slate-400">{b.value}%</span>
           </li>
         ))}
       </ul>
@@ -144,34 +165,34 @@ function AudienceVisual() {
 const CAPABILITIES = [
   {
     index: '01',
-    label: 'Real-time monitoring',
+    label: 'Live monitoring',
     title: 'Watch visitors arrive while it is happening.',
-    body: 'Events stream into your dashboard the moment they happen — no waiting for a nightly report. Filter by project and see the pages people are on right now.',
-    bullets: ['Live activity feed per project', 'Active visitor count', 'No sampling, no batching delay'],
+    body: 'Events stream into your dashboard as they happen, so you can see how many visitors are active and which pages they are on right now.',
+    bullets: ['Live activity feed per project', 'Active visitor count', 'No nightly report delay'],
     Visual: LiveVisual,
   },
   {
     index: '02',
     label: 'Traffic & engagement',
-    title: 'See how traffic moves over time.',
-    body: 'Track page views and sessions across 24 hours, 7 days, or 30 days, and find out which pages actually carry your traffic.',
-    bullets: ['Time-range comparison', 'Top pages and entry paths', 'Per-project breakdown'],
+    title: 'See which pages carry your traffic.',
+    body: 'Follow page views and sessions over 24 hours, 7 days, or 30 days — and find the pages that actually carry your traffic.',
+    bullets: ['24-hour, 7-day, and 30-day ranges', 'Top pages by views', 'Per-project breakdown'],
     Visual: TrafficVisual,
   },
   {
     index: '03',
     label: 'Acquisition',
     title: 'Know which channels bring people in.',
-    body: 'Every event records where the visitor came from, so direct traffic, search, social, and referral channels are separated automatically.',
-    bullets: ['Referrer attribution', 'Channel share at a glance', 'Works with campaign parameters'],
+    body: 'See which channels — direct, search, social, or referral — bring visitors in, and which ones deserve more attention.',
+    bullets: ['Referrer and channel attribution', 'Campaign parameters included', 'Channel share at a glance'],
     Visual: SourcesVisual,
   },
   {
     index: '04',
     label: 'Audience',
-    title: 'Understand the devices behind the visits.',
-    body: 'Device, browser, and country are attached to every visitor, giving context to the numbers instead of a single anonymous total.',
-    bullets: ['Desktop, mobile, and tablet split', 'Country distribution', 'Ready for project-level filtering'],
+    title: 'Understand the devices and browsers behind the visits.',
+    body: 'Device, browser, and operating system are attached to every visitor, giving context to the numbers instead of a single anonymous total.',
+    bullets: ['Desktop, mobile, and tablet split', 'Browser and OS breakdown', 'Ready for project-level filtering'],
     Visual: AudienceVisual,
   },
 ];
@@ -182,13 +203,8 @@ export default function Capabilities() {
       <div className="mkt-container">
         <SectionHead
           eyebrow="What you get"
-          title={
-            <>
-              One dashboard for the questions
-              <br className="hidden sm:block" /> you actually ask about your site.
-            </>
-          }
-          description="WebPulse records the page views, sessions, custom events, and visitor context that a website produces — then keeps them visible in real time."
+          title="Everything you need to understand your traffic."
+          description="WebPulse turns page views, sessions, and custom events into insights you can use to improve your website."
         />
 
         <div className="mt-16 space-y-20 lg:space-y-24">
