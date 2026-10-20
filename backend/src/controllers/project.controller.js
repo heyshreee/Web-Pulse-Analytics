@@ -498,12 +498,15 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
         projectId = project.id;
     }
 
-    // Check if project already has a token
+    // Check if project already has a token.
+    // Scoped to the owner: a probe must not be able to read whether another
+    // account's project already has a share link.
     const { data: existingProject } = await supabase
         .from('projects')
         .select('share_token')
         .eq('id', projectId)
-        .single();
+        .eq('user_id', userId)
+        .maybeSingle();
 
     // If no token exists, check limits before creating one
     if (!existingProject?.share_token) {
