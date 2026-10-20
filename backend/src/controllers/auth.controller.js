@@ -124,12 +124,17 @@ export const login = asyncHandler(async (req, res) => {
         .eq('email', email)
         .single();
 
-    if (!user) {
-        throw AppError.unauthorized('Invalid credentials');
+    // Compare against a dummy hash when the account does not exist so the
+    // response time does not reveal which addresses are registered.
+    let isMatch = false;
+    try {
+        const hash = user?.password_hash || '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+        isMatch = await bcrypt.compare(password, hash);
+    } catch {
+        isMatch = false;
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
+    if (!user || !isMatch) {
         throw AppError.unauthorized('Invalid credentials');
     }
 
@@ -207,20 +212,24 @@ export const verifyEmail = asyncHandler(async (req, res) => {
         .eq('email', email)
         .single();
 
+    // A single generic failure for "no such account" and "wrong code" — the
+    // endpoint must not be usable to discover which addresses are registered.
     if (!user) {
-        throw AppError.notFound('User not found');
+        throw AppError.badRequest('Invalid or expired verification code');
     }
 
     if (user.is_verified) {
-        return res.json({ success: true, message: 'Email already verified' });
+        // Same answer as a successful verification — the response must not
+        // reveal whether the address exists or is already verified.
+        return res.json({ success: true, message: 'Email verified successfully' });
     }
 
     if (user.otp_code !== code) {
-        throw AppError.badRequest('Invalid verification code');
+        throw AppError.badRequest('Invalid or expired verification code');
     }
 
     if (new Date(user.otp_expires_at) < new Date()) {
-        throw AppError.badRequest('Verification code expired');
+        throw AppError.badRequest('Invalid or expired verification code');
     }
 
     // Verify User
@@ -250,22 +259,26 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 export const resendVerification = asyncHandler(async (req, res) => {
     const { email } = req.body;
 
-    if (!email) {
-        throw AppError.badRequest('Email is required');
-    }
-
     const { data: user } = await supabase
         .from('users')
         .select('*')
         .eq('email', email)
         .single();
 
+    // Always answer the same way so the endpoint cannot be used to discover
+    // which addresses have accounts.
     if (!user) {
-        throw AppError.notFound('User not found');
+        return res.json({
+            success: true,
+            message: 'If the account exists and needs verification, a code is on its way.'
+        });
     }
 
     if (user.is_verified) {
-        return res.json({ success: true, message: 'Email already verified' });
+        return res.json({
+            success: true,
+            message: 'If the account exists and needs verification, a code is on its way.'
+        });
     }
 
     // Generate OTP
@@ -296,10 +309,15 @@ export const forgotPassword = asyncHandler(async (req, res) => {
         .from('users')
         .select('id, email, name')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
+    // Always answer the same way — a different response for unknown
+    // addresses would turn this endpoint into an account-discovery oracle.
     if (!user) {
-        throw AppError.notFound('No account found with this email address');
+        return res.json({
+            success: true,
+            message: 'If an account exists for that address, a reset link is on its way.'
+        });
     }
 
     // A dedicated, short-lived token that only the reset endpoint accepts.
@@ -320,7 +338,10 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
     await EmailService.sendPasswordResetEmail(user.email, resetLink, user.name || 'User');
 
-    res.json({ success: true, message: 'Reset link sent to your email.' });
+    res.json({
+        success: true,
+        message: 'If an account exists for that address, a reset link is on its way.'
+    });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
