@@ -15,57 +15,130 @@ import AppError from '../errors/AppError.js';
  * This ensures markers appear on the map during development.
  */
 /**
- * Enhanced High Accuracy Geo Lookup with timeout and fallback.
+ * Geo lookup
+ * ----------
+ * Visitor IP addresses are resolved to an approximate location. The lookup
+ * runs over HTTPS — the previous provider was queried over plain HTTP, which
+ * sent visitor IP addresses across the network unencrypted. An offline
+ * database is used when the provider cannot be reached.
+ */
+const GEO_LOOKUP_URL = 'https://ipwho.is';
+const GEO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const GEO_CACHE_MAX_ENTRIES = 5000;
+const geoCache = new Map();
+
+const isLocalAddress = (ip) =>
+    ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+
+const getCachedGeo = (ip) => {
+    const hit = geoCache.get(ip);
+    if (!hit) return null;
+    if (Date.now() - hit.at > GEO_CACHE_TTL_MS) {
+        geoCache.delete(ip);
+        return null;
+    }
+    return hit.value;
+};
+
+const setCachedGeo = (ip, value) => {
+    if (geoCache.size >= GEO_CACHE_MAX_ENTRIES) {
+        // Cheap eviction: drop the oldest entry.
+        const oldest = geoCache.keys().next().value;
+        if (oldest !== undefined) geoCache.delete(oldest);
+    }
+    geoCache.set(ip, { at: Date.now(), value });
+};
+
+const withTimeout = async (fn, ms = 3000) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+        return await fn(controller.signal);
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
+/** Resolves the caller's public IP — only used for local development. */
+const fetchPublicIp = async () => {
+    try {
+        const response = await withTimeout((signal) =>
+            fetch('https://api.ipify.org?format=json', { signal })
+        );
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data?.ip || null;
+    } catch {
+        return null;
+    }
+};
+
+/** Country/city for an IP address, via an HTTPS provider. */
+const lookupRemoteGeo = async (ip) => {
+    try {
+        const response = await withTimeout((signal) =>
+            fetch(`${GEO_LOOKUP_URL}/${encodeURIComponent(ip)}`, {
+                signal,
+                headers: { Accept: 'application/json' }
+            })
+        );
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        if (!data?.success) return null;
+
+        return {
+            country: data.country || 'Unknown',
+            city: data.city || 'Unknown',
+            lat: typeof data.latitude === 'number' ? data.latitude : null,
+            lng: typeof data.longitude === 'number' ? data.longitude : null
+        };
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.warn('[GeoIP] Provider lookup failed:', err.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * High accuracy geo lookup with an offline fallback and a short-lived cache,
+ * so a busy project does not trigger one outbound lookup per event.
  */
 const getHighAccuracyGeo = async (ip) => {
+    const cached = getCachedGeo(ip);
+    if (cached) return cached;
+
     let targetIp = ip;
     try {
-        // 1. Resolve Localhost (Development environment helper)
-        if (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
-            const ipifyResponse = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
-            clearTimeout(timeoutId);
-            const ipifyData = await ipifyResponse.json();
-            targetIp = ipifyData.ip;
+        // 1. Localhost (development) resolves to the machine's public IP.
+        if (isLocalAddress(ip)) {
+            const publicIp = await fetchPublicIp();
+            if (publicIp) targetIp = publicIp;
         }
 
-        // 2. High Accuracy Lookup (ip-api.com) with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
-        const response = await fetch(`http://ip-api.com/json/${targetIp}?fields=status,message,country,city,lat,lon`, { 
-            signal: controller.signal 
-        });
-        clearTimeout(timeoutId);
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            return {
-                country: data.country,
-                city: data.city,
-                lat: data.lat,
-                lng: data.lon
-            };
+        // 2. Provider lookup over HTTPS.
+        const remote = await lookupRemoteGeo(targetIp);
+        if (remote) {
+            setCachedGeo(ip, remote);
+            return remote;
         }
     } catch (err) {
-        // Silent fail, falls through to local lookup
-        if (err.name === 'AbortError') {
-            console.warn(`[GeoIP] Timeout for IP: ${targetIp}`);
-        } else {
-            console.error('[GeoIP] Lookup failed:', err.message);
-        }
+        console.warn('[GeoIP] Lookup failed:', err.message);
     }
 
     // 3. Fallback (geoip-lite - offline local DB)
     try {
         const geo = geoip.lookup(targetIp);
         if (geo) {
-            return {
+            const result = {
                 country: geo.country || 'Unknown',
                 city: geo.city || 'Unknown',
                 lat: geo.ll ? geo.ll[0] : null,
                 lng: geo.ll ? geo.ll[1] : null
             };
+            setCachedGeo(ip, result);
+            return result;
         }
     } catch (fallbackErr) {
         console.error('[GeoIP] Fallback failed:', fallbackErr.message);
