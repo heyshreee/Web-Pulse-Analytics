@@ -2,6 +2,7 @@ import supabase from '../config/supabase.js';
 import bcrypt from 'bcryptjs';
 import usageService from '../services/usage.service.js';
 import ActivityLogService from '../services/activity.service.js';
+import sessionService from '../services/session.service.js';
 import cloudinaryPkg from 'cloudinary';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
@@ -128,6 +129,11 @@ export const updatePassword = asyncHandler(async (req, res) => {
 
     if (error) throw error;
 
+    // A password change ends every other session: tokens issued against the
+    // old credential must not survive it. The session used for this request
+    // stays alive so the caller is not signed out.
+    await sessionService.revokeAllSessions(userId, { exceptTokenId: req.tokenId });
+
     await ActivityLogService.log(
         null,
         userId,
@@ -141,24 +147,31 @@ export const updatePassword = asyncHandler(async (req, res) => {
 });
 
 export const getSessions = asyncHandler(async (req, res) => {
-    // Mock sessions for now as we don't track them in DB yet
-    // In a real app, we would query a sessions table
-    const sessions = [
-        {
-            id: 'current',
-            device: req.headers['user-agent'],
-            ip: req.ip,
-            lastActive: new Date(),
-            isCurrent: true,
-            location: 'Unknown'
-        }
-    ];
+    const rows = await sessionService.listSessions(req.user.id);
+
+    const sessions = rows.map((row) => ({
+        id: row.id,
+        device: row.user_agent || 'Unknown device',
+        ip: row.ip || null,
+        lastActive: row.last_seen_at || row.created_at,
+        isCurrent: Boolean(req.tokenId) && row.token_id === req.tokenId,
+        location: 'Unknown'
+    }));
+
     res.json(sessions);
 });
 
 export const revokeSession = asyncHandler(async (req, res) => {
-    // Mock revocation
     const { sessionId } = req.params;
+
+    // Ownership is part of the update filter, so one account can never
+    // revoke another account's session.
+    const revoked = await sessionService.revokeSession(req.user.id, sessionId);
+
+    if (!revoked) {
+        throw AppError.notFound('Session not found');
+    }
+
     res.json({ success: true, message: 'Session revoked' });
 });
 
