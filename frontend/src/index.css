@@ -668,6 +668,72 @@
   transform: scaleX(1);
 }
 
+/* ---- Documentation rail --------------------------------------------------- */
+/* The rail is sticky under the marketing nav and scrolls on its own. The
+   offset is published by the docs layout as `--docs-rail-top` /
+   `--docs-rail-h` so the rail follows the nav even while the preview notice
+   above it is still on screen. */
+.docs-rail {
+  align-self: flex-start;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 1024px) {
+  .docs-rail {
+    position: sticky;
+    top: var(--docs-rail-top, 4rem);
+    height: var(--docs-rail-h, calc(100vh - 4rem));
+  }
+}
+
+/* The mobile drawer lives in a portal on <body> so it can sit above the
+   marketing nav instead of being trapped under it. */
+.docs-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 70;
+  width: 18rem;
+  max-width: 85vw;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: #0B0F17;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+.docs-drawer.is-open {
+  transform: translateX(0);
+}
+
+/* A slim, always visible scrollbar so it is obvious the list continues. */
+.docs-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167, 139, 250, 0.38) transparent;
+}
+.docs-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.docs-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.docs-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(167, 139, 250, 0.3);
+  border-radius: 9999px;
+}
+.docs-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(167, 139, 250, 0.5);
+}
+
+/* Fade the cut edge while there is more of the list below it. */
+.docs-scroll.has-more {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+}
+
 /* ---- Skeleton shimmer ----------------------------------------------------- */
 /* Background comes from the element itself so it can be tinted per surface. */
 @keyframes skeletonSweep {
