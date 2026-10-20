@@ -1,4 +1,5 @@
-import { verifyToken } from '../utils/jwt.js';
+import { verifyToken, TOKEN_PURPOSE } from '../utils/jwt.js';
+import { isSessionActive } from '../services/session.service.js';
 import supabase from '../config/supabase.js';
 
 export default async (req, res, next) => {
@@ -10,6 +11,23 @@ export default async (req, res, next) => {
         }
 
         const decoded = verifyToken(token);
+
+        // Only session tokens authenticate requests. A password-reset token
+        // (or a legacy token minted before the `purpose` claim existed) is
+        // never accepted here.
+        if (decoded.purpose !== TOKEN_PURPOSE.SESSION) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        req.tokenId = decoded.jti || null;
+
+        // Server-side revocation check. `null` means the session store could
+        // not answer (missing migration, transient failure) — the request is
+        // allowed through so an infrastructure fault never locks users out.
+        const active = await isSessionActive(req.tokenId);
+        if (active === false) {
+            return res.status(401).json({ error: 'Session has been revoked' });
+        }
 
         const { data: user, error } = await supabase
             .from('users')
