@@ -6,12 +6,14 @@
   "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "check:security": "node scripts/security-checks.js",
+    "check:smoke": "bash scripts/security-smoke.sh",
     "start": "node src/server.js",
     "dev": "nodemon ./src/server.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
     "bcryptjs": "^3.0.3",
