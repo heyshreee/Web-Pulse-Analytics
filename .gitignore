@@ -17,3 +17,12 @@ DEBUG.md
 PRONOUNCIATION-GUIDE.md
 
 .agents/
+
+# Generated video output (brag)
+/video/
+/brag-output-*/
+
+# Local dev runner (keep local-only)
+/run.sh
+/run.bat
+
