@@ -5,9 +5,53 @@ import { validateEmail, validatePassword } from '../utils/validators.js';
 import EmailService from '../services/email.service.js';
 import { logAction } from '../services/audit.service.js';
 import ActivityLogService from '../services/activity.service.js';
+import sessionService from '../services/session.service.js';
+import { getClientIp } from '../utils/ip.js';
+import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
+
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // matches the JWT lifetime
+
+/**
+ * Issues a session: a signed JWT plus the server-side row that makes it
+ * revocable. The token itself is only ever delivered through the HttpOnly
+ * cookie — it is never returned in a response body, so page scripts can
+ * never read it.
+ */
+const issueSession = async (user, req) => {
+    const tokenId = randomUUID();
+    const token = generateToken(user.id, { tokenId });
+
+    await sessionService.createSession({
+        userId: user.id,
+        tokenId,
+        purpose: sessionService.SESSION_PURPOSE.SESSION,
+        userAgent: req.headers['user-agent'] || null,
+        ip: getClientIp(req),
+        expiresAt: new Date(Date.now() + SESSION_MAX_AGE_MS).toISOString()
+    });
+
+    return token;
+};
+
+const setSessionCookie = (res, token) => {
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: SESSION_MAX_AGE_MS
+    });
+};
+
+const publicUser = (user) => ({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    plan: user.plan,
+    avatar_url: user.avatar_url
+});
 
 export const register = asyncHandler(async (req, res) => {
     const { email, password, name } = req.body;
@@ -94,7 +138,7 @@ export const login = asyncHandler(async (req, res) => {
         return res.status(403).json({ error: 'Email not verified', requireVerification: true, email: user.email });
     }
 
-    const token = generateToken(user.id);
+    const token = await issueSession(user, req);
 
     // Audit Log
     await logAction(user.id, 'USER_LOGIN');
@@ -126,44 +170,34 @@ export const login = asyncHandler(async (req, res) => {
     // Don't await to avoid blocking response
     EmailService.sendNewLoginEmail(user.email, loginDetails, user.name || 'User').catch(console.error);
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
+    setSessionCookie(res, token);
 
-    res.json({
-        token,
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            avatar_url: user.avatar_url
-        }
-    });
+    // The session token is delivered through the HttpOnly cookie only — it is
+    // never returned in the body, so it cannot be read by page scripts.
+    res.json({ user: publicUser(user) });
 });
 
-export const logout = (req, res) => {
+export const logout = asyncHandler(async (req, res) => {
+    // Revoke the session server-side so the token stops working even if it
+    // was copied out of the browser before sign-out.
+    if (req.tokenId) {
+        await sessionService.revokeSessionByTokenId(req.user.id, req.tokenId);
+    }
     res.clearCookie('token');
     res.json({ message: 'Logged out successfully' });
-};
+});
 
 export const getMe = async (req, res) => {
     res.json(req.user);
 };
 
 export const verifyEmail = asyncHandler(async (req, res) => {
-    console.log('Verify Email Request Body:', req.body);
-    const { code, email } = req.body; // Email is needed to find user if not authenticated
+    const { code, email } = req.body;
 
     if (!code || code.length !== 6) {
         throw AppError.badRequest('Invalid code format');
     }
 
-    // Find user by email (if provided) or if we had a temporary session (not applicable here as we don't issue token)
-    // We need email from frontend
     if (!email) {
         throw AppError.badRequest('Email is required');
     }
@@ -200,30 +234,17 @@ export const verifyEmail = asyncHandler(async (req, res) => {
         })
         .eq('id', user.id);
 
-    // Generate Token and Login
-    const token = generateToken(user.id);
+    const token = await issueSession(user, req);
 
     // Send Welcome Email NOW (after verification)
     await EmailService.sendWelcomeEmail(user.email, user.name || 'User');
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
+    setSessionCookie(res, token);
 
     res.json({
         success: true,
         message: 'Email verified successfully',
-        token,
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            avatar_url: user.avatar_url
-        }
+        user: publicUser(user)
     });
 });
 
@@ -271,8 +292,12 @@ export const resendVerification = asyncHandler(async (req, res) => {
 
 export const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
-    // Check if user exists
-    const { data: user } = await supabase.from('users').select('id').eq('email', email).single();
+
+    const { data: user } = await supabase
+        .from('users')
+        .select('id, email, name')
+        .eq('email', email)
+        .single();
 
     if (!user) {
         throw AppError.notFound('No account found with this email address');
@@ -335,11 +360,9 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const googleLogin = asyncHandler(async (req, res) => {
-    console.log('Google Login Request Body:', req.body);
     const { token } = req.body;
 
     if (!token) {
-        console.log('Token missing in request');
         throw AppError.badRequest('Token required');
     }
 
@@ -349,17 +372,13 @@ export const googleLogin = asyncHandler(async (req, res) => {
     });
 
     if (!response.ok) {
-        console.log('Google UserInfo failed:', response.status, response.statusText);
         throw AppError.unauthorized('Invalid Google token');
     }
 
     const googleUser = await response.json();
-    console.log('Google User Info:', googleUser);
-
     const { email, name, sub: googleId, picture: avatar } = googleUser;
 
     if (!email) {
-        console.log('Email missing in Google User Info');
         throw AppError.badRequest('Email required from Google');
     }
 
@@ -407,25 +426,11 @@ export const googleLogin = asyncHandler(async (req, res) => {
         await EmailService.sendWelcomeEmail(user.email, user.name || 'User');
     }
 
-    const jwtToken = generateToken(user.id);
+    const jwtToken = await issueSession(user, req);
 
-    res.cookie('token', jwtToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
+    setSessionCookie(res, jwtToken);
 
-    res.json({
-        token: jwtToken,
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            avatar_url: user.avatar_url
-        }
-    });
+    res.json({ user: publicUser(user) });
 });
 
 export default { register, login, logout, getMe, verifyEmail, resendVerification, forgotPassword, resetPassword, googleLogin };
