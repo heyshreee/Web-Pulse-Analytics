@@ -147,6 +147,90 @@ const getHighAccuracyGeo = async (ip) => {
     return { country: 'Unknown', city: 'Unknown', lat: null, lng: null };
 };
 
+/**
+ * Applies a project's allowed-origins list to an incoming tracking request.
+ *
+ * The allow-list is a browser control, not authentication: it only applies to
+ * requests that carry a browser `Origin` (or `Referer`) header. A client that
+ * sends neither is not origin-checked — the tracking ID is public by design,
+ * so this narrows casual misuse rather than proving who is calling.
+ */
+const enforceAllowedOrigin = async (project, req, { notify = true } = {}) => {
+    const allowed = project.allowed_origins;
+    if (!allowed || !String(allowed).trim()) return true;
+
+    const origin = req.headers.origin || req.headers.referer;
+    if (!origin) return true;
+
+    const hostnameOf = (value) => {
+        if (value === 'null') return 'null';
+        try {
+            return new URL(value).hostname;
+        } catch {
+            return null;
+        }
+    };
+
+    const originHostname = hostnameOf(origin);
+    if (!originHostname) {
+        throw AppError.forbidden('INVALID_ORIGIN', 'INVALID_ORIGIN');
+    }
+
+    const allowedHostnames = String(allowed)
+        .split(',')
+        .map((entry) => {
+            const trimmed = entry.trim();
+            if (!trimmed) return null;
+            if (trimmed.startsWith('http')) {
+                try {
+                    return new URL(trimmed).hostname;
+                } catch {
+                    return trimmed;
+                }
+            }
+            return trimmed;
+        })
+        .filter(Boolean);
+
+    const isAllowed = allowedHostnames.some(
+        (allowedHost) => originHostname === allowedHost || originHostname.endsWith(`.${allowedHost}`)
+    );
+
+    if (isAllowed) return true;
+
+    const ip = getClientIp(req);
+    const userAgent = req.headers['user-agent'] || '';
+
+    if (notify) {
+        await NotificationService.create(
+            project.user_id,
+            'Security Alert: Origin Blocked',
+            `Blocked request from unauthorized origin: ${originHostname} for project "${project.name || 'Unknown'}"`,
+            'security'
+        );
+    }
+
+    if (project.user_id) {
+        await ActivityLogService.log(
+            project.id,
+            project.user_id,
+            'security.alert',
+            `Blocked request from unauthorized origin: ${originHostname}`,
+            'failure',
+            ip,
+            {
+                resource: req.originalUrl,
+                http_method: req.method,
+                http_status: 403,
+                user_agent: userAgent,
+                event_type: 'security.alert'
+            }
+        );
+    }
+
+    throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
+};
+
 // Simple in-memory cache for deduplication (rolling TTL)
 const requestCache = new Map();
 
@@ -660,65 +744,7 @@ export const trackVisitorPublic = asyncHandler(async (req, res) => {
     }
 
     // Check Allowed Origins
-    const origin = req.headers['origin'] || req.headers['referer'];
-    if (project.allowed_origins && project.allowed_origins.length > 0 && origin) {
-        try {
-            let originHostname;
-            if (origin === 'null') {
-                originHostname = 'null';
-            } else {
-                originHostname = new URL(origin).hostname;
-            }
-            const allowedOriginsArray = project.allowed_origins.split(',').map(o => {
-                try {
-                    // If it's a full URL, extract the hostname
-                    if (o.trim().startsWith('http')) {
-                        return new URL(o.trim()).hostname;
-                    }
-                    return o.trim();
-                } catch (e) {
-                    return o.trim();
-                }
-            });
-            const isAllowed = allowedOriginsArray.some(allowed =>
-                originHostname === allowed || originHostname.endsWith('.' + allowed)
-            );
-
-            if (!isAllowed) {
-                // Notify user about blocked origin
-                await NotificationService.create(
-                    project.user_id,
-                    'Security Alert: Origin Blocked',
-                    `Blocked request from unauthorized origin: ${originHostname} for project "${project.name || 'Unknown'}"`,
-                    'security'
-                );
-
-                // Log security alert as failure
-                if (project.user_id) {
-                    await ActivityLogService.log(
-                        project.id,
-                        project.user_id,
-                        'security.alert',
-                        `Blocked request from unauthorized origin: ${originHostname}`,
-                        'failure',
-                        ip,
-                        {
-                            resource: pageUrl,
-                            http_method: req.method,
-                            http_status: 403,
-                            user_agent: userAgent,
-                            event_type: 'security.alert'
-                        }
-                    );
-                }
-
-                throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
-            }
-        } catch (urlError) {
-            console.error('Origin validation error:', urlError);
-            throw AppError.forbidden('INVALID_ORIGIN', 'INVALID_ORIGIN');
-        }
-    }
+    await enforceAllowedOrigin(project, req);
 
     // Check Limits
     const limitCheck = await usageService.checkLimit(project.user_id);
@@ -1184,7 +1210,11 @@ export const trackEvent = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    // origin check (omitted for brevity, but should be here if strict)
+    // The v1 event endpoint is the one the current tracker SDK posts to, so
+    // the project's allowed-origins list has to be applied here too —
+    // otherwise the allow-list would not protect the main ingest path.
+    await enforceAllowedOrigin(project, req, { notify: false });
+
     // check limits
     const limitCheck = await usageService.checkLimit(project.user_id);
     if (!limitCheck.canTrack) {
