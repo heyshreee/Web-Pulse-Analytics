@@ -1,10 +1,12 @@
 import { Eye, Users, Database, Activity, Smartphone, Tablet, Monitor, ChevronRight, Search } from 'lucide-react';
+import Reveal from '../../Reveal';
+import AnimatedNumber from '../../landing/AnimatedNumber';
 
 export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
   return (
     <div className="space-y-8">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 stagger-children">
         <div className="card card-pad">
           <div className="flex items-center justify-between mb-6">
             <h3 className="eyebrow">Total Pulses</h3>
@@ -13,7 +15,11 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{stats?.total_views?.toLocaleString() || 0}</span>
+            <AnimatedNumber
+              end={stats?.total_views || 0}
+              duration={1.4}
+              className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+            />
           </div>
           <div className="mt-4 flex items-center gap-2">
             <span className="badge-green">
@@ -30,7 +36,11 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{overviewStats.uniqueVisitors?.toLocaleString() || 0}</span>
+            <AnimatedNumber
+              end={overviewStats.uniqueVisitors || 0}
+              duration={1.4}
+              className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+            />
           </div>
           <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">Last 30 day window</p>
         </div>
@@ -44,9 +54,11 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
             </div>
           </div>
           <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums">
-                {overviewStats.realTimeVisitors || 0}
-            </span>
+            <AnimatedNumber
+              end={overviewStats.realTimeVisitors || 0}
+              duration={1.2}
+              className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+            />
             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">Live</span>
           </div>
           <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">Synchronized real-time</p>
@@ -75,7 +87,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Reveal delay={60} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
         <div className="card card-pad flex flex-col min-h-[420px]">
           <div className="flex items-center justify-between mb-6">
@@ -157,7 +169,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
             )}
           </div>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }

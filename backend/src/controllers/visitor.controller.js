@@ -15,63 +15,220 @@ import AppError from '../errors/AppError.js';
  * This ensures markers appear on the map during development.
  */
 /**
- * Enhanced High Accuracy Geo Lookup with timeout and fallback.
+ * Geo lookup
+ * ----------
+ * Visitor IP addresses are resolved to an approximate location. The lookup
+ * runs over HTTPS — the previous provider was queried over plain HTTP, which
+ * sent visitor IP addresses across the network unencrypted. An offline
+ * database is used when the provider cannot be reached.
+ */
+const GEO_LOOKUP_URL = 'https://ipwho.is';
+const GEO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const GEO_CACHE_MAX_ENTRIES = 5000;
+const geoCache = new Map();
+
+const isLocalAddress = (ip) =>
+    ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+
+const getCachedGeo = (ip) => {
+    const hit = geoCache.get(ip);
+    if (!hit) return null;
+    if (Date.now() - hit.at > GEO_CACHE_TTL_MS) {
+        geoCache.delete(ip);
+        return null;
+    }
+    return hit.value;
+};
+
+const setCachedGeo = (ip, value) => {
+    if (geoCache.size >= GEO_CACHE_MAX_ENTRIES) {
+        // Cheap eviction: drop the oldest entry.
+        const oldest = geoCache.keys().next().value;
+        if (oldest !== undefined) geoCache.delete(oldest);
+    }
+    geoCache.set(ip, { at: Date.now(), value });
+};
+
+const withTimeout = async (fn, ms = 3000) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+        return await fn(controller.signal);
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
+/** Resolves the caller's public IP — only used for local development. */
+const fetchPublicIp = async () => {
+    try {
+        const response = await withTimeout((signal) =>
+            fetch('https://api.ipify.org?format=json', { signal })
+        );
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data?.ip || null;
+    } catch {
+        return null;
+    }
+};
+
+/** Country/city for an IP address, via an HTTPS provider. */
+const lookupRemoteGeo = async (ip) => {
+    try {
+        const response = await withTimeout((signal) =>
+            fetch(`${GEO_LOOKUP_URL}/${encodeURIComponent(ip)}`, {
+                signal,
+                headers: { Accept: 'application/json' }
+            })
+        );
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        if (!data?.success) return null;
+
+        return {
+            country: data.country || 'Unknown',
+            city: data.city || 'Unknown',
+            lat: typeof data.latitude === 'number' ? data.latitude : null,
+            lng: typeof data.longitude === 'number' ? data.longitude : null
+        };
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.warn('[GeoIP] Provider lookup failed:', err.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * High accuracy geo lookup with an offline fallback and a short-lived cache,
+ * so a busy project does not trigger one outbound lookup per event.
  */
 const getHighAccuracyGeo = async (ip) => {
+    const cached = getCachedGeo(ip);
+    if (cached) return cached;
+
     let targetIp = ip;
     try {
-        // 1. Resolve Localhost (Development environment helper)
-        if (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
-            const ipifyResponse = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
-            clearTimeout(timeoutId);
-            const ipifyData = await ipifyResponse.json();
-            targetIp = ipifyData.ip;
+        // 1. Localhost (development) resolves to the machine's public IP.
+        if (isLocalAddress(ip)) {
+            const publicIp = await fetchPublicIp();
+            if (publicIp) targetIp = publicIp;
         }
 
-        // 2. High Accuracy Lookup (ip-api.com) with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
-        const response = await fetch(`http://ip-api.com/json/${targetIp}?fields=status,message,country,city,lat,lon`, { 
-            signal: controller.signal 
-        });
-        clearTimeout(timeoutId);
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            return {
-                country: data.country,
-                city: data.city,
-                lat: data.lat,
-                lng: data.lon
-            };
+        // 2. Provider lookup over HTTPS.
+        const remote = await lookupRemoteGeo(targetIp);
+        if (remote) {
+            setCachedGeo(ip, remote);
+            return remote;
         }
     } catch (err) {
-        // Silent fail, falls through to local lookup
-        if (err.name === 'AbortError') {
-            console.warn(`[GeoIP] Timeout for IP: ${targetIp}`);
-        } else {
-            console.error('[GeoIP] Lookup failed:', err.message);
-        }
+        console.warn('[GeoIP] Lookup failed:', err.message);
     }
 
     // 3. Fallback (geoip-lite - offline local DB)
     try {
         const geo = geoip.lookup(targetIp);
         if (geo) {
-            return {
+            const result = {
                 country: geo.country || 'Unknown',
                 city: geo.city || 'Unknown',
                 lat: geo.ll ? geo.ll[0] : null,
                 lng: geo.ll ? geo.ll[1] : null
             };
+            setCachedGeo(ip, result);
+            return result;
         }
     } catch (fallbackErr) {
         console.error('[GeoIP] Fallback failed:', fallbackErr.message);
     }
 
     return { country: 'Unknown', city: 'Unknown', lat: null, lng: null };
+};
+
+/**
+ * Applies a project's allowed-origins list to an incoming tracking request.
+ *
+ * The allow-list is a browser control, not authentication: it only applies to
+ * requests that carry a browser `Origin` (or `Referer`) header. A client that
+ * sends neither is not origin-checked — the tracking ID is public by design,
+ * so this narrows casual misuse rather than proving who is calling.
+ */
+const enforceAllowedOrigin = async (project, req, { notify = true } = {}) => {
+    const allowed = project.allowed_origins;
+    if (!allowed || !String(allowed).trim()) return true;
+
+    const origin = req.headers.origin || req.headers.referer;
+    if (!origin) return true;
+
+    const hostnameOf = (value) => {
+        if (value === 'null') return 'null';
+        try {
+            return new URL(value).hostname;
+        } catch {
+            return null;
+        }
+    };
+
+    const originHostname = hostnameOf(origin);
+    if (!originHostname) {
+        throw AppError.forbidden('INVALID_ORIGIN', 'INVALID_ORIGIN');
+    }
+
+    const allowedHostnames = String(allowed)
+        .split(',')
+        .map((entry) => {
+            const trimmed = entry.trim();
+            if (!trimmed) return null;
+            if (trimmed.startsWith('http')) {
+                try {
+                    return new URL(trimmed).hostname;
+                } catch {
+                    return trimmed;
+                }
+            }
+            return trimmed;
+        })
+        .filter(Boolean);
+
+    const isAllowed = allowedHostnames.some(
+        (allowedHost) => originHostname === allowedHost || originHostname.endsWith(`.${allowedHost}`)
+    );
+
+    if (isAllowed) return true;
+
+    const ip = getClientIp(req);
+    const userAgent = req.headers['user-agent'] || '';
+
+    if (notify) {
+        await NotificationService.create(
+            project.user_id,
+            'Security Alert: Origin Blocked',
+            `Blocked request from unauthorized origin: ${originHostname} for project "${project.name || 'Unknown'}"`,
+            'security'
+        );
+    }
+
+    if (project.user_id) {
+        await ActivityLogService.log(
+            project.id,
+            project.user_id,
+            'security.alert',
+            `Blocked request from unauthorized origin: ${originHostname}`,
+            'failure',
+            ip,
+            {
+                resource: req.originalUrl,
+                http_method: req.method,
+                http_status: 403,
+                user_agent: userAgent,
+                event_type: 'security.alert'
+            }
+        );
+    }
+
+    throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
 };
 
 // Simple in-memory cache for deduplication (rolling TTL)
@@ -404,7 +561,15 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 
     const sourceMap = {};
     sources?.forEach(s => {
-        const ref = s.referrer ? new URL(s.referrer).hostname : 'Direct';
+        let ref = 'Direct';
+        if (s.referrer) {
+            try {
+                ref = new URL(s.referrer).hostname;
+            } catch {
+                // Malformed referrer values must never break the dashboard.
+                ref = 'Direct';
+            }
+        }
         sourceMap[ref] = (sourceMap[ref] || 0) + 1;
     });
 
@@ -579,65 +744,7 @@ export const trackVisitorPublic = asyncHandler(async (req, res) => {
     }
 
     // Check Allowed Origins
-    const origin = req.headers['origin'] || req.headers['referer'];
-    if (project.allowed_origins && project.allowed_origins.length > 0 && origin) {
-        try {
-            let originHostname;
-            if (origin === 'null') {
-                originHostname = 'null';
-            } else {
-                originHostname = new URL(origin).hostname;
-            }
-            const allowedOriginsArray = project.allowed_origins.split(',').map(o => {
-                try {
-                    // If it's a full URL, extract the hostname
-                    if (o.trim().startsWith('http')) {
-                        return new URL(o.trim()).hostname;
-                    }
-                    return o.trim();
-                } catch (e) {
-                    return o.trim();
-                }
-            });
-            const isAllowed = allowedOriginsArray.some(allowed =>
-                originHostname === allowed || originHostname.endsWith('.' + allowed)
-            );
-
-            if (!isAllowed) {
-                // Notify user about blocked origin
-                await NotificationService.create(
-                    project.user_id,
-                    'Security Alert: Origin Blocked',
-                    `Blocked request from unauthorized origin: ${originHostname} for project "${project.name || 'Unknown'}"`,
-                    'security'
-                );
-
-                // Log security alert as failure
-                if (project.user_id) {
-                    await ActivityLogService.log(
-                        project.id,
-                        project.user_id,
-                        'security.alert',
-                        `Blocked request from unauthorized origin: ${originHostname}`,
-                        'failure',
-                        ip,
-                        {
-                            resource: pageUrl,
-                            http_method: req.method,
-                            http_status: 403,
-                            user_agent: userAgent,
-                            event_type: 'security.alert'
-                        }
-                    );
-                }
-
-                throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
-            }
-        } catch (urlError) {
-            console.error('Origin validation error:', urlError);
-            throw AppError.forbidden('INVALID_ORIGIN', 'INVALID_ORIGIN');
-        }
-    }
+    await enforceAllowedOrigin(project, req);
 
     // Check Limits
     const limitCheck = await usageService.checkLimit(project.user_id);
@@ -845,12 +952,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
     }
 
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const { count: realTimeVisitors } = await supabase
-        .from('visitors')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', project.id)
-        .eq('is_active', true)
-        .gte('last_seen', fiveMinutesAgo);
 
     const range = req.query.range || '7d';
     let timezone = req.query.timezone || 'UTC';
@@ -868,11 +969,26 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
     else startDate.setDate(startDate.getDate() - 6);
     const startDateStr = startDate.toISOString();
 
-    const { data: dailyViews } = await supabase
-        .from('page_views')
-        .select('created_at')
-        .eq('project_id', project.id)
-        .gte('created_at', startDateStr);
+    // The remaining reads are all independent for the same project — fire
+    // them concurrently. Sequential Supabase round-trips are otherwise the
+    // dominant cost of this endpoint (~1-2s each in some environments).
+    const [realTimeRes, dailyViewsRes, recentActivityRes, sourcesRes, uniqueVisitorsRes, devicesRes, pagesRes] = await Promise.all([
+        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', project.id).eq('is_active', true).gte('last_seen', fiveMinutesAgo),
+        supabase.from('page_views').select('created_at').eq('project_id', project.id).gte('created_at', startDateStr),
+        supabase.from('page_views').select('*, visitors(ip_address, device_type, city, country)').eq('project_id', project.id).order('created_at', { ascending: false }).limit(parseInt(req.query.limit) || 5),
+        supabase.from('visitors').select('referrer').eq('project_id', project.id).gte('last_seen', startDateStr),
+        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', project.id).gte('last_seen', startDateStr),
+        supabase.from('visitors').select('device_type').eq('project_id', project.id).gte('last_seen', startDateStr),
+        supabase.from('page_views').select('page_url, title').eq('project_id', project.id).gte('created_at', startDateStr)
+    ]);
+
+    const realTimeVisitors = realTimeRes.count;
+    const dailyViews = dailyViewsRes.data;
+    const recentActivity = recentActivityRes.data;
+    const sources = sourcesRes.data;
+    const uniqueVisitors = uniqueVisitorsRes.count;
+    const devices = devicesRes.data;
+    const pages = pagesRes.data;
 
     const trafficMap = {};
     if (range === '24h') {
@@ -911,13 +1027,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         return { name, views: trafficMap[key], fullDate: key };
     }).sort((a, b) => a.fullDate.localeCompare(b.fullDate));
 
-    const { data: recentActivity } = await supabase
-        .from('page_views')
-        .select('*, visitors(ip_address, device_type, city, country)')
-        .eq('project_id', project.id)
-        .order('created_at', { ascending: false })
-        .limit(parseInt(req.query.limit) || 5);
-
     const activityList = await Promise.all((recentActivity || []).map(async v => {
         const visitor = v.visitors || {};
         const location = [visitor.city, visitor.country].filter(c => c && c !== 'Unknown').join(', ') || 'Unknown Location';
@@ -935,12 +1044,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         return { id: v.id, type: 'view', location, ip: visitor.ip_address, lat, lng, path, title: v.title, timestamp: v.created_at, device: visitor.device_type };
     }));
 
-    const { data: sources } = await supabase
-        .from('visitors')
-        .select('referrer')
-        .eq('project_id', project.id)
-        .gte('last_seen', startDateStr);
-
     const sourceMap = {};
     sources?.forEach(s => {
         let ref = 'Direct';
@@ -954,18 +1057,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         .slice(0, 5)
         .map((s, i) => ({ ...s, color: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'][i] || '#CBD5E1' }));
 
-    const { count: uniqueVisitors } = await supabase
-        .from('visitors')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', project.id)
-        .gte('last_seen', startDateStr);
-
-    const { data: devices } = await supabase
-        .from('visitors')
-        .select('device_type')
-        .eq('project_id', project.id)
-        .gte('last_seen', startDateStr);
-
     const deviceMap = {};
     devices?.forEach(d => {
         const type = d.device_type || 'desktop';
@@ -977,12 +1068,6 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         value: deviceMap[key],
         color: key === 'desktop' ? '#3B82F6' : key === 'mobile' ? '#10B981' : '#F59E0B'
     }));
-
-    const { data: pages } = await supabase
-        .from('page_views')
-        .select('page_url, title')
-        .eq('project_id', project.id)
-        .gte('created_at', startDateStr);
 
     const pageMap = {};
     pages?.forEach(p => {
@@ -1040,7 +1125,12 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
     };
 
     if (navigator.sendBeacon) {
-      navigator.sendBeacon("${apiBaseUrl}/track/events", JSON.stringify(payload));
+      // sendBeacon cannot set request headers, so send JSON via a Blob and
+      // carry the API key in the payload (accepted by the server as fallback).
+      navigator.sendBeacon(
+        "${apiBaseUrl}/track/events",
+        new Blob([JSON.stringify({ ...payload, apiKey })], { type: "application/json" })
+      );
     } else {
       fetch("${apiBaseUrl}/track/events", {
         method: "POST",
@@ -1088,10 +1178,12 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
  * Uses x-api-key header for authentication.
  */
 export const trackEvent = asyncHandler(async (req, res) => {
-    const apiKey = req.headers['x-api-key'];
+    // The public SDK cannot always set headers (navigator.sendBeacon), so the
+    // key is accepted from the x-api-key header, the body, or the query string.
+    const apiKey = req.headers['x-api-key'] || req.body?.apiKey || req.query?.apiKey;
     if (!apiKey) throw AppError.unauthorized('Missing API key');
 
-    const { event, url, referrer, title, userAgent: bodyUA, ...customData } = req.body;
+    const { event, url, referrer, title, userAgent: bodyUA, apiKey: _ignoredApiKey, ...customData } = req.body;
     const userAgent = bodyUA || req.headers['user-agent'] || '';
     const ip = getClientIp(req);
 
@@ -1118,7 +1210,11 @@ export const trackEvent = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    // origin check (omitted for brevity, but should be here if strict)
+    // The v1 event endpoint is the one the current tracker SDK posts to, so
+    // the project's allowed-origins list has to be applied here too —
+    // otherwise the allow-list would not protect the main ingest path.
+    await enforceAllowedOrigin(project, req, { notify: false });
+
     // check limits
     const limitCheck = await usageService.checkLimit(project.user_id);
     if (!limitCheck.canTrack) {

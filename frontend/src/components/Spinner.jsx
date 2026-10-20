@@ -8,7 +8,7 @@ const Spinner = ({ fullScreen = true, className = "" }) => {
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-10 w-10 text-violet-500 animate-spin" />
                     <div className="h-1.5 w-32 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                        <div className="h-full w-1/2 rounded-full bg-violet-500 animate-pulse" />
+                        <div className="h-full w-1/2 rounded-full bg-violet-500 animate-loading-bar" />
                     </div>
                 </div>
             </div>

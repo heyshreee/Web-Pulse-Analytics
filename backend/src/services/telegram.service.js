@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+// Uses the global fetch available in Node 18+ (node-fetch was never declared
+// in package.json and only resolved transitively).
 
 /**
  * Telegram Notification Service

@@ -44,11 +44,20 @@ Top concerns:
 
 - **JWT**: issued on login; used for authenticating requests. Tokens are stored/handled
   per the app's session model.
+- **Token claims**: every token carries a `purpose` (`session` or `password_reset`)
+  and a `jti`. Only `purpose: session` tokens authenticate API and WebSocket
+  requests, so a password-reset link can never be replayed as a session.
+- **Session store**: `services/session.service.js` records issued sessions in
+  `public.user_sessions`, keyed on the JWT `jti`. Sign-out, "revoke this device"
+  and password resets mark rows revoked, and the auth middleware refuses a
+  revoked token. Tokens issued before the `purpose` claim existed are rejected.
 - **Auth middleware**: protects `/api/v1/*` routes that require login
 - **Project ownership**: controllers enforce that the authenticated user owns or has
   access to the requested project (`projectController`, `visitorController` checks)
-- **Role-based access**: `project_members.role` (owner/admin/editor/viewer) — enforced
-  where applicable
+- **Single-owner access**: a project belongs to the account that created it
+  (`projects.user_id`). The `project_members` table and its RLS policies exist for a
+  future multi-user model, but the API does not read them yet — do not describe
+  role-based access as enforced.
 - **OAuth**: Google OAuth supported (optional). Client ID exposed via `VITE_GOOGLE_CLIENT_ID`;
   `GOOGLE_CLIENT_SECRET` server-side only
 
@@ -62,8 +71,14 @@ Top concerns:
   input where possible
 - **CORS**: dedicated `trackingCors.js` middleware (different from global CORS). Restricts
   origins/referrers for browser-based requests
-- **Origin/referrer checks**: enforced against project configuration
-- **Rate limiting**: applied to tracking endpoints to deter spam
+- **Origin/referrer checks**: enforced against project configuration on every tracking
+  endpoint, including `POST /api/v1/track/events`. The check applies to requests that
+  carry a browser `Origin` (or `Referer`) header — it is an abuse control, not
+  authentication, and it cannot authenticate a non-browser client.
+- **Rate limiting**: applied to the public tracking routes, `/api/v1/meta/contact`,
+  and the account endpoints. The account limiters are keyed by IP *and* the
+  address in the request body, so neither one host nor one account can be used
+  to grind through credentials.
 - **No PII**: design avoids collecting emails/names; see [tracking-guide.md](tracking-guide.md)
 
 ## Web security headers
@@ -83,10 +98,11 @@ Review CSP `connect-src`, `img-src`, `script-src` when adding third-party integr
 
 | Control | Where | Notes |
 | --- | --- | --- |
-| **CSRF** | `middleware/csrf.js` + `routes/v1/index.js` | Applied to all non-GET `/api/v1` routes **except** paths starting with `/track`. Mutating requests must include CSRF token. |
-| **Global CORS** | `app.js` | Permissive with credentials (`origin: callback(null,true)` in the shown config) — acceptable if paired with auth + CSRF + tracking-specific CORS. Review if you restrict dashboard origins. |
+| **CSRF** | `middleware/csrf.js` + `routes/v1/index.js` | Applied to all non-GET `/api/v1` routes **except** paths starting with `/track`. Mutating requests must send an `X-Requested-With` header — the check is presence-only, not value-verified. |
+| **Global CORS** | `app.js` | The authenticated API uses an origin allow-list (`allowedOrigins`) with credentials; unknown origins get no CORS headers, so browser preflights fail. |
+| **Public CORS** | `app.js` | `/api/track/*` and `/api/v1/track/*` keep permissive CORS — the tracking ID is public by design. |
 | **Tracking CORS** | `middleware/trackingCors.js` | Tighter rules for `/api/track/*` to prevent cross-site abuse. |
-| **Rate limiting** | `middleware/rateLimiter.js` + applied to tracking/auth-prone routes | Uses `express-rate-limit`. Configure stores/limits per environment. |
+| **Rate limiting** | `middleware/rateLimiter.js` + applied to the public tracking routes and `/api/v1/meta/contact` | Uses `express-rate-limit` with the default in-memory store. The `/api/v1/auth/*` routes are not rate limited — see known gaps. |
 
 ## Secrets and environment variables
 
@@ -117,14 +133,17 @@ See `.env.example` files for the full list.
 
 - **Minimal data**: page, referrer, derived geo (country/city from IP), UA-derived
   browser/OS/device, timestamps.
-- **IP handling**: `geoip-lite` maps IP to location. If you need stronger privacy, consider
-  truncating IPs or disabling city-level precision.
+- **IP handling**: `geoip-lite` maps IP to location as an offline fallback. The
+  remote lookup runs over HTTPS (`https://ipwho.is`) and is cached for 24 hours, so
+  a busy project does not trigger one outbound lookup per event. Visitor IPs are
+  stored as collected — consider truncating them if GDPR requires.
 - **No PII by default**: avoid sending emails/names/tokens via tracker. Those go through
   authenticated flows.
-- **Retention**: `project_settings.retention_days` (default 365). Implement deletion jobs
-  if you need to enforce shorter retention.
-- **DNT**: `project_settings.respect_dnt` exists; the app can honor Do Not Track if
-  implemented in tracker logic.
+- **Retention**: analytics records are retained until the project is deleted. The
+  `plan.retention_days` value is published on the plan record, but no deletion job
+  enforces it yet.
+- **DNT**: `project_settings.respect_dnt` exists on the schema, but the tracker does
+  not read it — Do Not Track is not honored today.
 - **Anonymization**: `project_settings.anonymize_ip` exists as a hook.
 - **Transparency**: update your Privacy Policy before production use.
 
@@ -166,9 +185,13 @@ Review and merge dependency PRs promptly, especially security-related ones.
 
 ## Known gaps / future hardening
 
+- **Session store migration**: server-side session revocation depends on the
+  `public.user_sessions` table. Apply
+  `supabase/migrations/20261020000001_user_sessions.sql` to a deployment to
+  enable it. Until the table exists the API falls back to stateless JWT
+  validation, so sign-in keeps working but sessions cannot be revoked.
 - **Distributed rate limiting**: in-memory store won't work across multiple backend
   instances. Consider Redis.
-- **Request body size limits**: ensure `express.json()` has a reasonable `limit`.
 - **IP anonymization**: implement truncation (e.g. /24 for IPv4) if GDPR requires.
 - **Content Security Policy**: tighten `script-src` (avoid `'unsafe-inline'` if possible)
   and add `upgrade-insecure-requests` in production.

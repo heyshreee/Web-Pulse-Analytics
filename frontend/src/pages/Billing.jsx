@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import Spinner from '../components/Spinner';
+import Reveal from '../components/Reveal';
+import { plans, formatINR, getPlanById } from '../data/plans';
 
 export default function Billing() {
     const { user, loadUser } = useOutletContext();
@@ -18,60 +20,9 @@ export default function Billing() {
         storageUsed: 0,
         storageLimit: 1024 * 1024 * 1024,
         plan: 'free',
-        projectLimit: 5
+        projectLimit: 1
     });
     const [paymentHistory, setPaymentHistory] = useState([]);
-    const [currency, setCurrency] = useState('INR');
-    const [plans, setPlans] = useState([
-        {
-            id: 'free',
-            name: 'Free',
-            price_usd: 0,
-            price_inr: 0,
-            description: 'Trying WebPulse',
-            features: ['1 Project', '1 Allowed Origin', '1,000 events/mo', '60 sec refresh'],
-            max_projects: 1,
-            allowed_origins: 1,
-            monthly_events: 1000,
-            live_logs: false
-        },
-        {
-            id: 'basic',
-            name: 'Basic',
-            price_usd: 4,
-            price_inr: 299,
-            description: 'Students & solo devs',
-            features: ['5 Projects', '3 Allowed Origins', 'Live Device Stats', '50,000 events/mo', '10 sec refresh'],
-            max_projects: 5,
-            allowed_origins: 3,
-            monthly_events: 50000,
-            live_logs: false
-        },
-        {
-            id: 'pro',
-            name: 'Pro',
-            price_usd: 12,
-            price_inr: 999,
-            description: 'Streamers & growing apps',
-            features: ['15 Projects', '10 Allowed Origins', 'Live Activity Logs', '500,000 events/mo', '1 sec refresh', 'Advanced Analytics'],
-            max_projects: 15,
-            allowed_origins: 10,
-            monthly_events: 500000,
-            live_logs: true
-        },
-        {
-            id: 'business',
-            name: 'Business',
-            price_usd: 39,
-            price_inr: 2999,
-            description: 'Teams & high traffic',
-            features: ['Unlimited Projects', '100 Allowed Origins', '5,000,000 events/mo', 'Real-time / SLA', 'Team access'],
-            max_projects: 100,
-            allowed_origins: 100,
-            monthly_events: 5000000,
-            live_logs: true
-        }
-    ]);
 
     useEffect(() => {
         const init = async () => {
@@ -102,12 +53,11 @@ export default function Billing() {
     const handleDownloadReceipt = async (paymentId) => {
         try {
             // Trigger download by opening in new window or creating blob
-            // Since our API returns a stream, we can use fetch and blob
-            const token = localStorage.getItem('token');
+            // Since our API returns a stream, we can use fetch and blob.
+            // The session is carried by the HttpOnly cookie.
             const response = await fetch(`${import.meta.env.VITE_API_URL}/payment/receipt/${paymentId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
             if (!response.ok) throw new Error('Download failed');
@@ -159,6 +109,7 @@ export default function Billing() {
     const projectsCount = stats?.projectsCount || 0;
     const projectLimit = usageStats?.projectLimit || 5;
     const projectPercentage = Math.min((projectsCount / projectLimit) * 100, 100);
+    const currentPlan = getPlanById(usageStats.plan) || getPlanById('free');
 
     const getNextResetDate = () => {
         const now = new Date();
@@ -189,7 +140,7 @@ export default function Billing() {
             // 1. Create Order
             const { order } = await apiRequest('/payment/order', {
                 method: 'POST',
-                body: JSON.stringify({ planId, currency })
+                body: JSON.stringify({ planId })
             });
 
             const options = {
@@ -208,13 +159,12 @@ export default function Billing() {
                             body: JSON.stringify({
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                planId,
-                                currency // Pass currency to verify endpoint
+                                razorpay_signature: response.razorpay_signature
                             })
                         });
 
-                        showToast(`Successfully upgraded to ${planId} plan!`, 'success');
+                        const planName = getPlanById(planId)?.name || planId;
+                        showToast(`Successfully upgraded to the ${planName} plan.`, 'success');
                         loadUsage();
                         if (loadUser) loadUser();
                     } catch (error) {
@@ -251,7 +201,7 @@ export default function Billing() {
     };
 
     const handleDowngrade = async () => {
-        if (!window.confirm('Are you sure you want to downgrade to the Free plan? You will lose access to Pro features.')) {
+        if (!window.confirm('Are you sure you want to downgrade to the Free plan? You will lose access to paid plan features and limits.')) {
             return;
         }
 
@@ -288,7 +238,7 @@ export default function Billing() {
     if (pageLoading) return <Spinner />;
 
     return (
-        <div className="space-y-8 animate-fade-up">
+        <div className="space-y-8">
             {/* Header */}
             <div className="page-header">
                 <div className="page-header-title">
@@ -297,33 +247,8 @@ export default function Billing() {
                     </div>
                     <div>
                         <h1 className="page-title">Billing & Subscription</h1>
-                        <p className="page-sub">Manage your subscription, view usage, and download invoices.</p>
+                        <p className="page-sub">Manage your plan, track usage, and review billing terms.</p>
                     </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    {/* Currency Switcher */}
-                    <div className="segmented">
-                        <button
-                            onClick={() => setCurrency('INR')}
-                            className={`segmented-btn ${currency === 'INR'
-                                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                        >
-                            INR (₹)
-                        </button>
-                        <button
-                            onClick={() => setCurrency('USD')}
-                            className={`segmented-btn ${currency === 'USD'
-                                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                        >
-                            USD ($)
-                        </button>
-                    </div>
-
-                    <button className="icon-btn">
-                        <Clock className="h-5 w-5" />
-                    </button>
                 </div>
             </div>
 
@@ -336,23 +261,25 @@ export default function Billing() {
                         <div>
                             <p className="eyebrow mb-2">Current Plan</p>
                             <div className="flex items-center gap-3">
-                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white capitalize">{usageStats.plan} Plan</h2>
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{currentPlan.name} Plan</h2>
                                 <span className="badge-slate">Current</span>
                             </div>
+                            <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                {formatINR(currentPlan.amount)} / month
+                            </p>
                         </div>
                         <button
-                            onClick={() => handleUpgrade('pro')}
-                            disabled={usageStats.plan === 'pro' || loading}
-                            className="btn-primary btn-md"
+                            onClick={() => document.getElementById('choose-plan')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                            className="btn-secondary btn-md"
                         >
-                            {usageStats.plan === 'pro' ? 'Current Plan' : 'Upgrade Now'}
+                            Compare plans
                         </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
                         <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40">
                             <p className="eyebrow mb-2">Monthly Limit</p>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{viewLimit.toLocaleString()} <span className="text-sm text-slate-500 ml-1">views</span></p>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{viewLimit.toLocaleString()} <span className="text-sm text-slate-500 ml-1">tracked events</span></p>
                         </div>
                         <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40">
                             <p className="eyebrow mb-2">Next Reset</p>
@@ -373,7 +300,7 @@ export default function Billing() {
                     <div className="space-y-8 flex-1">
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Project Views</p>
+                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Tracked Events</p>
                                 <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                                     {totalViewsUsed.toLocaleString()} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {viewLimit.toLocaleString()}</span>
                                 </p>
@@ -405,33 +332,37 @@ export default function Billing() {
                     </div>
 
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-8 italic leading-relaxed">
-                        Resets automatically at the start of next billing cycle.
+                        Resets on the first day of each calendar month.
                     </p>
                 </div>
             </div>
 
             {/* Plan Comparison Section */}
-            <div>
+            <div id="choose-plan" className="scroll-mt-24">
                 <h2 className="section-title mb-2">Choose your plan</h2>
-                <p className="page-sub mb-8">Pick the best plan that fits your growth needs.</p>
+                <p className="page-sub">Pick the plan that fits your traffic and project needs.</p>
+                <p className="mb-8 mt-2 max-w-3xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    Prices are in INR per month of allowance. Paid plans are one-time orders with no
+                    subscription and no automatic renewal; the plan stays active until you change it,
+                    and amounts exclude applicable taxes.
+                </p>
 
                 {loading ? (
                     <div className="flex justify-center py-20">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Reveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {plans.map((plan) => {
                             const isCurrentPlan = usageStats.plan === plan.id;
                             const isFree = plan.id === 'free';
-                            const isPro = plan.id === 'pro';
-                            const isBusiness = plan.id === 'business';
-                            const isBasic = plan.id === 'basic';
-
-                            // Determine price to display/compare based on currency
-                            const price = currency === 'USD' ? plan.price_usd : plan.price_inr;
-                            const currentPlanPrice = (plans.find(p => p.id === usageStats.plan) || {})[currency === 'USD' ? 'price_usd' : 'price_inr'] || 0;
-                            const priceDisplay = currency === 'USD' ? `$${price}` : `₹${price}`;
+                            const isPro = plan.kind === 'primary';
+                            const isDowngrade = plan.amount < currentPlan.amount;
+                            const ctaLabel = isCurrentPlan
+                                ? 'Current plan'
+                                : isFree
+                                    ? 'Downgrade to Free'
+                                    : `${isDowngrade ? 'Switch' : 'Upgrade'} to ${plan.name}`;
 
                             return (
                                 <div key={plan.id} className={`
@@ -444,86 +375,74 @@ export default function Billing() {
                                 `}>
                                     {isPro && (
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                                            <span className="px-3 py-1 bg-violet-500 text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm">Popular</span>
+                                            <span className="px-3 py-1 bg-violet-500 text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm">Most popular</span>
                                         </div>
                                     )}
 
-                                    <div className="mb-6">
+                                    <div className="mb-5">
                                         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{plan.name}</h3>
                                         <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                             {plan.description}
                                         </p>
                                     </div>
 
-                                    <div className="mb-6">
+                                    <div className="mb-5">
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                                                {priceDisplay}
+                                                {formatINR(plan.amount)}
                                             </span>
-                                            <span className="text-slate-500 font-semibold text-xs">/mo</span>
+                                            <span className="text-slate-500 font-semibold text-xs">/ month</span>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4 mb-8 flex-1">
-                                        <ul className="space-y-4">
-                                            {plan.features && plan.features.length > 0 ? (
-                                                plan.features.map((feature, idx) => (
-                                                    <li key={idx} className="flex items-center gap-3 text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                        <Check className={`h-4 w-4 shrink-0 p-1 rounded-full ${isFree || isBasic ? 'text-violet-600 bg-violet-50 dark:bg-violet-500/10 dark:text-violet-400' :
-                                                            isPro ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' :
-                                                                'text-violet-500 bg-violet-50 dark:bg-violet-500/10'
-                                                            }`} />
-                                                        {feature.text || feature}
-                                                    </li>
-                                                ))
-                                            ) : (
-                                                <>
-                                                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                        <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> {plan.max_projects === 100 ? 'Unlimited' : plan.max_projects} Projects
-                                                    </li>
-                                                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                        <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> {plan.allowed_origins} Allowed Origin{plan.allowed_origins > 1 ? 's' : ''}
-                                                    </li>
-                                                    <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                        <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> {new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(plan.monthly_events)} events/mo
-                                                    </li>
-                                                    {plan.live_logs && (
-                                                        <li className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                            <Check className="h-4 w-4 text-violet-600 bg-violet-50 dark:bg-violet-500/10 shrink-0 p-0.5 rounded-full" /> Live Activity Logs
-                                                        </li>
-                                                    )}
-                                                </>
-                                            )}
-                                        </ul>
-                                    </div>
+                                    <dl className="mb-5 grid grid-cols-2 gap-x-3 gap-y-3 border-y border-slate-200/70 py-4 dark:border-slate-700/50">
+                                        {plan.limits.map((limit) => (
+                                            <div key={limit.label}>
+                                                <dt className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">{limit.label}</dt>
+                                                <dd className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{limit.value}</dd>
+                                            </div>
+                                        ))}
+                                    </dl>
+
+                                    <ul className="mb-6 flex-1 space-y-2.5">
+                                        {plan.features.map((feature) => (
+                                            <li key={feature} className="flex items-start gap-2.5 text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
+                                                {feature}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {plan.plannedNote && (
+                                        <p className="mb-6 flex items-start gap-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                            <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden="true" />
+                                            {plan.plannedNote}
+                                        </p>
+                                    )}
 
                                     <button
                                         onClick={() => {
                                             if (isCurrentPlan) return;
                                             if (isFree) handleDowngrade();
-                                            else if (plan.id === 'business') { /* Do nothing or handle contact sales */ }
-                                            else handleUpgrade(plan.id); // Pass plan.id to handleUpgrade
+                                            else handleUpgrade(plan.id);
                                         }}
-                                        disabled={isCurrentPlan || (isFree && usageStats.plan === 'free') || (plan.id === 'business')} // Disable business button
+                                        disabled={isCurrentPlan}
                                         className={`
                                             w-full btn-lg
                                             ${isCurrentPlan
                                                 ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-default border border-slate-200 dark:border-slate-700'
-                                                : isFree || isBusiness
-                                                    ? 'btn-secondary'
-                                                    : 'btn-primary'}
+                                                : plan.kind === 'primary'
+                                                    ? 'btn-primary'
+                                                    : 'btn-secondary'}
                                             disabled:opacity-50 disabled:cursor-not-allowed
                                         `}
                                     >
-                                        {isCurrentPlan ? 'Active Plan' :
-                                            isFree ? 'Downgrade' :
-                                                isBusiness ? 'Contact Sales' : // Text for Business plan
-                                                    currentPlanPrice < price ? 'Upgrade' : 'Switch'}
+                                        {ctaLabel}
                                     </button>
                                 </div>
                             );
                         })}
-                    </div>
+                    </Reveal>
                 )}
 
             </div>

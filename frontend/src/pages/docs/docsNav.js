@@ -53,3 +53,53 @@ export const docsNav = [
         ]
     }
 ];
+
+/**
+ * Every navigation entry, split into its path and anchor. The split lets the
+ * active entry be resolved from the URL *and* from the section the reader is
+ * currently looking at, so a page never ends up with an unhighlighted rail.
+ */
+export const navItems = docsNav.flatMap((group) =>
+    group.items.map((item) => {
+        const [path, hash] = item.to.split('#');
+        return { ...item, path, hash: hash || null };
+    })
+);
+
+/**
+ * Resolve which nav entry should be highlighted.
+ *
+ * 1. An explicit URL fragment wins.
+ * 2. Otherwise the section currently on screen.
+ * 3. Otherwise a plain page link ("Overview" -> /docs/api).
+ * 4. Otherwise the first entry that lives on the current page.
+ */
+export function resolveActiveTo(pathname, hash, sectionId, sectionIds) {
+    const onPage = navItems.filter((item) => item.path === pathname);
+    if (!onPage.length) return null;
+
+    if (hash) {
+        const exact = onPage.find((item) => item.hash === hash);
+        if (exact) return exact.to;
+    }
+
+    if (sectionId) {
+        const exact = onPage.find((item) => item.hash === sectionId);
+        if (exact) return exact.to;
+
+        // The section on screen is not itself a nav entry (an overview
+        // heading, for example) — fall back to the next entry below it.
+        const index = sectionIds.indexOf(sectionId);
+        if (index >= 0) {
+            const after = onPage
+                .filter((item) => item.hash && sectionIds.indexOf(item.hash) > index)
+                .sort((a, b) => sectionIds.indexOf(a.hash) - sectionIds.indexOf(b.hash))[0];
+            if (after) return after.to;
+        }
+    }
+
+    const pageLink = onPage.find((item) => !item.hash);
+    if (pageLink) return pageLink.to;
+
+    return onPage[0].to;
+}

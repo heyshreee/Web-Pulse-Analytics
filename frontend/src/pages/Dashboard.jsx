@@ -7,6 +7,8 @@ import Spinner from '../components/Spinner';
 import { useToast } from '../context/ToastContext';
 import NetworkGlobe from '../components/dashboard/NetworkGlobe';
 import { useTheme } from '../context/ThemeContext';
+import Reveal from '../components/Reveal';
+import AnimatedNumber from '../components/landing/AnimatedNumber';
 import {
   AreaChart,
   Area,
@@ -226,7 +228,7 @@ export default function Dashboard() {
   const strong = 'text-slate-900 dark:text-white';
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-8">
       {/* Header */}
       <div className="page-header">
         <div className="page-header-title">
@@ -339,7 +341,11 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="mt-4">
-              <span className="text-[2rem] font-bold text-slate-900 dark:text-white tracking-tight tabular-nums">{realTimeVisitors.toLocaleString()}</span>
+              <AnimatedNumber
+                end={realTimeVisitors}
+                duration={1.2}
+                className="text-[2rem] font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+              />
             </div>
           </div>
 
@@ -365,7 +371,7 @@ export default function Dashboard() {
       </div>
 
       {/* 2. Traffic Trends - Full Width */}
-      <div className="card card-pad h-full min-h-[420px] flex flex-col">
+      <Reveal className="card card-pad h-full min-h-[420px] flex flex-col">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h3 className="section-title flex items-center gap-2.5">
@@ -435,10 +441,10 @@ export default function Dashboard() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </Reveal>
 
       {/* Bottom Row: Referrals, Activity, Usage */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <Reveal delay={60} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 3. Top Referral Sources */}
         <div className="card card-pad h-full flex flex-col">
           <h3 className="eyebrow mb-6">Top Referral Sources</h3>
@@ -525,7 +531,12 @@ export default function Dashboard() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{Math.round(viewPercentage)}%</span>
+              <AnimatedNumber
+                end={Math.round(viewPercentage)}
+                suffix="%"
+                duration={1.4}
+                className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+              />
               <span className="eyebrow mt-1">Capacity</span>
             </div>
           </div>
@@ -537,10 +548,10 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* 6. Quick Actions */}
-      <div className="card card-pad flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+      <Reveal delay={80} className="card card-pad flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-violet-500/[0.02] pointer-events-none" />
         <div className="relative z-10 text-center md:text-left">
           <h3 className="section-title mb-1.5">Expand Your Reach</h3>
@@ -560,7 +571,7 @@ export default function Dashboard() {
           <Plus className="h-4 w-4" /> Register Domain
         </button>
         </div>
-      </div>
+      </Reveal>
 
       {/* Create Project / Register Domain Modal */}
       <Modal

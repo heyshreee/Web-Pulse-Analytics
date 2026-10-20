@@ -75,6 +75,9 @@
   .card-hover {
     @apply transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-slate-950/80;
   }
+  .card-hover:hover {
+    transform: translate3d(0, -2px, 0);
+  }
 
   /* ---- Inputs ---- */
   .input {
@@ -165,73 +168,589 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Landing utilities (scoped to the marketing page, theme-aware)
-   --------------------------------------------------------------------------- */
-.btn-signal {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
-  color: #fff;
-  background: linear-gradient(180deg, #7C6CE0 0%, #8B5CF6 55%, #7C3AED 100%);
+/* ===========================================================================
+   MARKETING DESIGN SYSTEM
+   ---------------------------------------------------------------------------
+   Scoped to the marketing / authentication surface only. Every class in this
+   section is prefixed `mkt-` and is referenced exclusively by non-dashboard
+   pages, so the dashboard styling is never affected.
+
+   The marketing surface is intentionally dark-only (see ThemeContext, which
+   pins every non-dashboard route to dark mode). Light-mode rules are therefore
+   not required here; the dashboard keeps its own light/dark tokens above.
+   =========================================================================== */
+:root {
+  /* Surfaces — same values as the space-* scale in tailwind.config.js */
+  --mkt-bg: #070A10;
+  --mkt-bg-soft: #0B0F17;
+  --mkt-surface: #101522;
+  --mkt-surface-2: #151B29;
+
+  /* Structure */
+  --mkt-line: rgba(148, 163, 184, 0.13);
+  --mkt-line-strong: rgba(148, 163, 184, 0.22);
+
+  /* Text — slate scale already used across the product */
+  --mkt-text: #F1F5F9;
+  --mkt-text-2: #CBD5E1;
+  --mkt-text-3: #94A3B8;
+  --mkt-text-4: #64748B;
+
+  /* Brand — exact WebPulse palette */
+  --mkt-brand: #8B5CF6;
+  --mkt-brand-2: #7C6CE0;
+  --mkt-brand-3: #A78BFA;
+  --mkt-live: #48E6A1;
+  --mkt-warn: #F59E0B;
+
+  --mkt-container: 75rem;      /* 1200px content width */
+  --mkt-radius: 1rem;
+  --mkt-radius-lg: 1.25rem;
 }
-.btn-signal:hover {
-  background: linear-gradient(180deg, #8B7DF0 0%, #9D74F7 55%, #8B5CF6 100%);
+
+/* ---- Page shell ---------------------------------------------------------- */
+.mkt-shell {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--mkt-bg);
+  color: var(--mkt-text);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.mkt-shell a {
+  text-decoration: none;
+}
+
+/* Faint blueprint grid, drawn purely with gradients (no image request). */
+.mkt-grid-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 20%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 20%, transparent 78%);
+}
+
+/* Soft brand glow used behind hero / CTA sections. */
+.mkt-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.5;
+}
+
+/* ---- Layout -------------------------------------------------------------- */
+.mkt-container {
+  width: 100%;
+  max-width: var(--mkt-container);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px) {
+  .mkt-container { padding-inline: 2rem; }
+}
+@media (min-width: 1024px) {
+  .mkt-container { padding-inline: 2.5rem; }
+}
+
+.mkt-section {
+  position: relative;
+  padding-block: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+}
+.mkt-section-tight {
+  position: relative;
+  padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+/* ---- Typography ---------------------------------------------------------- */
+.mkt-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mkt-brand-3);
+}
+
+.mkt-h1, .mkt-h2, .mkt-h3, .mkt-h4 {
+  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  color: var(--mkt-text);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.mkt-h1 {
+  font-size: clamp(2.5rem, 1.75rem + 3.2vw, 4rem);
+  line-height: 1.04;
+  font-weight: 800;
+}
+.mkt-h2 {
+  font-size: clamp(1.875rem, 1.35rem + 2.1vw, 2.75rem);
+  line-height: 1.12;
+  font-weight: 700;
+}
+.mkt-h3 {
+  font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  line-height: 1.25;
+  font-weight: 700;
+}
+.mkt-h4 {
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+.mkt-lead {
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  line-height: 1.65;
+  color: var(--mkt-text-3);
+  text-wrap: pretty;
+}
+.mkt-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--mkt-text-3);
+}
+.mkt-accent-text {
+  background: linear-gradient(100deg, #A78BFA 0%, #8B5CF6 55%, #C4B5FD 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---- Buttons ------------------------------------------------------------- */
+.mkt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+.mkt-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--mkt-bg), 0 0 0 4px rgba(139, 92, 246, 0.55);
+}
+.mkt-btn:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.mkt-btn-sm { padding: 0.5rem 0.875rem; font-size: 0.8125rem; }
+.mkt-btn-md { padding: 0.625rem 1.125rem; }
+.mkt-btn-lg { padding: 0.8125rem 1.375rem; font-size: 0.9375rem; }
+
+.mkt-btn-primary {
+  color: #fff;
+  background: linear-gradient(180deg, #8B5CF6 0%, #7C3AED 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 8px 24px -12px rgba(139, 92, 246, 0.9);
+}
+.mkt-btn-primary:hover {
+  background: linear-gradient(180deg, #9D74F7 0%, #8B5CF6 100%);
   transform: translateY(-1px);
 }
-.btn-ghost-dark {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40 disabled:opacity-50 disabled:pointer-events-none;
-  color: #334155;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+
+.mkt-btn-secondary {
+  color: var(--mkt-text-2);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--mkt-line-strong);
 }
-.dark .btn-ghost-dark {
-  color: #e2e8f0;
+.mkt-btn-secondary:hover {
+  color: var(--mkt-text);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(167, 139, 250, 0.45);
+}
+
+.mkt-btn-ghost {
+  color: var(--mkt-text-3);
+  background: transparent;
+}
+.mkt-btn-ghost:hover {
+  color: var(--mkt-text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Inline text link with an optional arrow. */
+.mkt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--mkt-brand-3);
+  transition: color 0.18s ease, gap 0.18s ease;
+}
+.mkt-link:hover {
+  color: #C4B5FD;
+}
+.mkt-link svg {
+  transition: transform 0.18s ease;
+}
+.mkt-link:hover svg {
+  transform: translateX(2px);
+}
+
+/* ---- Surfaces ------------------------------------------------------------ */
+.mkt-card {
+  position: relative;
+  border-radius: var(--mkt-radius);
+  border: 1px solid var(--mkt-line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, rgba(255, 255, 255, 0.012) 100%);
+}
+.mkt-card-hover {
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+.mkt-card-hover:hover {
+  border-color: rgba(167, 139, 250, 0.32);
+  transform: translateY(-2px);
+}
+
+.mkt-glass {
+  background: rgba(11, 15, 23, 0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--mkt-line);
+}
+
+.mkt-panel {
+  border-radius: var(--mkt-radius-lg);
+  border: 1px solid var(--mkt-line);
+  background: var(--mkt-bg-soft);
+  box-shadow: 0 32px 64px -32px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+
+.mkt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--mkt-line);
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-}
-.btn-ghost-dark:hover {
-  border-color: #8B5CF6;
-  color: #8B5CF6;
-}
-.dark .btn-ghost-dark:hover {
-  border-color: rgba(139, 92, 246, 0.5);
-  color: #a78bfa;
-  background: rgba(255, 255, 255, 0.06);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mkt-text-3);
 }
 
-.obs-grid {
-  background-image:
-    linear-gradient(rgba(100, 116, 139, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100, 116, 139, 0.07) 1px, transparent 1px);
-  background-size: 56px 56px;
-}
-.dark .obs-grid {
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+.mkt-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mkt-line-strong), transparent);
 }
 
-.glass-obs {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+/* Small live indicator dot (decorative, purely CSS). */
+.mkt-live-dot {
+  position: relative;
+  display: inline-flex;
+  height: 0.5rem;
+  width: 0.5rem;
+  flex-shrink: 0;
 }
-.dark .glass-obs {
-  background: rgba(11, 15, 23, 0.55);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+.mkt-live-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--mkt-live);
+  opacity: 0.55;
+  animation: mktPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.mkt-live-dot::after {
+  content: '';
+  position: relative;
+  border-radius: 9999px;
+  background: var(--mkt-live);
+  height: 100%;
+  width: 100%;
+}
+@keyframes mktPing {
+  0% { transform: scale(1); opacity: 0.5; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
 }
 
-.eyebrow-obs {
-  @apply text-[11px] font-semibold uppercase tracking-[0.22em];
-  color: #8B5CF6;
+/* Live activity feed used inside marketing product previews. */
+.mkt-feed-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.35) transparent;
+  /* Older rows scroll away under a soft fade so the clipped top row reads as
+     an intentional live-feed edge rather than a layout glitch. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 30px);
 }
-.dark .eyebrow-obs {
-  color: #a78bfa;
+.mkt-feed-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.mkt-feed-scroll::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.35);
+  border-radius: 4px;
+}
+.mkt-feed-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mkt-feed-item {
+  animation: mktFeedIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes mktFeedIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
 }
 
+/* Tabular figures for every metric shown in marketing previews. */
 .metric-num {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum';
+}
+
+/* ---- Auth surface --------------------------------------------------------
+   Shared by /login, /register, /verify-email, /forgot-password, /reset-password. */
+.mkt-field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--mkt-line-strong);
+  background: rgba(7, 10, 16, 0.6);
+  padding: 0.8125rem 1rem;
+  font-size: 0.9375rem;
+  color: var(--mkt-text);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.mkt-field::placeholder {
+  color: #4B5A75;
+}
+.mkt-field:hover {
+  border-color: rgba(148, 163, 184, 0.32);
+}
+.mkt-field:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.65);
+  background: rgba(7, 10, 16, 0.85);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+.mkt-field[aria-invalid='true'] {
+  border-color: rgba(239, 68, 68, 0.55);
+}
+.mkt-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mkt-text-2);
+}
+.mkt-hint {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--mkt-text-4);
+}
+
+/* ===========================================================================
+   SITE-WIDE MOTION
+   ---------------------------------------------------------------------------
+   Motion primitives shared by every surface — marketing, auth, docs and the
+   dashboard. Everything animates transform/opacity only, so it stays on the
+   compositor, and the prefers-reduced-motion rule at the bottom of this file
+   collapses the lot for visitors who ask for less motion.
+   =========================================================================== */
+
+/* ---- Route transitions (see components/PageTransition.jsx) --------------- */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pageFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pageEnterSoft {
+  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter {
+  animation: pageEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.page-enter[data-page-transition='fade'] {
+  animation-name: pageFade;
+}
+.page-enter[data-page-transition='soft'] {
+  animation-name: pageEnterSoft;
+  animation-duration: 0.36s;
+}
+
+/* ---- Scroll reveals (see components/Reveal.jsx) -------------------------- */
+/* Armed by JavaScript only when motion is allowed; visible by default.
+   Uses the independent `translate`/`scale` properties so a reveal never
+   clobbers a hover transform supplied by utilities on the same element. */
+.reveal[data-reveal-armed] {
+  opacity: 0;
+  transition:
+    opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    translate 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Promote to its own layer only while waiting to reveal. */
+.reveal[data-reveal-armed]:not(.is-revealed) {
+  will-change: opacity, translate, scale;
+}
+.reveal[data-reveal-armed][data-reveal='up']    { translate: 0 20px; }
+.reveal[data-reveal-armed][data-reveal='down']  { translate: 0 -20px; }
+.reveal[data-reveal-armed][data-reveal='left']  { translate: -24px 0; }
+.reveal[data-reveal-armed][data-reveal='right'] { translate: 24px 0; }
+.reveal[data-reveal-armed][data-reveal='scale'] { scale: 0.96; }
+.reveal[data-reveal-armed].is-revealed {
+  opacity: 1;
+  translate: none;
+  scale: none;
+}
+
+/* ---- Staggered entrances -------------------------------------------------- */
+/* Add .stagger-children to a container to cascade its direct children in. */
+@keyframes riseIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.stagger-children > * {
+  animation: riseIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger-children > *:nth-child(1)  { animation-delay: 0.04s; }
+.stagger-children > *:nth-child(2)  { animation-delay: 0.09s; }
+.stagger-children > *:nth-child(3)  { animation-delay: 0.14s; }
+.stagger-children > *:nth-child(4)  { animation-delay: 0.19s; }
+.stagger-children > *:nth-child(5)  { animation-delay: 0.24s; }
+.stagger-children > *:nth-child(6)  { animation-delay: 0.29s; }
+.stagger-children > *:nth-child(7)  { animation-delay: 0.34s; }
+.stagger-children > *:nth-child(8)  { animation-delay: 0.39s; }
+.stagger-children > *:nth-child(9)  { animation-delay: 0.44s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.49s; }
+.stagger-children > *:nth-child(11) { animation-delay: 0.54s; }
+.stagger-children > *:nth-child(n + 12) { animation-delay: 0.59s; }
+
+/* ---- Micro-interactions --------------------------------------------------- */
+/* Tactile press feedback shared by every button variant. */
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-ghost:active,
+.btn-danger:active {
+  transform: scale(0.97);
+}
+.mkt-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Marketing nav underline that slides in on hover / active. */
+.mkt-navlink {
+  position: relative;
+}
+.mkt-navlink::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.3rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #A78BFA 0%, #8B5CF6 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.mkt-navlink:hover::after,
+.mkt-navlink[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
+/* ---- Documentation rail --------------------------------------------------- */
+/* The rail is sticky under the marketing nav and scrolls on its own. The
+   offset is published by the docs layout as `--docs-rail-top` /
+   `--docs-rail-h` so the rail follows the nav even while the preview notice
+   above it is still on screen. */
+.docs-rail {
+  align-self: flex-start;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 1024px) {
+  .docs-rail {
+    position: sticky;
+    top: var(--docs-rail-top, 4rem);
+    height: var(--docs-rail-h, calc(100vh - 4rem));
+  }
+}
+
+/* The mobile drawer lives in a portal on <body> so it can sit above the
+   marketing nav instead of being trapped under it. */
+.docs-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 70;
+  width: 18rem;
+  max-width: 85vw;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: #0B0F17;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+.docs-drawer.is-open {
+  transform: translateX(0);
+}
+
+/* A slim, always visible scrollbar so it is obvious the list continues. */
+.docs-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167, 139, 250, 0.38) transparent;
+}
+.docs-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.docs-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.docs-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(167, 139, 250, 0.3);
+  border-radius: 9999px;
+}
+.docs-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(167, 139, 250, 0.5);
+}
+
+/* Fade the cut edge while there is more of the list below it. */
+.docs-scroll.has-more {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+}
+
+/* ---- Skeleton shimmer ----------------------------------------------------- */
+/* Background comes from the element itself so it can be tinted per surface. */
+@keyframes skeletonSweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  animation: skeletonSweep 1.6s ease-in-out infinite;
+  pointer-events: none;
 }
 
 /* Custom Scrollbar */
@@ -246,38 +765,6 @@
   @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-slate-50 dark:border-slate-950 hover:bg-slate-400 dark:hover:bg-slate-600;
 }
 
-/* Construction banner: infinite amber glow + gentle blink */
-@keyframes banner-glow {
-  0%, 100% {
-    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
-    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
-    opacity: 1;
-  }
-  50% {
-    background: linear-gradient(90deg, #fcd34d 0%, #fbbf24 50%, #fcd34d 100%);
-    box-shadow: 0 0 24px rgba(245, 158, 11, 0.55);
-    opacity: 0.82;
-  }
-}
-.banner-construction {
-  animation: banner-glow 1.8s ease-in-out infinite;
-}
-.dark .banner-construction {
-  animation: banner-glow-dark 1.8s ease-in-out infinite;
-}
-@keyframes banner-glow-dark {
-  0%, 100% {
-    background: linear-gradient(90deg, #78350f 0%, #92400e 50%, #78350f 100%);
-    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
-    opacity: 1;
-  }
-  50% {
-    background: linear-gradient(90deg, #92400e 0%, #b45309 50%, #92400e 100%);
-    box-shadow: 0 0 26px rgba(245, 158, 11, 0.45);
-    opacity: 0.82;
-  }
-}
-
 /* Respect users who prefer reduced motion: collapse CSS animations,
    transitions, and custom scrolling so decorative motion never causes
    unnecessary rendering/CPU work. */
@@ -286,8 +773,10 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
 }

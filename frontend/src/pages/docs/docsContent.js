@@ -198,7 +198,7 @@ export const docsContent = {
                         type: 'callout',
                         tone: 'warning',
                         title: 'Stored fields',
-                        text: 'Only the fields documented in the Track Events API reference — `event`, `url`, `referrer`, and `title` — are persisted. Additional fields are accepted on the wire but are not stored today.'
+                        text: 'Only `url`, `referrer`, and `title` are persisted. The event name and any additional fields are accepted on the wire but are not stored today.'
                     },
                     {
                         type: 'p',
@@ -351,6 +351,10 @@ export const docsContent = {
                         text: 'Endpoints in the `analytics` namespace that return project or account data require a signed-in console session. These are consumed by your WebPulse dashboard and are not meant for client-side browser calls in your applications.'
                     },
                     {
+                        type: 'p',
+                        text: 'The session is delivered as an `HttpOnly` cookie by the sign-in endpoint — the token is never returned in a response body and is never readable from page scripts. State-changing calls must also send the `X-Requested-With` header (the CSRF control).'
+                    },
+                    {
                         type: 'callout',
                         tone: 'warning',
                         title: 'Security warning',
@@ -402,7 +406,7 @@ export const docsContent = {
                         type: 'table',
                         headers: ['Parameter', 'Type', 'Description'],
                         rows: [
-                            ['event', 'string', 'Event name, e.g. `page_view`'],
+                            ['event', 'string', 'Event name, e.g. `page_view`. Accepted on the wire, but not stored today.'],
                             ['url', 'string', 'Page URL the event occurred on'],
                             ['referrer', 'string', 'Referring URL, if any'],
                             ['title', 'string', 'Optional page title'],
@@ -413,7 +417,7 @@ export const docsContent = {
                         type: 'callout',
                         tone: 'warning',
                         title: 'Stored fields',
-                        text: 'Only the fields in the table above are persisted. Extra fields in the request body are accepted on the wire but are not stored.'
+                        text: 'Of the fields in the table above, `url`, `referrer`, and `title` are persisted. The event name and any extra fields in the request body are accepted on the wire but are not stored today.'
                     },
                     {
                         type: 'code',
@@ -574,7 +578,7 @@ export const docsContent = {
                         type: 'callout',
                         tone: 'warning',
                         title: 'Stored fields',
-                        text: 'Only `event`, `url`, `referrer`, and `title` are persisted. Extra fields are accepted but not stored today.'
+                        text: 'Only `url`, `referrer`, and `title` are persisted. The event name and extra fields are accepted but not stored today.'
                     }
                 ]
             }
@@ -737,10 +741,17 @@ export const docsContent = {
                         text: 'Project settings let you restrict browser-based tracking to approved origins. Tracking requests from origins outside the allow-list are rejected.'
                     },
                     {
+                        type: 'ul',
+                        items: [
+                            'The allow-list is applied on every tracking endpoint, including `POST /api/v1/track/events`.',
+                            'It is not applied to requests that carry no browser `Origin` header — the check is an abuse control, not authentication.'
+                        ]
+                    },
+                    {
                         type: 'callout',
                         tone: 'warning',
                         title: 'Not authentication',
-                        text: 'Allowed origins are an abuse-control mechanism, not authentication. The tracking ID itself is public — anyone can read it from your page.'
+                        text: 'Allowed origins are an abuse-control mechanism, not authentication. The tracking ID itself is public — anyone can read it from your page, and a client that sends no `Origin` header is never origin-checked.'
                     }
                 ]
             },

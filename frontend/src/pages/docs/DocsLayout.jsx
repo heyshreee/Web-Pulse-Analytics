@@ -1,144 +1,225 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import Logo from '../../components/Logo';
-import {
-    ArrowLeft, Activity, Menu, X, BookOpen, BarChart2, ArrowRight
-} from 'lucide-react';
-import { docsNav } from './docsNav';
+import { Menu, X, ArrowRight } from 'lucide-react';
+import MarketingShell from '../../components/marketing/MarketingShell';
+import PageTransition from '../../components/PageTransition';
+import DocsSidebar from './DocsSidebar';
+import { resolveActiveTo } from './docsNav';
+
+const CTA_LINKS = [
+    { to: '/docs/getting-started', label: 'Getting Started' },
+    { to: '/docs/api', label: 'API Reference' },
+    { to: '/docs/security', label: 'Security Guide' },
+];
 
 export default function DocsLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sectionId, setSectionId] = useState(null);
+    const [sectionIds, setSectionIds] = useState([]);
+    const [railTop, setRailTop] = useState(null);
     const location = useLocation();
     const { pathname, hash } = location;
-    const mainRef = useRef(null);
 
+    const activeTo = useMemo(
+        () => resolveActiveTo(pathname, hash ? hash.slice(1) : null, sectionId, sectionIds),
+        [pathname, hash, sectionId, sectionIds]
+    );
+
+    // Scroll to the requested anchor. The document body is lazy loaded, so the
+    // element may not exist on the first frames — keep looking for a moment
+    // instead of dropping the fragment on the floor.
     useEffect(() => {
+        if (!hash) return undefined;
         let raf;
+        let attempts = 0;
         const scrollToHash = () => {
-            if (hash) {
-                const el = document.getElementById(hash.slice(1));
-                if (el) {
-                    const top = el.getBoundingClientRect().top + window.scrollY - 96;
-                    window.scrollTo({ top, behavior: 'smooth' });
-                }
+            const el = document.getElementById(hash.slice(1));
+            if (!el) {
+                if (attempts < 40) raf = requestAnimationFrame(scrollToHash);
+                return;
             }
+            // The sections carry `scroll-mt-24`, so the heading clears the
+            // sticky navigation bar.
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
-
-        if (hash) {
-            raf = requestAnimationFrame(scrollToHash);
-        }
+        raf = requestAnimationFrame(scrollToHash);
         return () => cancelAnimationFrame(raf);
     }, [pathname, hash]);
 
-    const isItemActive = (to) => {
-        const [path, itemHash] = to.split('#');
-        const pathMatch = location.pathname === path;
-        if (!pathMatch) return false;
-        return itemHash ? location.hash === `#${itemHash}` : !location.hash;
-    };
+    // Track the section the reader is on so the rail can highlight it.
+    useEffect(() => {
+        let raf = null;
+        const readSections = () => Array.from(document.querySelectorAll('main section[id]'));
+
+        const update = () => {
+            raf = null;
+            const sections = readSections();
+            const ids = sections.map((section) => section.id);
+            setSectionIds((prev) =>
+                prev.length === ids.length && prev.every((id, i) => id === ids[i]) ? prev : ids
+            );
+
+            const trigger = 140;
+            let current = null;
+            for (const section of sections) {
+                if (section.getBoundingClientRect().top - trigger <= 0) current = section.id;
+                else break;
+            }
+            // The final section stays current once the page is scrolled out.
+            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8) {
+                const last = sections[sections.length - 1];
+                if (last) current = last.id;
+            }
+            setSectionId((prev) => (prev === current ? prev : current));
+        };
+
+        const schedule = () => {
+            if (raf === null) raf = requestAnimationFrame(update);
+        };
+
+        update();
+        window.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', schedule);
+        // The page body arrives lazily — re-read the sections once it lands.
+        const main = document.querySelector('main');
+        const observer = typeof MutationObserver !== 'undefined' && main
+            ? new MutationObserver(schedule)
+            : null;
+        if (observer) observer.observe(main, { childList: true, subtree: true });
+        return () => {
+            window.removeEventListener('scroll', schedule);
+            window.removeEventListener('resize', schedule);
+            observer?.disconnect();
+            if (raf !== null) cancelAnimationFrame(raf);
+        };
+    }, [pathname]);
+
+    // The marketing nav is sticky and the preview notice above it changes its
+    // height, so the rail follows the nav instead of assuming a fixed offset.
+    useEffect(() => {
+        const header = document.querySelector('[data-marketing-nav]');
+        if (!header) return undefined;
+        let raf = null;
+        const update = () => {
+            raf = null;
+            const bottom = Math.round(header.getBoundingClientRect().bottom);
+            setRailTop((prev) => (prev === bottom ? prev : bottom));
+        };
+        const onScroll = () => {
+            if (raf === null) raf = requestAnimationFrame(update);
+        };
+        update();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        // Dismissing the preview notice moves the nav up without firing a
+        // scroll or resize event — watch the shell for that change.
+        const observer = typeof MutationObserver !== 'undefined' && header.parentElement
+            ? new MutationObserver(update)
+            : null;
+        if (observer) observer.observe(header.parentElement, { childList: true });
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onScroll);
+            observer?.disconnect();
+            if (raf !== null) cancelAnimationFrame(raf);
+        };
+    }, []);
+
+    // Escape closes the mobile drawer.
+    useEffect(() => {
+        if (!sidebarOpen) return undefined;
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') setSidebarOpen(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [sidebarOpen]);
+
+    const railStyle = railTop
+        ? { '--docs-rail-top': `${railTop}px`, '--docs-rail-h': `calc(100vh - ${railTop}px)` }
+        : undefined;
+
+    const ctaLinks = CTA_LINKS.filter((link) => link.to !== pathname);
+    const showCta = pathname !== '/docs' && ctaLinks.length > 0;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] text-slate-900 dark:text-slate-200 font-sans transition-colors duration-300">
-            <header className="fixed top-0 w-full z-[60] bg-white/80 dark:bg-space-900/75 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]">
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-10 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="lg:hidden p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg"
-                        >
-                            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
-                        <Link to="/" className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                            <ArrowLeft className="h-4 w-4" />
-                            <span className="font-medium text-sm">Back to Home</span>
-                        </Link>
-                        <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                            <BookOpen className="h-3.5 w-3.5" /> Documentation
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Link to="/register" className="btn-primary btn-sm">Get Started</Link>
-                    </div>
-                </div>
-            </header>
+        <MarketingShell grid={false} transition={false}>
+            <div className="mx-auto flex max-w-[1400px]" style={railStyle}>
+                <DocsSidebar activeTo={activeTo} variant="rail" />
 
-            <div className="max-w-[1400px] mx-auto flex">
-                <aside className={`
-                    fixed lg:sticky top-16 h-[calc(100vh-64px)] w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 z-50 transition-all duration-500 overflow-y-auto
-                    ${sidebarOpen ? 'left-0' : '-left-full lg:left-0'}
-                `}>
-                    <div className="p-6">
-                        <Logo to="/docs" label="Documentation" className="mb-6" />
-
-                        <nav className="space-y-6">
-                            {docsNav.map((group) => (
-                                <div key={group.label}>
-                                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{group.label}</p>
-                                    <div className="space-y-0.5">
-                                        {group.items.map((item) => {
-                                            const active = isItemActive(item.to);
-                                            return (
-                                                <button
-                                                    key={item.label}
-                                                    onClick={() => setSidebarOpen(false)}
-                                                    className={`block w-full text-left px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
-                                                        active
-                                                            ? 'bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-300'
-                                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                                                    }`}
-                                                >
-                                                    <Link to={item.to} className="flex items-center gap-2">
-                                                        {item.label}
-                                                        {active && <span className="ml-auto h-1 w-1 rounded-full bg-violet-500"></span>}
-                                                    </Link>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ))}
-                        </nav>
-                    </div>
-                </aside>
-
-                <main ref={mainRef} className="flex-1 min-w-0 pt-28 pb-24 px-6 sm:px-12 lg:px-16">
+                <div className="min-w-0 flex-1 px-5 pb-24 pt-10 sm:px-8 lg:px-12">
                     <div className="mx-auto max-w-3xl">
-                        <div className="lg:hidden mb-8">
+                        <div className="mb-8 lg:hidden">
                             <button
+                                type="button"
                                 onClick={() => setSidebarOpen(true)}
-                                className="inline-flex items-center gap-2 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors"
+                                aria-expanded={sidebarOpen}
+                                aria-controls="docs-drawer"
+                                className="mkt-btn mkt-btn-secondary mkt-btn-sm"
                             >
-                                <Menu className="h-4 w-4" /> Browse documentation
+                                {sidebarOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
+                                Browse documentation
                             </button>
                         </div>
-                        <Outlet />
+                        <PageTransition>
+                            <Outlet />
+                        </PageTransition>
                     </div>
 
-                    <div className="mx-auto max-w-3xl mt-20">
-                        <div className="card card-pad text-center bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/5 border-violet-100 dark:border-white/[0.06]">
-                            <h3 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">Still exploring?</h3>
-                            <p className="prose-quiet mb-6 max-w-xl mx-auto">
-                                Browse the full documentation hub, read the developer guides, or jump straight into building.
-                            </p>
-                            <div className="flex flex-wrap justify-center gap-4">
-                                <Link to="/docs/getting-started" className="btn-primary btn-md">
-                                    Getting Started <ArrowRight className="h-4 w-4" />
-                                </Link>
-                                <Link to="/docs/api" className="btn-secondary btn-md">
-                                    API Reference
-                                </Link>
+                    {showCta && (
+                        <div className="mx-auto mt-20 max-w-3xl">
+                            <div className="mkt-panel relative overflow-hidden px-6 py-10 text-center">
+                                <div
+                                    aria-hidden="true"
+                                    className="mkt-glow left-1/2 top-[-140px] h-[280px] w-[480px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                                />
+                                <div className="relative">
+                                    <h2 className="mkt-h3 !text-2xl">Still exploring?</h2>
+                                    <p className="mkt-body mx-auto mt-3 max-w-xl">
+                                        Browse the full documentation hub, read the developer guides, or jump straight into building.
+                                    </p>
+                                    <div className="mt-7 flex flex-wrap justify-center gap-3">
+                                        {ctaLinks.map((link, i) => (
+                                            <Link
+                                                key={link.to}
+                                                to={link.to}
+                                                className={`mkt-btn ${i === 0 ? 'mkt-btn-primary' : 'mkt-btn-secondary'} mkt-btn-md`}
+                                            >
+                                                {link.label}
+                                                {i === 0 && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </main>
+                    )}
+                </div>
             </div>
 
-            <footer className="border-t border-slate-200 dark:border-white/[0.06] py-10 bg-slate-50 dark:bg-[#070A10] text-center">
-                <div className="flex items-center justify-center gap-2 mb-4 opacity-70">
-                    <Logo />
-                </div>
-                <p className="text-slate-400 dark:text-slate-600 text-xs">© 2026 WebPulse · Documentation</p>
-            </footer>
-        </div>
+            {/* The drawer is portalled to <body> so it is not trapped inside the
+                page's stacking context and can sit above the marketing nav. */}
+            {typeof document !== 'undefined' &&
+                createPortal(
+                    <>
+                        {sidebarOpen && (
+                            <button
+                                type="button"
+                                aria-label="Close documentation menu"
+                                onClick={() => setSidebarOpen(false)}
+                                className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
+                            />
+                        )}
+                        <DocsSidebar
+                            activeTo={activeTo}
+                            variant="drawer"
+                            open={sidebarOpen}
+                            onNavigate={() => setSidebarOpen(false)}
+                        />
+                    </>,
+                    document.body
+                )}
+        </MarketingShell>
     );
 }

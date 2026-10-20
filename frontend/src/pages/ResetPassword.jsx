@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, Loader2, BarChart2 } from 'lucide-react';
+import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Logo from '../components/Logo';
+import AuthShell from '../components/marketing/AuthShell';
 
 export default function ResetPassword() {
     const [searchParams] = useSearchParams();
@@ -64,109 +64,120 @@ export default function ResetPassword() {
 
     if (success) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
-                <div className="w-full max-w-md card card-pad text-center">
-                    <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle2 className="h-7 w-7 text-emerald-500" />
+            <AuthShell legal={false}>
+                <div className="mkt-panel p-7 text-center sm:p-8">
+                    <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10">
+                        <CheckCircle2 className="h-7 w-7 text-emerald-300" aria-hidden="true" />
                     </div>
-                    <h2 className="page-title !text-2xl mb-2 font-display">Password updated</h2>
-                    <p className="page-sub mb-8">
+                    <h1 className="mkt-h3 !text-2xl">Password updated</h1>
+                    <p className="mkt-body mb-8 mt-2">
                         Your password has been successfully reset.<br />
                         You can now log in with your new password.
                     </p>
-                    <Link to="/login" className="btn-primary btn-lg w-full">
+                    <Link to="/login" className="mkt-btn mkt-btn-primary mkt-btn-lg w-full">
                         Back to login
                     </Link>
                 </div>
-            </div>
+            </AuthShell>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
-            <div className="w-full max-w-md">
-                <div className="flex items-center justify-between mb-8">
-                    <Logo />
+        <AuthShell legal={false}>
+            <div className="mkt-panel p-7 sm:p-8">
+                <div className="mb-8 text-center">
+                    <h1 className="mkt-h3 !text-2xl">Create new password</h1>
+                    <p className="mkt-body mt-2">Choose a strong password to secure your account.</p>
                 </div>
 
-                <div className="card card-pad">
-                    <div className="text-center mb-8">
-                        <h2 className="page-title !text-2xl mb-2 font-display">Create new password</h2>
-                        <p className="page-sub">Choose a strong password to secure your account.</p>
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                        <label htmlFor="reset-password" className="mkt-label">New password</label>
+                        <div className="relative">
+                            <input
+                                id="reset-password"
+                                type={showPassword ? "text" : "password"}
+                                autoComplete="new-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="mkt-field peer !pl-11 !pr-11"
+                                placeholder="••••••••"
+                            />
+                            <Lock
+                                className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                aria-hidden="true"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-3.5 flex items-center text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 rounded"
+                                aria-label="Toggle password visibility"
+                            >
+                                {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                            </button>
+                        </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        <div>
-                            <label className="label">New password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-slate-400" />
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="input pl-10 pr-11"
-                                    placeholder="••••••••"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
-                                    aria-label="Toggle password visibility"
-                                >
-                                    {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
-                                </button>
-                            </div>
-
-                            {password && (
-                                <div className="pt-2">
-                                    <div className="flex gap-1.5 h-1 mb-1.5">
-                                        <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 1 ? strength.color : 'bg-slate-200 dark:bg-slate-800'}`}></div>
-                                        <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 2 ? strength.color : 'bg-slate-200 dark:bg-slate-800'}`}></div>
-                                        <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 3 ? strength.color : 'bg-slate-200 dark:bg-slate-800'}`}></div>
-                                    </div>
-                                    <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                                        Strength: <span className={strength.color.replace('bg-', 'text-')}>{strength.label}</span>
-                                    </p>
+                        {password && (
+                            <div className="pt-2">
+                                <div className="mb-1.5 flex h-1 gap-1.5">
+                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 1 ? strength.color : 'bg-white/[0.08]'}`}></div>
+                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 2 ? strength.color : 'bg-white/[0.08]'}`}></div>
+                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 3 ? strength.color : 'bg-white/[0.08]'}`}></div>
                                 </div>
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="label">Confirm password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-slate-400" />
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="input pl-10 pr-11"
-                                    placeholder="••••••••"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
-                                    aria-label="Toggle password visibility"
-                                >
-                                    {showConfirmPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
-                                </button>
+                                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                                    Strength: <span className={strength.color.replace('bg-', 'text-')}>{strength.label}</span>
+                                </p>
                             </div>
-                        </div>
-
-                        <button type="submit" disabled={loading} className="btn-primary btn-lg w-full !mt-6">
-                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                            {loading ? 'Updating...' : 'Update password'}
-                        </button>
-                    </form>
-
-                    <div className="mt-8 text-center">
-                        <Link to="/login" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to login
-                        </Link>
+                        )}
                     </div>
+
+                    <div>
+                        <label htmlFor="reset-confirm" className="mkt-label">Confirm password</label>
+                        <div className="relative">
+                            <input
+                                id="reset-confirm"
+                                type={showConfirmPassword ? "text" : "password"}
+                                autoComplete="new-password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="mkt-field peer !pl-11 !pr-11"
+                                placeholder="••••••••"
+                            />
+                            <Lock
+                                className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                aria-hidden="true"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute inset-y-0 right-3.5 flex items-center text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 rounded"
+                                aria-label="Toggle password visibility"
+                            >
+                                {showConfirmPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="mkt-btn mkt-btn-primary mkt-btn-lg !mt-6 w-full"
+                    >
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+                        {loading ? 'Updating...' : 'Update password'}
+                    </button>
+                </form>
+
+                <div className="mt-8 text-center">
+                    <Link
+                        to="/login"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-violet-300"
+                    >
+                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                        Back to login
+                    </Link>
                 </div>
             </div>
-        </div>
+        </AuthShell>
     );
 }

@@ -1,0 +1,18 @@
+# Gitleaks configuration
+#
+# The default rules are extended, not replaced — only the exceptions below
+# are added on top of them.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Documentation placeholder for the public tracking ID"
+regexes = [
+  # The help centre and the API reference show copy-pasteable curl examples.
+  # The value in the `x-api-key` header is one of these literal
+  # placeholders, not a real key — the tracking ID is a public identifier by
+  # design. The default `curl-auth-header` rule cannot tell the two apart.
+  '''YOUR_TRACKING_ID''',
+  '''YOUR_API_KEY''',
+]

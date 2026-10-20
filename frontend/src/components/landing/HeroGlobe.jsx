@@ -276,7 +276,7 @@ const HeroGlobe = forwardRef(function HeroGlobe(
 
     const glowTex = createGlowTexture(CYAN);
     const nodeGlowMat = new THREE.SpriteMaterial({
-      map: glowTex, color: CYAN, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      map: glowTex, color: CYAN, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending,
     });
     const glowSprites = [];
     const glowGroup = new THREE.Group();
@@ -388,14 +388,14 @@ const HeroGlobe = forwardRef(function HeroGlobe(
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         const pos = geoToVec3(n.lat, n.lng, 1.02);
-        const sc = 0.04 + Math.log(1 + (n.count || 1)) * 0.03;
+        const sc = 0.016 + Math.log(1 + (n.count || 1)) * 0.0085;
         dotDummy.position.copy(pos);
-        dotDummy.scale.setScalar(Math.min(0.16, sc));
+        dotDummy.scale.setScalar(Math.min(0.075, sc));
         dotDummy.updateMatrix();
         s.nodesInst.setMatrixAt(i, dotDummy.matrix);
         glowSprites[i].visible = true;
         glowSprites[i].position.copy(geoToVec3(n.lat, n.lng, 1.022));
-        glowSprites[i].scale.setScalar(sc * 7);
+        glowSprites[i].scale.setScalar(sc * 3);
       }
       s.nodesInst.instanceMatrix.needsUpdate = true;
 
@@ -515,16 +515,16 @@ const HeroGlobe = forwardRef(function HeroGlobe(
         const nodes = s._nodes || [];
         for (let i = 0; i < nodes.length && i < s.nodesInst.count; i++) {
           const n = nodes[i];
-          const base = 0.04 + Math.log(1 + (n.count || 1)) * 0.03;
+          const base = 0.016 + Math.log(1 + (n.count || 1)) * 0.0085;
           const pid = (n.name || '') + n.lat + n.lng;
           const phase = (pid.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 100) / 100;
           const amp = 1 + Math.sin(t * 2.4 + phase * Math.PI * 2) * 0.16;
           dotDummy.position.copy(geoToVec3(n.lat, n.lng, 1.02));
-          dotDummy.scale.setScalar(Math.min(0.16, base) * amp);
+          dotDummy.scale.setScalar(Math.min(0.075, base) * amp);
           dotDummy.updateMatrix();
           s.nodesInst.setMatrixAt(i, dotDummy.matrix);
           if (s.glowSprites[i]) {
-            s.glowSprites[i].scale.setScalar(base * 7 * (0.9 + amp * 0.15));
+            s.glowSprites[i].scale.setScalar(base * 3 * (0.9 + amp * 0.15));
           }
         }
         if (s.nodesInst.count) s.nodesInst.instanceMatrix.needsUpdate = true;
@@ -588,7 +588,7 @@ const HeroGlobe = forwardRef(function HeroGlobe(
       <div ref={containerRef} className={className ?? 'absolute inset-0'} style={{ cursor: 'grab' }} />
       {hover && (
         <div
-          className="pointer-events-none absolute z-20 glass-obs rounded-xl px-3 py-2"
+          className="pointer-events-none absolute z-20 mkt-glass rounded-xl px-3 py-2"
           style={{
             left: Math.min(hover.x + 16, window.innerWidth - 170),
             top: Math.min(hover.y + 16, window.innerHeight - 90),

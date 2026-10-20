@@ -160,18 +160,14 @@ export const deleteProject = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    let projectId = id;
-    if (!isUuid(id)) {
-        const { data: project } = await supabase
-            .from('projects')
-            .select('id')
-            .eq('name', id)
-            .eq('user_id', userId)
-            .single();
+    // Resolve the project and verify ownership for both UUID and name lookups
+    // before any cascade delete touches related analytics data.
+    let query = supabase.from('projects').select('id').eq('user_id', userId);
+    query = isUuid(id) ? query.eq('id', id) : query.eq('name', id);
+    const { data: project } = await query.maybeSingle();
 
-        if (!project) throw AppError.notFound('Project not found');
-        projectId = project.id;
-    }
+    if (!project) throw AppError.notFound('Project not found');
+    const projectId = project.id;
 
     // Manual Cascade Delete (in case DB constraints are missing)
     // 1. Delete Page Views
@@ -502,12 +498,15 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
         projectId = project.id;
     }
 
-    // Check if project already has a token
+    // Check if project already has a token.
+    // Scoped to the owner: a probe must not be able to read whether another
+    // account's project already has a share link.
     const { data: existingProject } = await supabase
         .from('projects')
         .select('share_token')
         .eq('id', projectId)
-        .single();
+        .eq('user_id', userId)
+        .maybeSingle();
 
     // If no token exists, check limits before creating one
     if (!existingProject?.share_token) {
@@ -522,7 +521,7 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
         .update({ share_token: uuid() })
         .eq('id', projectId)
         .eq('user_id', userId)
-        .select('share_token')
+        .select('share_token, name')
         .single();
 
     if (error) throw error;

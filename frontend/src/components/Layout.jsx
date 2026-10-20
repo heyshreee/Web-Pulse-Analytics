@@ -16,10 +16,12 @@ import {
     Zap
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
+import { clearSession } from '../utils/auth';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 import ThemeToggle from './ThemeToggle';
 import Logo from './Logo';
+import PageTransition from './PageTransition';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 const SOCKET_URL = API_URL.replace(/\/api$/, '').replace(/\/v1$/, '');
@@ -138,11 +140,11 @@ export default function Layout() {
     };
 
     const handleLogout = async () => {
-        try {
-            await apiRequest('/auth/logout', { method: 'POST' });
-        } catch (error) {
-            console.error('Logout failed', error);
-        }
+        // Revoke the session server-side first so the token stops working
+        // even if it was copied out of the browser, then clear the local
+        // session. Logout must never fail or hang on the round-trip.
+        apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
+        clearSession();
         navigate('/login');
     };
 
@@ -178,7 +180,7 @@ export default function Layout() {
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && !isSettingsPage && (
                 <div
-                    className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 lg:hidden"
+                    className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -208,11 +210,15 @@ export default function Layout() {
                                             key={item.path}
                                             to={item.path}
                                             onClick={() => setSidebarOpen(false)}
-                                            className={`group flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
+                                            className={`group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
                                                 ? 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
                                                 : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                                                 }`}
                                         >
+                                            <span
+                                                aria-hidden="true"
+                                                className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-violet-500 transition-all duration-300 ease-out ${isActive ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'}`}
+                                            />
                                             <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-violet-600 dark:text-violet-300' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300'}`} />
                                             <span>{item.label}</span>
                                         </Link>
@@ -362,7 +368,9 @@ export default function Layout() {
                 {/* Page Content */}
                 <main className="flex-1 overflow-auto layout-scroll-content">
                     <div className="container-app py-6 sm:py-8">
-                        <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
+                        <PageTransition>
+                            <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
+                        </PageTransition>
                     </div>
                 </main>
             </div>

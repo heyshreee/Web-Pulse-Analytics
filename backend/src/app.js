@@ -36,7 +36,7 @@ const createApp = () => {
             'https://accounts.google.com',
             'https://*.googleapis.com',
             'https://api.ipify.org',
-            'http://ip-api.com',
+            'https://ipwho.is',
           ],
         },
       },
@@ -45,18 +45,44 @@ const createApp = () => {
 
   app.use(cookieParser());
 
-  // Global CORS — tracking endpoint CORS is handled per-route by trackingCors
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        callback(null, true);
-      },
-      credentials: true,
-    })
-  );
+  // Global CORS — tracking endpoints handle their own CORS (trackingCors).
+  // Only known dashboard origins may call the authenticated API with credentials;
+  // unknown origins get no CORS headers, so browser preflights fail.
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'https://obs-tracker.netlify.app',
+    env.frontendUrl ? new URL(env.frontendUrl).origin : null,
+  ].filter(Boolean);
 
-  app.use(express.json());
+  const apiCors = cors({
+    origin: (origin, callback) => {
+      // No Origin header: same-origin, server-to-server or CLI tools — allow.
+      if (!origin) return callback(null, true);
+      callback(null, allowedOrigins.includes(origin.replace(/\/$/, '')));
+    },
+    credentials: true,
+  });
+
+  // Public tracking endpoints (/api/track/*) are called from arbitrary
+  // customer origins and keep the historic permissive CORS behaviour (the API
+  // key is public by design). Everything else — the authenticated API — uses
+  // a strict origin allowlist.
+  const publicCors = cors({
+    origin: (origin, callback) => callback(null, true),
+    credentials: true,
+  });
+
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/track') || req.path.startsWith('/api/v1/track')) {
+      return publicCors(req, res, next);
+    }
+    return apiCors(req, res, next);
+  });
+
+  // Body size cap — a large payload must never be buffered in memory.
+  app.use(express.json({ limit: '100kb' }));
 
   // Routes
   app.use('/api/v1', v1Routes);

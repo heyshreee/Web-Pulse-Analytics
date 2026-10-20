@@ -18,9 +18,9 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 0,
             price_inr: 0,
             interval: 'month',
-            description: 'Trying WebPulse',
-            features: ['1 Project', '1 Allowed Origin', '1,000 events/mo', '60 sec refresh'],
-            buttonText: 'Get Started',
+            description: 'For learning, prototypes, and personal projects.',
+            features: ['1 project', '1 allowed domain per project', '1,000 tracked events / month', '60-second dashboard refresh'],
+            buttonText: 'Start for free',
             limits: {
                 monthlyViews: 1000,
                 projectLimit: 1
@@ -33,8 +33,8 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 4,
             price_inr: 299,
             interval: 'month',
-            description: 'Students & solo devs',
-            features: ['5 Projects', '3 Allowed Origins', 'Live Device Stats', '50,000 events/mo', '10 sec refresh'],
+            description: 'For independent developers running a few small websites.',
+            features: ['5 projects', '3 allowed domains per project', '50,000 tracked events / month', '10-second dashboard refresh'],
             buttonText: 'Choose Basic',
             limits: {
                 monthlyViews: 50000,
@@ -48,8 +48,8 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 12,
             price_inr: 999,
             interval: 'month',
-            description: 'Streamers & growing apps',
-            features: ['15 Projects', '10 Allowed Origins', 'Live Activity Logs', '500,000 events/mo', '1 sec refresh'],
+            description: 'For growing products that need live activity logs and public reports.',
+            features: ['15 projects', '10 allowed domains per project', '500,000 tracked events / month', '1-second dashboard refresh', 'Live activity logs', '5 public reports'],
             buttonText: 'Choose Pro',
             popular: true,
             limits: {
@@ -64,9 +64,9 @@ export const getPlans = asyncHandler(async (req, res) => {
             price_usd: 39,
             price_inr: 2999,
             interval: 'month',
-            description: 'Teams & high traffic',
-            features: ['Unlimited Projects', '100 Allowed Origins', '5,000,000 events/mo', 'Real-time / SLA', 'Team access'],
-            buttonText: 'Contact Sales',
+            description: 'For high-traffic sites tracking millions of events across many projects.',
+            features: ['100 projects', '100 allowed domains per project', '5,000,000 tracked events / month', '1-second dashboard refresh', '100 public reports', 'Team access (planned)'],
+            buttonText: 'Choose Business',
             limits: {
                 monthlyViews: 5000000,
                 projectLimit: 100
@@ -116,8 +116,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     const {
         razorpay_order_id,
         razorpay_payment_id,
-        razorpay_signature,
-        planId
+        razorpay_signature
     } = req.body;
     const userId = req.user.id;
 
@@ -127,74 +126,104 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         .update(body.toString())
         .digest('hex');
 
-    if (expectedSignature === razorpay_signature) {
-        // Payment verified - Update user plan
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({
-                plan: planId
-            })
-            .eq('id', userId);
-
-        if (updateError) throw updateError;
-
-        // Store payment record
-        const planLimits = getPlanLimits(planId);
-        const amount = planLimits.amount;
-
-        const { error: paymentError } = await supabase
-            .from('payments')
-            .insert({
-                user_id: userId,
-                amount: amount,
-                currency: 'USD', // Or INR based on Razorpay config
-                status: 'paid',
-                method: 'razorpay',
-                plan_id: planId,
-                provider_payment_id: razorpay_payment_id,
-                provider_order_id: razorpay_order_id,
-                metadata: {
-                    plan: planId,
-                    order_id: razorpay_order_id
-                }
-            });
-
-        if (paymentError) console.error('Failed to store payment record:', paymentError);
-
-        // Log activity
-        await ActivityLogService.log(
-            null, // No project ID for user-level action
-            userId,
-            'subscription.upgraded',
-            `Upgraded to ${planId} plan`,
-            'success',
-            req.ip,
-            {
-                plan: planId,
-                payment_id: razorpay_payment_id,
-                order_id: razorpay_order_id
-            }
-        );
-
-        // Send Payment Receipt Email
-        if (req.user && req.user.email) {
-            const planLimits = getPlanLimits(planId);
-            const amount = planLimits.amount;
-
-            await EmailService.sendPaymentSuccessEmail(
-                req.user.email,
-                planId,
-                amount, // Amount is already in currency unit (e.g., 29), not paise
-                razorpay_payment_id,
-                new Date().toLocaleDateString(),
-                req.user.name || 'User'
-            );
-        }
-
-        res.json({ success: true, message: 'Payment verified and plan updated' });
-    } else {
+    if (expectedSignature !== razorpay_signature) {
         throw AppError.badRequest('Invalid signature');
     }
+
+    // Idempotency: never process the same payment twice.
+    const { data: existingPayment } = await supabase
+        .from('payments')
+        .select('id')
+        .eq('provider_payment_id', razorpay_payment_id)
+        .maybeSingle();
+
+    if (existingPayment) {
+        return res.json({ success: true, message: 'Payment already processed' });
+    }
+
+    // Never trust the client-supplied plan: fetch the order we created and
+    // derive both the owner and the plan from its server-side notes.
+    let order;
+    try {
+        order = await razorpay.orders.fetch(razorpay_order_id);
+    } catch {
+        throw AppError.badRequest('Unknown Razorpay order');
+    }
+
+    const notes = order?.notes || {};
+    if (notes.userId !== userId) {
+        throw AppError.forbidden('Order does not belong to this user');
+    }
+
+    const verifiedPlanId = notes.planId;
+    if (!verifiedPlanId || verifiedPlanId === 'free') {
+        throw AppError.badRequest('Order is not associated with a purchasable plan');
+    }
+
+    // Payment verified - Update user plan
+    const { error: updateError } = await supabase
+        .from('users')
+        .update({
+            plan: verifiedPlanId
+        })
+        .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Store payment record
+    const planLimits = getPlanLimits(verifiedPlanId);
+    const amount = planLimits.amount;
+
+    const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+            user_id: userId,
+            amount: amount,
+            currency: 'INR', // Razorpay charges in INR
+            status: 'paid',
+            method: 'razorpay',
+            plan_id: verifiedPlanId,
+            provider_payment_id: razorpay_payment_id,
+            provider_order_id: razorpay_order_id,
+            metadata: {
+                plan: verifiedPlanId,
+                order_id: razorpay_order_id
+            }
+        });
+
+    if (paymentError) console.error('Failed to store payment record:', paymentError);
+
+    // Log activity
+    await ActivityLogService.log(
+        null, // No project ID for user-level action
+        userId,
+        'subscription.upgraded',
+        `Upgraded to ${verifiedPlanId} plan`,
+        'success',
+        req.ip,
+        {
+            plan: verifiedPlanId,
+            payment_id: razorpay_payment_id,
+            order_id: razorpay_order_id
+        }
+    );
+
+    // Send Payment Receipt Email
+    if (req.user && req.user.email) {
+        const emailPlanLimits = getPlanLimits(verifiedPlanId);
+        const emailAmount = emailPlanLimits.amount;
+
+        await EmailService.sendPaymentSuccessEmail(
+            req.user.email,
+            verifiedPlanId,
+            emailAmount, // Amount is already in currency unit (e.g., 29), not paise
+            razorpay_payment_id,
+            new Date().toLocaleDateString(),
+            req.user.name || 'User'
+        );
+    }
+
+    res.json({ success: true, message: 'Payment verified and plan updated' });
 });
 
 export const getPaymentHistory = asyncHandler(async (req, res) => {
@@ -232,17 +261,15 @@ export const getReceipt = asyncHandler(async (req, res) => {
         throw AppError.notFound('Payment not found');
     }
 
-    // Verify ownership via email (Razorpay stores email) or check if it exists in user's activity logs
-    // For stricter security, check if this payment_id exists in user's activity logs
-    const { data: log } = await supabase
-        .from('activity_logs')
+    // Verify ownership against the stored payment record
+    const { data: paymentRow } = await supabase
+        .from('payments')
         .select('id')
+        .eq('provider_payment_id', id)
         .eq('user_id', userId)
-        .eq('action', 'subscription.upgraded')
-        .contains('metadata', { payment_id: id })
-        .single();
+        .maybeSingle();
 
-    if (!log) {
+    if (!paymentRow) {
         throw AppError.forbidden('Access denied to this receipt');
     }
 
@@ -311,16 +338,15 @@ export const emailReceipt = asyncHandler(async (req, res) => {
         throw AppError.notFound('Payment not found');
     }
 
-    // Verify ownership
-    const { data: log } = await supabase
-        .from('activity_logs')
+    // Verify ownership against the stored payment record
+    const { data: paymentRow } = await supabase
+        .from('payments')
         .select('id')
+        .eq('provider_payment_id', id)
         .eq('user_id', userId)
-        .eq('action', 'subscription.upgraded')
-        .contains('metadata', { payment_id: id })
-        .single();
+        .maybeSingle();
 
-    if (!log) {
+    if (!paymentRow) {
         throw AppError.forbidden('Access denied to this receipt');
     }
 

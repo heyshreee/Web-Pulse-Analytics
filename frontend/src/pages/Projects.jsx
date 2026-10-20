@@ -7,6 +7,7 @@ import {
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import Spinner from '../components/Spinner';
+import Reveal from '../components/Reveal';
 import { useToast } from '../context/ToastContext';
 
 export default function Projects() {
@@ -158,7 +159,7 @@ export default function Projects() {
     ];
 
     return (
-        <div className="space-y-8 animate-fade-up">
+        <div className="space-y-8">
             {(deletingId || creating) && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-950/80 backdrop-blur-md">
                     <Spinner fullScreen={false} />
@@ -197,7 +198,7 @@ export default function Projects() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
                 {statCards.map((card) => (
                     <div key={card.label} className="card card-pad relative overflow-hidden">
                         <div className="flex justify-between items-start mb-6">
@@ -216,7 +217,7 @@ export default function Projects() {
             </div>
 
             {/* Controls */}
-            <div className="card p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <Reveal delay={40} className="card p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
                 <div className="relative w-full md:w-80">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
@@ -245,14 +246,15 @@ export default function Projects() {
                         <List className="h-4 w-4" />
                     </button>
                 </div>
-            </div>
+            </Reveal>
 
             {/* Projects View */}
             {viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProjects.map((project) => (
-                        <div
+                    {filteredProjects.map((project, index) => (
+                        <Reveal
                             key={project.id}
+                            delay={(index % 3) * 70}
                             onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
                             className="card card-pad card-hover relative flex flex-col cursor-pointer group/card"
                         >
@@ -290,7 +292,7 @@ export default function Projects() {
                                     <ArrowRight className="h-4 w-4" />
                                 </Link>
                             </div>
-                        </div>
+                        </Reveal>
                     ))}
 
                     {/* New Project Card */}

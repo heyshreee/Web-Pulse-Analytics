@@ -32,7 +32,7 @@ For local development:
 ```
 
 Once added, page views will be recorded automatically. The script sends data to
-`POST /api/track/:trackingId`.
+`POST /api/v1/track/events`.
 
 ## 1. Get your Tracking ID
 
@@ -54,11 +54,16 @@ GET /api/track/:trackingId/script.js
 Content-Type: `application/javascript`. It is a lightweight script (no external
 dependencies) that:
 
-- Detects page path (`location.pathname + location.search`)
+- Detects the current page URL (`window.location.href`, including any query string)
 - Reads referrer (`document.referrer`)
-- Sends a POST to `/api/track/:trackingId` on page load (and optionally on SPA route
+- Sends a POST to `/api/v1/track/events` on page load (and optionally on SPA route
   changes if you extend it)
-- Avoids collecting sensitive query parameters where possible
+- Sets and reads no cookies, uses no `localStorage` or `sessionStorage`, and performs
+  no browser fingerprinting
+
+> Caution: the script sends the page URL exactly as the browser shows it, including the
+> query string. If a URL carries personal information in its query string, that
+> information is recorded. Do not put personal information in a tracked URL.
 
 > Note: For SPAs (React Router), the default script only fires on full page loads. If you
 > need to track client-side route changes, you can call the REST endpoint manually (see
@@ -76,10 +81,15 @@ POST /api/track/:trackingId
 Content-Type: application/json
 
 {
-  "page": "/pricing",
-  "referrer": "https://google.com"
+  "pageUrl": "https://example.com/pricing",
+  "referrer": "https://google.com",
+  "title": "Pricing"
 }
 ```
+
+> The legacy `:trackingId` endpoint reads `pageUrl`, `referrer`, and `title`. A `page`
+> field is ignored. Prefer `POST /api/v1/track/events` (section 3a) for new
+> integrations — it is the endpoint the tracker script itself calls.
 
 ### Track a custom event
 
@@ -88,11 +98,33 @@ POST /api/track/:trackingId
 Content-Type: application/json
 
 {
-  "event": "button_clicked",
-  "page": "/checkout",
-  "referrer": "https://example.com"
+  "pageUrl": "https://example.com/checkout",
+  "referrer": "https://example.com",
+  "title": "Checkout"
 }
 ```
+
+> The custom event **name** is not stored today, and neither are custom event fields.
+> Both endpoints record a page view and the visitor fields listed in section 4, and
+> nothing else from the payload.
+
+### 3a. Track Events endpoint (recommended)
+
+```http
+POST /api/v1/track/events
+x-api-key: YOUR_TRACKING_ID
+Content-Type: application/json
+
+{
+  "event": "page_view",
+  "url": "https://example.com/pricing",
+  "referrer": "https://google.com",
+  "title": "Pricing"
+}
+```
+
+`url`, `referrer`, `title`, and `userAgent` are persisted. `event` and any additional
+fields are accepted on the wire but are not stored today.
 
 Both endpoints return `200 OK` on success (shape varies). Invalid payloads return `400`.
 
@@ -100,30 +132,40 @@ Both endpoints return `200 OK` on success (shape varies). Invalid payloads retur
 
 The backend derives additional metadata from the request:
 
-- **IP address** — used for approximate geolocation via `geoip-lite` (country/city/region).
-  IPs are not stored as raw PII in logs unless explicitly logged elsewhere.
+- **IP address** — stored as collected, without truncation, in `visitors.ip_address` and
+  in the project activity log. It is used for approximate geolocation and for abuse
+  prevention and duplicate filtering. The lookup goes to `https://ipwho.is` over HTTPS,
+  with an offline `geoip-lite` database as the fallback when that lookup fails. Only
+  country and city are stored; latitude and longitude are derived on demand for display
+  and are not persisted.
 - **User-Agent** — parsed with `ua-parser-js` to extract browser, OS, device type.
-- **Referrer** — stored as provided (validated and normalized).
-- **Page** — the path you send (or derived). Avoid sending full URLs with tokens.
-- **Session/Visitor** — deduped and attributed server-side using cookies/heuristics
-  (see `visitorController` for the exact logic).
+- **Referrer** — stored as provided.
+- **Page URL** — the full URL you send. Avoid sending URLs with tokens or other
+  sensitive query parameters.
+- **Session/Visitor** — derived server-side as a SHA-256 hash of the IP address, user
+  agent, and project ID (see `visitor.controller.js` for the exact logic). The tracker
+  uses no cookies, so this is a derived identifier rather than a cookie-backed one.
 
 Do **not** embed personally identifiable information (emails, names, IDs, tokens,
-search terms containing PII) in `page` or `event` fields. Those belong in your
+search terms containing PII) in `url` or custom event fields. Those belong in your
 authenticated app, not in the public tracking payload.
 
 ## 5. Payload schema
 
-Current minimal fields (as expected by the ingest logic):
+Fields expected by the current ingest logic:
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `page` | string | Recommended | Path of the viewed page (e.g. `/`, `/blog/post-1`) |
-| `referrer` | string | Optional | Referrer URL (or `""`) |
-| `event` | string | Optional | Custom event name if not a page view |
+| Field | Type | Required | Description | Stored? |
+| --- | --- | --- | --- | --- |
+| `url` | string | Recommended | Full URL of the viewed page (e.g. `https://example.com/blog/post-1`) | Yes |
+| `referrer` | string | Optional | Referrer URL (or `""`) | Yes |
+| `title` | string | Optional | Page title | Yes |
+| `userAgent` | string | Optional | User agent; defaults to the request header | Yes (parsed) |
+| `event` | string | Optional | Event name, e.g. `page_view` | No — accepted but discarded |
+| anything else | any | Optional | Custom event fields | No — accepted but discarded |
 
-Additional fields may be ignored or rejected. The controller validates types and lengths
-(`utils/validators.js`). Keep payloads small and non-sensitive.
+The legacy `:trackingId` endpoint uses `pageUrl` in place of `url`. Additional fields
+are accepted but not stored, and the tracking path does not apply the length checks in
+`utils/validators.js`. Keep payloads small and non-sensitive.
 
 ## 6. Custom events
 
@@ -134,12 +176,14 @@ events with lowercase, hyphen or underscore (e.g. `signup_click`, `cta_clicked`,
 ```json
 {
   "event": "newsletter_subscribed",
-  "page": "/blog"
+  "url": "https://example.com/blog"
 }
 ```
 
-Events are stored and aggregated separately from page views. See the Analytics API for
-retrieving event counts.
+Custom events follow the same path as page views: they are subject to bot filtering,
+duplicate protection, and the project's monthly usage limits, and they produce a page
+view record. **The event name and any custom fields are not stored today**, so the
+dashboard cannot currently report event names or event counts.
 
 ## 7. CORS, Origin, and Referrer validation
 
@@ -167,10 +211,12 @@ No extra configuration is needed beyond running the backend and frontend togethe
 
 ## 9. Privacy and GDPR considerations
 
-Web Pulse Analytics collects **technical, non-PII metadata** (IP-derived location at
-country/city granularity, UA, referrer, page path, timestamps). We do **not**
-intentionally collect names, emails, passwords, or sensitive personal data via the
-public tracker.
+Web Pulse Analytics collects **technical metadata**: the visitor's IP address (stored as
+collected, without truncation), IP-derived location at country/city granularity, user
+agent, referrer, page URL, and timestamps. The IP address and the page URL can be
+personal information depending on the site you track, so treat the analytics data as
+containing personal information. We do **not** intentionally collect names, emails,
+passwords, or other sensitive personal data via the public tracker.
 
 Recommendations before going to production:
 
@@ -178,10 +224,12 @@ Recommendations before going to production:
   retention.
 - Consider whether you need **consent** (GDPR/ePrivacy) in your jurisdiction. If consent
   is required, defer loading the tracker script until consent is granted.
-- **Anonymize IPs** if your compliance requires it (you can truncate IPs before
-  geo-lookup or disable precise city-level storage). Check your legal requirements.
+- **Truncate IPs** if your compliance requires it. Today the ingest path stores the IP
+  address as collected, with no truncation, so this needs a change to the ingest code
+  before it can be relied on. Check your legal requirements.
 - Avoid logging full payloads containing user input. Review backend logs and ensure
-  `visitorController` doesn't log sensitive values.
+  `visitor.controller.js` doesn't log sensitive values. Note that project activity log
+  entries do record the visitor IP address and the page URL.
 - Respect **Do Not Track (DNT)** if you choose to honor it (not enforced by default;
   add a check in the tracker script if required).
 
@@ -201,7 +249,7 @@ See [security.md](security.md) for data handling boundaries.
 | --- | --- | --- |
 | Script not loading (404) | Wrong `trackingId` or backend URL | Verify `trackingId` exists; check `GET /api/track/:id/script.js` returns JS |
 | No events appear | CORS/origin rejected, or site not allowed | Check the project's domain config and `trackingCors` logs; ensure you're testing from an allowed origin |
-| SPA routes not tracked | Script only runs on load | Fire `POST /api/track/:id` on route changes (manually) |
+| SPA routes not tracked | Script only runs on load | Fire `POST /api/v1/track/events` on route changes (manually) |
 | Real-time not updating | Socket.IO disconnected | Verify `VITE_API_URL` matches backend, `ws:` allowed in CSP, and backend is reachable |
 | High false traffic | Public endpoint abused | Tighten allowed referrers/origins, increase rate limiting, or block known bots |
 

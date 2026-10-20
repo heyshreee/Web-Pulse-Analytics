@@ -32,6 +32,8 @@ export const env = {
   resendFromEmail: read('RESEND_FROM_EMAIL'),
   supportEmail: read('SUPPORT_EMAIL'),
   privacyEmail: read('PRIVACY_EMAIL'),
+  legalEmail: read('LEGAL_EMAIL'),
+  securityEmail: read('SECURITY_EMAIL'),
   googleClientId: read('GOOGLE_CLIENT_ID'),
   googleClientSecret: read('GOOGLE_CLIENT_SECRET'),
   cloudinaryCloudName: read('CLOUDINARY_CLOUD_NAME'),

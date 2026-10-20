@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
+import { setSession } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
-import Logo from '../components/Logo';
+import AuthShell from '../components/marketing/AuthShell';
 
 export default function VerifyEmail() {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -88,6 +89,10 @@ export default function VerifyEmail() {
                 body: JSON.stringify({ code, email })
             });
 
+            // The session is delivered as an HttpOnly cookie; the browser
+            // only keeps a non-sensitive flag that a session exists.
+            setSession();
+
             showToast('Email verified successfully!', 'success');
             navigate('/dashboard');
         } catch (error) {
@@ -110,66 +115,68 @@ export default function VerifyEmail() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] flex items-center justify-center p-4 transition-colors duration-300">
-            <div className="w-full max-w-md">
-                <div className="flex items-center justify-between mb-8">
-                    <Logo />
+        <AuthShell legal={false}>
+            <div className="mkt-panel p-7 sm:p-8">
+                <div className="mb-8 text-center">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10">
+                        <Mail className="h-6 w-6 text-violet-300" aria-hidden="true" />
+                    </div>
+                    <h1 className="mkt-h3 !text-2xl">Verify your email</h1>
+                    <p className="mkt-body mt-2">
+                        We sent a code to your email address.<br />
+                        Enter the 6-digit code below to continue.
+                    </p>
                 </div>
 
-                <div className="card card-pad">
-                    <div className="text-center mb-8">
-                        <div className="w-12 h-12 bg-violet-50 dark:bg-violet-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <Mail className="h-6 w-6 text-violet-500" />
-                        </div>
-                        <h2 className="page-title !text-2xl mb-2 font-display">Verify your email</h2>
-                        <p className="page-sub">
-                            We sent a code to your email address.<br />
-                            Enter the 6-digit code below to continue.
-                        </p>
+                <form onSubmit={handleVerify} className="space-y-6">
+                    <div className="flex justify-center gap-2">
+                        {otp.map((digit, index) => (
+                            <input
+                                key={index}
+                                ref={el => inputRefs.current[index] = el}
+                                type="text"
+                                inputMode="numeric"
+                                aria-label={`Digit ${index + 1}`}
+                                maxLength={1}
+                                value={digit}
+                                onChange={(e) => handleChange(index, e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(index, e)}
+                                onPaste={handlePaste}
+                                className="mkt-field !w-12 !px-0 h-14 text-center text-xl font-semibold"
+                            />
+                        ))}
                     </div>
 
-                    <form onSubmit={handleVerify} className="space-y-6">
-                        <div className="flex justify-center gap-2">
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    ref={el => inputRefs.current[index] = el}
-                                    type="text"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleChange(index, e.target.value)}
-                                    onKeyDown={(e) => handleKeyDown(index, e)}
-                                    onPaste={handlePaste}
-                                    className="w-12 h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-xl font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
-                                />
-                            ))}
-                        </div>
+                    <button
+                        type="submit"
+                        disabled={loading || otp.join('').length !== 6}
+                        className="mkt-btn mkt-btn-primary mkt-btn-lg w-full"
+                    >
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+                        {loading ? 'Verifying...' : 'Verify account'}
+                    </button>
+                </form>
 
+                <div className="mt-8 space-y-6 text-center">
+                    <p className="text-xs font-medium text-slate-500">
+                        Didn't receive the code?{' '}
                         <button
-                            type="submit"
-                            disabled={loading || otp.join('').length !== 6}
-                            className="btn-primary btn-lg w-full"
+                            onClick={handleResend}
+                            className="font-semibold text-violet-300 transition-colors hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 rounded"
                         >
-                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                            {loading ? 'Verifying...' : 'Verify account'}
+                            Resend code
                         </button>
-                    </form>
+                    </p>
 
-                    <div className="mt-8 text-center space-y-6">
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                            Didn't receive the code?{' '}
-                            <button onClick={handleResend} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline underline-offset-4 transition-colors">
-                                Resend code
-                            </button>
-                        </p>
-
-                        <Link to="/login" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-white transition-colors">
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to login
-                        </Link>
-                    </div>
+                    <Link
+                        to="/login"
+                        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-violet-300"
+                    >
+                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                        Back to login
+                    </Link>
                 </div>
             </div>
-        </div>
+        </AuthShell>
     );
 }

@@ -3,7 +3,7 @@ import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { setToken } from '../utils/auth';
+import { setSession } from '../utils/auth';
 
 export default function OTPVerification({ email, onSuccess, onBack }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -73,14 +73,13 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
 
         setLoading(true);
         try {
-            const data = await apiRequest('/auth/verify-email', {
+            await apiRequest('/auth/verify-email', {
                 method: 'POST',
                 body: JSON.stringify({ code, email })
             });
 
-            if (data.token) {
-                setToken(data.token);
-            }
+            // The session is delivered as an HttpOnly cookie.
+            setSession();
 
             showToast('Email verified successfully!', 'success');
             if (onSuccess) {

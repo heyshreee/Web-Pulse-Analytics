@@ -126,7 +126,7 @@ export default function ActivityLog() {
     };
 
     return (
-        <div className="space-y-6 animate-fade-up">
+        <div className="space-y-6">
             {/* Header */}
             <div className="page-header">
                 <div className="page-header-title">
