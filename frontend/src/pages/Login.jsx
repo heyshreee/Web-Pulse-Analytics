@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setToken } from '../utils/auth';
+import { setSession } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -27,15 +27,14 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const data = await apiRequest('/auth/login', {
+            await apiRequest('/auth/login', {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
             });
 
-            // Token is set via HttpOnly cookie
-            if (data.token) {
-                setToken(data.token);
-            }
+            // The session is delivered as an HttpOnly cookie; the browser
+            // only keeps a non-sensitive flag that a session exists.
+            setSession();
             showToast('Welcome back!', 'success');
             navigate('/dashboard');
         } catch (err) {
@@ -54,16 +53,14 @@ export default function Login() {
             setIsGoogleLoading(true);
             try {
                 // Send access token to backend to verify and login/register
-                const data = await apiRequest('/auth/google-login', {
+                await apiRequest('/auth/google-login', {
                     method: 'POST',
                     body: JSON.stringify({
                         token: tokenResponse.access_token
                     }),
                 });
 
-                if (data.token) {
-                    setToken(data.token);
-                }
+                setSession();
                 showToast('Welcome back!', 'success');
                 navigate('/dashboard');
             } catch (err) {

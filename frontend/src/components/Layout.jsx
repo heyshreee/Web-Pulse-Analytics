@@ -16,7 +16,7 @@ import {
     Zap
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { removeToken } from '../utils/auth';
+import { clearSession } from '../utils/auth';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 import ThemeToggle from './ThemeToggle';
@@ -140,12 +140,11 @@ export default function Layout() {
     };
 
     const handleLogout = async () => {
-        // Fire the server-side cleanup first so the request still carries
-        // the auth token in its headers, then clear the local session
-        // immediately — logout must never fail or hang on the round-trip
-        // (PrivateRoute checks the local token).
+        // Revoke the session server-side first so the token stops working
+        // even if it was copied out of the browser, then clear the local
+        // session. Logout must never fail or hang on the round-trip.
         apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
-        removeToken();
+        clearSession();
         navigate('/login');
     };
 

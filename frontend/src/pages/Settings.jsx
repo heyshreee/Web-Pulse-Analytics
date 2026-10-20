@@ -10,6 +10,7 @@ import {
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import Spinner from '../components/Spinner';
+import { formatINR, getPlanById } from '../data/plans';
 
 export default function Settings() {
     const { user, loadUser } = useOutletContext();
@@ -344,6 +345,16 @@ function SecuritySection({ user, showToast }) {
         }
     };
 
+    const handleRevokeSession = async (sessionId) => {
+        try {
+            await apiRequest(`/user/sessions/${sessionId}`, { method: 'DELETE' });
+            showToast('Session revoked', 'success');
+            await loadSessions();
+        } catch (error) {
+            showToast(error.message || 'Failed to revoke session', 'error');
+        }
+    };
+
     const handlePasswordUpdate = async (e) => {
         e.preventDefault();
         if (passwords.new !== passwords.confirm) {
@@ -458,7 +469,12 @@ function SecuritySection({ user, showToast }) {
                                 </div>
                             </div>
                             {!session.isCurrent && (
-                                <button className="btn-ghost btn-sm text-red-500 hover:text-red-600 dark:hover:text-red-400">
+                                <button
+                                    type="button"
+                                    onClick={() => handleRevokeSession(session.id)}
+                                    aria-label={`Revoke session for ${session.device || 'this device'}`}
+                                    className="btn-ghost btn-sm text-red-500 hover:text-red-600 dark:text-red-400"
+                                >
                                     <LogOut className="h-4 w-4" />
                                 </button>
                             )}
@@ -776,6 +792,7 @@ function BillingSection({ user }) {
     const [paymentHistory, setPaymentHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const { showToast } = useToast();
+    const currentPlan = getPlanById(user?.plan) || getPlanById('free');
 
     useEffect(() => {
         loadPaymentHistory();
@@ -795,15 +812,14 @@ function BillingSection({ user }) {
 
     const handleDownloadReceipt = async (paymentId) => {
         try {
-            const token = localStorage.getItem('token');
             // Ensure we target the v1 endpoint correctly
             const baseUrl = import.meta.env.VITE_API_URL;
             const apiUrl = baseUrl.endsWith('/v1') ? baseUrl : `${baseUrl}/v1`;
 
             const response = await fetch(`${apiUrl}/payment/receipt/${paymentId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                // The session is carried by the HttpOnly cookie.
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
             if (!response.ok) throw new Error('Failed to download receipt');
@@ -851,28 +867,31 @@ function BillingSection({ user }) {
                     <div className="card card-pad card-hover">
                         <p className="eyebrow mb-2">Current Plan</p>
                         <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-slate-900 dark:text-white capitalize tracking-tight">{user?.plan || 'Free'}</span>
+                            <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{currentPlan.name}</span>
                             <span className="badge-green">Active</span>
                         </div>
-                    </div>
-                    <div className="card card-pad card-hover">
-                        <p className="eyebrow mb-2">Next Payment Date</p>
-                        <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                            {user?.next_billing_date
-                                ? new Date(user.next_billing_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                                : 'N/A'}
+                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            {formatINR(currentPlan.amount)} / month
                         </p>
-                        {user?.next_billing_date && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Auto-renewal scheduled</p>
-                        )}
                     </div>
                     <div className="card card-pad card-hover">
-                        <p className="eyebrow mb-2">Payment Method</p>
+                        <p className="eyebrow mb-2">Billing</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                            One-time monthly order
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            No automatic renewal
+                        </p>
+                    </div>
+                    <div className="card card-pad card-hover">
+                        <p className="eyebrow mb-2">Payments</p>
                         <div className="flex items-center gap-2">
                             <CreditCard className="h-5 w-5 text-slate-500 dark:text-slate-300" />
-                            <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">•••• 4242</span>
+                            <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Razorpay</span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1"> via Stripe/Razorpay</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            INR · amounts exclude taxes
+                        </p>
                     </div>
                 </div>
 
@@ -893,14 +912,14 @@ function BillingSection({ user }) {
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
                                         <Loader className="h-6 w-6 animate-spin mx-auto mb-2" />
                                         Loading history...
                                     </td>
                                 </tr>
                             ) : paymentHistory.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
                                         No payment history found
                                     </td>
                                 </tr>
@@ -912,7 +931,7 @@ function BillingSection({ user }) {
                                             {new Date(payment.date).toLocaleDateString()}
                                         </td>
                                         <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium tracking-tight">{payment.description || 'Subscription'}</td>
-                                        <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium tracking-tight">${payment.amount}</td>
+                                        <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium tracking-tight">{payment.amount != null ? formatINR(payment.amount) : '—'}</td>
                                         <td className="px-6 py-4">
                                             <span className="badge-green capitalize">
                                                 {payment.status}

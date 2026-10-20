@@ -1,14 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, LayoutDashboard, BarChart2 } from 'lucide-react';
-import { removeToken } from '../utils/auth';
+import { clearSession, isAuthenticated } from '../utils/auth';
 import Logo from './Logo';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const signedIn = isAuthenticated();
 
   const handleLogout = () => {
-    removeToken();
+    clearSession();
     navigate('/login');
   };
 
@@ -19,7 +19,7 @@ export default function Navbar() {
           <Logo />
 
           <div className="flex items-center gap-4">
-            {token ? (
+            {signedIn ? (
               <>
                 <Link
                   to="/dashboard"

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setToken } from '../utils/auth';
+import { setSession } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import AuthShell from '../components/marketing/AuthShell';
 
@@ -84,14 +84,14 @@ export default function VerifyEmail() {
         setLoading(true);
         try {
             // Real API call
-            const data = await apiRequest('/auth/verify-email', {
+            await apiRequest('/auth/verify-email', {
                 method: 'POST',
                 body: JSON.stringify({ code, email })
             });
 
-            // Store the session token returned after verification, otherwise
-            // the dashboard's auth guard bounces straight back to /login.
-            if (data?.token) setToken(data.token);
+            // The session is delivered as an HttpOnly cookie; the browser
+            // only keeps a non-sensitive flag that a session exists.
+            setSession();
 
             showToast('Email verified successfully!', 'success');
             navigate('/dashboard');
