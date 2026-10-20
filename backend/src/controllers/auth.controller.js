@@ -1,6 +1,6 @@
 import supabase from '../config/supabase.js';
 import bcrypt from 'bcryptjs';
-import { generateToken } from '../utils/jwt.js';
+import { generateToken, generateResetToken, verifyToken, TOKEN_PURPOSE } from '../utils/jwt.js';
 import { validateEmail, validatePassword } from '../utils/validators.js';
 import EmailService from '../services/email.service.js';
 import { logAction } from '../services/audit.service.js';
@@ -8,7 +8,6 @@ import ActivityLogService from '../services/activity.service.js';
 import sessionService from '../services/session.service.js';
 import { getClientIp } from '../utils/ip.js';
 import { randomUUID } from 'crypto';
-import jwt from 'jsonwebtoken';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
@@ -303,12 +302,23 @@ export const forgotPassword = asyncHandler(async (req, res) => {
         throw AppError.notFound('No account found with this email address');
     }
 
-    // Generate reset token (JWT or random string)
-    const resetToken = generateToken(user.id); // Short lived token
+    // A dedicated, short-lived token that only the reset endpoint accepts.
+    const tokenId = randomUUID();
+    const resetToken = generateResetToken(user.id, { tokenId });
+
+    await sessionService.createSession({
+        userId: user.id,
+        tokenId,
+        purpose: sessionService.SESSION_PURPOSE.PASSWORD_RESET,
+        userAgent: req.headers['user-agent'] || null,
+        ip: getClientIp(req),
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
+    });
+
     const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
     const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-    await EmailService.sendPasswordResetEmail(email, resetLink);
+    await EmailService.sendPasswordResetEmail(user.email, resetLink, user.name || 'User');
 
     res.json({ success: true, message: 'Reset link sent to your email.' });
 });
@@ -324,11 +334,29 @@ export const resetPassword = asyncHandler(async (req, res) => {
         throw AppError.badRequest('Password must be at least 6 characters');
     }
 
-    // Verify token
+    // Verify the token. Only a password-reset token is accepted here — a
+    // session token must never be usable to take over an account.
     let decoded;
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        decoded = verifyToken(token);
     } catch (err) {
+        throw AppError.badRequest('Invalid or expired token');
+    }
+
+    if (decoded.purpose !== TOKEN_PURPOSE.PASSWORD_RESET) {
+        throw AppError.badRequest('Invalid or expired token');
+    }
+
+    // The reset token is single-use: it must exist in the session store, must
+    // not have been used already, and must not have expired.
+    const resetRecord = await sessionService.getSession(decoded.jti);
+    const usable =
+        resetRecord &&
+        resetRecord.purpose === sessionService.SESSION_PURPOSE.PASSWORD_RESET &&
+        !resetRecord.revoked_at &&
+        (!resetRecord.expires_at || new Date(resetRecord.expires_at) > new Date());
+
+    if (!usable) {
         throw AppError.badRequest('Invalid or expired token');
     }
 
@@ -348,13 +376,24 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
     if (error) throw error;
 
+    // Burn the reset token and end every existing session: a password change
+    // must invalidate tokens that were issued against the old credential.
+    await sessionService.revokeSessionByTokenId(userId, decoded.jti);
+    await sessionService.revokeAllSessions(userId);
+
     // Audit Log
     await logAction(userId, 'USER_PASSWORD_RESET');
 
     // Send Password Changed Email
+    const { data: user } = await supabase
+        .from('users')
+        .select('email, name')
+        .eq('id', userId)
+        .maybeSingle();
+
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
-    EmailService.sendPasswordChangedEmail(decoded.email || 'User', date, time, 'User').catch(console.error);
+    EmailService.sendPasswordChangedEmail(user?.email || 'User', date, time, user?.name || 'User').catch(console.error);
 
     res.json({ success: true, message: 'Password reset successfully' });
 });

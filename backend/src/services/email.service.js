@@ -110,7 +110,7 @@ class EmailService {
                 <h2 style="color: #111827; margin-bottom: 20px;">Action Required: Reset Your OBS Tracker Password</h2>
                 <p>Dear ${name},</p>
                 <p>We received a request to reset the password for your OBS Tracker account.</p>
-                <p>To proceed with creating a new password, please click the button below. This link will expire in 24 hours for your security.</p>
+                <p>To proceed with creating a new password, please click the button below. This link expires in 15 minutes and can be used once.</p>
                 
                 ${EmailService.getButton('Reset Password', link)}
 
