@@ -31,16 +31,23 @@ class EmailService {
     /**
      * Forward a message submitted through the public contact form to the
      * monitored support mailbox. The sender address is used as reply-to.
+     *
+     * `to` lets the caller route the request to a specific mailbox (privacy,
+     * legal, security) so a request is never delivered to the wrong inbox.
      */
-    static async sendContactRequest({ name = 'Anonymous', email, subject = 'General question', message }) {
-        const to = process.env.SUPPORT_EMAIL || FROM_EMAIL;
+    static async sendContactRequest({ name = 'Anonymous', email, subject = 'General question', message, to: toOverride, kind = 'support', account = '' }) {
+        const to = toOverride || process.env.SUPPORT_EMAIL || FROM_EMAIL;
         const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         try {
+            const accountRow = account
+                ? `<p><strong>${esc(kind === 'privacy' ? 'Account email' : 'Related account')}:</strong> ${esc(account)}</p>`
+                : '';
             const html = EmailService.getBaseTemplate(`
-                <h2 style="color: #111827; margin-bottom: 20px;">New message from the contact form</h2>
+                <h2 style="color: #111827; margin-bottom: 20px;">New ${esc(kind)} message from the contact form</h2>
                 <p><strong>Name:</strong> ${esc(name)}</p>
                 <p><strong>Email:</strong> ${esc(email)}</p>
                 <p><strong>Subject:</strong> ${esc(subject)}</p>
+                ${accountRow}
                 <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin-top: 16px; white-space: pre-wrap; color: #333333;">
                     ${esc(message)}
                 </div>
@@ -51,7 +58,7 @@ class EmailService {
                 from: FROM_EMAIL,
                 to,
                 reply_to: email,
-                subject: `[Contact] ${subject}`,
+                subject: `[${esc(kind)}] ${subject}`,
                 html
             });
 
