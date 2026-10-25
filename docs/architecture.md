@@ -1,11 +1,13 @@
 # Architecture
 
-Web Pulse Analytics is split into two parts: a React/Vite frontend and a Node.js/Express
-backend with Socket.IO. Data lives in Supabase (Postgres). The system is designed to be
-easily run locally and to keep the V1 release stable while V2 UI work is separate.
+Web Pulse Analytics is structured as a monorepo separating four distinct responsibilities:
+a standalone public marketing website (`apps/marketing`), a stable V1 dashboard (`apps/v1`),
+an advanced V2 dashboard (`apps/v2`), and a Node.js/Express backend (`backend`) with Socket.IO.
+Data lives in Supabase (Postgres). The repository is designed to let each application run,
+build, and deploy independently.
 
 - [High-level overview](#high-level-overview)
-- [Frontend architecture](#frontend-architecture)
+- [Monorepo application layout](#monorepo-application-layout)
 - [Backend architecture](#backend-architecture)
 - [Real-time (Socket.IO)](#real-time-socketio)
 - [Data model (Supabase)](#data-model-supabase)
@@ -19,45 +21,30 @@ easily run locally and to keep the V1 release stable while V2 UI work is separat
 ```
 Browser (site being tracked) ──▶ /api/track/:id ──┐
                                                 │
-Dashboard (SPA) ──▶ REST /api/v1/* ──► Backend │
-                ▲                          (Express)  │
-                └────────── WebSocket ◀── Socket.IO◀┘
+Marketing (apps/marketing) ──▶ Static Site      │
+                                                │
+V1 Dashboard (apps/v1) ──────▶ REST /api/v1/* ──► Backend │
+                                                │ (Express)
+V2 Dashboard (apps/v2) ──────▶ REST /api/v1/* ──►         │
+                ▲                                         │
+                └────────── WebSocket ◀── Socket.IO◀──────┘
                                     │
                                   Supabase
                                    (Postgres)
 ```
 
-The frontend is a Vite SPA with React Router, React Context for auth/theme/projects,
-Recharts/Leaflet for visualizations, and `socket.io-client` for live updates.
+## Monorepo application layout
 
-The backend is an Express 5 API with routers mounted under `/api/v1` and a public
-tracking router under `/api/track`. Middleware enforces CORS (tracking-specific),
-CSRF (on non-GET `/api/v1` where applicable), Helmet security headers, and
-rate limiting on abuse-prone routes. Supabase is accessed server-side via the service
-role key.
+1. **`apps/marketing/`**: The canonical public website (landing page, product features, pricing,
+   blog, documentation rail, security disclosure, legal policies, community, and help center).
+2. **`apps/v1/`**: The stable V1 console and analytics dashboard.
+3. **`apps/v2/`**: The modern V2 dashboard featuring the App Shell design system, 15+ metrics
+   modules, interactive 3D globe visualizations, and session telemetry.
+4. **`backend/`**: Express 5 API supporting both V1 and V2 consoles, background cron jobs,
+   payment processing, email/telegram dispatch, and tracking event ingestion.
 
-## Frontend architecture
-
-Key folders (`frontend/src/`):
-
-- `components/` — reusable UI primitives, shell (header/sidebar), dashboard widgets,
-  form elements, overlays
-- `pages/` — route-level views (Dashboard, Visitors, Sessions, Geography, Projects,
-  Billing, API Keys, Docs, Landing, etc)
-- `context/` — React Context providers (Theme, Toast, Project)
-- `lib/` — data service and helpers (`dataService.js`)
-- `hooks/` — custom React hooks
-- `utils/` — API client and utilities
-- `styles/` — theme and app styles (`theme.css`, `app.css`)
-
-Tooling:
-
-- Vite 7.x, React 19, TypeScript-friendly JS
-- Tailwind CSS 3.x
-- ESLint (flat config) with React Hooks/Refresh rules
-- Recharts 3.x, react-globe.gl, Leaflet, Framer Motion, Socket.IO client
-
-Build: `npm run build` produces a static bundle in `frontend/dist/`. Lint: `npm run lint`.
+Each frontend application is an independent Vite SPA with its own `package.json`, `vite.config.js`,
+and production build (`npm run build` generates a standalone `dist/`).
 
 ## Backend architecture
 
