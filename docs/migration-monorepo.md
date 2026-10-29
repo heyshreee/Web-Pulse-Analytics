@@ -4,6 +4,8 @@
 
 **Base Commit:** `3eaf020d779bcf5509779255a148b6e5a940d3be` (`origin/main`)
 
+**Migration Commit:** `465dd1e1a6d05247afc26c2884ea426712ae3b2b`
+
 **Status:** Locally validated; not pushed, merged, or deployed
 
 **Date:** October 29, 2026
