@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-md', align = 'center' }) {
   if (!isOpen) return null;

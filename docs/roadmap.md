@@ -14,15 +14,15 @@ priorities: **stabilize V1 first**, keep **V2 UI work separate**.
 1. **Stability > scope**: V1 must remain stable and safe for production use.
 2. **Security first**: RLS, authZ/authN, tracking hardening, and dependency hygiene
    are non-negotiable.
-3. **Isolate redesigns**: V2 UI work lives on `v2-ui` and never merges into V1
-   stabilization branches.
+3. **Isolate redesigns**: V2 work lives on the V2 branches (`v2`/`v2-dev`) and never
+   merges into V1 branches.
 4. **Small, reviewed changes**: Prefer additive, testable, well-documented PRs.
 5. **No fake badges/data**: Everything in README/docs must reflect reality.
 
 ## V1 Stabilization (stable release)
 
-Target: harden the existing implementation for a stable V1. Work against
-`v1-stabilization` branch.
+Target: harden the existing implementation for a stable V1. Work against the
+`v1`/`v1-dev` branches.
 
 | Priority | Item | Status | Notes |
 | --- | --- | --- | --- |
@@ -39,8 +39,8 @@ Target: harden the existing implementation for a stable V1. Work against
 
 ## V2 UI (new interface)
 
-Target: modernized dashboard/marketing experience. Work against `v2-ui` branch.
-Keep separate from V1.
+Target: modernized dashboard/marketing experience. Work against the `v2`/`v2-dev`
+branches. Keep separate from V1.
 
 | Priority | Item | Status | Notes |
 | --- | --- | --- | --- |
@@ -66,7 +66,8 @@ Keep separate from V1.
 
 ## How to influence the roadmap
 
-- **Open an issue** with the `feature` template and select the release line (`v1-stabilization` vs `v2-ui`).
+- **Open an issue** with the `feature` template and select the release line
+  (V1: `v1`/`v1-dev`; V2: `v2`/`v2-dev`).
 - Use `good first issue`/`help wanted` if you're looking to contribute.
 - Security items go through [SECURITY.md](../SECURITY.md), not public issues.
 - For large changes, discuss scope before opening a PR (see [CONTRIBUTING.md](../CONTRIBUTING.md)).

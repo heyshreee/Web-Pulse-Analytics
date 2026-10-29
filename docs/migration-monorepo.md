@@ -1,166 +1,261 @@
 # WebPulse Analytics: Monorepo Migration & Restructuring Report
 
-**Branch:** `chore/monorepo-restructure`  
-**Base Commit:** `3eaf020d779bcf5509779255a148b6e5a940d3be` (`origin/main`)  
-**Status:** Validated Checkpoint  
-**Date:** October 26, 2026  
+**Branch:** `chore/monorepo-restructure` (local only)
+
+**Base Commit:** `3eaf020d779bcf5509779255a148b6e5a940d3be` (`origin/main`)
+
+**Status:** Locally validated; not pushed, merged, or deployed
+
+**Date:** October 29, 2026
 
 ---
 
 ## 1. Overview & Objectives
 
-This document details the safe restructuring of the **WebPulse Analytics** repository into a decoupled, clean monorepo without disrupting existing branches, production deployments, or historical Git references.
+This document records the safe restructuring of the **WebPulse Analytics** repository
+into independently maintainable applications without disrupting existing branches,
+production deployments, or historical Git references.
 
-The migration establishes clear architectural boundaries:
-- **`apps/marketing/`**: Canonical public website (landing page, pricing, features, blog, docs, legal, help center, security).
-- **`apps/v1/`**: Stable V1 analytics dashboard and console.
-- **`apps/v2/`**: Advanced V2 analytics dashboard with modular UI and expanded metrics.
-- **`backend/`**: Shared Express/Node.js API, authentication, WebSocket ingestion, payments, and background jobs.
+The migration establishes clear boundaries:
+
+- **`apps/marketing/`**: Standalone public website (landing, pricing, features, blog,
+  docs, legal, help center, security).
+- **`apps/v1/`**: Stable V1 dashboard, kept separate from V2 source.
+- **`apps/v2/`**: V2 dashboard and expanded analytics views.
+- **`backend/`**: Shared Express/Socket.IO API used by both dashboards.
+- **`supabase/`**: Versioned SQL migrations, now tracked because they are required for
+  self-hosting and already referenced throughout the docs.
+
+No application source was merged across V1 and V2. No branch was force-pushed, deleted,
+or rewritten. No Vercel setting, domain, environment variable, or production deployment
+was changed.
 
 ---
 
-## 2. Original Branch & Commit Mapping
+## 2. Branch & Commit Mapping
 
-All existing branches remain intact and unmodified in the remote repository:
+Remote-tracking refs verified during the migration:
 
-| Branch Name | Commit SHA | Role / Content Description |
+| Branch | Commit SHA | Role / Content |
 | :--- | :--- | :--- |
-| `origin/main` | `3eaf020d779bcf5509779255a148b6e5a940d3be` | Main integration branch. Merged PR #50 from `v2`. Contains V2 dashboard and backend endpoints. |
-| `origin/development` | `52dd0d1c6c567219b928909c1723592aa64378e5` | Pre-release development branch. Content matches `main`. |
-| `origin/v1` | `fef4a6ac6cb087ede94c08c0c6bde0c980304e65` | Stable V1 release. Includes PR #62 (canonical marketing website redesign + hardened backend). |
-| `origin/v1-dev` | `b9809bb28e6a2d062721fb871af91016a32a03e9` | V1 development branch prior to merge commit #62. |
-| `origin/v2` | `d90be9a5b8a27b2a4280c8bfdfbe011a713d38cc` | V2 release branch. Merged PR #49 from `development`. |
-| `origin/v2-dev` | `d90be9a5b8a27b2a4280c8bfdfbe011a713d38cc` | V2 development tracking branch. |
+| `origin/main` | `3eaf020d779bcf5509779255a148b6e5a940d3be` | Stable integrated release (V2 line) |
+| `origin/development` | `52dd0d1c6c567219b928909c1723592aa64378e5` | Integration branch |
+| `origin/v1` | `fef4a6ac6cb087ede94c08c0c6bde0c980304e65` | Stable V1 release |
+| `origin/v1-dev` | `b9809bb28e6a2d062721fb871af91016a32a03e9` | V1 development |
+| `origin/v2` | `d90be9a5b8a27b2a4280c8bfdfbe011a713d38cc` | V2 release |
+| `origin/v2-dev` | `d90be9a5b8a27b2a4280c8bfdfbe011a713d38cc` | V2 development |
+
+> The local `v2` ref in the working clone points at `17c83fa...` and is two commits
+> behind `origin/v2`. This is pre-existing local state; it was not modified, and no
+> branch was pushed or deleted.
 
 ---
 
 ## 3. Directory Restructuring & Extraction Summary
 
-### A. apps/v2 (V2 Dashboard)
-- **Source:** Moved directly from `frontend/` on `main` using `git mv frontend apps/v2`.
-- **Git History:** Preserved via 100% rename detection across all 110+ tracked files.
-- **Package Name:** Set to `webpulse-v2` in `apps/v2/package.json`.
-- **Validation:** Independent build passed (`npm --prefix apps/v2 run build`) bundling 3,720 modules in 29.37s.
+### A. `apps/v2` (V2 Dashboard)
 
-### B. apps/v1 (Stable V1 Dashboard)
-- **Source:** Extracted from `origin/v1:frontend` (`fef4a6a`).
-- **Package Name:** Set to `webpulse-v1` in `apps/v1/package.json`.
-- **Dependencies:** Installed via `npm --prefix apps/v1 ci`.
-- **Validation:** Independent build passed (`npm --prefix apps/v1 run build`) bundling 3,696 modules in 27.39s.
+- **Source:** Moved from `frontend/` on `main` (commit `b5073b8`).
+- **Provenance:** Tree matches `origin/main:frontend`; only the package name was changed
+  to `webpulse-v2`.
+- **Validation:** Independent production build passes.
 
-### C. apps/marketing (Canonical Marketing Website)
-- **Source:** Extracted from canonical redesign on `origin/v1:frontend`.
-- **Pruned:** Removed console/dashboard-specific views (`Dashboard.jsx`, `Projects.jsx`, `Billing.jsx`, `Settings.jsx`, `APIKeys.jsx`, `WorldMap.jsx`, etc.).
-- **Retained Public Pages:**
-  - Landing (`src/pages/Landing.jsx` + `src/components/landing/*`)
-  - Features (`src/pages/Features.jsx`)
-  - Pricing (`src/pages/Pricing.jsx` + `src/data/plans.js`)
-  - Blog (`src/pages/Blog.jsx`)
-  - Community (`src/pages/Community.jsx`)
-  - Help Center (`src/pages/HelpCenter.jsx`)
-  - Security (`src/pages/Security.jsx`)
-  - Legal (`src/pages/Legal.jsx`, `legal/LegalContact.jsx`, `legal/policies.js`)
-  - API Overview (`src/pages/API.jsx`)
-  - Integrations (`src/pages/Integrations.jsx`)
-  - Documentation Rail (`src/pages/docs/*`: `DocsLayout`, `DocsIndex`, `DocPage`, `DocsSidebar`, `CodeBlock`, `docsContent`, `docsNav`)
-  - Illustrations (`public/illustrations/*`)
-- **Console Redirects:** Added `ConsoleRedirect` handlers in `apps/marketing/src/App.jsx` for `/login`, `/register`, and `/dashboard/*`, redirecting to `VITE_APP_URL` (or landing fallback).
-- **Package Name:** Set to `webpulse-marketing` in `apps/marketing/package.json`.
-- **Validation:** Independent build passed (`npm --prefix apps/marketing run build`) bundling 2,607 modules in 52.15s.
+### B. `apps/v1` (Stable V1 Dashboard)
 
-### D. backend (API & Background Services)
-- **Location:** Maintained at root-level `backend/`.
-- **Preserved:** All controllers, routes, middleware, services, socket handlers, and server configuration.
-- **Compatibility:** Root backend serves all endpoints (`/api/v1/*` and `/api/track/*`) compatible with Marketing, V1, and V2.
+- **Source:** Extracted from `origin/v1:frontend` (`fef4a6ac`).
+- **Provenance:** Tree matches `origin/v1:frontend`; only the package name was changed to
+  `webpulse-v1`.
+- **Validation:** Independent production build passes.
 
-### E. Root Workspace & Scripts
-- Created root `package.json` providing standard delegating commands:
-  - `npm run dev:marketing`, `npm run build:marketing`, `npm run lint:marketing`
-  - `npm run dev:v1`, `npm run build:v1`, `npm run lint:v1`
-  - `npm run dev:v2`, `npm run build:v2`, `npm run lint:v2`
-  - `npm run dev:backend`, `npm run start:backend`
-  - `npm run build:all`
+### C. `apps/marketing` (Canonical Marketing Website)
 
-### F. GitHub Actions CI/CD Updates
-- Updated `.github/workflows/ci.yml` with distinct jobs for `marketing`, `v1`, `v2`, and `backend`.
-- Updated `.github/workflows/security.yml` to audit dependencies across all four workspaces.
-- Updated `.github/workflows/release.yml` to build and package artifacts for all three frontend applications.
+- **Source:** Extracted from the canonical redesign on `origin/v1:frontend`.
+- **Pruned:** Console/dashboard views (`Dashboard.jsx`, `Projects.jsx`, `Billing.jsx`,
+  `Settings.jsx`, `APIKeys.jsx`, `WorldMap.jsx`, and related components) were removed.
+- **Retained:** Landing, features, pricing, blog, community, help center, security, legal,
+  API overview, integrations, and the documentation rail.
+- **Console redirects:** `/login`, `/register`, and `/dashboard/*` redirect to
+  `VITE_APP_URL` (or the marketing landing page when unset).
+- **Validation:** Independent production build passes.
 
----
+### D. `backend/` (API & Background Services)
 
-## 4. Verification Results & Limitations
+- Kept at the repository root. All controllers, routes, middleware, services, socket
+  handlers, and server configuration are shared by Marketing, V1, and V2.
+- A backward-compatible `POST/DELETE /api/v1/projects/:id/share-token` alias was added;
+  both dashboards call that path while the backend previously exposed only
+  `/:id/regenerate-token`. The existing route remains.
+- `backend/vercel.json` was left untouched. It is **not** a supported deployment path; see
+  section 5.
 
-| Application / Target | Install / Syntax | Lint Status | Production Build | Automated Test Suite |
-| :--- | :--- | :--- | :--- | :--- |
-| `apps/marketing` | `npm ci` (0 errors) | Verified | **PASSED (Exit 0)** in 52s | *No test suite configured* |
-| `apps/v1` | `npm ci` (0 errors) | Pre-existing lint warnings | **PASSED (Exit 0)** in 27s | *No test suite configured* |
-| `apps/v2` | Preserved (0 errors) | Pre-existing lint warnings | **PASSED (Exit 0)** in 29s | *No test suite configured* |
-| `backend` | `node --check` (100% pass) | Syntax valid | N/A (Node.js service) | *No test suite configured* |
+### E. Root Scripts & Tooling
 
-> [!WARNING]
-> **Testing Suite Notice:** The repository does not currently contain automated unit or integration tests (the `backend/package.json` test script is defined as `echo "Error: no test specified" && exit 1`). We report this limitation transparently. All applications have passed complete production compilation, module resolution, and syntax validation.
+- Root `package.json` provides delegating scripts for each app and the backend:
+  - `dev:*`, `build:*`, `lint:*`, `preview:*`
+  - `dev:backend`, `start:backend`, `test:backend`, `build:all`, `lint:all`,
+    `check:backend`
+- There are **no npm workspaces** at the root. Each app and the backend install and lock
+  dependencies independently.
+- `scripts/check-syntax.mjs` replaces the old Unix-only `find | xargs node --check`
+  command with a cross-platform syntax checker.
+- `backend/test/health.test.js` adds a real `node:test` smoke test (boot, health, 404) and
+  replaces the placeholder `test` script.
 
----
+### F. Supabase Migrations
 
-## 5. Vercel Migration Checklist (Pending Manual Configuration)
+- Removed the blanket `/supabase/` ignore rule. `supabase/.temp/` and
+  `supabase/.branches/` remain ignored.
+- Seven existing migration files are now tracked because self-hosting requires them and
+  the docs already referenced them. No migration was modified or executed.
 
-> [!IMPORTANT]
-> **No changes were made to production Vercel projects or DNS settings during this migration.**  
-> When ready to link Vercel deployments to the new monorepo layout, follow this checklist:
+### G. Application Configuration
 
-### 1. Marketing Website Project
-- **Vercel Project:** Create or re-target project (e.g. `webpulse-marketing`).
-- **Root Directory:** Set to `apps/marketing`.
-- **Framework Preset:** `Vite`.
-- **Build Command:** `npm run build` (or leave default Vite setting).
-- **Output Directory:** `dist`.
-- **Environment Variables:**
-  - `VITE_API_URL`: Backend URL (e.g. `https://api.webpulse.app` or production backend).
-  - `VITE_APP_URL`: Dashboard console URL (e.g. `https://app.webpulse.app`).
+- Aligned `apps/marketing` and `apps/v1` ESLint configs with the V2 policy; fixed genuine
+  lint errors instead of suppressing them.
+- Updated all app `.env.example` files to `VITE_API_URL=http://localhost:5000/api`.
+- Updated Vite proxy targets to `http://localhost:5000`; marketing dev server uses port
+  `5174`.
+- Made `getApiUrl()` accept a bare origin, an `/api` base, or a full `/api/v1` base.
+- Documented that V1 and V2 both default to port `5173`.
 
-### 2. V1 Dashboard Project
-- **Vercel Project:** Dedicated V1 deployment (e.g. `webpulse-v1`).
-- **Root Directory:** Set to `apps/v1`.
-- **Framework Preset:** `Vite`.
-- **Build Command:** `npm run build`.
-- **Output Directory:** `dist`.
-- **Environment Variables:**
-  - `VITE_API_URL`: Backend API URL.
-  - `VITE_SUPABASE_URL`: Supabase project URL.
-  - `VITE_SUPABASE_ANON_KEY`: Supabase anon key.
-  - `VITE_GOOGLE_CLIENT_ID`: Google OAuth client ID.
-  - `VITE_RAZORPAY_KEY_ID`: Razorpay key ID.
+### H. CI, Security, and Documentation
 
-### 3. V2 Dashboard Project
-- **Vercel Project:** Dedicated V2 deployment (e.g. `webpulse-v2` or main dashboard).
-- **Root Directory:** Set to `apps/v2`.
-- **Framework Preset:** `Vite`.
-- **Build Command:** `npm run build`.
-- **Output Directory:** `dist`.
-- **Environment Variables:**
-  - Same as V1, plus any V2-specific configuration.
-
-### 4. Backend (If Deployed on Vercel or Separate Platform)
-- If deployed on Vercel:
-  - **Root Directory:** `backend`.
-  - Configuration defined in `backend/vercel.json` (`@vercel/node` handler pointing to `src/server.js`).
-- If deployed on Render / Railway / Fly.io / VPS:
-  - **Root Directory:** `backend`.
-  - **Start Command:** `npm start` (runs `node src/server.js`).
+- `.github/workflows/ci.yml`: separate marketing, V1, V2, and backend jobs; no
+  `continue-on-error`; backend syntax check and tests restored.
+- `.github/workflows/security.yml`: audits all four workspaces.
+- `.github/dependabot.yml`: points at `/apps/marketing`, `/apps/v1`, `/apps/v2`, and
+  `/backend`.
+- README, CONTRIBUTING, architecture, deployment, getting-started, security,
+  troubleshooting, roadmap, PR template, issue template, SECURITY, and SUPPORT were
+  updated for the monorepo layout and real branch names.
+- `.gitattributes` enforces LF in the index to stop Windows/Linux CRLF churn.
 
 ---
 
-## 6. Safe Rollback Procedure
+## 4. Verification Results
 
-Because all restructuring work was conducted strictly on the isolated branch `chore/monorepo-restructure`, rolling back is completely safe and immediate:
+All checks below were run locally on October 29, 2026 from the repository root.
 
-1. **Discard the migration branch locally:**
+| Check | Command | Result |
+| :--- | :--- | :--- |
+| Frontend lint | `npm run lint:all` | **PASS** — 0 errors; 3 marketing warnings, 12 V1 warnings, 3 V2 warnings (pre-existing hooks/fast-refresh warnings) |
+| Frontend builds | `npm run build:all` | **PASS** — marketing 2,607 modules / 56.6s; V1 3,696 modules / 46.6s; V2 3,720 modules / 51.1s. Chunk-size warnings only |
+| Backend syntax | `npm run check:backend` | **PASS** — 54 files checked |
+| Backend tests | `npm run test:backend` | **PASS** — 1 test, 0 failures, ~67s locally |
+| Workflow YAML | Parse all `.github/workflows/*.yml` + `dependabot.yml` | **PASS** |
+| Diff hygiene | `git diff --cached --check` | **PASS for code/docs**; legacy SQL migrations retain trailing spaces and are tracked unchanged |
+
+### What the checks do and do not cover
+
+- The backend test is a **smoke test**, not comprehensive API/route coverage. It boots
+  the Express app, checks `GET /`, and checks a 404. It does not exercise auth, projects,
+  tracking ingest, payments, or Socket.IO.
+- No browser E2E or component test suite is configured for any frontend.
+- No Vercel preview deployment, production backend deployment, or live Supabase migration
+  was performed. All deployment steps remain manual and unverified.
+- The builds emit chunk-size warnings (some lazy-loaded chunks exceed 500 kB). These are
+  pre-existing and non-blocking.
+
+---
+
+## 5. Backend Compatibility & Deployment Constraints
+
+### Not Vercel-suitable
+
+The backend depends on:
+
+- Persistent Socket.IO connections,
+- an hourly `setInterval` notification cleanup job,
+- `geoip-lite` loading a local database at startup.
+
+Deploy it to a long-lived Node.js host with WebSocket support (Render, Railway, Fly, EC2,
+or a VPS). `backend/vercel.json` remains in the tree to avoid changing existing state, but
+it should not be used for new deployments.
+
+### API compatibility
+
+- Both dashboards use `/api/v1/*` and `/api/track/*`; the shared backend serves both.
+- The new `/:id/share-token` aliases close a contract gap found during the audit. The
+  previous `/:id/regenerate-token` route is unchanged.
+- V1 Settings calls `/api/v1/user/linked-accounts`, which is absent from both the V1 and
+  current backends. This is a **pre-existing dead endpoint**, not a migration regression;
+  the tab degrades without a server error. It should be fixed or removed in a separate
+  change.
+
+### Multiple frontend origins
+
+`backend/src/server.js` whitelists one `FRONTEND_URL` (plus localhost and a legacy
+Netlify origin) for Socket.IO. If V1 and V2 are deployed to different origins, both must be
+added before cutover, or one dashboard's live connection will fail. HTTP API calls can
+still work because global CORS is permissive.
+
+### Known security risks carried over
+
+- Global HTTP CORS allows every origin with credentials. This is pre-existing and should
+  be tightened separately.
+- Production auth cookies use `SameSite=None; Secure`, which is required for cross-origin
+  dashboards but is sensitive to third-party-cookie blocking. Prefer custom domains under
+  one parent domain.
+- The backend test does not cover authorization or RLS behavior.
+
+---
+
+## 6. Vercel Migration Checklist
+
+The full checklist is in [deployment.md](deployment.md#7-vercel-migration-checklist).
+Summary:
+
+1. **Preflight:** review the migration commit; confirm CI/builds pass; deploy the backend
+   to a long-lived Node host; back up Supabase; record current Vercel project IDs, domains,
+   and env-var names.
+2. **Create preview projects:** one each for `apps/marketing`, `apps/v1`, and `apps/v2`.
+   Framework preset Vite, Node 22, build `npm run build`, output `dist`. SPA rewrites are
+   already provided by each app's `vercel.json`.
+3. **Set build-time env vars:** `VITE_API_URL`, Supabase URL/anon key, plus
+   `VITE_APP_URL` for marketing and optional OAuth/Razorpay IDs. Never add server secrets.
+4. **Verify previews:** deep links, login/logout, cookie acceptance, cross-origin API,
+   Socket.IO from both dashboard origins, tracking ingest, and CSP/mixed-content behavior.
+5. **Cut over in a separate window:** add domains, update backend `FRONTEND_URL` and the
+   Socket.IO allowlist, update frontend API URLs, redeploy, and re-run smoke checks.
+6. **Rollback:** reassign the domain to the previous deployment; do not delete old
+   projects until the new ones are stable.
+
+> Proposed project names and URLs (for example `webpulse-marketing`, `webpulse-v1`,
+> `webpulse-v2`) are examples only. No production URL was created, renamed, or verified.
+
+---
+
+## 7. Safe Rollback Procedure
+
+All work is confined to the local `chore/monorepo-restructure` branch. No remote branch,
+production tag, Vercel project, DNS record, or deployed asset was changed.
+
+1. **Abandon the migration locally:**
    ```bash
    git checkout main
    git branch -D chore/monorepo-restructure
    ```
-2. **Verify working tree:**
+2. **Or reset the local branch to the base commit** (destroys uncommitted work):
    ```bash
-   git status
+   git reset --hard 3eaf020d779bcf5509779255a148b6e5a940d3be
    ```
-3. No remote branches, production tags, or deployed assets were altered or deleted.
+3. **Verify the working tree and production:** `git status`; confirm Vercel projects still
+   serve their existing deployments.
+4. **Database:** never roll back migrations blindly. Write a forward-fixing migration or
+   restore from a verified backup.
+5. **Vercel:** if a domain was already moved, point it back to the previous project or
+   deployment.
+
+---
+
+## 8. Remaining Risks & Follow-ups
+
+- Add real backend route/auth/RLS tests; the current smoke test is not coverage.
+- Add frontend component or E2E tests.
+- Tighten global CORS and make the Socket.IO origin allowlist configurable for multiple
+  dashboard origins.
+- Resolve the missing `/user/linked-accounts` endpoint or remove the dead V1 UI call.
+- Verify Supabase migrations against a staging project before production.
+- Re-run dependency audits and browser checks in the target deployment environment.
+- Remove or clearly mark the unused `backend/vercel.json` after confirming no existing
+  project depends on it.

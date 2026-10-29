@@ -41,7 +41,8 @@ V2 Dashboard (apps/v2) ──────▶ REST /api/v1/* ──►         �
 3. **`apps/v2/`**: The modern V2 dashboard featuring the App Shell design system, 15+ metrics
    modules, interactive 3D globe visualizations, and session telemetry.
 4. **`backend/`**: Express 5 API supporting both V1 and V2 consoles, background cron jobs,
-   payment processing, email/telegram dispatch, and tracking event ingestion.
+   payment processing, email/telegram dispatch, and tracking event ingestion. The backend
+   is a long-lived Node.js process, not a serverless function.
 
 Each frontend application is an independent Vite SPA with its own `package.json`, `vite.config.js`,
 and production build (`npm run build` generates a standalone `dist/`).
@@ -71,7 +72,10 @@ mounts `/api/v1` and `/api/track`, health root, 404, and centralized error handl
 ## Real-time (Socket.IO)
 
 - Namespace/socket: initialized in `setupVisitorSocket(io)` (`socket/visitorSocket.js`).
-- CORS whitelist includes `FRONTEND_URL`, `localhost:5173`, and `obs-tracker.netlify.app/`.
+- `server.js` configures the Socket.IO CORS whitelist. It currently allows the single
+  `FRONTEND_URL`, `localhost:5173`, and a legacy Netlify origin. If V1 and V2 are deployed
+  to **different** origins, both origins must be added here before cutover; otherwise one
+  dashboard will fail the WebSocket handshake even though its HTTP API calls work.
 - Controllers can emit events via `global.io` when visitors are tracked or state changes.
 - Dashboard pages subscribe to socket events to refresh live visitor counts without polling.
 
@@ -107,7 +111,7 @@ validation where appropriate.
 
 ## Security boundaries
 
-- **Browser-exposed secrets**: only `VITE_*` in `frontend/.env`. Never expose service keys.
+- **Browser-exposed secrets**: only `VITE_*` in each app's `.env`. Never expose service keys.
 - **Server-only keys**: `SUPABASE_SERVICE_KEY`, `JWT_SECRET`, third-party secrets.
 - **CSRF**: applied to non-GET `/api/v1` routes except `/track` prefix (public ingest).
 - **CSP**: Helmet CSP allows required CDNs/sources (Supabase, OpenStreetMap tiles,
@@ -120,23 +124,32 @@ See [security.md](security.md) for a complete treatment.
 
 ## Deployment overview
 
-- **Frontend**: can be built (`npm run build`) and served as static files (Vercel/Netlify
-  or any CDN). Set `VITE_API_URL` to the deployed backend.
-- **Backend**: Node.js app (`npm start`) on a Node 22 host (Render, Railway, Fly, EC2).
-  Ensure `PORT`, `FRONTEND_URL`, Supabase creds, and JWT secret are set.
-- **Database**: Supabase project. Apply migrations manually (reviewed). Never let release
-  workflow auto-apply migrations.
+- **Frontends**: `apps/marketing`, `apps/v1`, and `apps/v2` are independent Vite SPAs.
+  Each builds to its own `dist/` and can be served from Vercel, Netlify, Cloudflare Pages,
+  or any static CDN. Set `VITE_API_URL` to the deployed backend (for example
+  `https://api.example.com/api`).
+- **Backend**: Node.js app (`npm start`) on a long-lived Node 22 host (Render, Railway,
+  Fly, EC2, or a VPS). It requires WebSocket support and persistent process behavior for
+  Socket.IO and the hourly notification cleanup job. Do **not** deploy it to Vercel
+  serverless functions.
+- **Database**: Supabase project. Apply migrations manually (reviewed). Never let the
+  release workflow auto-apply migrations.
 
 Environment variable parity between local and deployed is critical. See
 [deployment.md](deployment.md).
 
 ## Branching strategy
 
-| Branch | Role | Merge rules |
-| --- | --- | --- |
-| `main` | Stable release | PRs from `v1-stabilization` after review and CI pass |
-| `v1-stabilization` | Stabilize current V1 | Bug fixes and minimal hardenings; no large V2 UI changes |
-| `v2-ui` | New UI/design (V2) | Isolated redesign; must not merge into V1 lines |
-| `development` | Integration | Day-to-day work; target release lines via PR |
+The repository keeps the V1 and V2 source lines separate. Each app under `apps/` is an
+export of its corresponding branch; do not merge one app's source into the other.
+
+| Branch | Role |
+| --- | --- |
+| `main` | Stable integrated release (currently the V2 line) |
+| `development` | Integration branch for day-to-day work |
+| `v1` | Stable V1 release line |
+| `v1-dev` | V1 development |
+| `v2` | V2 release line |
+| `v2-dev` | V2 development |
 
 All changes require a PR, review, and passing CI. See [CONTRIBUTING.md](../CONTRIBUTING.md).

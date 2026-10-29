@@ -39,12 +39,12 @@ policy.
 ## Supported versions
 
 Web Pulse Analytics is pre-1.0. Security fixes are provided for the latest released
-version and the active `v1-stabilization` line.
+version and the maintained release branches (`main`, `v1`, `v2`).
 
 | Version | Supported |
 | --- | --- |
-| Latest release (`v1.x`) | ✅ |
-| `v1-stabilization` branch (unreleased) | ✅ |
+| Latest release (`main`) | ✅ |
+| `v1` / `v2` release branches | ✅ |
 | Older / historical versions | ❌ |
 
 If you depend on a specific commit, please state it in your report.

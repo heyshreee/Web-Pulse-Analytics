@@ -23,7 +23,7 @@
 ---
 
 > [!NOTE]
-> **Monorepo Architecture:** The repository is organized into distinct applications under `apps/` (`marketing`, `v1`, `v2`) and the shared `backend/` API. Existing branches (`main`, `development`, `v1`, `v1-dev`, `v2`, `v2-dev`) are preserved intact. Vercel deployment root directories will be configured separately post-migration (see [Monorepo Migration Guide](docs/migration-monorepo.md)).
+> **Monorepo Architecture:** The repository is organized into distinct applications under `apps/` (`marketing`, `v1`, `v2`) and the shared `backend/` API. Existing branches (`main`, `development`, `v1`, `v1-dev`, `v2`, `v2-dev`) are preserved intact. Each app installs and builds independently; there are no root npm workspaces. The backend requires a long-lived Node.js host with WebSocket support and is **not** deployed to Vercel. See the [Monorepo Migration Guide](docs/migration-monorepo.md) and [Deployment Guide](docs/deployment.md).
 
 ---
 
@@ -187,12 +187,15 @@ WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for s
    # V2 Dashboard
    cp apps/v2/.env.example apps/v2/.env
    ```
-   Each frontend `.env` exposes variables starting with `VITE_`:
+   Each application `.env` exposes only variables starting with `VITE_`:
    ```env
-   VITE_API_URL=http://localhost:5000
+   VITE_API_URL=http://localhost:5000/api
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
+   `VITE_API_URL` accepts a bare backend origin (`http://localhost:5000`), an `/api`
+   base, or a full `/api/v1` base. The examples use `/api` because the dev proxy and
+   production configs are easiest to reason about that way.
 
 ### Database Migrations
 
@@ -222,7 +225,7 @@ The repository root includes convenient scripts to run each application independ
 # Run the Backend API server (http://localhost:5000)
 npm run dev:backend
 
-# Run the Marketing Website (http://localhost:5173)
+# Run the Marketing Website (http://localhost:5174)
 npm run dev:marketing
 
 # Run the Stable V1 Dashboard (http://localhost:5173)
@@ -239,6 +242,10 @@ npm run build:marketing
 npm run build:v1
 npm run build:v2
 ```
+
+> V1 and V2 both default to port `5173`, so run one dashboard at a time unless you
+> override the port (`npm --prefix apps/v1 run dev -- --port 5175`). The marketing site
+> is on `5174` and can run alongside either dashboard.
 
 ---
 
@@ -398,7 +405,7 @@ Web-Pulse-Analytics/
 │   └── migrations/           # 7 Versioned SQL migration scripts
 ├── docs/                     # Detailed architectural and user guides
 ├── .github/                  # CI/CD Workflows, security scans, and templates
-├── package.json              # Monorepo workspace execution scripts
+├── package.json              # Convenience scripts (no root npm workspaces)
 ├── LICENSE                   # MIT License
 └── README.md                 # Project documentation
 ```

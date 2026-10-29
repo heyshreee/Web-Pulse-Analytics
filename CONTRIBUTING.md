@@ -36,12 +36,24 @@ Please read it before interacting with the project.
 
 ```
 web-pulse/
-├── frontend/         # React 19 + Vite single-page app (dashboard + marketing + docs UI)
+├── apps/
+│   ├── marketing/    # Public site: landing, pricing, features, blog, docs, legal
+│   ├── v1/           # Stable V1 dashboard (independent React/Vite app)
+│   └── v2/           # V2 dashboard (independent React/Vite app)
 ├── backend/          # Express 5 API, Socket.IO, services, Supabase access
 ├── supabase/         # SQL migrations (schema, functions, RLS policies)
+├── scripts/          # Repository maintenance/check scripts
 ├── docs/             # Project documentation
 └── .github/          # Workflows, issue/PR templates, CODEOWNERS, dependabot
 ```
+
+Each application has its own `package.json` and lockfile. The root `package.json`
+provides convenience scripts only; it does **not** define npm workspaces. Install
+dependencies inside the app you are changing.
+
+The backend is a long-lived Node.js service (Socket.IO, scheduled cleanup,
+`geoip-lite` local database). It is not designed to run as a Vercel serverless
+function; see [docs/deployment.md](docs/deployment.md).
 
 ## Local setup
 
@@ -54,62 +66,87 @@ web-pulse/
 
 ### 1. Install dependencies
 
+Install only what you need:
+
 ```bash
-# backend
+# Backend
 cd backend && npm install
 
-# frontend
-cd ../frontend && npm install
+# One or more frontends
+cd ../apps/marketing && npm install
+cd ../apps/v1 && npm install
+cd ../apps/v2 && npm install
 ```
 
 ### 2. Configure environment
 
 ```bash
-cp backend/.env.example backend/.env      # then fill in real values
-cp frontend/.env.example frontend/.env
+cp backend/.env.example backend/.env        # then fill in real values
+cp apps/marketing/.env.example apps/marketing/.env
+cp apps/v1/.env.example apps/v1/.env
+cp apps/v2/.env.example apps/v2/.env
 ```
 
 Use the `.env.example` files as the source of truth for variable **names**. Never commit
 real values. Backend variables are validated in `backend/src/config/env.js`.
 
+`VITE_API_URL` accepts a bare origin, an `/api` base, or an `/api/v1` base. The
+examples use `http://localhost:5000/api`.
+
 ### 3. Run the apps
 
 ```bash
-# terminal 1
-cd backend && npm run dev      # http://localhost:5000
+# Terminal 1
+npm run dev:backend       # http://localhost:5000
 
-# terminal 2
-cd frontend && npm run dev     # http://localhost:5173
+# Terminal 2 — pick a dashboard
+npm run dev:v1            # http://localhost:5173
+# or
+npm run dev:v2            # http://localhost:5173
+
+# Optional, alongside either dashboard
+npm run dev:marketing     # http://localhost:5174
+```
+
+V1 and V2 both default to port `5173`. Run one at a time, or override the port:
+
+```bash
+npm --prefix apps/v1 run dev -- --port 5175
 ```
 
 ### 4. (Optional) Apply the database schema
 
 Database migrations live in `supabase/migrations/`. See
 [docs/database-schema.md](docs/database-schema.md) for how to apply them in your own
-Supabase project.
+Supabase project. Migrations are never applied automatically by CI or a release.
 
 ## Branching and release lines
 
-We keep the stable release and active UI work on separate lines so ongoing redesigns
-cannot destabilize users.
+We keep V1 and V2 source separate so ongoing V2 work cannot destabilize the V1
+release.
 
 | Branch | Purpose |
 | --- | --- |
-| `main` | Latest reviewed, stable state |
-| `v1-stabilization` | Focused fixes that keep the current release stable |
-| `v2-ui` | New interface/design work, kept isolated from V1 |
+| `main` | Latest reviewed, stable integrated release |
 | `development` | Integration branch for day-to-day work |
+| `v1` | Stable V1 release line |
+| `v1-dev` | V1 development |
+| `v2` | V2 release line |
+| `v2-dev` | V2 development |
 
 Rules:
 
-- **Do not merge V2 UI work into V1 branches.** Label and target those PRs with `v2-ui`.
-- Open fixes that stabilize the current release against `v1-stabilization`.
+- **Do not merge V1 and V2 source into each other.** Each app under `apps/` is the
+  source of truth for its release line.
+- Target V1 fixes at the V1 line (`v1`/`v1-dev`) and V2 work at the V2 line
+  (`v2`/`v2-dev`). Use `development` for shared/tooling work.
 - Never commit directly to `main`.
+- Keep all existing branches; do not rewrite history or force-push.
 
 Create a branch from the line you are targeting:
 
 ```bash
-git checkout v1-stabilization
+git checkout v1-dev
 git checkout -b fix/tracking-origin-check
 ```
 
@@ -138,34 +175,52 @@ security/<short-name>      # security hardening
 
 ## Testing and quality checks
 
-Run the checks that exist for the area you changed. Do not skip them.
+Run the checks that exist for the package you changed. Do not skip them.
 
-### Frontend (`frontend/`)
+### Frontends (`apps/marketing`, `apps/v1`, `apps/v2`)
 
 ```bash
-npm run lint     # ESLint
-npm run build    # production build must succeed
+npm --prefix apps/marketing run lint
+npm --prefix apps/marketing run build
+
+npm --prefix apps/v1 run lint
+npm --prefix apps/v1 run build
+
+npm --prefix apps/v2 run lint
+npm --prefix apps/v2 run build
 ```
 
-A component/unit test runner is **not yet configured** for the frontend. If you add one,
-wire it into `.github/workflows/ci.yml` and document the command here.
+From the repository root you can run all frontend checks at once:
+
+```bash
+npm run lint:all
+npm run build:all
+```
+
+A component/unit test runner is **not yet configured** for any frontend app. If you add
+one, wire it into `.github/workflows/ci.yml` and document the command here.
 
 ### Backend (`backend/`)
 
-The backend currently has **no automated test suite** (the `test` script is a
-placeholder). Until one exists, verify your change by:
+```bash
+npm run check:backend   # node --check across backend/src
+npm run test:backend    # node:test smoke tests (boot, health, 404)
+```
 
-- Starting the server (`npm run dev`) and exercising the affected endpoint.
-- Confirming syntax: `find src -name '*.js' -print0 | xargs -0 -n1 node --check`.
+The backend test suite is currently a small smoke test, not comprehensive coverage. If
+you change a route or service, also start the server and exercise the affected flow.
+The test takes longer on slow or network-mounted disks because `geoip-lite` loads its
+local database at import time.
 
-If you introduce a test framework, update `backend/package.json` and CI in the same PR.
+If you introduce a broader test framework, update `backend/package.json` and CI in the
+same PR.
 
 ### What CI checks
 
-`.github/workflows/ci.yml` installs both workspaces, lints and builds the frontend,
-syntax-checks the backend, and runs backend tests once a real `test` script exists.
-Security workflows run `npm audit`, CodeQL, and gitleaks. A PR cannot merge while a
-required check is failing.
+`.github/workflows/ci.yml` has four independent jobs: marketing, V1, V2, and backend.
+The frontend jobs run `npm ci`, lint, build, and upload `dist`; the backend job runs
+`npm ci`, the syntax checker, and `npm test`. Security workflows run `npm audit`,
+CodeQL, and gitleaks. A PR cannot merge while a required check is failing.
 
 ## Commit and PR conventions
 
@@ -189,9 +244,9 @@ security(auth): enforce project ownership on stats endpoints
 In your PR description, always include:
 
 - **What** changed and **why**
-- **How** you tested it
+- **How** you tested it (commands and/or scenarios)
 - Whether **database migrations** are involved
-- Whether it targets **V1** or **V2**
+- Whether it targets **V1**, **V2**, the marketing site, or shared tooling
 
 ## Security-sensitive areas
 
@@ -209,6 +264,7 @@ Never:
 - Commit secrets, `.env` files, tokens, or credentials.
 - Include real visitor data or PII (redact logs and screenshots).
 - Loosen authentication, authorization, CORS, CSRF, or rate limiting without review.
+- Disable a failing check or add `continue-on-error` just to make CI green.
 
 See [SECURITY.md](SECURITY.md) and [docs/security.md](docs/security.md).
 
@@ -219,7 +275,7 @@ See [SECURITY.md](SECURITY.md) and [docs/security.md](docs/security.md).
 - **RLS is mandatory** for any table that stores user or visitor data; add policies in
   the same migration as the table.
 - Never edit an already-applied migration; add a new one.
-- Migrations are **never** auto-deployed by the release workflow.
+- Migrations are **never** auto-deployed by CI or the release workflow.
 
 See [docs/database-schema.md](docs/database-schema.md).
 

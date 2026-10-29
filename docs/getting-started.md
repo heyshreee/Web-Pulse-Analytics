@@ -1,12 +1,12 @@
 # Getting Started
 
-This guide helps you run Web Pulse Analytics locally. By the end, you'll have the
-frontend, backend, and database configured and talking to each other.
+This guide helps you run Web Pulse Analytics locally. By the end, you'll have one or
+more frontends, the backend, and the database configured and talking to each other.
 
 - [Prerequisites](#prerequisites)
 - [1. Clone and install](#1-clone-and-install)
 - [2. Configure backend](#2-configure-backend)
-- [3. Configure frontend](#3-configure-frontend)
+- [3. Configure frontends](#3-configure-frontends)
 - [4. Database setup (Supabase)](#4-database-setup-supabase)
 - [5. Run the applications](#5-run-the-applications)
 - [6. Verify the setup](#6-verify-the-setup)
@@ -37,9 +37,13 @@ cd Web-Pulse-Analytics
 # Backend dependencies
 cd backend && npm install
 
-# Frontend dependencies
-cd ../frontend && npm install
+# Frontend dependencies — install the apps you need
+cd ../apps/marketing && npm install
+cd ../v1 && npm install
+cd ../v2 && npm install
 ```
+
+Each app has its own lockfile. There are no root npm workspaces.
 
 ## 2. Configure backend
 
@@ -56,36 +60,43 @@ Fill in the minimum required values:
 | --- | --- | --- |
 | `PORT` | Backend port | `5000` |
 | `JWT_SECRET` | Long, random string for signing JWTs | `openssl rand -base64 32` |
-| `FRONTEND_URL` | URL where frontend runs | `http://localhost:5173` |
+| `FRONTEND_URL` | URL where the primary dashboard runs | `http://localhost:5173` |
 | `SUPABASE_URL` | Your Supabase project URL | `https://<ref>.supabase.co` |
 | `SUPABASE_SERVICE_KEY` | Supabase service_role key (server-side only) | `<service-role-key>` |
 
 `SUPABASE_SERVICE_KEY` must never be exposed to the browser.
 
-The rest are optional — leave them blank until you need those features. For more detail, see [docs/security.md](security.md).
+The rest are optional — leave them blank until you need those features. For more detail,
+see [security.md](security.md).
 
-## 3. Configure frontend
+## 3. Configure frontends
 
-Create `.env` in `frontend/`:
+Create a `.env` in each app you plan to run, from that app's `.env.example`:
 
 ```bash
-cd ../frontend
-cp .env.example .env
+cp apps/marketing/.env.example apps/marketing/.env
+cp apps/v1/.env.example apps/v1/.env
+cp apps/v2/.env.example apps/v2/.env
 ```
 
 | Variable | What it is | Example |
 | --- | --- | --- |
-| `VITE_API_URL` | Backend API base | `http://localhost:5000` |
+| `VITE_API_URL` | Backend API base | `http://localhost:5000/api` |
 | `VITE_SUPABASE_URL` | Supabase URL (public) | `https://<ref>.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon key (public) | `<anon-key>` |
+| `VITE_APP_URL` | Dashboard URL used by marketing redirects (marketing only) | `http://localhost:5173` |
 | `VITE_GOOGLE_CLIENT_ID` | Google OAuth client ID (optional) | `<google-client-id>` |
 | `VITE_RAZORPAY_KEY_ID` | Razorpay key ID (optional) | `<razorpay-key-id>` |
 
-Only `VITE_*` vars are exposed to the browser. No secrets belong here.
+Only `VITE_*` vars are exposed to the browser. No secrets belong here. `VITE_API_URL`
+may be a bare origin, an `/api` base, or a full `/api/v1` base; the example values use
+`/api`.
 
 ## 4. Database setup (Supabase)
 
-SQL migrations are stored in [`supabase/migrations/`](../supabase/migrations/). You can apply them using the Supabase CLI (`supabase db push`/`db reset`) or by running them in the Supabase SQL Editor in order of timestamp.
+SQL migrations are stored in [`supabase/migrations/`](../supabase/migrations/). Apply
+them using the Supabase CLI (`supabase db push`) or by running them in the Supabase SQL
+Editor in timestamp order.
 
 Key files:
 
@@ -94,36 +105,64 @@ Key files:
 3. `20261001000003_indexes.sql` — indexes
 4. `20261001000004_analytics_functions.sql` — functions
 5. `20261001000005_rls_security.sql` — RLS policies
-6. `20261008000001_fix_security_and_performance_linter.sql` — fixes
+6. `20261008000001_fix_security_and_performance_linter.sql` — security/performance fixes
+7. `20261020000001_user_sessions.sql` — user session tracking
 
-> ⚠️ Migrations are never auto-deployed by the release workflow. Apply them manually to each environment and review changes.
+> ⚠️ Migrations are never auto-deployed by CI or the release workflow. Apply them
+> manually to each environment and review changes.
 
-Once applied, confirm RLS is enabled on tables that store user/visitor data. The expected baseline is documented in [database-schema.md](database-schema.md).
+Once applied, confirm RLS is enabled on tables that store user/visitor data. The expected
+baseline is documented in [database-schema.md](database-schema.md).
 
 ## 5. Run the applications
 
-Open two terminals:
+From the repository root, use the convenience scripts:
 
 ```bash
-# Terminal 1 — backend
-cd backend && npm run dev
+# Terminal 1 — backend (http://localhost:5000)
+npm run dev:backend
+
+# Terminal 2 — choose one dashboard (both default to http://localhost:5173)
+npm run dev:v1
+# or
+npm run dev:v2
+
+# Optional — marketing site (http://localhost:5174)
+npm run dev:marketing
 ```
 
-Backend starts on `http://localhost:5000`. Health: `GET /`.
+V1 and V2 share the default port `5173`, so run them one at a time unless you override
+the port:
 
 ```bash
-# Terminal 2 — frontend
-cd frontend && npm run dev
+npm --prefix apps/v1 run dev -- --port 5175
 ```
 
-Frontend starts on `http://localhost:5173`.
+You can also run an app directly:
+
+```bash
+cd apps/v2 && npm run dev
+```
 
 ## 6. Verify the setup
 
-- Frontend: `http://localhost:5173` should load
-- Backend health: `curl http://localhost:5000` returns a short API status message
-- With a valid Supabase connection, signup/login flow should work
-- Real-time dashboard updates require Socket.IO connectivity between frontend and backend
+- Marketing: `http://localhost:5174` loads.
+- Dashboard: `http://localhost:5173` loads and can reach the API.
+- Backend health: `curl http://localhost:5000` returns a short API status message.
+- With a valid Supabase connection, signup/login works.
+- Real-time dashboard updates require Socket.IO connectivity between the dashboard and
+  backend. Check the browser console if live counts do not update.
+
+Automated checks:
+
+```bash
+npm run lint:all
+npm run build:all
+npm run check:backend
+npm run test:backend
+```
+
+The backend test is a smoke test (boot, health, 404), not full endpoint coverage.
 
 ## 7. Tracking a website
 
@@ -137,9 +176,10 @@ Serve via the API:
 <script src="http://localhost:5000/api/track/TRACKING_ID/script.js"></script>
 ```
 
-Replace `TRACKING_ID` with your project's tracking ID (generated when creating a project in the dashboard).
+Replace `TRACKING_ID` with your project's tracking ID (generated when creating a project
+in the dashboard).
 
-The script will send page views and basic metadata to `POST /api/track/:trackingId`.
+The script sends page views and basic metadata to `POST /api/track/:trackingId`.
 
 ### Manual tracking (REST)
 
@@ -153,7 +193,8 @@ Content-Type: application/json
 }
 ```
 
-See [tracking-guide.md](tracking-guide.md) for details, payload validation, CORS restrictions, and event tracking.
+See [tracking-guide.md](tracking-guide.md) for details on payload validation, CORS
+restrictions, and event tracking.
 
 ## 8. Troubleshooting
 
@@ -161,8 +202,9 @@ See [tracking-guide.md](tracking-guide.md) for details, payload validation, CORS
 | --- | --- |
 | CORS errors from tracking | `FRONTEND_URL` in backend, and the page's origin. Tracking CORS is handled per-route. |
 | JWT/auth failures | `JWT_SECRET` set and consistent; cookies/credentials allowed. |
-| Socket.IO disconnected | Check `VITE_API_URL` and CSP `connect-src` (see `backend/src/app.js`). |
+| Socket.IO disconnected | Check `VITE_API_URL`, the Socket.IO origin allowlist in `backend/src/server.js`, and CSP `connect-src`. |
 | Supabase connection fails | `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` correct; no network restrictions. |
 | Empty analytics | Ensure the tracking script is loaded and events are POSTing to `/api/track`. |
+| Port 5173 conflict | V1 and V2 both default to 5173; stop one or override the port. |
 
 More answers in [troubleshooting.md](troubleshooting.md).

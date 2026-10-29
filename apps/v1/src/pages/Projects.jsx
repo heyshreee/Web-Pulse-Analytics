@@ -11,7 +11,7 @@ import Reveal from '../components/Reveal';
 import { useToast } from '../context/ToastContext';
 
 export default function Projects() {
-    const { user, loadUser, loadSidebarData, usageStats } = useOutletContext();
+    const { user, loadUser, usageStats } = useOutletContext();
     const [projects, setProjects] = useState([]);
     const [stats, setStats] = useState({});
     const [showModal, setShowModal] = useState(false);
@@ -20,7 +20,7 @@ export default function Projects() {
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState('grid');
     const [creating, setCreating] = useState(false);
-    const [deletingId, setDeletingId] = useState(null);
+    const [deletingId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -85,34 +85,6 @@ export default function Projects() {
         }
     };
 
-
-    const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this project?')) return;
-
-        setDeletingId(id);
-        try {
-            await apiRequest(`/projects/${id}`, { method: 'DELETE' });
-            showToast('Project deleted', 'success');
-            loadProjects();
-            loadUser();
-            loadSidebarData();
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            setDeletingId(null);
-        }
-    };
-
-    const handleTogglePin = async (project) => {
-        try {
-            const updatedProject = await apiRequest(`/projects/${project.id}/pin`, { method: 'PUT' });
-            setProjects(projects.map(p => p.id === project.id ? { ...p, is_pinned: updatedProject.is_pinned } : p));
-            loadSidebarData();
-            showToast(updatedProject.is_pinned ? 'Project pinned' : 'Project unpinned', 'success');
-        } catch (err) {
-            showToast(err.message, 'error');
-        }
-    };
 
     if (loading) return <Spinner />;
 

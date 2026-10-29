@@ -26,7 +26,7 @@ Most `/api/v1/*` endpoints require authentication.
 - **JWT cookie/session**: after login, the server issues a token (cookie-based flow is used
   in the app). The frontend sends credentials with requests where applicable.
 - **CSRF**: non-GET `/api/v1` routes (except `/track` prefix) are protected by CSRF
-  middleware. The frontend must include the CSRF token when making mutating requests.
+  middleware. Mutating requests must include the `X-Requested-With` header.
 - **Auth middleware**: controllers use `auth` middleware to enforce authenticated access.
 
 Check the route files in `backend/src/routes/` for exact guards.
@@ -190,7 +190,7 @@ and CSP `connect-src` allows `ws:`/`wss:` to the backend.
 ## Security notes
 
 - **CSRF**: non-GET v1 routes skip CSRF only for paths starting with `/track` (public).
-  Mutating v1 requests must include a valid CSRF token.
+  Mutating v1 requests must include the `X-Requested-With` header.
 - **CORS**: global CORS is permissive with credentials; tracking routes use a dedicated
   `trackingCors` middleware to restrict origins/referrers for ingest safety.
 - **Rate limiting**: applied to tracking and selected endpoints.

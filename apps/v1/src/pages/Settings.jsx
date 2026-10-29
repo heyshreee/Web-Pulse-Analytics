@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import {
     User, Shield, Bell, BarChart2, Briefcase,
     Save, Loader, Upload, Trash2, Monitor, Smartphone, Globe,
@@ -323,7 +323,7 @@ function ProfileSection({ user, loadUser, showToast }) {
     );
 }
 
-function SecuritySection({ user, showToast }) {
+function SecuritySection({ showToast }) {
     const [loading, setLoading] = useState(false);
     const [loadingSessions, setLoadingSessions] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -655,16 +655,12 @@ function UsageSection() {
     );
 }
 
-function ProjectsSection({ user }) {
+function ProjectsSection() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', allowedOrigins: '' });
     const { showToast } = useToast();
-
-    useEffect(() => {
-        loadProjects();
-    }, []);
 
     const loadProjects = () => {
         apiRequest('/projects')
@@ -672,6 +668,10 @@ function ProjectsSection({ user }) {
             .catch(console.error)
             .finally(() => setLoading(false));
     };
+
+    useEffect(() => {
+        loadProjects();
+    }, []);
 
     const startEditing = (project) => {
         setEditingId(project.id);
@@ -966,7 +966,7 @@ function BillingSection({ user }) {
     );
 }
 
-function LinkedAccountsSection({ user, showToast }) {
+function LinkedAccountsSection({ showToast }) {
     const [accounts, setAccounts] = useState({});
     const [loading, setLoading] = useState(true);
     const [telegramChatId, setTelegramChatId] = useState('');

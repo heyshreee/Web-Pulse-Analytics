@@ -21,4 +21,8 @@ router.put('/:id/pin', projectController.togglePin);
 router.post('/:id/regenerate-token', projectController.regenerateShareToken);
 router.get('/:id/verify', projectController.verifyProjectInstallation);
 
+// Backward-compatible share-token aliases used by both the V1 and V2 dashboards.
+router.post('/:id/share-token', projectController.regenerateShareToken);
+router.delete('/:id/share-token', projectController.revokeShareToken);
+
 export default router;

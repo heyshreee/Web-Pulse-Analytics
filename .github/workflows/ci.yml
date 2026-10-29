@@ -36,7 +36,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Build (production)
         run: npm run build
@@ -71,7 +70,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Build (production)
         run: npm run build
@@ -106,7 +104,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Build (production)
         run: npm run build
@@ -140,15 +137,10 @@ jobs:
         run: npm ci
 
       - name: Syntax check all source files
-        run: find src -name '*.js' -print0 | xargs -0 -n1 node --check
+        run: node ../scripts/check-syntax.mjs src
 
-      - name: Run tests (if a real test script exists)
-        run: |
-          if grep -q '"test"' package.json && ! grep -q 'no test specified' package.json; then
-            npm test
-          else
-            echo "No test script configured yet — skipping."
-          fi
+      - name: Run tests
+        run: npm test
 
   ci:
     name: CI

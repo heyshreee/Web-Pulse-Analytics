@@ -11,6 +11,16 @@ export default function Notifications() {
     const dropdownRef = useRef(null);
     const { showToast, notificationSpotlight, triggerNotificationSpotlight } = useToast();
 
+    const loadNotifications = async () => {
+        try {
+            const data = await apiRequest('/notifications');
+            setNotifications(data);
+            setUnreadCount(data.filter(n => !n.is_read).length);
+        } catch (err) {
+            console.error('Failed to load notifications:', err);
+        }
+    };
+
     useEffect(() => {
         loadNotifications();
 
@@ -46,16 +56,6 @@ export default function Notifications() {
         }
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isOpen]);
-
-    const loadNotifications = async () => {
-        try {
-            const data = await apiRequest('/notifications');
-            setNotifications(data);
-            setUnreadCount(data.filter(n => !n.is_read).length);
-        } catch (err) {
-            console.error('Failed to load notifications:', err);
-        }
-    };
 
     const markAsRead = async (id) => {
         try {

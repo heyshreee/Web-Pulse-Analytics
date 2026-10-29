@@ -29,7 +29,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 function ConsoleRedirect({ target = '/login' }) {
     const appUrl = import.meta.env.VITE_APP_URL;
     if (appUrl) {
-        window.location.href = `${appUrl.replace(/\/$/, '')}${target}`;
+        window.location.assign(`${appUrl.replace(/\/$/, '')}${target}`);
         return null;
     }
     // Fallback: redirect to landing if no external app URL configured

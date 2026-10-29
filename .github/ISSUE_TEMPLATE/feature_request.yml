@@ -16,10 +16,11 @@ body:
     attributes:
       label: Area
       options:
-        - Dashboard UI
+        - V1 dashboard (apps/v1)
+        - V2 dashboard (apps/v2)
         - Marketing / docs site
+        - Backend API
         - Tracking script
-        - API
         - Real-time (Socket.IO)
         - Database / Supabase
         - Billing / plans
@@ -32,10 +33,11 @@ body:
     id: release-line
     attributes:
       label: Release line
-      description: V1 must stay stable; new UI work is tracked separately under v2-ui.
+      description: Keep V1 and V2 isolated; shared tooling goes to development.
       options:
-        - v1-stabilization (keep the current release stable)
-        - v2-ui (new interface work)
+        - V1 (v1 / v1-dev)
+        - V2 (v2 / v2-dev)
+        - Shared / tooling (development)
         - Unsure
     validations:
       required: true

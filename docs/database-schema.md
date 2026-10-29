@@ -28,7 +28,8 @@ Migrations in order:
 3. `20261001000003_indexes.sql` — performance indexes
 4. `20261001000004_analytics_functions.sql` — SQL functions
 5. `20261001000005_rls_security.sql` — RLS policies
-6. `20261008000001_fix_security_and_performance_linter.sql` — subsequent fixes
+6. `20261008000001_fix_security_and_performance_linter.sql` — security/performance fixes
+7. `20261020000001_user_sessions.sql` — revocable server-side user sessions
 
 ## Auth and users
 
@@ -38,6 +39,7 @@ table (1:1 with `auth.users(id)`).
 | Table | Key columns | Notes |
 | --- | --- | --- |
 | `public.profiles` | `id uuid PK → auth.users(id) ON DELETE CASCADE`, `full_name text`, `email text`, `avatar_url text`, `created_at`, `updated_at` | Profile metadata |
+| `public.user_sessions` | `id uuid PK`, `user_id uuid`, `token_id text UNIQUE`, `purpose text`, `expires_at timestamptz`, `revoked_at timestamptz` | Revocable JWT sessions/reset tokens; RLS limits users to their own rows |
 
 ## Projects
 

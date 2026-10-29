@@ -1,9 +1,10 @@
 export const getApiUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
+  const envUrl = import.meta.env.VITE_API_URL?.trim();
   if (envUrl) {
-    // If the URL ends with /v1, use it as is, otherwise append /v1
-    const base = envUrl.replace(/\/$/, '');
-    return base.endsWith('/v1') ? base : `${base}/v1`;
+    const base = envUrl.replace(/\/+$/, '');
+    if (base.endsWith('/v1')) return base;
+    if (base.endsWith('/api')) return `${base}/v1`;
+    return `${base}/api/v1`;
   }
   // Fallback for development with Vite proxy
   return '/api/v1';

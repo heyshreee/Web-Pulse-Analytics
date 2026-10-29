@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import {
     Search, Download, ChevronLeft, ChevronRight,
     Key, Shield, AlertTriangle, Settings, Lock, Activity
@@ -9,7 +9,6 @@ import { useToast } from '../context/ToastContext';
 import Spinner from '../components/Spinner';
 
 export default function ActivityLog() {
-    const { idOrName } = useParams();
     const { project, socket, usageStats } = useOutletContext();
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);

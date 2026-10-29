@@ -45,9 +45,9 @@ export default function ProjectDetail() {
   const {
     project, stats, overviewStats, loading, loadingChart, saving, deleting,
     projectName, setProjectName, allowedOrigins, setAllowedOrigins,
-    targetUrl, setTargetUrl, isActive, setIsActive, timezone, setTimezone,
+    targetUrl, setTargetUrl, isActive, timezone, setTimezone,
     notifications, setNotifications, shareToken, setShareToken,
-    loadData, loadStats, handleSaveSettings, handleDelete, handleLiveUpdate
+    loadStats, handleSaveSettings, handleDelete, handleLiveUpdate
   } = useProjectData(idOrName, timeRange);
 
   // WebSocket Hook

@@ -18,8 +18,10 @@
     "preview:v2": "npm --prefix apps/v2 run preview",
     "dev:backend": "npm --prefix backend run dev",
     "start:backend": "npm --prefix backend run start",
+    "test:backend": "npm --prefix backend test",
     "build:all": "npm run build:marketing && npm run build:v1 && npm run build:v2",
-    "check:backend": "node backend/src/server.js --check"
+    "lint:all": "npm run lint:marketing && npm run lint:v1 && npm run lint:v2",
+    "check:backend": "node scripts/check-syntax.mjs backend/src"
   },
   "keywords": [
     "analytics",

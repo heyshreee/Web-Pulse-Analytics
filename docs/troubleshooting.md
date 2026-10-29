@@ -18,9 +18,10 @@ locally/production.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `Missing required environment variable: JWT_SECRET` | Backend `.env` missing vars | Copy `backend/.env.example` to `.env` and fill required values |
-| Frontend can't reach backend | Wrong `VITE_API_URL` | Set `VITE_API_URL=http://localhost:5000` in `frontend/.env` |
-| Port already in use (5000/5173) | Another process bound | Change `PORT` in backend `.env` or `vite --port` |
+| Frontend can't reach backend | Wrong `VITE_API_URL` | Set `VITE_API_URL=http://localhost:5000/api` in the relevant `apps/<app>/.env` and restart Vite |
+| Port already in use (5000/5173/5174) | Another process bound | Change `PORT` in backend `.env` or run Vite with `--port`; V1 and V2 both default to 5173 |
 | CORS errors in browser console | `FRONTEND_URL` mismatch or global CORS | Ensure `FRONTEND_URL=http://localhost:5173` in backend `.env`; restart backend |
+| Marketing login/register goes to the wrong place | `VITE_APP_URL` unset or stale | Set `VITE_APP_URL=http://localhost:5173` in `apps/marketing/.env` and restart Vite |
 
 ## Tracking / ingestion
 
@@ -37,7 +38,7 @@ locally/production.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | Login returns 401/403 | Wrong credentials or account not verified | Check Supabase Auth/users; verify email if enabled |
-| CSRF errors on mutating requests | Missing/invalid CSRF token | Frontend must send CSRF token for non-GET v1 routes (except `/track`). Clear cookies and retry |
+| CSRF errors on mutating requests | Missing `X-Requested-With` header | Frontend must send `X-Requested-With` for non-GET v1 routes (except `/track`). Clear cookies and retry |
 | Logged out immediately | `JWT_SECRET` changed or cookies not sent | Keep `JWT_SECRET` stable; ensure `credentials: 'include'` in fetch; check `secure` flag (use `false` on http://localhost) |
 | Google OAuth fails | `VITE_GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` misconfigured | Match redirect URIs in Google Cloud Console to backend/frontend URLs |
 
@@ -45,9 +46,9 @@ locally/production.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Dashboard shows "disconnected" | Socket can't connect to backend | Check `VITE_API_URL` is correct; backend CORS allows frontend origin; WebSocket allowed through proxy/firewall |
+| Dashboard shows "disconnected" | Socket can't connect to backend | Check `VITE_API_URL` is correct; the Socket.IO origin allowlist in `backend/src/server.js` includes the dashboard origin; WebSocket is allowed through proxy/firewall |
 | Live visitors don't update | Not joined to project room or events not emitted | Ensure tracking event was ingested; check `visitorSocket.js` handlers and `global.io` usage |
-| 400 during handshake | CORS blocked | Update Socket.IO CORS whitelist in `server.js` to include your frontend origin |
+| 400 during handshake | CORS blocked | Add the dashboard origin to the Socket.IO CORS allowlist in `server.js` |
 | Reconnects constantly | Proxy dropping WS | Use `wss://` in production behind HTTPS; disable buffering on proxy (e.g. nginx `proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade;`) |
 
 ## Supabase / database
@@ -61,6 +62,8 @@ locally/production.
 | Slow analytics queries | Missing indexes | Verify indexes from migration 003 exist; run `EXPLAIN ANALYZE` on slow queries |
 
 ## Frontend build/lint
+
+Run checks in the app you changed (`apps/marketing`, `apps/v1`, or `apps/v2`).
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
@@ -83,7 +86,8 @@ locally/production.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | Mixed content (http/https) | `VITE_API_URL` or `FRONTEND_URL` uses http | Use `https://` for both in production |
-| Cookies not set | `secure` true on http or `sameSite` wrong | In production `NODE_ENV=production` sets secure cookies; must serve over HTTPS |
+| Cookies not set | `Secure`/`SameSite` mismatch or cross-site blocking | Production uses `Secure` + `SameSite=None`; serve all apps/API over HTTPS. Prefer custom domains under one parent domain, and test in the target browser |
+| Socket works for one dashboard only | Socket.IO allowlist has one `FRONTEND_URL` | Add every production dashboard origin to the Socket.IO CORS allowlist in `backend/src/server.js` |
 | CSP blocks resources | Missing domains in `connect-src`/`img-src` | Update CSP in `backend/src/app.js` for your CDNs/domains |
 | WebSocket fails behind proxy | No WS upgrade headers | Configure proxy (nginx/Cloudflare) to pass `Upgrade`/`Connection: upgrade` and use HTTP/1.1 |
 | 502/504 from backend | Cold start or timeout | Check host logs; increase timeout; ensure `npm start` works; verify `PORT` binding |

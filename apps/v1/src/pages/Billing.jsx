@@ -1,5 +1,4 @@
 import { useOutletContext } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Check, Zap, CreditCard, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { apiRequest } from '../utils/api';
@@ -22,7 +21,7 @@ export default function Billing() {
         plan: 'free',
         projectLimit: 1
     });
-    const [paymentHistory, setPaymentHistory] = useState([]);
+    const [, setPaymentHistory] = useState([]);
 
     useEffect(() => {
         const init = async () => {
@@ -47,32 +46,6 @@ export default function Billing() {
             setPaymentHistory(history);
         } catch (err) {
             console.error('Failed to load payment history:', err);
-        }
-    };
-
-    const handleDownloadReceipt = async (paymentId) => {
-        try {
-            // Trigger download by opening in new window or creating blob
-            // Since our API returns a stream, we can use fetch and blob.
-            // The session is carried by the HttpOnly cookie.
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/payment/receipt/${paymentId}`, {
-                credentials: 'include',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-
-            if (!response.ok) throw new Error('Download failed');
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `receipt_${paymentId}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (error) {
-            showToast('Failed to download receipt', 'error');
         }
     };
 
@@ -220,18 +193,6 @@ export default function Billing() {
             showToast('Failed to downgrade plan', 'error');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleEmailReceipt = async (paymentId) => {
-        try {
-            await apiRequest(`/payment/receipt/${paymentId}/email`, {
-                method: 'POST'
-            });
-            showToast('Receipt sent to your email', 'success');
-        } catch (error) {
-            console.error('Email receipt error:', error);
-            showToast('Failed to send receipt email', 'error');
         }
     };
 

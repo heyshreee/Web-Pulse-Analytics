@@ -41,12 +41,11 @@ const variants = {
 };
 
 export default function Toast({ message, type = 'info', onClose, duration = 5000, action = null }) {
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
     const variant = variants[type] || variants.info;
     const Icon = variant.icon;
 
     useEffect(() => {
-        setIsVisible(true);
         const timer = setTimeout(() => {
             setIsVisible(false);
             setTimeout(onClose, 300); // Wait for exit animation
