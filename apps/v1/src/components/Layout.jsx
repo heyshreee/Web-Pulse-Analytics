@@ -15,16 +15,13 @@ import {
     LifeBuoy,
     Zap
 } from 'lucide-react';
-import { apiRequest } from '../utils/api';
+import { apiRequest, getSocketUrl, isSocketEnabled } from '../utils/api';
 import { clearSession } from '../utils/auth';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 import ThemeToggle from './ThemeToggle';
 import Logo from './Logo';
 import PageTransition from './PageTransition';
-
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
-const SOCKET_URL = API_URL.replace(/\/api$/, '').replace(/\/v1$/, '');
 
 export default function Layout() {
     const [user, setUser] = useState(null);
@@ -57,9 +54,8 @@ export default function Layout() {
 
         loadSidebarData();
 
-        // Socket connection (Skip on Vercel)
-        if (!API_URL.includes('vercel.app')) {
-            const newSocket = io(SOCKET_URL, {
+        if (isSocketEnabled()) {
+            const newSocket = io(getSocketUrl(), {
                 withCredentials: true,
                 transports: ['websocket', 'polling'],
                 reconnectionAttempts: 5

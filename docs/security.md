@@ -60,8 +60,9 @@ Top concerns:
 - **Ingest**: `POST /api/track/:trackingId` accepts minimal JSON
 - **Validation**: payloads validated (`utils/validators.js`); reject malformed/oversized
   input where possible
-- **CORS**: dedicated `trackingCors.js` middleware (different from global CORS). Restricts
-  origins/referrers for browser-based requests
+- **CORS**: dedicated `trackingCors.js` middleware (different from API CORS). Dashboard
+  origins are the only credentialed clients; customer-site origins never receive
+  `Access-Control-Allow-Credentials`
 - **Origin/referrer checks**: enforced against project configuration
 - **Rate limiting**: applied to tracking endpoints to deter spam
 - **No PII**: design avoids collecting emails/names; see [tracking-guide.md](tracking-guide.md)
@@ -84,8 +85,9 @@ Review CSP `connect-src`, `img-src`, `script-src` when adding third-party integr
 | Control | Where | Notes |
 | --- | --- | --- |
 | **CSRF** | `middleware/csrf.js` + `routes/v1/index.js` | Applied to all non-GET `/api/v1` routes **except** paths starting with `/track`. Mutating requests must include the `X-Requested-With` header. |
-| **Global CORS** | `app.js` | Permissive with credentials (`origin: callback(null,true)` in the shown config) — acceptable if paired with auth + CSRF + tracking-specific CORS. Review if you restrict dashboard origins. |
-| **Tracking CORS** | `middleware/trackingCors.js` | Tighter rules for `/api/track/*` to prevent cross-site abuse. |
+| **Authenticated API CORS** | `app.js` + `config/origins.js` | Explicit allowlist with credentials. Built from `FRONTEND_URLS`/`FRONTEND_URL`; disallowed browser origins receive `403 CORS_ORIGIN_DENIED`. Never use wildcards or `*.vercel.app`. |
+| **Tracking CORS** | `middleware/trackingCors.js` | Separate public policy for `/api/track/*`, `/api/v1/track/*`, and the public `/api/v1/analytics/count` endpoint. Project origins are validated against `allowed_origins` where a project ID is present, and never receive credentials. |
+| **Socket.IO origins** | `server.js` + `config/origins.js` | Same allowlist as API CORS, enforced through both Socket.IO CORS and `allowRequest` for raw WebSocket upgrades. |
 | **Rate limiting** | `middleware/rateLimiter.js` + applied to tracking/auth-prone routes | Uses `express-rate-limit`. Configure stores/limits per environment. |
 
 ## Secrets and environment variables

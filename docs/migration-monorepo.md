@@ -186,19 +186,17 @@ it should not be used for new deployments.
 
 ### Multiple frontend origins
 
-`backend/src/server.js` whitelists one `FRONTEND_URL` (plus localhost and a legacy
-Netlify origin) for Socket.IO. If V1 and V2 are deployed to different origins, both must be
-added before cutover, or one dashboard's live connection will fail. HTTP API calls can
-still work because global CORS is permissive.
+> Superseded by section 9. The backend now uses a shared allowlist
+> (`FRONTEND_URLS`/`FRONTEND_URL`) for both credentialed HTTP CORS and Socket.IO.
 
 ### Known security risks carried over
 
-- Global HTTP CORS allows every origin with credentials. This is pre-existing and should
-  be tightened separately.
+- ~~Global HTTP CORS allows every origin with credentials.~~ **Resolved in section 9.**
 - Production auth cookies use `SameSite=None; Secure`, which is required for cross-origin
   dashboards but is sensitive to third-party-cookie blocking. Prefer custom domains under
   one parent domain.
-- The backend test does not cover authorization or RLS behavior.
+- The backend tests cover the CORS allowlist and route mounting, but not authorization or
+  RLS behavior end-to-end.
 
 ---
 
@@ -252,12 +250,75 @@ production tag, Vercel project, DNS record, or deployed asset was changed.
 
 ## 8. Remaining Risks & Follow-ups
 
-- Add real backend route/auth/RLS tests; the current smoke test is not coverage.
+- Add real backend route/auth/RLS tests; the current tests are still not full coverage.
 - Add frontend component or E2E tests.
-- Tighten global CORS and make the Socket.IO origin allowlist configurable for multiple
-  dashboard origins.
-- Resolve the missing `/user/linked-accounts` endpoint or remove the dead V1 UI call.
+- ~~Tighten global CORS and make the Socket.IO origin allowlist configurable for multiple
+  dashboard origins.~~ **Resolved in section 9.**
+- ~~Resolve the missing `/user/linked-accounts` endpoint or remove the dead V1 UI call.~~
+  **Resolved in section 9.**
 - Verify Supabase migrations against a staging project before production.
 - Re-run dependency audits and browser checks in the target deployment environment.
 - Remove or clearly mark the unused `backend/vercel.json` after confirming no existing
   project depends on it.
+
+---
+
+## 9. P0 Remediation (October 30, 2026)
+
+The release-readiness review identified four P0 items. They were fixed locally on
+`chore/monorepo-restructure`; nothing was pushed, merged, deployed, or applied to a
+database.
+
+### A. Credentialed CORS and Socket.IO allowlist
+
+- Added `backend/src/config/origins.js`, a single allowlist built from `FRONTEND_URLS`,
+  `FRONTEND_URL`, `V1_FRONTEND_URL`, `V2_FRONTEND_URL`, and `MARKETING_FRONTEND_URL`.
+  Development localhost origins are added only when `NODE_ENV !== 'production'`.
+- `backend/src/app.js` now rejects disallowed browser origins with
+  `403 CORS_ORIGIN_DENIED` instead of reflecting every origin with credentials.
+- `backend/src/server.js` uses the same allowlist for Socket.IO CORS and for
+  `allowRequest`, which validates the `Origin` header on raw WebSocket upgrades.
+- Public tracking CORS was moved fully into `trackingCors.js` and separated from API CORS.
+  Customer-site origins never receive `Access-Control-Allow-Credentials`. The public
+  `/api/v1/analytics/count` endpoint (called from customer sites with `x-api-key`) uses
+  the same public policy so the documented live-count snippet keeps working.
+- Removed the unnecessary `trackingCors` middleware from authenticated project routes so
+  it cannot widen CORS for `/api/v1/projects/*`.
+
+### B. V1 linked accounts
+
+- Mounted the existing controller at:
+  - `GET /api/v1/user/linked-accounts`
+  - `POST /api/v1/user/linked-accounts/telegram`
+  - `DELETE /api/v1/user/linked-accounts/:platform`
+- The controller now strips stored `bot_token` values from every response. Integration
+  credentials remain server-side.
+
+### C. Share-token aliases
+
+- Confirmed both dashboards call `POST/DELETE /api/v1/projects/:id/share-token`.
+- Both aliases delegate to the same controller functions as the existing
+  `/:id/regenerate-token` route and remain behind the same auth middleware.
+- Scoped the revoke update by `user_id` and selected the project name needed by the
+  share-report notification.
+
+### D. Socket URL derivation
+
+- Removed the `includes('vercel.app')` guard that silently disabled live updates on any
+  Vercel-hosted API URL.
+- Added `getSocketUrl()` / `isSocketEnabled()` helpers. Socket.IO now derives its origin
+  from `VITE_API_URL` (or `VITE_SOCKET_URL`) without leaving an `/api` path in the
+  namespace. `VITE_ENABLE_SOCKET=false` is the explicit opt-out.
+
+### Verification
+
+| Check | Result |
+| :--- | :--- |
+| Backend syntax (`node scripts/check-syntax.mjs backend/src`) | **PASS** — 55 files |
+| Backend tests (`npm --prefix backend test`) | **PASS** — 6 tests, including CORS allowlist, public-tracking separation, linked-accounts route mounting, and share-token route auth |
+| Frontend lint (`npm run lint:all`) | **PASS** — 0 errors; same pre-existing warnings |
+| Frontend builds (`npm run build:all`) | **PASS** — all three apps; chunk-size warnings only |
+
+These checks still do not prove remote GitHub Actions, Vercel previews, live Supabase
+migrations, OAuth cookies, payments, or full Socket.IO behavior. Those remain release
+gates.

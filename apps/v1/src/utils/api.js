@@ -10,6 +10,36 @@ export const getApiUrl = () => {
   return '/api/v1';
 };
 
+/**
+ * Socket.IO server URL. Prefer an explicit VITE_SOCKET_URL; otherwise derive it
+ * from the API URL by removing the /api/v1 suffix. In local development the API
+ * is proxied, so fall back to the backend dev server.
+ */
+export const getSocketUrl = () => {
+  const explicit = import.meta.env.VITE_SOCKET_URL?.trim();
+  if (explicit) return explicit.replace(/\/+$/, '');
+
+  const apiUrl = getApiUrl();
+  if (/^https?:\/\//i.test(apiUrl)) {
+    return apiUrl
+      .replace(/\/api\/v1\/?$/, '')
+      .replace(/\/v1\/?$/, '')
+      .replace(/\/api\/?$/, '');
+  }
+
+  if (
+    typeof window !== 'undefined' &&
+    !['localhost', '127.0.0.1'].includes(window.location.hostname)
+  ) {
+    return window.location.origin;
+  }
+
+  return 'http://localhost:5000';
+};
+
+export const isSocketEnabled = () =>
+  import.meta.env.VITE_ENABLE_SOCKET !== 'false';
+
 import { clearSession } from './auth';
 
 const API_URL = getApiUrl();

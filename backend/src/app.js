@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
 import { env } from './config/env.js';
+import { isAllowedOrigin } from './config/origins.js';
 import v1Routes from './routes/v1/index.js';
 import trackRoutes from './routes/v1/track.routes.js';
 import { notFound, errorHandler } from './middlewares/errorHandler.js';
@@ -56,16 +57,50 @@ const createApp = () => {
 
   app.use(cookieParser());
 
-  // Global CORS — tracking endpoint CORS is handled per-route by trackingCors
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        callback(null, true);
-      },
-      credentials: true,
-    })
-  );
+  // Credentialed CORS for the authenticated API. Only explicitly configured
+  // dashboard/marketing origins are allowed. Public tracking routes are skipped
+  // here because trackingCors validates customer-site origins per project.
+  const apiCors = cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      return callback(null, isAllowedOrigin(origin));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Cache-Control',
+      'Pragma',
+    ],
+  });
+
+  // Public tracking ingestion and the public live-count endpoint are called
+  // directly from customer sites, so they use the non-credentialed public CORS
+  // policy instead of the dashboard allowlist.
+  const isTrackingPath = (path) =>
+    path === '/api/track' ||
+    path.startsWith('/api/track/') ||
+    path === '/api/v1/track' ||
+    path.startsWith('/api/v1/track/') ||
+    path === '/api/v1/analytics/count' ||
+    path === '/api/v1/analytics/count/';
+
+  app.use((req, res, next) => {
+    if (isTrackingPath(req.path)) return next();
+
+    const origin = req.headers.origin;
+    if (origin && !isAllowedOrigin(origin)) {
+      return res.status(403).json({
+        error: 'CORS_ORIGIN_DENIED',
+        message: 'Origin is not allowed to access this API',
+      });
+    }
+
+    return apiCors(req, res, next);
+  });
 
   app.use(express.json());
 

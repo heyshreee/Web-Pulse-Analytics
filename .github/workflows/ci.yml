@@ -142,10 +142,25 @@ jobs:
       - name: Run tests
         run: npm test
 
+  repo:
+    name: Repository hygiene (migrations)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate migration files (no SQL executed)
+        run: node scripts/check-migrations.mjs
+
   ci:
     name: CI
-    needs: [marketing, v1, v2, backend]
+    needs: [marketing, v1, v2, backend, repo]
     runs-on: ubuntu-latest
     steps:
       - name: All required checks passed
-        run: echo "Marketing, V1, V2, and backend checks passed."
+        run: echo "Marketing, V1, V2, backend, and migration hygiene checks passed."

@@ -74,7 +74,8 @@ database migrations from the backend start command.
 | --- | --- | --- |
 | `NODE_ENV` | Yes | `production` |
 | `PORT` | Usually host-provided | The app reads `PORT` and defaults to `5000` |
-| `FRONTEND_URL` | Yes | Primary dashboard origin used for email links, tracking CORS, and the Socket.IO whitelist (for example `https://app.example.com`) |
+| `FRONTEND_URL` | Yes | Primary dashboard origin used for email links (for example `https://app.example.com`) |
+| `FRONTEND_URLS` | Recommended | Comma-separated trusted browser origins for credentialed API and Socket.IO requests: marketing, V1, V2, and any preview URLs. No wildcards. |
 | `JWT_SECRET` | Yes | Strong random string; rotating it invalidates sessions |
 | `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_SERVICE_KEY` | Yes | **Service role** — server-side only; never expose to a browser |
@@ -88,21 +89,35 @@ database migrations from the backend start command.
 
 ### Socket.IO and multiple frontend origins
 
-`backend/src/server.js` currently whitelists one `FRONTEND_URL` plus localhost and a
-legacy Netlify origin. If V1 and V2 are deployed to **different** origins, add both
-production origins to the Socket.IO CORS configuration before cutover. Otherwise HTTP
-requests may work while the dashboard's live WebSocket connection is rejected.
+`backend/src/config/origins.js` builds one explicit allowlist from `FRONTEND_URLS`,
+`FRONTEND_URL`, and the optional `V1_FRONTEND_URL`, `V2_FRONTEND_URL`, and
+`MARKETING_FRONTEND_URL` variables. The same list is used by:
+
+- credentialed HTTP CORS in `backend/src/app.js`,
+- Socket.IO's HTTP CORS configuration, and
+- Socket.IO's `allowRequest` check, which validates the `Origin` header on raw
+  WebSocket upgrades (CORS does not cover those).
+
+If V1 and V2 are deployed to **different** origins, both must be in `FRONTEND_URLS`
+before cutover. Do not use a wildcard or `*.vercel.app`: production auth cookies use
+`SameSite=None`, so every allowed origin can read authenticated responses. Add each
+preview URL explicitly.
 
 `FRONTEND_URL` is also used for password-reset/email links, so point it at the primary
-dashboard (normally V2) and keep the Socket.IO allowlist explicit.
+dashboard (normally V2) and keep `FRONTEND_URLS` explicit.
 
 ### CSP / CORS
 
 - Update CSP `connect-src`/`img-src` in `backend/src/app.js` if you add CDNs or API
   origins.
-- Global HTTP CORS is currently permissive with credentials. Treat that as a known
-  security risk and review it before exposing the API broadly.
-- Tracking CORS is handled separately in `backend/src/middleware/trackingCors.js`.
+- Authenticated API CORS is allowlisted with credentials; disallowed browser origins
+  receive `403 CORS_ORIGIN_DENIED`.
+- Public tracking CORS is handled separately in `backend/src/middleware/trackingCors.js`
+  for `/api/track/*`, `/api/v1/track/*`, and `/api/v1/analytics/count`. Customer-site
+  origins are checked against the project's `allowed_origins` where a project ID is
+  present and never receive `Access-Control-Allow-Credentials`.
+- If `FRONTEND_URLS` is empty in production, the backend logs a warning and rejects all
+  browser origins. Server-to-server requests without an `Origin` header still work.
 
 ## 2. Deploy the frontends
 
@@ -128,6 +143,8 @@ Vite bakes `VITE_*` values into the bundle at build time. Rebuild after changing
 | Variable | Marketing | V1 | V2 | Notes |
 | --- | :---: | :---: | :---: | --- |
 | `VITE_API_URL` | Yes | Yes | Yes | Backend API base, e.g. `https://api.example.com/api` |
+| `VITE_SOCKET_URL` | Optional | Optional | Optional | Explicit Socket.IO origin; defaults to the API origin |
+| `VITE_ENABLE_SOCKET` | Optional | Optional | Optional | Set to `false` only to disable live updates |
 | `VITE_APP_URL` | Yes | — | — | Dashboard URL used by marketing login/register/dashboard redirects |
 | `VITE_SUPABASE_URL` | Yes | Yes | Yes | Public Supabase URL |
 | `VITE_SUPABASE_ANON_KEY` | Yes | Yes | Yes | Public anon key |
@@ -205,7 +222,8 @@ also means:
 
 ### Backend origin settings
 
-- Set `FRONTEND_URL` to the primary dashboard origin.
+- Set `FRONTEND_URL` to the primary dashboard origin and `FRONTEND_URLS` to every
+  dashboard and marketing origin.
 - Update `VITE_API_URL` in each frontend to the backend origin plus `/api`.
 - If the API domain changes, update all three frontend projects and redeploy them.
 
@@ -290,7 +308,8 @@ For each app, create a separate Vercel project from the same repository:
 ### Cutover (separate change window)
 
 - [ ] Add custom domains to the new projects; keep the old deployments available.
-- [ ] Update backend `FRONTEND_URL` and the Socket.IO origin allowlist for the final
+- [ ] Update backend `FRONTEND_URL`/`FRONTEND_URLS` (the same allowlist covers Socket.IO)
+      for the final
       dashboard origins.
 - [ ] Update `VITE_API_URL` in all three frontend projects to the production API.
 - [ ] Update marketing `VITE_APP_URL` to the production dashboard.
@@ -314,7 +333,8 @@ For each app, create a separate Vercel project from the same repository:
 - [ ] RLS enabled on all user/visitor tables; policies reviewed
 - [ ] Rate limiting enabled on tracking/abuse-prone routes
 - [ ] CSP tightened for production (remove localhost if not needed)
-- [ ] CORS reviewed, especially the global permissive policy and Socket.IO allowlist
+- [ ] CORS reviewed: credentialed API and Socket.IO origins are allowlisted; tracking CORS
+      is separate and never credentialed
 - [ ] CSRF header enforced on mutating v1 routes (except `/track`)
 - [ ] Monitoring/logging configured without PII/secrets
 - [ ] Dependabot alerts enabled; CI security checks passing

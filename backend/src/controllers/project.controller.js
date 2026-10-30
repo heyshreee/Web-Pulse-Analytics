@@ -529,7 +529,7 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
         .update({ share_token: uuid() })
         .eq('id', projectId)
         .eq('user_id', userId)
-        .select('share_token')
+        .select('share_token, name')
         .single();
 
     if (error) throw error;
@@ -581,6 +581,7 @@ export const revokeShareToken = asyncHandler(async (req, res) => {
         .from('projects')
         .update({ share_token: null })
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
         .single();
 

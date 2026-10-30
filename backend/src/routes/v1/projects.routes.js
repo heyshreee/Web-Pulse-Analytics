@@ -1,14 +1,12 @@
 import express from 'express';
 const router = express.Router();
 import projectController from '../../controllers/project.controller.js';
-import trackingCors from '../../middleware/trackingCors.js';
 import auth from '../../middleware/auth.js';
 
 // Public routes
 router.get('/share/:shareToken', projectController.getShareReport);
 
 router.use(auth);
-router.use(trackingCors);
 
 router.post('/', projectController.createProject);
 router.get('/', projectController.getProjects);

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import { apiRequest } from '../utils/api';
+import { apiRequest, getSocketUrl, isSocketEnabled } from '../utils/api';
 import Sidebar from './shell/Sidebar';
 import Header from './shell/Header';
 import MobileNav from './shell/MobileNav';
@@ -11,9 +11,6 @@ import AddProjectWizard from './shell/AddProjectWizard';
 import ProjectCodeModal from './shell/ProjectCodeModal';
 import GlobalLoader from './GlobalLoader';
 import { useProject } from '../context/ProjectContext';
-
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
-const SOCKET_URL = API_URL.replace(/\/api$/, '').replace(/\/v1$/, '');
 
 export default function Layout() {
   const [user, setUser] = useState(null);
@@ -107,8 +104,8 @@ export default function Layout() {
   useEffect(() => {
     if (!user) return;
 
-    if (!API_URL.includes('vercel.app')) {
-      const socket = io(SOCKET_URL, {
+    if (isSocketEnabled()) {
+      const socket = io(getSocketUrl(), {
         withCredentials: true,
         transports: ['polling', 'websocket'],
         reconnectionAttempts: 5

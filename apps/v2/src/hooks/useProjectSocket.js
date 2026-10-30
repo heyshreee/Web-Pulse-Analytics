@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { getApiUrl } from '../utils/api';
+import { getSocketUrl, isSocketEnabled } from '../utils/api';
 
-const API_URL = getApiUrl();
-const SOCKET_URL = API_URL.replace('/api/v1', '');
+const SOCKET_URL = getSocketUrl();
 
 export default function useProjectSocket(projectId, onUpdate) {
   useEffect(() => {
@@ -11,8 +10,7 @@ export default function useProjectSocket(projectId, onUpdate) {
 
     let socket;
     
-    // Skip socket for Vercel demo if needed, but here we assume it's standard
-    if (!SOCKET_URL.includes('vercel.app')) {
+    if (isSocketEnabled()) {
       socket = io(SOCKET_URL, {
         withCredentials: true,
         transports: ['polling', 'websocket']

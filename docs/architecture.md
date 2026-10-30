@@ -72,10 +72,12 @@ mounts `/api/v1` and `/api/track`, health root, 404, and centralized error handl
 ## Real-time (Socket.IO)
 
 - Namespace/socket: initialized in `setupVisitorSocket(io)` (`socket/visitorSocket.js`).
-- `server.js` configures the Socket.IO CORS whitelist. It currently allows the single
-  `FRONTEND_URL`, `localhost:5173`, and a legacy Netlify origin. If V1 and V2 are deployed
-  to **different** origins, both origins must be added here before cutover; otherwise one
-  dashboard will fail the WebSocket handshake even though its HTTP API calls work.
+- `server.js` uses the shared allowlist in `config/origins.js` for Socket.IO CORS and for
+  `allowRequest`, which validates the `Origin` header on raw WebSocket upgrades. The list
+  is built from `FRONTEND_URLS`/`FRONTEND_URL` (plus localhost in development). If V1 and
+  V2 are deployed to **different** origins, both must be configured before cutover;
+  otherwise one dashboard will fail the WebSocket handshake even though its HTTP API
+  calls work.
 - Controllers can emit events via `global.io` when visitors are tracked or state changes.
 - Dashboard pages subscribe to socket events to refresh live visitor counts without polling.
 
@@ -105,9 +107,11 @@ Functions/triggers live in `20261001000004_analytics_functions.sql`.
 4. Socket.IO broadcasts live visitor updates to subscribed dashboard clients.
 5. Dashboard queries `/api/v1/analytics/*` for aggregated stats.
 
-CORS for the tracking endpoint is handled per-route (`trackingCors.js`). Only GET
-`/api/track/*` is served publicly; write endpoints enforce origin/referrer
-validation where appropriate.
+CORS for tracking is handled separately from the credentialed API by
+`trackingCors.js`, which covers `/api/track/*`, `/api/v1/track/*`, and the public
+`/api/v1/analytics/count` endpoint (including preflight). Customer-site origins are
+checked against the project's `allowed_origins` where a project identifier is present,
+and never receive credentials; dashboard origins are the only credentialed clients.
 
 ## Security boundaries
 

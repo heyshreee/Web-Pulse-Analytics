@@ -61,6 +61,7 @@ Fill in the minimum required values:
 | `PORT` | Backend port | `5000` |
 | `JWT_SECRET` | Long, random string for signing JWTs | `openssl rand -base64 32` |
 | `FRONTEND_URL` | URL where the primary dashboard runs | `http://localhost:5173` |
+| `FRONTEND_URLS` | Comma-separated trusted browser origins (marketing, V1, V2) | `http://localhost:5173,http://localhost:5174` |
 | `SUPABASE_URL` | Your Supabase project URL | `https://<ref>.supabase.co` |
 | `SUPABASE_SERVICE_KEY` | Supabase service_role key (server-side only) | `<service-role-key>` |
 
@@ -82,6 +83,7 @@ cp apps/v2/.env.example apps/v2/.env
 | Variable | What it is | Example |
 | --- | --- | --- |
 | `VITE_API_URL` | Backend API base | `http://localhost:5000/api` |
+| `VITE_SOCKET_URL` | Explicit Socket.IO origin (optional) | `http://localhost:5000` |
 | `VITE_SUPABASE_URL` | Supabase URL (public) | `https://<ref>.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon key (public) | `<anon-key>` |
 | `VITE_APP_URL` | Dashboard URL used by marketing redirects (marketing only) | `http://localhost:5173` |
@@ -200,9 +202,9 @@ restrictions, and event tracking.
 
 | Symptom | Check |
 | --- | --- |
-| CORS errors from tracking | `FRONTEND_URL` in backend, and the page's origin. Tracking CORS is handled per-route. |
+| CORS errors from tracking | Add the page's origin to the project's `allowed_origins`. Tracking CORS is handled separately in `backend/src/middleware/trackingCors.js`. |
 | JWT/auth failures | `JWT_SECRET` set and consistent; cookies/credentials allowed. |
-| Socket.IO disconnected | Check `VITE_API_URL`, the Socket.IO origin allowlist in `backend/src/server.js`, and CSP `connect-src`. |
+| Socket.IO disconnected | Check `VITE_API_URL`/`VITE_SOCKET_URL`, the `FRONTEND_URLS` allowlist in `backend/src/config/origins.js`, and CSP `connect-src`. |
 | Supabase connection fails | `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` correct; no network restrictions. |
 | Empty analytics | Ensure the tracking script is loaded and events are POSTing to `/api/track`. |
 | Port 5173 conflict | V1 and V2 both default to 5173; stop one or override the port. |

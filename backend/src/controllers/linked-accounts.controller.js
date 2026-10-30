@@ -4,6 +4,18 @@ import TelegramService from '../services/telegram.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
+// Integration credentials stay server-side. Never return stored bot tokens to
+// the browser, even to the user who supplied them.
+const sanitizeLinkedAccounts = (accounts = {}) => {
+    const safe = {};
+    for (const [platform, value] of Object.entries(accounts || {})) {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+        const { bot_token, ...publicFields } = value;
+        safe[platform] = publicFields;
+    }
+    return safe;
+};
+
 export const getLinkedAccounts = asyncHandler(async (req, res) => {
     const { data, error } = await supabase
         .from('users')
@@ -12,7 +24,7 @@ export const getLinkedAccounts = asyncHandler(async (req, res) => {
         .single();
 
     if (error) throw error;
-    res.json(data.linked_accounts || {});
+    res.json(sanitizeLinkedAccounts(data.linked_accounts));
 });
 
 export const linkTelegram = asyncHandler(async (req, res) => {
@@ -60,13 +72,16 @@ export const linkTelegram = asyncHandler(async (req, res) => {
 
     if (error) throw error;
 
+    // A delivery failure must not roll back a link that was already saved.
     await TelegramService.send(
         chat_id,
-        'Welcome to OBS Tracker! Your Telegram account has been successfully linked.',
+        'Welcome to WebPulse Analytics! Your Telegram account has been successfully linked.',
         bot_token
-    );
+    ).catch((error) => {
+        console.error('[linked-accounts] Telegram welcome message failed:', error.message);
+    });
 
-    res.json({ success: true, linked_accounts: newData });
+    res.json({ success: true, linked_accounts: sanitizeLinkedAccounts(newData) });
 });
 
 export const unlinkAccount = asyncHandler(async (req, res) => {
@@ -95,7 +110,7 @@ export const unlinkAccount = asyncHandler(async (req, res) => {
         if (error) throw error;
     }
 
-    res.json({ success: true, linked_accounts: existing });
+    res.json({ success: true, linked_accounts: sanitizeLinkedAccounts(existing) });
 });
 
 export default { getLinkedAccounts, linkTelegram, unlinkAccount };
