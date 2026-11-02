@@ -47,7 +47,7 @@ const createApp = () => {
             'https://accounts.google.com',
             'https://*.googleapis.com',
             'https://api.ipify.org',
-            'http://ip-api.com',
+            'https://ipwho.is',
             'https://ipapi.co',
           ],
         },
@@ -102,7 +102,8 @@ const createApp = () => {
     return apiCors(req, res, next);
   });
 
-  app.use(express.json());
+  // Body size cap — a large payload must never be buffered in memory.
+  app.use(express.json({ limit: '100kb' }));
 
   // Routes
   app.use('/api/v1', v1Routes);
