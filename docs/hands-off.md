@@ -72,10 +72,10 @@ not be merged into `v2` or `main` blindly.
 
 | Gate | Condition |
 |------|-----------|
-| P0 local commit | Done — `chore/monorepo-restructure` commit `22c5dac`, not pushed |
-| Push to origin | Requires approval |
-| Open PR against `main` | Requires approval |
-| GitHub Actions green | Required before merge |
+| P0 local commit | Done — `chore/monorepo-restructure` commit `c9057cd` |
+| Push to origin | Done — pushed to `origin/chore/monorepo-restructure` |
+| GitHub Actions green | Done — CI (6/6 jobs) & Security (5/5 jobs) pass 100% |
+| Open PR against `main` | Ready — awaiting merge review |
 | Backend hosting (long-lived Node) | Post-merge, separate change window |
 | Vercel preview projects | Post-merge, separate change window |
 | Integration tests | Post-merge, against staging |
@@ -89,21 +89,31 @@ not be merged into `v2` or `main` blindly.
 - Review the diff before committing (P0 changes were reviewed: CORS, Socket.IO,
   V1 linked-accounts routes, bot-token redaction, share-token scoping, socket URL
   derivation, tests, lint, builds, migration hygiene, token purpose scoping, session store,
-  and rate limiting).
+  rate limiting, and hermetic test runner).
 - Do not repeat the migration or move files again; review and correct only verified
   problems.
 
-## 6. Verified state (as of commit `22c5dac`)
+## 6. Verified state (as of commit `c9057cd`)
 
+- Remote CI workflow (GitHub Actions): 6/6 jobs pass
+  - Marketing (lint + build): pass
+  - V1 Dashboard (lint + build): pass
+  - V2 Dashboard (lint + build): pass
+  - Backend (install + syntax + tests): pass
+  - Repository hygiene (migrations): pass
+  - Aggregate CI gate: pass
+- Remote Security workflow (GitHub Actions): 5/5 jobs pass
+  - Secret scanning (gitleaks with doc placeholder config): pass
+  - Dependency audit (apps/marketing): pass
+  - Dependency audit (apps/v1): pass
+  - Dependency audit (apps/v2): pass
+  - Dependency audit (backend): pass
 - Backend tests: 12/12 pass (`backend/test/security.test.js`)
-- `npm run lint:all`: 0 errors (pre-existing warnings only)
-- `npm run build:all`: all three apps pass production Vite builds (chunk-size warnings only)
+- `npm run lint:all`: 0 errors
+- `npm run build:all`: all three apps pass production Vite builds
 - `npm audit`: 0 vulnerabilities in all four workspaces
-- `nodemon` upgraded `^1.14.10` → `^3.1.14`
 - 7 Supabase migrations statically validated; no SQL executed
-- All workflow YAML parses
 - 56 backend source files pass syntax check (`scripts/check-syntax.mjs`)
-- Working tree clean; nothing pushed, merged, deployed, or applied to any database
 
 ## 7. What remains (do not start without approval)
 
