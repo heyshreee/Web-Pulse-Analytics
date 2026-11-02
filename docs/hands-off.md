@@ -72,7 +72,7 @@ not be merged into `v2` or `main` blindly.
 
 | Gate | Condition |
 |------|-----------|
-| P0 local commit | Done — `chore/monorepo-restructure` commit `c9057cd` |
+| P0 local commit | Done — `chore/monorepo-restructure` commit `4c228f1` |
 | Push to origin | Done — pushed to `origin/chore/monorepo-restructure` |
 | GitHub Actions green | Done — CI (6/6 jobs) & Security (5/5 jobs) pass 100% |
 | Open PR against `main` | Ready — awaiting merge review |
@@ -93,7 +93,7 @@ not be merged into `v2` or `main` blindly.
 - Do not repeat the migration or move files again; review and correct only verified
   problems.
 
-## 6. Verified state (as of commit `c9057cd`)
+## 6. Verified state (as of commit `4c228f1`)
 
 - Remote CI workflow (GitHub Actions): 6/6 jobs pass
   - Marketing (lint + build): pass
