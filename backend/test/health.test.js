@@ -9,6 +9,9 @@ process.env.JWT_SECRET = 'test-only-secret';
 process.env.SUPABASE_URL = 'https://example.supabase.co';
 process.env.SUPABASE_SERVICE_KEY = 'test-only-service-key';
 process.env.FRONTEND_URL = 'http://localhost:5173';
+process.env.RESEND_API_KEY = 'test-only-resend-key';
+process.env.RAZORPAY_KEY_ID = 'test-only-razorpay-id';
+process.env.RAZORPAY_KEY_SECRET = 'test-only-razorpay-secret';
 
 test('backend boots and serves health + 404 responses', async (t) => {
   const { default: createApp } = await import('../src/app.js');

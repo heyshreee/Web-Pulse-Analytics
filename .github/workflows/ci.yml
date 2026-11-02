@@ -184,6 +184,15 @@ jobs:
 
       - name: Run tests
         working-directory: backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-only-secret
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SERVICE_KEY: test-only-service-key
+          RESEND_API_KEY: test-only-resend-key
+          RAZORPAY_KEY_ID: test-only-razorpay-id
+          RAZORPAY_KEY_SECRET: test-only-razorpay-secret
+          FRONTEND_URL: http://localhost:5173
         run: npm test
 
   repo:

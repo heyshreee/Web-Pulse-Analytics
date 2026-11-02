@@ -2,7 +2,15 @@ import { Resend } from 'resend';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+const sendEmail = async (options) => {
+    if (!resend) {
+        console.warn('[EmailService] RESEND_API_KEY not configured, skipping email delivery.');
+        return { data: { id: 'mock-id' }, error: null };
+    }
+    return sendEmail(options);
+};
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 const FRONTEND_URL = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
 
@@ -47,7 +55,7 @@ class EmailService {
                 <p style="margin-top: 20px; font-size: 13px; color: #888888;">Reply to the sender directly at ${esc(email)}.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to,
                 reply_to: email,
@@ -85,7 +93,7 @@ class EmailService {
                 <p>We're here to help. If you have any questions, feel free to visit our Help Center.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Welcome to OBS Tracker! Please Verify Your Email',
@@ -117,7 +125,7 @@ class EmailService {
                 <p>If you did not request a password reset, you can safely ignore this email. Your account remains secure.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Action Required: Reset Your OBS Tracker Password',
@@ -162,7 +170,7 @@ class EmailService {
                 <p>Thank you for your business,</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: `Payment Successful: Receipt for Transaction ${transactionId}`,
@@ -202,7 +210,7 @@ class EmailService {
                 <p>If you believe this is an error, we recommend contacting your bank or financial institution for more information.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Action Required: Payment Failed for your OBS Tracker Account',
@@ -250,7 +258,7 @@ class EmailService {
                 <p>Your security is our top priority.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Security Alert: New Sign-in to Your OBS Tracker Account',
@@ -284,7 +292,7 @@ class EmailService {
                 <p>For your protection, we recommend using a strong, unique password.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Security Alert: Your OBS Tracker Password Has Been Changed',
@@ -326,7 +334,7 @@ class EmailService {
                 <p>Please note that this link may expire after a certain period. You can always generate a new report from your dashboard.</p>
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: `Your OBS Tracker Report is Ready: ${reportName}`,
@@ -358,7 +366,7 @@ class EmailService {
                 ${EmailService.getButton('Manage Subscription', `${FRONTEND_URL}/dashboard/settings`)}
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Your Plan Has Been Updated - OBS Tracker',
@@ -388,7 +396,7 @@ class EmailService {
                 ${EmailService.getButton('Manage Subscription', `${FRONTEND_URL}/dashboard/settings`)}
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: `Receipt for Transaction ${transactionId}`,
@@ -425,7 +433,7 @@ class EmailService {
                 ${EmailService.getButton('Go to Dashboard', `${FRONTEND_URL}/dashboard`)}
             `);
 
-            const { data, error } = await resend.emails.send({
+            const { data, error } = await sendEmail({
                 from: FROM_EMAIL,
                 to: email,
                 subject: 'Welcome to OBS Tracker!',
