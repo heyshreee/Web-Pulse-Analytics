@@ -36,6 +36,15 @@ function ConsoleRedirect({ target = '/login' }) {
     return <Navigate to="/" replace />;
 }
 
+/**
+ * Redirect handler for Legacy V1 dashboard requests.
+ */
+function V1Redirect() {
+    const v1Url = import.meta.env.VITE_V1_APP_URL || 'http://localhost:5173';
+    window.location.assign(v1Url);
+    return null;
+}
+
 function App() {
     return (
         <ErrorBoundary>
@@ -79,6 +88,7 @@ function App() {
                             <Route path="/login" element={<ConsoleRedirect target="/login" />} />
                             <Route path="/register" element={<ConsoleRedirect target="/register" />} />
                             <Route path="/dashboard/*" element={<ConsoleRedirect target="/dashboard" />} />
+                            <Route path="/v1/*" element={<V1Redirect />} />
 
                             {/* Fallback 404 */}
                             <Route path="*" element={<NotFound />} />
