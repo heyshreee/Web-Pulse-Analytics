@@ -75,6 +75,8 @@ not be merged into `v2` or `main` blindly.
 | P0 local commit | Done — `chore/monorepo-restructure` commit `4c228f1` |
 | Push to origin | Done — pushed to `origin/chore/monorepo-restructure` |
 | GitHub Actions green | Done — CI (6/6 jobs) & Security (5/5 jobs) pass 100% |
+| Branch hygiene | Done — 8 obsolete remote Dependabot branches and obsolete local branches removed; exact 7 release branches preserved |
+| Deployment history cleanup | Done — 270 stale preview/backend deployments purged; 3 active production baselines preserved |
 | Open PR against `main` | Ready — awaiting merge review |
 | Backend hosting (long-lived Node) | Post-merge, separate change window |
 | Vercel preview projects | Post-merge, separate change window |
@@ -93,8 +95,10 @@ not be merged into `v2` or `main` blindly.
 - Do not repeat the migration or move files again; review and correct only verified
   problems.
 
-## 6. Verified state (as of commit `4c228f1`)
+## 6. Verified state (as of commit `4c228f1` / cleanup completion)
 
+- GitHub Deployment history: 270 stale/preview deployments deleted; 3 active production baselines preserved (Production – web-pulse-analytics-v1 [ID 7204342064], Production – web-pulse-analytics [ID 7007260845], Production [ID 4280298323])
+- Git branch audit: Cleaned 8 obsolete remote Dependabot branches and obsolete local branches; exact 7 canonical branches remain (`main`, `chore/monorepo-restructure`, `v1`, `v1-dev`, `v2`, `v2-dev`, `development`)
 - Remote CI workflow (GitHub Actions): 6/6 jobs pass
   - Marketing (lint + build): pass
   - V1 Dashboard (lint + build): pass
@@ -117,12 +121,11 @@ not be merged into `v2` or `main` blindly.
 
 ## 7. What remains (do not start without approval)
 
-1. Push `chore/monorepo-restructure` to `origin` and open a PR against `main`.
-2. Confirm GitHub Actions results (including the `repo` migration-hygiene job).
-3. Backend hosting on a long-lived Node host.
-4. Vercel preview projects for all three apps.
-5. Integration tests against staging.
-6. Supabase migration review against a staging project (static; no production run).
+1. Open PR `chore/monorepo-restructure` against `main` and complete review.
+2. Backend hosting setup on a long-lived Node 22 host (Railway / Render / Fly / VPS).
+3. Vercel preview projects for `apps/marketing`, `apps/v1`, and `apps/v2`.
+4. Integration tests against staging environment.
+5. Supabase migration review against a staging project (static verification; no production execution).
 
 ## 8. Escalation
 
