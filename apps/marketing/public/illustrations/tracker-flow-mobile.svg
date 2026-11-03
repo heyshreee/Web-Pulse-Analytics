@@ -1,0 +1,139 @@
+<svg viewBox="0 0 440 780" width="440" height="780" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tfmTitle">
+  <title id="tfmTitle">Two script tags on a website reach the WebPulse tracker, which sends page views, sessions, custom events, referrers, devices and location to the dashboard</title>
+
+  <defs>
+    <marker id="tfmArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#A78BFA" fill-opacity="0.75"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    .tfm-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .tfm-march { stroke-dasharray: 5 9; animation: tfmMarch 1.4s linear infinite; }
+    @keyframes tfmMarch { to { stroke-dashoffset: -28; } }
+
+    .tfm-travel { animation: tfmTravel 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+    @keyframes tfmTravel {
+      0%   { transform: translate(0, 0); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translate(0, 34px); opacity: 0; }
+    }
+    .tfm-d1 { animation-delay: -0.1s; }
+    .tfm-d2 { animation-delay: -1.1s; }
+    .tfm-d3 { animation-delay: -0.6s; }
+    .tfm-d4 { animation-delay: -1.7s; }
+
+    .tfm-row { animation: tfmRow 0.7s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+    @keyframes tfmRow { from { opacity: 0; transform: translateX(10px); } }
+    .tfm-r1 { animation-delay: 0.15s; }
+    .tfm-r2 { animation-delay: 0.28s; }
+    .tfm-r3 { animation-delay: 0.41s; }
+    .tfm-r4 { animation-delay: 0.54s; }
+    .tfm-r5 { animation-delay: 0.67s; }
+    .tfm-r6 { animation-delay: 0.8s; }
+
+    .tfm-pulse { transform-box: fill-box; transform-origin: center; animation: tfmPulse 2.6s ease-out infinite; }
+    @keyframes tfmPulse {
+      0%   { transform: scale(0.8); opacity: 0.5; }
+      70%  { transform: scale(1.45); opacity: 0; }
+      100% { transform: scale(1.45); opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tfm-march, .tfm-row, .tfm-pulse { animation: none !important; }
+      .tfm-travel { animation: none !important; opacity: 0 !important; }
+    }
+  </style>
+
+  <text x="30" y="36" font-size="13" font-weight="600" letter-spacing="2.4" fill="#64748B">YOUR SITE</text>
+  <text x="30" y="300" font-size="13" font-weight="600" letter-spacing="2.4" fill="#64748B">TRACKER</text>
+  <text x="30" y="468" font-size="13" font-weight="600" letter-spacing="2.4" fill="#64748B">EVENTS ARRIVING</text>
+
+  <!-- Browser card -->
+  <g>
+    <rect x="30" y="52" width="380" height="196" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.18"/>
+    <path d="M30 88h380" stroke="#94A3B8" stroke-opacity="0.16"/>
+    <circle cx="52" cy="70" r="3.4" fill="#94A3B8" fill-opacity="0.5"/>
+    <circle cx="66" cy="70" r="3.4" fill="#94A3B8" fill-opacity="0.5"/>
+    <circle cx="80" cy="70" r="3.4" fill="#94A3B8" fill-opacity="0.5"/>
+    <rect x="106" y="59" width="182" height="22" rx="11" fill="#94A3B8" fill-opacity="0.1"/>
+    <text x="118" y="74" font-size="12" fill="#94A3B8">your-site.com</text>
+
+    <rect x="50" y="104" width="340" height="128" rx="12" fill="#8B5CF6" fill-opacity="0.08" stroke="#8B5CF6" stroke-opacity="0.24"/>
+    <text x="66" y="132" font-size="12" class="tfm-mono" fill="#C4B5FD">&lt;script src="api.webpulse.app/track.js"&gt;</text>
+    <text x="66" y="158" font-size="12" class="tfm-mono" fill="#C4B5FD">tracker('init', 'YOUR_TRACKING_ID')</text>
+    <text x="66" y="184" font-size="12" class="tfm-mono" fill="#C4B5FD">tracker('track', 'page_view')</text>
+    <text x="66" y="212" font-size="12" class="tfm-mono" fill="#64748B">// no build step, no dependencies</text>
+  </g>
+
+  <!-- Connector 1 -->
+  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfmArrow)">
+    <line x1="220" y1="248" x2="220" y2="306" class="tfm-march"/>
+  </g>
+  <g fill="#48E6A1">
+    <circle class="tfm-travel tfm-d1" cx="220" cy="254" r="3.4"/>
+    <circle class="tfm-travel tfm-d2" cx="220" cy="254" r="3.4"/>
+  </g>
+
+  <!-- Tracker -->
+  <g>
+    <circle cx="74" cy="364" r="26" fill="none" stroke="#8B5CF6" stroke-opacity="0.45" class="tfm-pulse"/>
+    <rect x="30" y="312" width="380" height="104" rx="18" fill="#101522" stroke="#8B5CF6" stroke-opacity="0.32"/>
+    <rect x="52" y="342" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.4"/>
+    <g transform="translate(63,353) scale(0.83)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>
+    </g>
+    <text x="112" y="358" font-size="15" font-weight="600" fill="#E2E8F0">WebPulse tracker</text>
+    <text x="112" y="380" font-size="12.5" fill="#64748B">dependency-free function</text>
+  </g>
+
+  <!-- Connector 2 -->
+  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfmArrow)">
+    <line x1="220" y1="416" x2="220" y2="474" class="tfm-march"/>
+  </g>
+  <g fill="#48E6A1">
+    <circle class="tfm-travel tfm-d3" cx="220" cy="422" r="3.4"/>
+    <circle class="tfm-travel tfm-d4" cx="220" cy="422" r="3.4"/>
+  </g>
+
+  <!-- Events -->
+  <g>
+    <rect x="30" y="480" width="380" height="280" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.18"/>
+    <circle cx="56" cy="512" r="4.5" fill="#48E6A1"/>
+    <text x="72" y="517" font-size="12" font-weight="600" letter-spacing="1.6" fill="#48E6A1">RECEIVING EVENTS</text>
+
+    <g class="tfm-row tfm-r1">
+      <circle cx="64" cy="556" r="9" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M60 556.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="86" y="561" font-size="14" fill="#CBD5E1">Page views</text>
+    </g>
+    <g class="tfm-row tfm-r2">
+      <circle cx="64" cy="590" r="9" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M60 590.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="86" y="595" font-size="14" fill="#CBD5E1">Sessions</text>
+    </g>
+    <g class="tfm-row tfm-r3">
+      <circle cx="64" cy="624" r="9" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M60 624.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="86" y="629" font-size="14" fill="#CBD5E1">Custom events</text>
+    </g>
+    <g class="tfm-row tfm-r4">
+      <circle cx="64" cy="658" r="9" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M60 658.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="86" y="663" font-size="14" fill="#CBD5E1">Referrers</text>
+    </g>
+    <g class="tfm-row tfm-r5">
+      <circle cx="64" cy="692" r="9" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M60 692.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="86" y="697" font-size="14" fill="#CBD5E1">Devices</text>
+    </g>
+    <g class="tfm-row tfm-r6">
+      <circle cx="64" cy="726" r="9" fill="#48E6A1" fill-opacity="0.14"/>
+      <path d="M60 726.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="86" y="731" font-size="14" fill="#CBD5E1">Location</text>
+    </g>
+  </g>
+</svg>

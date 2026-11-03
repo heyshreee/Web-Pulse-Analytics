@@ -1,0 +1,20 @@
+# Normalize line endings for all text files and keep binaries untouched.
+# This repository is developed on Windows and Linux; LF in the index keeps
+# diffs stable regardless of the local platform.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg text eol=lf
+*.mp4 binary
+*.webm binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary

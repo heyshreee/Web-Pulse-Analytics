@@ -2,10 +2,13 @@ import express from 'express';
 const router = express.Router();
 import projectController from '../../controllers/project.controller.js';
 import visitorController from '../../controllers/visitor.controller.js';
+import trackingCors from '../../middleware/trackingCors.js';
 import auth from '../../middleware/auth.js';
 
-// Public Analytics (Standard SaaS API)
-router.get('/count', visitorController.getEventCount);
+// Public Analytics (Standard SaaS API). Customer sites call this with an
+// x-api-key header, so it uses the public, non-credentialed CORS policy.
+router.options('/count', trackingCors);
+router.get('/count', trackingCors, visitorController.getEventCount);
 
 router.use(auth);
 

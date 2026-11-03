@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://obs-real-time-tracker.vercel.app/sitemap.xml

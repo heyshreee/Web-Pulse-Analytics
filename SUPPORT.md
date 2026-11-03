@@ -13,7 +13,8 @@ Redact secrets and any real visitor data from logs and screenshots.
 
 Open a **feature request** with the
 [issue form](https://github.com/heyshreee/Web-Pulse-Analytics/issues/new?template=feature_request.yml).
-Note whether it targets the stable line (`v1-stabilization`) or new UI work (`v2-ui`).
+Note whether it targets the V1 line (`v1`/`v1-dev`), the V2 line
+(`v2`/`v2-dev`), or shared tooling (`development`).
 
 ## I have a question about using the product
 

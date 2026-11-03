@@ -1,13 +1,54 @@
 import supabase from '../config/supabase.js';
 import bcrypt from 'bcryptjs';
-import { generateToken } from '../utils/jwt.js';
+import { generateToken, generateResetToken, verifyToken, TOKEN_PURPOSE } from '../utils/jwt.js';
 import { validateEmail, validatePassword } from '../utils/validators.js';
 import EmailService from '../services/email.service.js';
 import { logAction } from '../services/audit.service.js';
 import ActivityLogService from '../services/activity.service.js';
-import jwt from 'jsonwebtoken';
+import sessionService from '../services/session.service.js';
+import { getClientIp } from '../utils/ip.js';
+import { randomUUID } from 'crypto';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
+
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (matches JWT TTL)
+
+/**
+ * Issues a session: a signed JWT carrying purpose=session and a unique jti,
+ * plus the server-side row that makes it revocable.
+ */
+const issueSession = async (user, req) => {
+    const tokenId = randomUUID();
+    const token = generateToken(user.id, { tokenId });
+
+    await sessionService.createSession({
+        userId: user.id,
+        tokenId,
+        purpose: sessionService.SESSION_PURPOSE.SESSION,
+        userAgent: req.headers['user-agent'] || null,
+        ip: getClientIp(req),
+        expiresAt: new Date(Date.now() + SESSION_MAX_AGE_MS).toISOString()
+    });
+
+    return token;
+};
+
+const setSessionCookie = (res, token) => {
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: SESSION_MAX_AGE_MS
+    });
+};
+
+const publicUser = (user) => ({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    plan: user.plan,
+    avatar_url: user.avatar_url
+});
 
 export const register = asyncHandler(async (req, res) => {
     const { email, password, name } = req.body;
@@ -64,7 +105,6 @@ export const register = asyncHandler(async (req, res) => {
     // Send Verification Email
     await EmailService.sendVerificationEmail(newUser.email, otpCode);
 
-    // Do NOT send token yet
     res.status(201).json({
         requireVerification: true,
         email: newUser.email,
@@ -81,12 +121,17 @@ export const login = asyncHandler(async (req, res) => {
         .eq('email', email)
         .single();
 
-    if (!user) {
-        throw AppError.unauthorized('Invalid credentials');
+    // Compare against a dummy hash when the account does not exist so the
+    // response time does not reveal which addresses are registered.
+    let isMatch = false;
+    try {
+        const hash = user?.password_hash || '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+        isMatch = await bcrypt.compare(password, hash);
+    } catch {
+        isMatch = false;
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
+    if (!user || !isMatch) {
         throw AppError.unauthorized('Invalid credentials');
     }
 
@@ -94,14 +139,14 @@ export const login = asyncHandler(async (req, res) => {
         return res.status(403).json({ error: 'Email not verified', requireVerification: true, email: user.email });
     }
 
-    const token = generateToken(user.id);
+    const token = await issueSession(user, req);
 
     // Audit Log
     await logAction(user.id, 'USER_LOGIN');
 
     // Activity Log
     await ActivityLogService.log(
-        null, // No specific project for login
+        null,
         user.id,
         'auth.login',
         `User logged in: ${user.email}`,
@@ -111,8 +156,7 @@ export const login = asyncHandler(async (req, res) => {
             resource: '/auth/login',
             http_method: 'POST',
             http_status: 200,
-            user_agent: req.headers['user-agent'],
-            plan: user.plan
+            user_agent: req.headers['user-agent']
         }
     );
 
@@ -120,50 +164,39 @@ export const login = asyncHandler(async (req, res) => {
     const loginDetails = {
         time: new Date().toLocaleString(),
         ip: req.ip,
-        location: 'Unknown Location', // GeoIP lookup would go here
+        location: 'Unknown Location',
         device: req.headers['user-agent']
     };
-    // Don't await to avoid blocking response
     EmailService.sendNewLoginEmail(user.email, loginDetails, user.name || 'User').catch(console.error);
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
+    setSessionCookie(res, token);
 
-    res.json({
-        token,
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            avatar_url: user.avatar_url
-        }
-    });
+    // Deliver session token via HttpOnly cookie for web browsers, and return
+    // in payload for clients and mobile/API consumers.
+    res.json({ token, user: publicUser(user) });
 });
 
-export const logout = (req, res) => {
+export const logout = asyncHandler(async (req, res) => {
+    // Revoke the session server-side so the token stops working even if it
+    // was copied out of the browser before sign-out.
+    if (req.tokenId) {
+        await sessionService.revokeSessionByTokenId(req.user.id, req.tokenId);
+    }
     res.clearCookie('token');
     res.json({ message: 'Logged out successfully' });
-};
+});
 
 export const getMe = async (req, res) => {
     res.json(req.user);
 };
 
 export const verifyEmail = asyncHandler(async (req, res) => {
-    console.log('Verify Email Request Body:', req.body);
-    const { code, email } = req.body; // Email is needed to find user if not authenticated
+    const { code, email } = req.body;
 
     if (!code || code.length !== 6) {
         throw AppError.badRequest('Invalid code format');
     }
 
-    // Find user by email (if provided) or if we had a temporary session (not applicable here as we don't issue token)
-    // We need email from frontend
     if (!email) {
         throw AppError.badRequest('Email is required');
     }
@@ -174,20 +207,22 @@ export const verifyEmail = asyncHandler(async (req, res) => {
         .eq('email', email)
         .single();
 
+    // A single generic failure for "no such account" and "wrong code" — the
+    // endpoint must not be usable to discover which addresses are registered.
     if (!user) {
-        throw AppError.notFound('User not found');
+        throw AppError.badRequest('Invalid or expired verification code');
     }
 
     if (user.is_verified) {
-        return res.json({ success: true, message: 'Email already verified' });
+        return res.json({ success: true, message: 'Email verified successfully' });
     }
 
     if (user.otp_code !== code) {
-        throw AppError.badRequest('Invalid verification code');
+        throw AppError.badRequest('Invalid or expired verification code');
     }
 
     if (new Date(user.otp_expires_at) < new Date()) {
-        throw AppError.badRequest('Verification code expired');
+        throw AppError.badRequest('Invalid or expired verification code');
     }
 
     // Verify User
@@ -200,30 +235,18 @@ export const verifyEmail = asyncHandler(async (req, res) => {
         })
         .eq('id', user.id);
 
-    // Generate Token and Login
-    const token = generateToken(user.id);
+    const token = await issueSession(user, req);
 
-    // Send Welcome Email NOW (after verification)
+    // Send Welcome Email
     await EmailService.sendWelcomeEmail(user.email, user.name || 'User');
 
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
+    setSessionCookie(res, token);
 
     res.json({
         success: true,
         message: 'Email verified successfully',
         token,
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            avatar_url: user.avatar_url
-        }
+        user: publicUser(user)
     });
 });
 
@@ -240,12 +263,9 @@ export const resendVerification = asyncHandler(async (req, res) => {
         .eq('email', email)
         .single();
 
-    if (!user) {
-        throw AppError.notFound('User not found');
-    }
-
-    if (user.is_verified) {
-        return res.json({ success: true, message: 'Email already verified' });
+    // Generic response if account not found or already verified, preventing user enumeration
+    if (!user || user.is_verified) {
+        return res.json({ success: true, message: 'If an unverified account exists, a verification code was sent.' });
     }
 
     // Generate OTP
@@ -271,35 +291,72 @@ export const resendVerification = asyncHandler(async (req, res) => {
 
 export const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
-    // Check if user exists
-    const { data: user } = await supabase.from('users').select('id').eq('email', email).single();
+    const { data: user } = await supabase.from('users').select('id, email, name').eq('email', email).maybeSingle();
 
     if (!user) {
-        throw AppError.notFound('No account found with this email address');
+        // Return same success message so existence is not revealed
+        return res.json({
+            success: true,
+            message: 'If an account exists for that address, a reset link is on its way.'
+        });
     }
 
-    // Generate reset token (JWT or random string)
-    const resetToken = generateToken(user.id); // Short lived token
+    // Generate single-use reset token and store in session store
+    const resetTokenId = randomUUID();
+    const resetToken = generateResetToken(user.id, { tokenId: resetTokenId });
+
+    await sessionService.createSession({
+        userId: user.id,
+        tokenId: resetTokenId,
+        purpose: sessionService.SESSION_PURPOSE.PASSWORD_RESET,
+        userAgent: req.headers['user-agent'] || null,
+        ip: getClientIp(req),
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
+    });
+
     const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
     const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-    await EmailService.sendPasswordResetEmail(email, resetLink);
+    await EmailService.sendPasswordResetEmail(user.email, resetLink, user.name || 'User');
 
-    res.json({ success: true, message: 'Reset link sent to your email.' });
+    res.json({
+        success: true,
+        message: 'If an account exists for that address, a reset link is on its way.'
+    });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-    const { token, password } = req.body;
+    const { token, password } = req.body || {};
 
     if (!token) {
         throw AppError.badRequest('Token is required');
     }
 
+    if (!validatePassword(password)) {
+        throw AppError.badRequest('Password must be at least 6 characters');
+    }
+
     // Verify token
     let decoded;
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
+        decoded = verifyToken(token);
     } catch (err) {
+        throw AppError.badRequest('Invalid or expired token');
+    }
+
+    if (decoded.purpose !== TOKEN_PURPOSE.PASSWORD_RESET) {
+        throw AppError.badRequest('Invalid or expired token');
+    }
+
+    // Single-use validation via session store
+    const resetRecord = await sessionService.getSession(decoded.jti);
+    const usable =
+        resetRecord &&
+        resetRecord.purpose === sessionService.SESSION_PURPOSE.PASSWORD_RESET &&
+        !resetRecord.revoked_at &&
+        (!resetRecord.expires_at || new Date(resetRecord.expires_at) > new Date());
+
+    if (!usable) {
         throw AppError.badRequest('Invalid or expired token');
     }
 
@@ -313,29 +370,37 @@ export const resetPassword = asyncHandler(async (req, res) => {
         .from('users')
         .update({
             password_hash: passwordHash,
-            is_verified: true // Auto-verify since they have email access
+            is_verified: true
         })
         .eq('id', userId);
 
     if (error) throw error;
 
+    // Burn the reset token and revoke all active sessions
+    await sessionService.revokeSessionByTokenId(userId, decoded.jti);
+    await sessionService.revokeAllSessions(userId);
+
     // Audit Log
     await logAction(userId, 'USER_PASSWORD_RESET');
 
     // Send Password Changed Email
+    const { data: user } = await supabase
+        .from('users')
+        .select('email, name')
+        .eq('id', userId)
+        .maybeSingle();
+
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
-    EmailService.sendPasswordChangedEmail(decoded.email || 'User', date, time, 'User').catch(console.error);
+    EmailService.sendPasswordChangedEmail(user?.email || 'User', date, time, user?.name || 'User').catch(console.error);
 
     res.json({ success: true, message: 'Password reset successfully' });
 });
 
 export const googleLogin = asyncHandler(async (req, res) => {
-    console.log('Google Login Request Body:', req.body);
     const { token } = req.body;
 
     if (!token) {
-        console.log('Token missing in request');
         throw AppError.badRequest('Token required');
     }
 
@@ -345,17 +410,13 @@ export const googleLogin = asyncHandler(async (req, res) => {
     });
 
     if (!response.ok) {
-        console.log('Google UserInfo failed:', response.status, response.statusText);
         throw AppError.unauthorized('Invalid Google token');
     }
 
     const googleUser = await response.json();
-    console.log('Google User Info:', googleUser);
-
     const { email, name, sub: googleId, picture: avatar } = googleUser;
 
     if (!email) {
-        console.log('Email missing in Google User Info');
         throw AppError.badRequest('Email required from Google');
     }
 
@@ -367,12 +428,10 @@ export const googleLogin = asyncHandler(async (req, res) => {
         .single();
 
     if (user) {
-        // Update google_id if missing
         if (!user.google_id) {
             await supabase.from('users').update({ google_id: googleId, is_verified: true }).eq('id', user.id);
         }
 
-        // Send New Login Email for existing users
         const loginDetails = {
             time: new Date().toLocaleString(),
             ip: req.ip,
@@ -381,7 +440,6 @@ export const googleLogin = asyncHandler(async (req, res) => {
         };
         EmailService.sendNewLoginEmail(user.email, loginDetails, user.name || 'User').catch(console.error);
     } else {
-        // Create new user
         const { data: newUser, error } = await supabase
             .from('users')
             .insert({
@@ -389,9 +447,9 @@ export const googleLogin = asyncHandler(async (req, res) => {
                 name,
                 google_id: googleId,
                 avatar_url: avatar,
-                is_verified: true, // Google emails are verified
+                is_verified: true,
                 plan: 'free',
-                password_hash: 'google_auth' // Placeholder
+                password_hash: 'google_auth'
             })
             .select()
             .single();
@@ -399,29 +457,14 @@ export const googleLogin = asyncHandler(async (req, res) => {
         if (error) throw error;
         user = newUser;
 
-        // Send Welcome Email for new Google users
         await EmailService.sendWelcomeEmail(user.email, user.name || 'User');
     }
 
-    const jwtToken = generateToken(user.id);
+    const jwtToken = await issueSession(user, req);
 
-    res.cookie('token', jwtToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-    });
+    setSessionCookie(res, jwtToken);
 
-    res.json({
-        token: jwtToken,
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            plan: user.plan,
-            avatar_url: user.avatar_url
-        }
-    });
+    res.json({ token: jwtToken, user: publicUser(user) });
 });
 
 export default { register, login, logout, getMe, verifyEmail, resendVerification, forgotPassword, resetPassword, googleLogin };

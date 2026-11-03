@@ -1,19 +1,53 @@
 version: 2
 updates:
-  # Frontend (React + Vite)
+  # Marketing website (React + Vite)
   - package-ecosystem: npm
-    directory: /frontend
+    directory: /apps/marketing
     schedule:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
     labels:
       - dependencies
-      - frontend
+      - marketing
     commit-message:
       prefix: 'chore(deps)'
     groups:
-      frontend-minor-patch:
+      marketing-minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+
+  # V1 dashboard (React + Vite)
+  - package-ecosystem: npm
+    directory: /apps/v1
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - v1
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      v1-minor-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+
+  # V2 dashboard (React + Vite)
+  - package-ecosystem: npm
+    directory: /apps/v2
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - v2
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      v2-minor-patch:
         patterns: ['*']
         update-types: ['minor', 'patch']
 

@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, development, v1, v2]
+    branches: [main, development, marketing, v1, v1-dev, v2, v2-dev, chore/monorepo-restructure]
   pull_request:
-    branches: [main, development, v1, v2]
+    branches: [main, development, marketing, v1, v1-dev, v2, v2-dev, chore/monorepo-restructure]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -14,46 +14,153 @@ permissions:
   contents: read
 
 jobs:
-  frontend:
-    name: Frontend (lint + build)
+  marketing:
+    name: Marketing (lint + build)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check workspace exists
+        id: check_workspace
+        run: |
+          if [ -f "apps/marketing/package.json" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node
+        if: steps.check_workspace.outputs.present == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: apps/marketing/package-lock.json
 
       - name: Install dependencies
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/marketing
         run: npm ci
 
       - name: Lint
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/marketing
         run: npm run lint
 
       - name: Build (production)
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/marketing
         run: npm run build
 
       - name: Upload build artifact
+        if: steps.check_workspace.outputs.present == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-dist
-          path: frontend/dist
+          name: marketing-dist
+          path: apps/marketing/dist
+          retention-days: 7
+          if-no-files-found: error
+
+  v1:
+    name: V1 Dashboard (lint + build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check workspace exists
+        id: check_workspace
+        run: |
+          if [ -f "apps/v1/package.json" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.check_workspace.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/v1/package-lock.json
+
+      - name: Install dependencies
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v1
+        run: npm ci
+
+      - name: Lint
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v1
+        run: npm run lint
+
+      - name: Build (production)
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v1
+        run: npm run build
+
+      - name: Upload build artifact
+        if: steps.check_workspace.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: v1-dist
+          path: apps/v1/dist
+          retention-days: 7
+          if-no-files-found: error
+
+  v2:
+    name: V2 Dashboard (lint + build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check workspace exists
+        id: check_workspace
+        run: |
+          if [ -f "apps/v2/package.json" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.check_workspace.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/v2/package-lock.json
+
+      - name: Install dependencies
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v2
+        run: npm ci
+
+      - name: Lint
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v2
+        run: npm run lint
+
+      - name: Build (production)
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v2
+        run: npm run build
+
+      - name: Upload build artifact
+        if: steps.check_workspace.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-dist
+          path: apps/v2/dist
           retention-days: 7
           if-no-files-found: error
 
   backend:
     name: Backend (install + syntax + tests)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,23 +173,62 @@ jobs:
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
+        working-directory: backend
         run: npm ci
 
       - name: Syntax check all source files
-        run: find src -name '*.js' -print0 | xargs -0 -n1 node --check
-
-      - name: Run tests (if a real test script exists)
         run: |
-          if grep -q '"test"' package.json && ! grep -q 'no test specified' package.json; then
-            npm test
+          if [ -f "scripts/check-syntax.mjs" ]; then
+            node scripts/check-syntax.mjs backend/src
+          fi
+
+      - name: Run tests
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-only-secret
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SERVICE_KEY: test-only-service-key
+          RESEND_API_KEY: test-only-resend-key
+          RAZORPAY_KEY_ID: test-only-razorpay-id
+          RAZORPAY_KEY_SECRET: test-only-razorpay-secret
+          FRONTEND_URL: http://localhost:5173
+        run: npm test
+
+  repo:
+    name: Repository hygiene (migrations)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate migration files (no SQL executed)
+        run: |
+          if [ -f "scripts/check-migrations.mjs" ]; then
+            node scripts/check-migrations.mjs
           else
-            echo "No test script configured yet — skipping."
+            echo "Migration checker not present on this branch; skipping."
           fi
 
   ci:
     name: CI
-    needs: [frontend, backend]
+    needs: [marketing, v1, v2, backend, repo]
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: All required checks passed
-        run: echo "Frontend and backend checks passed."
+        run: |
+          if [ "${{ needs.marketing.result }}" = "failure" ] || \
+             [ "${{ needs.v1.result }}" = "failure" ] || \
+             [ "${{ needs.v2.result }}" = "failure" ] || \
+             [ "${{ needs.backend.result }}" = "failure" ] || \
+             [ "${{ needs.repo.result }}" = "failure" ]; then
+            echo "One or more required checks failed."
+            exit 1
+          fi
+          echo "All active workspace checks passed."

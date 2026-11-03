@@ -1,28 +1,29 @@
-# WebPulse Analytics v2.0
+# WebPulse Analytics
 
 <p align="center">
-  <img src="frontend/public/logo.png" alt="WebPulse Analytics Logo" width="80" height="80" />
+  <img src="apps/marketing/public/logo.png" alt="WebPulse Analytics Logo" width="80" height="80" />
 </p>
 
-<h3 align="center">Next-Generation Real-Time Web Telemetry & Visitor Analytics</h3>
+<h3 align="center">Privacy-Friendly Real-Time Web Telemetry & Analytics Platform</h3>
 
 <p align="center">
-  A privacy-focused, high-performance web analytics platform engineered for modern web applications.<br />
+  A high-performance web analytics platform engineered for modern web applications.<br />
   Track live visitors, page performance, and custom telemetry events with zero hassle.
 </p>
 
 <p align="center">
   <a href="https://github.com/heyshreee/Web-Pulse-Analytics/releases"><img src="https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat-square" alt="Version 2.0.0" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/ci.yml?branch=development&style=flat-square&label=CI" alt="CI Status" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/security.yml?branch=development&style=flat-square&label=Security" alt="Security Status" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/codeql.yml?branch=development&style=flat-square&label=CodeQL" alt="CodeQL" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT%20(Jan%2017%2C%202026)-green.svg?style=flat-square" alt="License MIT" /></a>
+  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status" /></a>
+  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/security.yml?branch=main&style=flat-square&label=Security" alt="Security Status" /></a>
+  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/codeql.yml?branch=main&style=flat-square&label=CodeQL" alt="CodeQL" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License MIT" /></a>
   <a href="https://github.com/heyshreee/Web-Pulse-Analytics/issues"><img src="https://img.shields.io/github/issues/heyshreee/Web-Pulse-Analytics?style=flat-square" alt="Open Issues" /></a>
 </p>
 
 ---
 
-> **Current Release:** **Version 2.0** is the active, production-ready release of WebPulse Analytics. It brings a completely overhauled design system, a 3D interactive data network globe, 15+ comprehensive dashboard modules, additive Supabase SQL aggregations with 11 custom RPCs, and dual-layer resilient querying.
+> [!NOTE]
+> **Monorepo Architecture:** The repository is organized into distinct applications under `apps/` (`marketing`, `v1`, `v2`) and the shared `backend/` API. Existing branches (`main`, `development`, `v1`, `v1-dev`, `v2`, `v2-dev`) are preserved intact. Each app installs and builds independently; there are no root npm workspaces. The backend requires a long-lived Node.js host with WebSocket support and is **not** deployed to Vercel. See the [Monorepo Migration Guide](docs/migration-monorepo.md) and [Deployment Guide](docs/deployment.md).
 
 ---
 
@@ -174,17 +175,27 @@ WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for s
    SUPABASE_SERVICE_KEY=your_supabase_service_role_key
    ```
 
-3. **Configure Frontend Environment:**
+3. **Configure Frontend Environments:**
+   Configure environment files for whichever applications you are developing:
    ```bash
-   cd ../frontend
-   cp .env.example .env
+   # Marketing site
+   cp apps/marketing/.env.example apps/marketing/.env
+
+   # V1 Dashboard
+   cp apps/v1/.env.example apps/v1/.env
+
+   # V2 Dashboard
+   cp apps/v2/.env.example apps/v2/.env
    ```
-   Edit `frontend/.env`:
+   Each application `.env` exposes only variables starting with `VITE_`:
    ```env
-   VITE_API_URL=http://localhost:5000
+   VITE_API_URL=http://localhost:5000/api
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
+   `VITE_API_URL` accepts a bare backend origin (`http://localhost:5000`), an `/api`
+   base, or a full `/api/v1` base. The examples use `/api` because the dev proxy and
+   production configs are easiest to reason about that way.
 
 ### Database Migrations
 
@@ -201,27 +212,40 @@ supabase db push
 # 4. 20261001000004_analytics_functions.sql
 # 5. 20261001000005_rls_security.sql
 # 6. 20261008000001_fix_security_and_performance_linter.sql
+# 7. 20261020000001_user_sessions.sql
 ```
 
 > **Note:** Database migrations are never executed automatically by CI/CD workflows to prevent accidental production downtime.
 
-### Running the Services
+### Running Applications
 
-1. **Install and run the Backend:**
-   ```bash
-   cd backend
-   npm install
-   npm run dev
-   ```
-   The API server will listen on `http://localhost:5000`.
+The repository root includes convenient scripts to run each application independently:
 
-2. **Install and run the Frontend:**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-   The Vite development server will open on `http://localhost:5173`.
+```bash
+# Run the Backend API server (http://localhost:5000)
+npm run dev:backend
+
+# Run the Marketing Website (http://localhost:5174)
+npm run dev:marketing
+
+# Run the Stable V1 Dashboard (http://localhost:5173)
+npm run dev:v1
+
+# Run the V2 Dashboard (http://localhost:5173)
+npm run dev:v2
+
+# Build all applications for production
+npm run build:all
+
+# Build specific applications
+npm run build:marketing
+npm run build:v1
+npm run build:v2
+```
+
+> V1 and V2 both default to port `5173`, so run one dashboard at a time unless you
+> override the port (`npm --prefix apps/v1 run dev -- --port 5175`). The marketing site
+> is on `5174` and can run alongside either dashboard.
 
 ---
 
@@ -340,34 +364,49 @@ For complete request/response schemas, refer to the [API Reference](docs/api-ref
 
 ```
 Web-Pulse-Analytics/
+├── apps/
+│   ├── marketing/            # Canonical Public Website (Landing, Docs, Pricing, Blog)
+│   │   ├── public/           # Static assets, branding, and SVG illustrations
+│   │   ├── src/
+│   │   │   ├── components/   # Marketing & landing components (Hero, Features, Shell)
+│   │   │   ├── pages/        # Public pages (Landing, Pricing, Features, Docs, Legal)
+│   │   │   └── App.jsx
+│   │   ├── package.json      # webpulse-marketing
+│   │   └── vite.config.js
+│   │
+│   ├── v1/                   # Stable V1 Dashboard Application
+│   │   ├── src/
+│   │   │   ├── components/   # V1 project tabs, WorldMap, and modals
+│   │   │   ├── pages/        # V1 dashboard, projects, billing, settings
+│   │   │   └── App.jsx
+│   │   ├── package.json      # webpulse-v1
+│   │   └── vite.config.js
+│   │
+│   └── v2/                   # Modern V2 Dashboard Application
+│       ├── src/
+│       │   ├── components/   # V2 App Shell, modular UI kit, and settings
+│       │   ├── pages/        # V2 metrics views (Visitors, Sessions, Events, Geo)
+│       │   ├── styles/       # Design system tokens (theme.css, app.css)
+│       │   └── App.jsx
+│       ├── package.json      # webpulse-v2
+│       └── vite.config.js
+│
 ├── backend/                  # Node.js & Express 5 API Server
 │   ├── src/
 │   │   ├── config/           # Environment and third-party service configs
 │   │   ├── controllers/      # Route request handlers
-│   │   ├── errors/           # Centralized AppError classes
-│   │   ├── middlewares/      # Auth, CORS, Helmet, Rate Limiter, Error handling
+│   │   ├── middlewares/      # Auth, CORS, Helmet, Rate Limiter, CSRF
 │   │   ├── routes/           # REST route definitions (v1 + track)
 │   │   ├── services/         # Business logic (analytics, email, payments)
 │   │   ├── socket/           # Socket.IO visitor streaming setup
 │   │   └── utils/            # Shared utilities (crypto, IP, formatters)
 │   └── package.json
-├── frontend/                 # React 19 + Vite Single-Page Application
-│   ├── public/               # Static assets, branding, and icons
-│   ├── src/
-│   │   ├── components/       # Reusable UI primitives, App Shell, & Modals
-│   │   │   └── ui/           # Unified v2 UI kit (Button, Card, DataTable, etc.)
-│   │   ├── context/          # React Contexts (Theme, Toast, Project)
-│   │   ├── hooks/            # Custom application hooks
-│   │   ├── lib/              # Dual data service client (dataService.js)
-│   │   ├── pages/            # 36+ Route views (Dashboard, Marketing, Auth)
-│   │   ├── styles/           # Design system tokens (theme.css, app.css)
-│   │   └── utils/            # API client and formatting helpers
-│   └── package.json
-├── supabase/                 # Supabase PostgreSQL Migrations
-│   └── migrations/           # 6 Versioned SQL migration scripts
+├── supabase/                 # Supabase PostgreSQL Migrations (applied manually)
+│   └── migrations/           # 7 Versioned SQL migration scripts
 ├── docs/                     # Detailed architectural and user guides
 ├── .github/                  # CI/CD Workflows, security scans, and templates
-├── LICENSE                   # MIT License (Created Jan 17, 2026)
+├── package.json              # Convenience scripts (no root npm workspaces)
+├── LICENSE                   # MIT License
 └── README.md                 # Project documentation
 ```
 
@@ -377,8 +416,9 @@ Web-Pulse-Analytics/
 
 Deep dive into the architecture, deployment, and security of WebPulse Analytics:
 
+- 📋 [Monorepo Migration Guide](docs/migration-monorepo.md) — Architecture mapping, verification results, and Vercel checklist.
 - 📖 [Getting Started Guide](docs/getting-started.md) — Comprehensive local setup and configuration.
-- 🏗️ [Architecture Deep Dive](docs/architecture.md) — System design, data pipeline, and real-time streams.
+- 🏗️ [Architecture Deep Dive](docs/architecture.md) — System design, monorepo layout, and data pipelines.
 - 📡 [API Reference](docs/api-reference.md) — Full REST endpoint documentation and parameters.
 - 🔍 [Tracking Guide](docs/tracking-guide.md) — Client integration, bot protection, and custom events.
 - 💾 [Database Schema](docs/database-schema.md) — Supabase PostgreSQL schema, tables, and RPC functions.

@@ -1,11 +1,13 @@
 # Architecture
 
-Web Pulse Analytics is split into two parts: a React/Vite frontend and a Node.js/Express
-backend with Socket.IO. Data lives in Supabase (Postgres). The system is designed to be
-easily run locally and to keep the V1 release stable while V2 UI work is separate.
+Web Pulse Analytics is structured as a monorepo separating four distinct responsibilities:
+a standalone public marketing website (`apps/marketing`), a stable V1 dashboard (`apps/v1`),
+an advanced V2 dashboard (`apps/v2`), and a Node.js/Express backend (`backend`) with Socket.IO.
+Data lives in Supabase (Postgres). The repository is designed to let each application run,
+build, and deploy independently.
 
 - [High-level overview](#high-level-overview)
-- [Frontend architecture](#frontend-architecture)
+- [Monorepo application layout](#monorepo-application-layout)
 - [Backend architecture](#backend-architecture)
 - [Real-time (Socket.IO)](#real-time-socketio)
 - [Data model (Supabase)](#data-model-supabase)
@@ -19,45 +21,31 @@ easily run locally and to keep the V1 release stable while V2 UI work is separat
 ```
 Browser (site being tracked) ──▶ /api/track/:id ──┐
                                                 │
-Dashboard (SPA) ──▶ REST /api/v1/* ──► Backend │
-                ▲                          (Express)  │
-                └────────── WebSocket ◀── Socket.IO◀┘
+Marketing (apps/marketing) ──▶ Static Site      │
+                                                │
+V1 Dashboard (apps/v1) ──────▶ REST /api/v1/* ──► Backend │
+                                                │ (Express)
+V2 Dashboard (apps/v2) ──────▶ REST /api/v1/* ──►         │
+                ▲                                         │
+                └────────── WebSocket ◀── Socket.IO◀──────┘
                                     │
                                   Supabase
                                    (Postgres)
 ```
 
-The frontend is a Vite SPA with React Router, React Context for auth/theme/projects,
-Recharts/Leaflet for visualizations, and `socket.io-client` for live updates.
+## Monorepo application layout
 
-The backend is an Express 5 API with routers mounted under `/api/v1` and a public
-tracking router under `/api/track`. Middleware enforces CORS (tracking-specific),
-CSRF (on non-GET `/api/v1` where applicable), Helmet security headers, and
-rate limiting on abuse-prone routes. Supabase is accessed server-side via the service
-role key.
+1. **`apps/marketing/`**: The canonical public website (landing page, product features, pricing,
+   blog, documentation rail, security disclosure, legal policies, community, and help center).
+2. **`apps/v1/`**: The stable V1 console and analytics dashboard.
+3. **`apps/v2/`**: The modern V2 dashboard featuring the App Shell design system, 15+ metrics
+   modules, interactive 3D globe visualizations, and session telemetry.
+4. **`backend/`**: Express 5 API supporting both V1 and V2 consoles, background cron jobs,
+   payment processing, email/telegram dispatch, and tracking event ingestion. The backend
+   is a long-lived Node.js process, not a serverless function.
 
-## Frontend architecture
-
-Key folders (`frontend/src/`):
-
-- `components/` — reusable UI primitives, shell (header/sidebar), dashboard widgets,
-  form elements, overlays
-- `pages/` — route-level views (Dashboard, Visitors, Sessions, Geography, Projects,
-  Billing, API Keys, Docs, Landing, etc)
-- `context/` — React Context providers (Theme, Toast, Project)
-- `lib/` — data service and helpers (`dataService.js`)
-- `hooks/` — custom React hooks
-- `utils/` — API client and utilities
-- `styles/` — theme and app styles (`theme.css`, `app.css`)
-
-Tooling:
-
-- Vite 7.x, React 19, TypeScript-friendly JS
-- Tailwind CSS 3.x
-- ESLint (flat config) with React Hooks/Refresh rules
-- Recharts 3.x, react-globe.gl, Leaflet, Framer Motion, Socket.IO client
-
-Build: `npm run build` produces a static bundle in `frontend/dist/`. Lint: `npm run lint`.
+Each frontend application is an independent Vite SPA with its own `package.json`, `vite.config.js`,
+and production build (`npm run build` generates a standalone `dist/`).
 
 ## Backend architecture
 
@@ -84,7 +72,12 @@ mounts `/api/v1` and `/api/track`, health root, 404, and centralized error handl
 ## Real-time (Socket.IO)
 
 - Namespace/socket: initialized in `setupVisitorSocket(io)` (`socket/visitorSocket.js`).
-- CORS whitelist includes `FRONTEND_URL`, `localhost:5173`, and `obs-tracker.netlify.app/`.
+- `server.js` uses the shared allowlist in `config/origins.js` for Socket.IO CORS and for
+  `allowRequest`, which validates the `Origin` header on raw WebSocket upgrades. The list
+  is built from `FRONTEND_URLS`/`FRONTEND_URL` (plus localhost in development). If V1 and
+  V2 are deployed to **different** origins, both must be configured before cutover;
+  otherwise one dashboard will fail the WebSocket handshake even though its HTTP API
+  calls work.
 - Controllers can emit events via `global.io` when visitors are tracked or state changes.
 - Dashboard pages subscribe to socket events to refresh live visitor counts without polling.
 
@@ -114,13 +107,15 @@ Functions/triggers live in `20261001000004_analytics_functions.sql`.
 4. Socket.IO broadcasts live visitor updates to subscribed dashboard clients.
 5. Dashboard queries `/api/v1/analytics/*` for aggregated stats.
 
-CORS for the tracking endpoint is handled per-route (`trackingCors.js`). Only GET
-`/api/track/*` is served publicly; write endpoints enforce origin/referrer
-validation where appropriate.
+CORS for tracking is handled separately from the credentialed API by
+`trackingCors.js`, which covers `/api/track/*`, `/api/v1/track/*`, and the public
+`/api/v1/analytics/count` endpoint (including preflight). Customer-site origins are
+checked against the project's `allowed_origins` where a project identifier is present,
+and never receive credentials; dashboard origins are the only credentialed clients.
 
 ## Security boundaries
 
-- **Browser-exposed secrets**: only `VITE_*` in `frontend/.env`. Never expose service keys.
+- **Browser-exposed secrets**: only `VITE_*` in each app's `.env`. Never expose service keys.
 - **Server-only keys**: `SUPABASE_SERVICE_KEY`, `JWT_SECRET`, third-party secrets.
 - **CSRF**: applied to non-GET `/api/v1` routes except `/track` prefix (public ingest).
 - **CSP**: Helmet CSP allows required CDNs/sources (Supabase, OpenStreetMap tiles,
@@ -133,23 +128,32 @@ See [security.md](security.md) for a complete treatment.
 
 ## Deployment overview
 
-- **Frontend**: can be built (`npm run build`) and served as static files (Vercel/Netlify
-  or any CDN). Set `VITE_API_URL` to the deployed backend.
-- **Backend**: Node.js app (`npm start`) on a Node 22 host (Render, Railway, Fly, EC2).
-  Ensure `PORT`, `FRONTEND_URL`, Supabase creds, and JWT secret are set.
-- **Database**: Supabase project. Apply migrations manually (reviewed). Never let release
-  workflow auto-apply migrations.
+- **Frontends**: `apps/marketing`, `apps/v1`, and `apps/v2` are independent Vite SPAs.
+  Each builds to its own `dist/` and can be served from Vercel, Netlify, Cloudflare Pages,
+  or any static CDN. Set `VITE_API_URL` to the deployed backend (for example
+  `https://api.example.com/api`).
+- **Backend**: Node.js app (`npm start`) on a long-lived Node 22 host (Render, Railway,
+  Fly, EC2, or a VPS). It requires WebSocket support and persistent process behavior for
+  Socket.IO and the hourly notification cleanup job. Do **not** deploy it to Vercel
+  serverless functions.
+- **Database**: Supabase project. Apply migrations manually (reviewed). Never let the
+  release workflow auto-apply migrations.
 
 Environment variable parity between local and deployed is critical. See
 [deployment.md](deployment.md).
 
 ## Branching strategy
 
-| Branch | Role | Merge rules |
-| --- | --- | --- |
-| `main` | Stable release | PRs from `v1-stabilization` after review and CI pass |
-| `v1-stabilization` | Stabilize current V1 | Bug fixes and minimal hardenings; no large V2 UI changes |
-| `v2-ui` | New UI/design (V2) | Isolated redesign; must not merge into V1 lines |
-| `development` | Integration | Day-to-day work; target release lines via PR |
+The repository keeps the V1 and V2 source lines separate. Each app under `apps/` is an
+export of its corresponding branch; do not merge one app's source into the other.
+
+| Branch | Role |
+| --- | --- |
+| `main` | Stable integrated release (currently the V2 line) |
+| `development` | Integration branch for day-to-day work |
+| `v1` | Stable V1 release line |
+| `v1-dev` | V1 development |
+| `v2` | V2 release line |
+| `v2-dev` | V2 development |
 
 All changes require a PR, review, and passing CI. See [CONTRIBUTING.md](../CONTRIBUTING.md).

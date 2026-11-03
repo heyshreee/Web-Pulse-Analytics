@@ -5,19 +5,23 @@ import createApp from './app.js';
 import setupVisitorSocket from './socket/visitorSocket.js';
 import NotificationService from './services/notification.service.js';
 import { env } from './config/env.js';
+import { isAllowedOrigin } from './config/origins.js';
 
 const app = createApp();
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      'http://localhost:5173',
-      'https://obs-tracker.netlify.app/',
-      env.frontendUrl,
-    ].filter(Boolean),
+    origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
     methods: ['GET', 'POST'],
     credentials: true,
+  },
+  // CORS does not apply to raw WebSocket upgrades, so validate the Origin
+  // header for every transport as well.
+  allowRequest: (req, callback) => {
+    const origin = req.headers.origin;
+    if (!origin || isAllowedOrigin(origin)) return callback(null, true);
+    return callback('Origin not allowed', false);
   },
 });
 

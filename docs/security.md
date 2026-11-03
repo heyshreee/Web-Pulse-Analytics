@@ -60,8 +60,9 @@ Top concerns:
 - **Ingest**: `POST /api/track/:trackingId` accepts minimal JSON
 - **Validation**: payloads validated (`utils/validators.js`); reject malformed/oversized
   input where possible
-- **CORS**: dedicated `trackingCors.js` middleware (different from global CORS). Restricts
-  origins/referrers for browser-based requests
+- **CORS**: dedicated `trackingCors.js` middleware (different from API CORS). Dashboard
+  origins are the only credentialed clients; customer-site origins never receive
+  `Access-Control-Allow-Credentials`
 - **Origin/referrer checks**: enforced against project configuration
 - **Rate limiting**: applied to tracking endpoints to deter spam
 - **No PII**: design avoids collecting emails/names; see [tracking-guide.md](tracking-guide.md)
@@ -83,16 +84,18 @@ Review CSP `connect-src`, `img-src`, `script-src` when adding third-party integr
 
 | Control | Where | Notes |
 | --- | --- | --- |
-| **CSRF** | `middleware/csrf.js` + `routes/v1/index.js` | Applied to all non-GET `/api/v1` routes **except** paths starting with `/track`. Mutating requests must include CSRF token. |
-| **Global CORS** | `app.js` | Permissive with credentials (`origin: callback(null,true)` in the shown config) — acceptable if paired with auth + CSRF + tracking-specific CORS. Review if you restrict dashboard origins. |
-| **Tracking CORS** | `middleware/trackingCors.js` | Tighter rules for `/api/track/*` to prevent cross-site abuse. |
+| **CSRF** | `middleware/csrf.js` + `routes/v1/index.js` | Applied to all non-GET `/api/v1` routes **except** paths starting with `/track`. Mutating requests must include the `X-Requested-With` header. |
+| **Authenticated API CORS** | `app.js` + `config/origins.js` | Explicit allowlist with credentials. Built from `FRONTEND_URLS`/`FRONTEND_URL`; disallowed browser origins receive `403 CORS_ORIGIN_DENIED`. Never use wildcards or `*.vercel.app`. |
+| **Tracking CORS** | `middleware/trackingCors.js` | Separate public policy for `/api/track/*`, `/api/v1/track/*`, and the public `/api/v1/analytics/count` endpoint. Project origins are validated against `allowed_origins` where a project ID is present, and never receive credentials. |
+| **Socket.IO origins** | `server.js` + `config/origins.js` | Same allowlist as API CORS, enforced through both Socket.IO CORS and `allowRequest` for raw WebSocket upgrades. |
 | **Rate limiting** | `middleware/rateLimiter.js` + applied to tracking/auth-prone routes | Uses `express-rate-limit`. Configure stores/limits per environment. |
 
 ## Secrets and environment variables
 
 - **Never commit secrets**: `.env`, `.env.*`, keys, tokens excluded by `.gitignore`.
-- **Frontend**: only `VITE_*` exposed. Never put `SUPABASE_SERVICE_KEY`, `JWT_SECRET`,
-  OAuth secrets in frontend.
+- **Frontend apps**: only `VITE_*` values are exposed. Never put `SUPABASE_SERVICE_KEY`,
+  `JWT_SECRET`, OAuth secrets, or any other private key in `apps/marketing`, `apps/v1`,
+  or `apps/v2`.
 - **Backend validation**: `backend/src/config/env.js` reads `.env` and fails fast if
   required vars missing (`JWT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`).
 - **Rotation**: rotate `JWT_SECRET` and service keys with care (invalidates sessions).
@@ -131,12 +134,13 @@ See `.env.example` files for the full list.
 ## Dependency management
 
 - **npm ci** in CI with lockfiles ensures reproducible installs.
-- **Dependabot**: runs weekly for npm (frontend/backend) and GitHub Actions
-  (`.github/dependabot.yml`). Creates grouped minor/patch PRs.
+- **Dependabot**: runs weekly for npm (`apps/marketing`, `apps/v1`, `apps/v2`, `backend`)
+  and GitHub Actions (`.github/dependabot.yml`). Creates grouped minor/patch PRs.
 - **Dependency review**: `.github/workflows/dependency-review.yml` fails PRs introducing
   dependencies with known high/critical vulnerabilities.
-- **npm audit**: `security.yml` runs `npm audit --omit=dev --audit-level=high` for both
-  workspaces on push/PR/schedule.
+- **npm audit**: `security.yml` runs `npm audit --omit=dev --audit-level=high` for all
+  four workspaces (`apps/marketing`, `apps/v1`, `apps/v2`, `backend`) on
+  push/PR/schedule.
 - **CodeQL**: static analysis for JavaScript/TypeScript on push/PR/schedule.
 
 Review and merge dependency PRs promptly, especially security-related ones.

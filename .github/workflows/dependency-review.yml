@@ -2,7 +2,7 @@ name: Dependency Review
 
 on:
   pull_request:
-    branches: [main, development, v1, v2]
+    branches: [main, development, marketing, v1, v1-dev, v2, v2-dev, chore/monorepo-restructure]
 
 permissions:
   contents: read

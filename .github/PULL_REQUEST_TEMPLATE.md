@@ -11,7 +11,9 @@
 
 <!-- Tick everything that applies. -->
 
-- [ ] Frontend (dashboard / marketing / docs UI)
+- [ ] Marketing site (`apps/marketing`)
+- [ ] V1 dashboard (`apps/v1`)
+- [ ] V2 dashboard (`apps/v2`)
 - [ ] Backend (API, Socket.IO, services)
 - [ ] Tracking (ingest endpoint, tracker script)
 - [ ] Analytics (aggregation, filters, metrics)
@@ -20,11 +22,12 @@
 
 ## Release line
 
-<!-- Keep V1 stable. V2 UI work must stay isolated. -->
+<!-- Keep V1 and V2 source separate. -->
 
-- [ ] V1 stabilization (`v1-stabilization`) — stabilizing the current release
-- [ ] V2 UI (`v2-ui`) — new interface work
-- [ ] Both / neither (tooling, docs)
+- [ ] V1 (`v1` / `v1-dev`) — stabilizing the current release
+- [ ] V2 (`v2` / `v2-dev`) — new interface work
+- [ ] Shared / integration (`development`) — tooling, docs, backend
+- [ ] Both / neither
 
 ## What changed
 
@@ -36,9 +39,11 @@
 
 <!-- Commands you ran and/or scenarios you verified. Do not write "not tested". -->
 
-- [ ] `cd frontend && npm run lint`
-- [ ] `cd frontend && npm run build`
-- [ ] `cd backend && npm start` (or `npm run dev`)
+- [ ] `npm run lint:all`
+- [ ] `npm run build:all`
+- [ ] `npm run check:backend`
+- [ ] `npm run test:backend`
+- [ ] `npm start --prefix backend` (or `npm run dev:backend`)
 - [ ] Manual check of the affected flow (describe below)
 
 <!-- Describe the manual verification and any edge cases. -->
