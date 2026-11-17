@@ -1,11 +1,10 @@
-# Deployment
+# Deployment & Infrastructure Guide
 
-This guide covers deploying Web Pulse Analytics in production. The repository contains
-three independent static frontends (`apps/marketing`, `apps/v1`, `apps/v2`), one
-long-lived Node.js backend, and Supabase Postgres migrations. Migrations are **never**
-auto-applied by CI or the release workflow.
+This guide covers deploying WebPulse Analytics across development, beta, and production environments. The repository contains three independent static frontends (`apps/marketing`, `apps/v1`, `apps/v2`), one long-lived Node.js backend (`backend`), and Supabase Postgres database migrations (`supabase`). Migrations are **never** auto-applied by CI, deployment workflows, or releases.
 
+- [Target Architecture & Branch Mapping](#target-architecture--branch-mapping)
 - [Architecture summary](#architecture-summary)
+- [Automated GitHub Actions Workflows](#automated-github-actions-workflows)
 - [Prerequisites](#prerequisites)
 - [1. Deploy the backend](#1-deploy-the-backend)
 - [2. Deploy the frontends](#2-deploy-the-frontends)
@@ -15,6 +14,44 @@ auto-applied by CI or the release workflow.
 - [6. Rollback](#6-rollback)
 - [7. Vercel migration checklist](#7-vercel-migration-checklist)
 - [8. Security checklist](#8-security-checklist)
+
+---
+
+## Target Architecture & Branch Mapping
+
+WebPulse Analytics utilizes a branch-driven, environment-segregated deployment lifecycle:
+
+| Deployment Branch | GitHub Environment | Target Component | Canonical Domain | Purpose |
+|---|---|---|---|---|
+| **`development`** | `development` | All apps (preview) | Ephemeral / Preview | Development testing and integration |
+| **`beta`** | `beta` | `apps/v2` (Beta Dashboard) | `https://beta.webpulseanalytics.tech` | Customer testing of next-generation features |
+| **`main`** | `production` | `apps/marketing`<br/>`apps/v1` (Stable Dashboard)<br/>`backend` | `https://webpulseanalytics.tech`<br/>`https://app.webpulseanalytics.tech`<br/>`https://api.webpulseanalytics.tech` | Live production service |
+
+> [!IMPORTANT]
+> **Product Hierarchy Guarantee**: `apps/v1` is the designated stable production dashboard. `apps/v2` is explicitly an opt-in Beta dashboard and must **never** be deployed into the `production` environment. The deployment workflows strictly enforce this guard.
+>
+> **Branch Constraint**: `main` is the GitHub default branch and sole deployment source for `production`. No separate `production` branch exists.
+>
+> For deep-dive architectural specifications, refer to:
+> - [GitHub Environments Configuration](github-environments.md)
+> - [Branching Strategy & Promotion Lifecycle](branching-strategy.md)
+> - [Rollback Procedures Runbook](rollback.md)
+
+---
+
+## Automated GitHub Actions Workflows
+
+Deployment is managed via enterprise GitHub Actions workflows located in `.github/workflows/`:
+
+- **`deploy.yml`**: Central orchestrator workflow triggered on pushes to `development`, `beta`, or `main`, or manually via `workflow_dispatch`. Evaluates branch targets and delegates to individual component workflows.
+- **`deploy-marketing.yml`**: Dedicated pipeline for `apps/marketing`. Builds and deploys to `webpulseanalytics.tech`. Restricted from deploying to `beta`.
+- **`deploy-v1.yml`**: Dedicated pipeline for `apps/v1`. Builds and deploys to `app.webpulseanalytics.tech`. Restricted from deploying to `beta`.
+- **`deploy-v2.yml`**: Dedicated pipeline for `apps/v2`. Builds and deploys to `beta.webpulseanalytics.tech`. Restricted from deploying to `production`.
+- **`deploy-backend.yml`**: Dedicated pipeline for `backend`. Runs Node 22 test suite and invokes persistent hosting hooks. Never deploys to serverless runtimes.
+
+All workflows follow a strict two-stage pattern:
+1. **Build Job**: Executes in a sandboxed runner with no GitHub Environment attached and zero credentials, generating static artifacts and output checksum digests.
+2. **Deploy Job**: Executes inside the targeted GitHub Environment (`development`, `beta`, or `production`), reading only the designated environment secrets, downloading verified build artifacts, and calling the deployment provider.
 
 ## Architecture summary
 

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
@@ -9,7 +9,8 @@ import { ThemeSync } from './context/ThemeContext';
 import { ProjectProvider } from './context/ProjectContext';
 import GoogleAuth from './components/GoogleAuth';
 import ExternalRedirect from './components/ExternalRedirect';
-import { isAuthenticated } from './utils/auth';
+import { isAuthenticated, setSession, clearSession } from './utils/auth';
+import { apiRequest } from './utils/api';
 
 const ShareReport = lazy(() => import('./pages/ShareReport'));
 const Login = lazy(() => import('./pages/Login'));
@@ -39,7 +40,47 @@ const GoogleCallback = lazy(() => import('./pages/GoogleCallback'));
 
 function PrivateRoute({ children }) {
   const location = useLocation();
-  if (!isAuthenticated()) {
+  const [checking, setChecking] = useState(!isAuthenticated());
+  const [authed, setAuthed] = useState(isAuthenticated());
+
+  useEffect(() => {
+    let isMounted = true;
+    if (authed) {
+      setChecking(false);
+      return;
+    }
+
+    // Seamless SSO session restoration: check if HttpOnly cookie session exists (e.g. from V1)
+    apiRequest('/auth/me')
+      .then((user) => {
+        if (isMounted && user && user.id) {
+          setSession();
+          setAuthed(true);
+        } else if (isMounted) {
+          clearSession();
+          setAuthed(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          clearSession();
+          setAuthed(false);
+        }
+      })
+      .finally(() => {
+        if (isMounted) setChecking(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authed]);
+
+  if (checking) {
+    return <GlobalLoader />;
+  }
+
+  if (!authed) {
     const returnUrl = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
   }

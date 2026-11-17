@@ -1,0 +1,187 @@
+name: Deploy Orchestrator
+
+on:
+  push:
+    branches:
+      - development
+      - beta
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target GitHub Environment'
+        required: true
+        type: choice
+        options:
+          - development
+          - beta
+          - production
+        default: 'development'
+      target:
+        description: 'Target Application to Deploy'
+        required: true
+        type: choice
+        options:
+          - all
+          - marketing
+          - v1
+          - v2
+          - backend
+        default: 'all'
+      dry_run:
+        description: 'Dry run (build and validate configuration without invoking provider)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || github.ref_name) }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve Deployment Targets
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.matrix.outputs.environment }}
+      deploy_marketing: ${{ steps.matrix.outputs.deploy_marketing }}
+      deploy_v1: ${{ steps.matrix.outputs.deploy_v1 }}
+      deploy_v2: ${{ steps.matrix.outputs.deploy_v2 }}
+      deploy_backend: ${{ steps.matrix.outputs.deploy_backend }}
+      dry_run: ${{ steps.matrix.outputs.dry_run }}
+    steps:
+      - name: Compute Target Matrix
+        id: matrix
+        run: |
+          EVENT="${{ github.event_name }}"
+          REF_NAME="${{ github.ref_name }}"
+          INPUT_ENV="${{ github.event.inputs.environment }}"
+          INPUT_TARGET="${{ github.event.inputs.target || 'all' }}"
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+
+          # Resolve environment:
+          # - main branch maps directly to production environment
+          # - beta branch maps directly to beta environment
+          # - development branch maps to development environment
+          # - manual dispatch uses the explicitly selected environment
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            ENV="$INPUT_ENV"
+          elif [ "$REF_NAME" = "main" ]; then
+            ENV="production"
+          elif [ "$REF_NAME" = "beta" ]; then
+            ENV="beta"
+          else
+            ENV="development"
+          fi
+
+          echo "environment=$ENV" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+
+          # Determine application targets based on architecture rules:
+          # - Production: marketing, v1, backend (V2 is NEVER deployed to production; V1 is stable)
+          # - Beta: v2 only (marketing, v1, backend are NOT deployed to beta)
+          # - Development: all apps preview
+
+          DEPLOY_MARKETING="false"
+          DEPLOY_V1="false"
+          DEPLOY_V2="false"
+          DEPLOY_BACKEND="false"
+
+          if [ "$ENV" = "production" ]; then
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "marketing" ]; then DEPLOY_MARKETING="true"; fi
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "v1" ]; then DEPLOY_V1="true"; fi
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "backend" ]; then DEPLOY_BACKEND="true"; fi
+            if [ "$INPUT_TARGET" = "v2" ]; then
+              echo "::error::Target 'v2' cannot be deployed to 'production'! V2 is strictly beta. Production dashboard is V1."
+              exit 1
+            fi
+          elif [ "$ENV" = "beta" ]; then
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "v2" ]; then DEPLOY_V2="true"; fi
+            if [ "$INPUT_TARGET" = "marketing" ] || [ "$INPUT_TARGET" = "v1" ] || [ "$INPUT_TARGET" = "backend" ]; then
+              echo "::error::Target '$INPUT_TARGET' cannot be deployed to 'beta'. Beta is reserved exclusively for the V2 Beta Dashboard."
+              exit 1
+            fi
+          else
+            # Development previews
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "marketing" ]; then DEPLOY_MARKETING="true"; fi
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "v1" ]; then DEPLOY_V1="true"; fi
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "v2" ]; then DEPLOY_V2="true"; fi
+            if [ "$INPUT_TARGET" = "all" ] || [ "$INPUT_TARGET" = "backend" ]; then DEPLOY_BACKEND="true"; fi
+          fi
+
+          echo "deploy_marketing=$DEPLOY_MARKETING" >> "$GITHUB_OUTPUT"
+          echo "deploy_v1=$DEPLOY_V1" >> "$GITHUB_OUTPUT"
+          echo "deploy_v2=$DEPLOY_V2" >> "$GITHUB_OUTPUT"
+          echo "deploy_backend=$DEPLOY_BACKEND" >> "$GITHUB_OUTPUT"
+
+          echo "=== WebPulse Deployment Resolution ==="
+          echo "Environment: $ENV"
+          echo "Marketing:   $DEPLOY_MARKETING"
+          echo "V1:          $DEPLOY_V1"
+          echo "V2:          $DEPLOY_V2"
+          echo "Backend:     $DEPLOY_BACKEND"
+          echo "Dry Run:     $DRY_RUN"
+
+  marketing:
+    name: Marketing
+    needs: resolve
+    if: needs.resolve.outputs.deploy_marketing == 'true'
+    uses: ./.github/workflows/deploy-marketing.yml
+    with:
+      environment: ${{ needs.resolve.outputs.environment }}
+      dry_run: ${{ needs.resolve.outputs.dry_run == 'true' }}
+    secrets: inherit
+
+  v1:
+    name: V1 (Stable)
+    needs: resolve
+    if: needs.resolve.outputs.deploy_v1 == 'true'
+    uses: ./.github/workflows/deploy-v1.yml
+    with:
+      environment: ${{ needs.resolve.outputs.environment }}
+      dry_run: ${{ needs.resolve.outputs.dry_run == 'true' }}
+    secrets: inherit
+
+  v2:
+    name: V2 (Beta)
+    needs: resolve
+    if: needs.resolve.outputs.deploy_v2 == 'true'
+    uses: ./.github/workflows/deploy-v2.yml
+    with:
+      environment: ${{ needs.resolve.outputs.environment }}
+      dry_run: ${{ needs.resolve.outputs.dry_run == 'true' }}
+    secrets: inherit
+
+  backend:
+    name: Backend API
+    needs: resolve
+    if: needs.resolve.outputs.deploy_backend == 'true'
+    uses: ./.github/workflows/deploy-backend.yml
+    with:
+      environment: ${{ needs.resolve.outputs.environment }}
+      dry_run: ${{ needs.resolve.outputs.dry_run == 'true' }}
+    secrets: inherit
+
+  orchestrator_summary:
+    name: Deployment Summary
+    needs: [resolve, marketing, v1, v2, backend]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate High-Level Summary
+        run: |
+          ENV="${{ needs.resolve.outputs.environment }}"
+          echo "## 📊 WebPulse Deployment Pipeline Status" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Pipeline Component | Target Environment | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Marketing Site** | \`$ENV\` | \`${{ needs.marketing.result || 'Skipped' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **V1 Stable Dashboard** | \`$ENV\` | \`${{ needs.v1.result || 'Skipped' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **V2 Beta Dashboard** | \`$ENV\` | \`${{ needs.v2.result || 'Skipped' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Backend API** | \`$ENV\` | \`${{ needs.backend.result || 'Skipped' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit: \`${{ github.sha }}\` on ref \`${{ github.ref }}\` (Triggered via \`${{ github.event_name }}\`)" >> "$GITHUB_STEP_SUMMARY"

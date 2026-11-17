@@ -6,9 +6,14 @@ export default function Logo({ to = '/', label = 'WebPulse', className = '' }) {
             <span className="relative flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden">
                 <img src="/logo-128.png" alt="WebPulse logo" width="40" height="40" decoding="async" className="h-full w-full object-cover" />
             </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">
-                {label}
-            </span>
+            <div className="flex items-center gap-1.5">
+                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 font-display">
+                    {label}
+                </span>
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                    Beta
+                </span>
+            </div>
         </Link>
     );
 }
