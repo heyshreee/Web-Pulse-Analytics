@@ -54,6 +54,12 @@ export default function MarketingNav() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Link
+            to="/beta"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-950/30 px-2.5 py-1.5 text-xs font-semibold text-violet-300 transition-colors hover:border-violet-500/50 hover:bg-violet-900/40 hover:text-white"
+          >
+            <span>Try V2 Beta</span>
+          </Link>
           <Link to="/login" className="mkt-btn mkt-btn-ghost mkt-btn-md">
             Log in
           </Link>
@@ -93,6 +99,12 @@ export default function MarketingNav() {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 border-t border-white/[0.07] pt-4">
+              <Link
+                to="/beta"
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-950/30 px-3 py-2 text-xs font-semibold text-violet-300 transition-colors hover:bg-violet-900/40 hover:text-white"
+              >
+                <span>Try V2 Beta</span>
+              </Link>
               <Link to="/login" className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full">
                 Log in
               </Link>
