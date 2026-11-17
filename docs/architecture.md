@@ -126,6 +126,22 @@ and never receive credentials; dashboard origins are the only credentialed clien
 
 See [security.md](security.md) for a complete treatment.
 
+## Production Domains & Architecture Mapping
+
+The production deployment routes to dedicated subdomains:
+
+| Purpose | Application | Production Domain | Local Development |
+| --- | --- | --- | ---: |
+| **Marketing** | `apps/marketing` | `https://webpulseanalytics.tech` | `http://localhost:5174` |
+| **Stable V1** | `apps/v1` | `https://app.webpulseanalytics.tech` | `http://localhost:5173` |
+| **Beta V2** | `apps/v2` | `https://beta.webpulseanalytics.tech` | `http://localhost:5175` |
+| **Backend API** | `backend` | `https://api.webpulseanalytics.tech` | `http://localhost:3000` |
+
+- **Marketing (`webpulseanalytics.tech`)**: Public-facing landing pages, documentation, blog, legal, and entry routes. User login and registration default to Stable V1 (`app.webpulseanalytics.tech`), with explicit Beta routes (`/beta`, `/beta/login`) leading to V2 (`beta.webpulseanalytics.tech`).
+- **Stable V1 (`app.webpulseanalytics.tech`)**: Canonical production analytics console using HttpOnly session cookie authentication.
+- **Beta V2 (`beta.webpulseanalytics.tech`)**: Optional Beta analytics dashboard with expanded metrics and modern telemetry.
+- **Backend (`api.webpulseanalytics.tech`)**: Centralized API with CORS allowing all `webpulseanalytics.tech` subdomains.
+
 ## Deployment overview
 
 - **Frontends**: `apps/marketing`, `apps/v1`, and `apps/v2` are independent Vite SPAs.
