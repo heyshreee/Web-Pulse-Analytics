@@ -48,6 +48,21 @@ test('development origins allow V1 (5173), Marketing (5174), and V2 (5175)', () 
   assert.equal(isAllowedOrigin('http://127.0.0.1:5175'), true);
 });
 
+test('production architecture origins allow Marketing, Stable V1, Beta V2, and Backend', () => {
+  const expectedOrigins = [
+    'https://webpulseanalytics.tech',
+    'https://www.webpulseanalytics.tech',
+    'https://app.webpulseanalytics.tech',
+    'https://beta.webpulseanalytics.tech',
+    'https://api.webpulseanalytics.tech',
+  ];
+  for (const origin of expectedOrigins) {
+    assert.ok(allowedOrigins.includes(origin), `allowedOrigins must include ${origin}`);
+    assert.equal(isAllowedOrigin(origin), true, `isAllowedOrigin must accept ${origin}`);
+    assert.equal(isAllowedOrigin(`${origin}/`), true, `isAllowedOrigin must accept ${origin}/ with trailing slash`);
+  }
+});
+
 test('credentialed CORS only reflects trusted origins', async (t) => {
   const base = await startServer(t);
 

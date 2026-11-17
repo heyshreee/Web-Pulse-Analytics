@@ -33,13 +33,16 @@ const issueSession = async (user, req) => {
     return token;
 };
 
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: SESSION_MAX_AGE_MS,
+    ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {})
+});
+
 const setSessionCookie = (res, token) => {
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: SESSION_MAX_AGE_MS
-    });
+    res.cookie('token', token, getCookieOptions());
 };
 
 const publicUser = (user) => ({
@@ -182,7 +185,8 @@ export const logout = asyncHandler(async (req, res) => {
     if (req.tokenId) {
         await sessionService.revokeSessionByTokenId(req.user.id, req.tokenId);
     }
-    res.clearCookie('token');
+    const { maxAge: _discard, ...clearOptions } = getCookieOptions();
+    res.clearCookie('token', clearOptions);
     res.json({ message: 'Logged out successfully' });
 });
 
@@ -314,7 +318,10 @@ export const forgotPassword = asyncHandler(async (req, res) => {
         expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
     });
 
-    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
+    const frontendUrl = (
+        process.env.FRONTEND_URL ||
+        (process.env.NODE_ENV === 'production' ? 'https://app.webpulseanalytics.tech' : 'http://localhost:5173')
+    ).replace(/\/$/, '');
     const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     await EmailService.sendPasswordResetEmail(user.email, resetLink, user.name || 'User');

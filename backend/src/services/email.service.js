@@ -12,7 +12,10 @@ const sendEmail = async (options) => {
     return sendEmail(options);
 };
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-const FRONTEND_URL = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
+const FRONTEND_URL = (
+    process.env.FRONTEND_URL ||
+    (process.env.NODE_ENV === 'production' ? 'https://app.webpulseanalytics.tech' : 'http://localhost:5173')
+).replace(/\/$/, '');
 
 class EmailService {
     static getBaseTemplate(content) {
