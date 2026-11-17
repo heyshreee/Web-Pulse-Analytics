@@ -23,25 +23,28 @@ const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 /**
- * Redirect handler for console / authentication routes when accessed
- * from the marketing site domain. Respects VITE_APP_URL if configured.
+ * Redirect handler for stable V1 console / authentication routes when accessed
+ * from the marketing site domain. Respects VITE_V1_APP_URL / VITE_APP_URL (default: http://localhost:5173).
+ * Preserves query parameters (?plan=..., ?returnUrl=...).
  */
-function ConsoleRedirect({ target = '/login' }) {
-    const appUrl = import.meta.env.VITE_APP_URL;
-    if (appUrl) {
-        window.location.assign(`${appUrl.replace(/\/$/, '')}${target}`);
-        return null;
-    }
-    // Fallback: redirect to landing if no external app URL configured
-    return <Navigate to="/" replace />;
+function V1Redirect({ target = '/dashboard' }) {
+    const v1Url = (import.meta.env.VITE_V1_APP_URL || import.meta.env.VITE_APP_URL || 'http://localhost:5173').replace(/\/+$/, '');
+    const search = typeof window !== 'undefined' ? window.location.search || '' : '';
+    const cleanTarget = target.startsWith('/') ? target : `/${target}`;
+    window.location.assign(`${v1Url}${cleanTarget}${search}`);
+    return null;
 }
 
 /**
- * Redirect handler for Legacy V1 dashboard requests.
+ * Redirect handler for optional V2 Beta console / authentication routes when accessed
+ * from the marketing site domain. Respects VITE_V2_APP_URL (default: http://localhost:5175).
+ * Preserves query parameters (?plan=..., ?returnUrl=...).
  */
-function V1Redirect() {
-    const v1Url = import.meta.env.VITE_V1_APP_URL || 'http://localhost:5173';
-    window.location.assign(v1Url);
+function V2BetaRedirect({ target = '/dashboard' }) {
+    const v2Url = (import.meta.env.VITE_V2_APP_URL || 'http://localhost:5175').replace(/\/+$/, '');
+    const search = typeof window !== 'undefined' ? window.location.search || '' : '';
+    const cleanTarget = target.startsWith('/') ? target : `/${target}`;
+    window.location.assign(`${v2Url}${cleanTarget}${search}`);
     return null;
 }
 
@@ -59,6 +62,8 @@ function App() {
                             <Route path="/pricing" element={<Pricing />} />
                             <Route path="/features" element={<Features />} />
                             <Route path="/blog" element={<Blog />} />
+                            <Route path="/about" element={<Navigate to="/community" replace />} />
+                            <Route path="/contact" element={<Navigate to="/help" replace />} />
                             <Route path="/community" element={<Community />} />
                             <Route path="/help" element={<HelpCenter />} />
                             <Route path="/security" element={<Security />} />
@@ -84,11 +89,23 @@ function App() {
                                 <Route path="security" element={<DocPage slug="security" />} />
                             </Route>
 
-                            {/* Console / Auth Handlers */}
-                            <Route path="/login" element={<ConsoleRedirect target="/login" />} />
-                            <Route path="/register" element={<ConsoleRedirect target="/register" />} />
-                            <Route path="/dashboard/*" element={<ConsoleRedirect target="/dashboard" />} />
-                            <Route path="/v1/*" element={<V1Redirect />} />
+                            {/* Primary Stable (V1) Console & Authentication Redirects */}
+                            <Route path="/login" element={<V1Redirect target="/login" />} />
+                            <Route path="/register" element={<V1Redirect target="/register" />} />
+                            <Route path="/dashboard" element={<V1Redirect target="/dashboard" />} />
+                            <Route path="/dashboard/*" element={<V1Redirect target="/dashboard" />} />
+
+                            {/* Explicit V1 Route Aliases */}
+                            <Route path="/v1/login" element={<V1Redirect target="/login" />} />
+                            <Route path="/v1/register" element={<V1Redirect target="/register" />} />
+                            <Route path="/v1" element={<V1Redirect target="/dashboard" />} />
+                            <Route path="/v1/*" element={<V1Redirect target="/dashboard" />} />
+
+                            {/* Optional Beta (V2) Console & Authentication Redirects */}
+                            <Route path="/beta/login" element={<V2BetaRedirect target="/login" />} />
+                            <Route path="/beta/register" element={<V2BetaRedirect target="/register" />} />
+                            <Route path="/beta" element={<V2BetaRedirect target="/dashboard" />} />
+                            <Route path="/beta/*" element={<V2BetaRedirect target="/dashboard" />} />
 
                             {/* Fallback 404 */}
                             <Route path="*" element={<NotFound />} />
