@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars -- `motion` is only used as a JSX member expression
 import { motion, useReducedMotion } from 'framer-motion';
 import { Mail, Lock, Loader2, User, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setSession } from '../utils/auth';
+import { setSession, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -21,7 +21,11 @@ export default function Register() {
     const [showVerification, setShowVerification] = useState(false);
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const location = useLocation();
     const reduceMotion = useReducedMotion();
+
+    const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl') || location.state?.from?.pathname);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,7 +52,7 @@ export default function Register() {
             // only keeps a non-sensitive flag that a session exists.
             setSession();
             showToast('Account created successfully!', 'success');
-            navigate('/dashboard');
+            navigate(returnUrl, { replace: true });
         } catch (err) {
             showToast(err.message, 'error');
         } finally {
@@ -70,7 +74,7 @@ export default function Register() {
 
                 setSession();
                 showToast('Account created successfully!', 'success');
-                navigate('/dashboard');
+                navigate(returnUrl, { replace: true });
             } catch (err) {
                 showToast(err.message || 'Google login failed', 'error');
                 setIsGoogleLoading(false);
@@ -99,7 +103,7 @@ export default function Register() {
                 {showVerification ? (
                     <OTPVerification
                         email={email}
-                        onSuccess={() => navigate('/dashboard')}
+                        onSuccess={() => navigate(returnUrl, { replace: true })}
                         onBack={() => setShowVerification(false)}
                     />
                 ) : (

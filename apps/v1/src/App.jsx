@@ -1,9 +1,10 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import Spinner from './components/Spinner';
 import ScrollToTop from './components/ScrollToTop';
+import ExternalRedirect from './components/ExternalRedirect';
 
 const ShareReport = lazy(() => import('./pages/ShareReport'));
 const Login = lazy(() => import('./pages/Login'));
@@ -15,19 +16,6 @@ const ProjectActivity = lazy(() => import('./pages/ProjectActivity'));
 const Billing = lazy(() => import('./pages/Billing'));
 const Settings = lazy(() => import('./pages/Settings'));
 const APIKeys = lazy(() => import('./pages/APIKeys'));
-const Landing = lazy(() => import('./pages/Landing'));
-const Pricing = lazy(() => import('./pages/Pricing'));
-const Blog = lazy(() => import('./pages/Blog'));
-const Legal = lazy(() => import('./pages/Legal'));
-const Features = lazy(() => import('./pages/Features'));
-const API = lazy(() => import('./pages/API'));
-const Integrations = lazy(() => import('./pages/Integrations'));
-const Security = lazy(() => import('./pages/Security'));
-const DocsLayout = lazy(() => import('./pages/docs/DocsLayout'));
-const DocsIndex = lazy(() => import('./pages/docs/DocsIndex'));
-const DocPage = lazy(() => import('./pages/docs/DocPage'));
-const Community = lazy(() => import('./pages/Community'));
-const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
@@ -40,7 +28,12 @@ import { isAuthenticated } from './utils/auth';
 import './App.css';
 
 function PrivateRoute({ children }) {
-    return isAuthenticated() ? children : <Navigate to="/login" />;
+    const location = useLocation();
+    if (!isAuthenticated()) {
+        const returnUrl = encodeURIComponent(location.pathname + location.search);
+        return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
+    }
+    return children;
 }
 
 function App() {
@@ -53,7 +46,10 @@ function App() {
                         <ThemeSync />
                         <Suspense fallback={<Spinner />}>
                             <Routes>
-                                {/* Public Routes */}
+                                {/* Root entry: redirect to dashboard */}
+                                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+                                {/* Technical Auth Routes */}
                                 <Route path="/share/:shareToken" element={<ShareReport />} />
                                 <Route path="/login" element={<GoogleAuth><Login /></GoogleAuth>} />
                                 <Route path="/register" element={<GoogleAuth><Register /></GoogleAuth>} />
@@ -62,9 +58,7 @@ function App() {
                                 <Route path="/reset-password" element={<ResetPassword />} />
                                 <Route path="/auth/google/callback" element={<GoogleAuth><GoogleCallback /></GoogleAuth>} />
 
-
-
-                                {/* Protected Routes wrapped in Layout */}
+                                {/* Protected V1 Dashboard Routes */}
                                 <Route element={<Layout />}>
                                     <Route
                                         path="/dashboard"
@@ -98,7 +92,6 @@ function App() {
                                             </PrivateRoute>
                                         }
                                     />
-
                                     <Route
                                         path="/dashboard/billing"
                                         element={
@@ -133,32 +126,23 @@ function App() {
                                     />
                                 </Route>
 
-                                <Route path="/" element={<Landing />} />
-                                <Route path="/pricing" element={<Pricing />} />
-                                <Route path="/blog" element={<Blog />} />
-                                <Route path="/features" element={<Features />} />
-                                <Route path="/api" element={<API />} />
-                                <Route path="/integrations" element={<Integrations />} />
-                                <Route path="/docs" element={<DocsLayout />}>
-                                    <Route index element={<DocsIndex />} />
-                                    <Route path="getting-started" element={<DocPage slug="getting-started" />} />
-                                    <Route path="tracking" element={<DocPage slug="tracking" />} />
-                                    <Route path="tracking/events" element={<DocPage slug="tracking-events" />} />
-                                    <Route path="api" element={<DocPage slug="api" />} />
-                                    <Route path="api/authentication" element={<DocPage slug="api-authentication" />} />
-                                    <Route path="api/events" element={<DocPage slug="api-events" />} />
-                                    <Route path="api/analytics" element={<DocPage slug="api-analytics" />} />
-                                    <Route path="javascript" element={<DocPage slug="javascript" />} />
-                                    <Route path="guides" element={<DocPage slug="guides" />} />
-                                    <Route path="guides/react" element={<DocPage slug="guide-react" />} />
-                                    <Route path="security" element={<DocPage slug="security" />} />
-                                </Route>
-                                <Route path="/community" element={<Community />} />
-                                <Route path="/help" element={<HelpCenter />} />
-                                <Route path="/security" element={<Security />} />
-                                <Route path="/privacy" element={<Legal type="privacy" />} />
-                                <Route path="/terms" element={<Legal type="terms" />} />
-                                <Route path="/cookies" element={<Legal type="cookies" />} />
+                                {/* Public Marketing Redirects to Canonical Marketing Site */}
+                                <Route path="/pricing" element={<ExternalRedirect to="/pricing" />} />
+                                <Route path="/blog" element={<ExternalRedirect to="/blog" />} />
+                                <Route path="/features" element={<ExternalRedirect to="/features" />} />
+                                <Route path="/about" element={<ExternalRedirect to="/about" />} />
+                                <Route path="/contact" element={<ExternalRedirect to="/contact" />} />
+                                <Route path="/api" element={<ExternalRedirect to="/api" />} />
+                                <Route path="/integrations" element={<ExternalRedirect to="/integrations" />} />
+                                <Route path="/docs/*" element={<ExternalRedirect />} />
+                                <Route path="/community" element={<ExternalRedirect to="/community" />} />
+                                <Route path="/help" element={<ExternalRedirect to="/help" />} />
+                                <Route path="/security" element={<ExternalRedirect to="/security" />} />
+                                <Route path="/privacy" element={<ExternalRedirect to="/privacy" />} />
+                                <Route path="/terms" element={<ExternalRedirect to="/terms" />} />
+                                <Route path="/cookies" element={<ExternalRedirect to="/cookies" />} />
+
+                                {/* Fallback 404 */}
                                 <Route path="*" element={<NotFound />} />
                             </Routes>
                         </Suspense>
