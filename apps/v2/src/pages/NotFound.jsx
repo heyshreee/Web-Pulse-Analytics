@@ -35,10 +35,10 @@ export default function NotFound() {
                         <Home className="h-4 w-4" />
                         Back to dashboard
                     </Link>
-                    <Link to="/" className="btn btn--outline">
+                    <a href={import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174'} className="btn btn--outline">
                         <ArrowLeft className="h-4 w-4" />
-                        Go to homepage
-                    </Link>
+                        Back to site
+                    </a>
                 </div>
             </main>
 
