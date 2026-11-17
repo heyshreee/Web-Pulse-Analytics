@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars -- `motion` is only used as a JSX member expression
 import { motion, useReducedMotion } from 'framer-motion';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setSession, getSafeReturnUrl } from '../utils/auth';
+import { setSession, isAuthenticated, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -25,6 +25,30 @@ export default function Login() {
     const reduceMotion = useReducedMotion();
 
     const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl') || location.state?.from?.pathname);
+
+    useEffect(() => {
+        let isMounted = true;
+        if (isAuthenticated()) {
+            navigate(returnUrl, { replace: true });
+            return;
+        }
+
+        // If user is already authenticated via cookie (e.g. logged in on V2), skip login screen
+        apiRequest('/auth/me')
+            .then((userData) => {
+                if (isMounted && userData && userData.id) {
+                    setSession();
+                    navigate(returnUrl, { replace: true });
+                }
+            })
+            .catch(() => {
+                // Not authenticated
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [navigate, returnUrl]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

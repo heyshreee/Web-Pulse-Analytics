@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ShieldCheck, Zap, Globe, Sparkles } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setToken, getSafeReturnUrl } from '../utils/auth';
+import { setToken, setSession, isAuthenticated, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -24,6 +24,30 @@ export default function Login() {
     const location = useLocation();
 
     const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl') || location.state?.from?.pathname);
+
+    useEffect(() => {
+        let isMounted = true;
+        if (isAuthenticated()) {
+            navigate(returnUrl, { replace: true });
+            return;
+        }
+
+        // If user is already authenticated via cookie (e.g. logged in on V1), skip login screen
+        apiRequest('/auth/me')
+            .then((userData) => {
+                if (isMounted && userData && userData.id) {
+                    setSession();
+                    navigate(returnUrl, { replace: true });
+                }
+            })
+            .catch(() => {
+                // Not authenticated
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [navigate, returnUrl]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

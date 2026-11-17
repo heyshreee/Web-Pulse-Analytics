@@ -12,7 +12,6 @@ const columns = [
       { to: '/integrations', label: 'Integrations' },
       { to: '/pricing', label: 'Pricing' },
       { to: '/api', label: 'API' },
-      { to: '/beta', label: 'Try V2 Beta' },
     ],
   },
   {
