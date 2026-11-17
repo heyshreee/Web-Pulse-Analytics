@@ -1,4 +1,4 @@
-import useInView from '../../hooks/useInView';
+import useInView from '../hooks/useInView';
 import CountUp from './CountUp';
 
 export default function AnimatedNumber({

@@ -8,7 +8,7 @@ import { useToast } from '../context/ToastContext';
 import NetworkGlobe from '../components/dashboard/NetworkGlobe';
 import { useTheme } from '../context/ThemeContext';
 import Reveal from '../components/Reveal';
-import AnimatedNumber from '../components/landing/AnimatedNumber';
+import AnimatedNumber from '../components/AnimatedNumber';
 import {
   AreaChart,
   Area,
