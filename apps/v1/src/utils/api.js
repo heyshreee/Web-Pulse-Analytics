@@ -6,6 +6,13 @@ export const getApiUrl = () => {
     if (base.endsWith('/api')) return `${base}/v1`;
     return `${base}/api/v1`;
   }
+  // Default to production backend API domain when hosted on webpulseanalytics.tech
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'))
+  ) {
+    return 'https://api.webpulseanalytics.tech/api/v1';
+  }
   // Fallback for development with Vite proxy
   return '/api/v1';
 };
@@ -25,6 +32,13 @@ export const getSocketUrl = () => {
       .replace(/\/api\/v1\/?$/, '')
       .replace(/\/v1\/?$/, '')
       .replace(/\/api\/?$/, '');
+  }
+
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'))
+  ) {
+    return 'https://api.webpulseanalytics.tech';
   }
 
   if (

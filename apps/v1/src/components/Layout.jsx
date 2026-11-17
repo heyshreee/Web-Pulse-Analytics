@@ -172,6 +172,13 @@ export default function Layout() {
 
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
 
+    const isProdDomain = typeof window !== 'undefined' &&
+        (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+    const defaultMarketingUrl = isProdDomain ? 'https://webpulseanalytics.tech' : 'http://localhost:5174';
+    const defaultV2Url = isProdDomain ? 'https://beta.webpulseanalytics.tech' : 'http://localhost:5175';
+    const marketingUrl = (import.meta.env.VITE_MARKETING_URL || defaultMarketingUrl).replace(/\/+$/, '');
+    const v2AppUrl = import.meta.env.VITE_V2_APP_URL || defaultV2Url;
+
     return (
         <div className="h-screen overflow-hidden bg-slate-50 dark:bg-[#070A10] flex font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
             {/* Mobile Sidebar Overlay */}
@@ -287,7 +294,7 @@ export default function Layout() {
                     {/* Footer */}
                     <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800/80">
                         <a
-                            href={`${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`}
+                            href={`${marketingUrl}/docs`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -319,7 +326,7 @@ export default function Layout() {
 
                     <div className="flex items-center gap-2 sm:gap-3">
                         <a
-                            href={import.meta.env.VITE_V2_APP_URL || 'http://localhost:5175'}
+                            href={v2AppUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/60 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"

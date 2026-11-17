@@ -28,7 +28,12 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isProd: process.env.NODE_ENV === 'production',
   port: Number(process.env.PORT || 5000),
-  frontendUrl: read('FRONTEND_URL') || 'http://localhost:5173',
+  frontendUrl:
+    read('FRONTEND_URL') ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://app.webpulseanalytics.tech'
+      : 'http://localhost:5173'),
+  cookieDomain: read('COOKIE_DOMAIN') || undefined,
   // Trusted browser origins for credentialed API and Socket.IO requests.
   // FRONTEND_URLS is the preferred comma-separated list; the single-URL
   // variables remain supported for existing deployments.

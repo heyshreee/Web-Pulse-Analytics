@@ -23,12 +23,30 @@ const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 /**
+ * Helper to determine default base URL based on runtime environment.
+ * When hosted on webpulseanalytics.tech in production, defaults to the canonical
+ * subdomains:
+ * - Stable V1: https://app.webpulseanalytics.tech
+ * - Beta V2: https://beta.webpulseanalytics.tech
+ */
+function getCanonicalAppUrl(type = 'v1') {
+    const isProdDomain = typeof window !== 'undefined' &&
+        (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+
+    if (type === 'v2') {
+        return (import.meta.env.VITE_V2_APP_URL || (isProdDomain ? 'https://beta.webpulseanalytics.tech' : 'http://localhost:5175')).replace(/\/+$/, '');
+    }
+    return (import.meta.env.VITE_V1_APP_URL || import.meta.env.VITE_APP_URL || (isProdDomain ? 'https://app.webpulseanalytics.tech' : 'http://localhost:5173')).replace(/\/+$/, '');
+}
+
+/**
  * Redirect handler for stable V1 console / authentication routes when accessed
- * from the marketing site domain. Respects VITE_V1_APP_URL / VITE_APP_URL (default: http://localhost:5173).
+ * from the marketing site domain. Respects VITE_V1_APP_URL / VITE_APP_URL, falling back to
+ * https://app.webpulseanalytics.tech on production or http://localhost:5173 locally.
  * Preserves query parameters (?plan=..., ?returnUrl=...).
  */
 function V1Redirect({ target = '/dashboard' }) {
-    const v1Url = (import.meta.env.VITE_V1_APP_URL || import.meta.env.VITE_APP_URL || 'http://localhost:5173').replace(/\/+$/, '');
+    const v1Url = getCanonicalAppUrl('v1');
     const search = typeof window !== 'undefined' ? window.location.search || '' : '';
     const cleanTarget = target.startsWith('/') ? target : `/${target}`;
     window.location.assign(`${v1Url}${cleanTarget}${search}`);
@@ -37,11 +55,12 @@ function V1Redirect({ target = '/dashboard' }) {
 
 /**
  * Redirect handler for optional V2 Beta console / authentication routes when accessed
- * from the marketing site domain. Respects VITE_V2_APP_URL (default: http://localhost:5175).
+ * from the marketing site domain. Respects VITE_V2_APP_URL, falling back to
+ * https://beta.webpulseanalytics.tech on production or http://localhost:5175 locally.
  * Preserves query parameters (?plan=..., ?returnUrl=...).
  */
 function V2BetaRedirect({ target = '/dashboard' }) {
-    const v2Url = (import.meta.env.VITE_V2_APP_URL || 'http://localhost:5175').replace(/\/+$/, '');
+    const v2Url = getCanonicalAppUrl('v2');
     const search = typeof window !== 'undefined' ? window.location.search || '' : '';
     const cleanTarget = target.startsWith('/') ? target : `/${target}`;
     window.location.assign(`${v2Url}${cleanTarget}${search}`);

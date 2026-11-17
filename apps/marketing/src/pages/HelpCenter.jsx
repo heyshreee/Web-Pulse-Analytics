@@ -32,7 +32,7 @@ import MarketingShell from '../components/marketing/MarketingShell';
 import Reveal from '../components/marketing/Reveal';
 import CodeSnippet from '../components/marketing/CodeSnippet';
 
-const API_DOMAIN = 'https://api.webpulse.app';
+const API_DOMAIN = 'https://api.webpulseanalytics.tech';
 const ISSUES_URL = 'https://github.com/heyshreee/Web-Pulse-Analytics/issues';
 
 const SEARCH_STOPWORDS = new Set([
@@ -80,7 +80,7 @@ const categories = [
 </script>`,
                 note: {
                     tone: 'info',
-                    text: 'If you self-host the API, replace `https://api.webpulse.app` with your own API origin. The script must load before `tracker(...)` is called.',
+                    text: 'If you self-host the API, replace `https://api.webpulseanalytics.tech` with your own API origin. The script must load before `tracker(...)` is called.',
                 },
                 links: [
                     { to: '/docs/tracking#installation', label: 'Installation guide' },
@@ -277,7 +277,7 @@ tracker('track', 'page_view');`,
                 summary: "A 404 or blocked script means no events can be sent. Check the URL, the API origin, and the browser's content policy.",
                 steps: [
                     'Open the script URL directly in a new tab. It should return JavaScript, not a 404 page.',
-                    'Use the API origin your deployment actually serves. The default snippet points at `https://api.webpulse.app`.',
+                    'Use the API origin your deployment actually serves. The default snippet points at `https://api.webpulseanalytics.tech`.',
                     'Check the browser console for CSP violations and allow the API origin in `script-src` and `connect-src`.',
                     'Disable ad blockers or privacy extensions for the test, and confirm the request is HTTPS if your site is HTTPS.',
                 ],

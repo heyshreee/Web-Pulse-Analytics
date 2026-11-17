@@ -37,4 +37,6 @@ dist-ssr/
 .vite/
 *.local
 .env
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example

@@ -33,10 +33,21 @@ export function isAuthenticated() {
     }
 }
 
+const TRUSTED_HOSTS = new Set([
+    'localhost',
+    '127.0.0.1',
+    'webpulseanalytics.tech',
+    'www.webpulseanalytics.tech',
+    'app.webpulseanalytics.tech',
+    'beta.webpulseanalytics.tech',
+    'api.webpulseanalytics.tech',
+]);
+
 /**
  * Validates a return URL to prevent open redirect vulnerabilities.
  * Only allows relative application paths (e.g., /dashboard/settings)
- * and disallows protocol-relative URLs (//attacker.com) or backslash tricks.
+ * or explicit same-origin/trusted-domain routes, and disallows
+ * protocol-relative URLs (//attacker.com) or backslash tricks.
  */
 export function getSafeReturnUrl(target, fallback = '/dashboard') {
     if (!target || typeof target !== 'string') return fallback;
@@ -47,7 +58,7 @@ export function getSafeReturnUrl(target, fallback = '/dashboard') {
     try {
         if (typeof window !== 'undefined') {
             const parsed = new URL(trimmed, window.location.origin);
-            if (parsed.origin === window.location.origin) {
+            if (parsed.origin === window.location.origin || TRUSTED_HOSTS.has(parsed.hostname)) {
                 return `${parsed.pathname}${parsed.search}${parsed.hash}`;
             }
         }

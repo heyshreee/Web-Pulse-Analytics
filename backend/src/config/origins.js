@@ -7,6 +7,21 @@ import { env } from './env.js';
  */
 export const normalizeOrigin = (origin) => origin.trim().replace(/\/+$/, '');
 
+/**
+ * Canonical production architecture origins for WebPulse Analytics:
+ * - Marketing: https://webpulseanalytics.tech (and www)
+ * - Stable V1: https://app.webpulseanalytics.tech
+ * - Beta V2: https://beta.webpulseanalytics.tech
+ * - Backend: https://api.webpulseanalytics.tech
+ */
+export const productionOrigins = [
+  'https://webpulseanalytics.tech',
+  'https://www.webpulseanalytics.tech',
+  'https://app.webpulseanalytics.tech',
+  'https://beta.webpulseanalytics.tech',
+  'https://api.webpulseanalytics.tech',
+];
+
 const developmentOrigins = env.isProd
   ? []
   : [
@@ -32,7 +47,7 @@ const developmentOrigins = env.isProd
  * Add each preview URL individually (or use a dedicated preview environment).
  */
 export const allowedOrigins = [
-  ...new Set([...env.frontendUrls, ...developmentOrigins]),
+  ...new Set([...productionOrigins, ...env.frontendUrls, ...developmentOrigins]),
 ];
 
 export const isAllowedOrigin = (origin) => {
@@ -46,4 +61,4 @@ if (env.isProd && env.frontendUrls.length === 0) {
   );
 }
 
-export default { allowedOrigins, isAllowedOrigin, normalizeOrigin };
+export default { allowedOrigins, isAllowedOrigin, normalizeOrigin, productionOrigins };

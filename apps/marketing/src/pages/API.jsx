@@ -8,7 +8,7 @@ import MarketingShell from '../components/marketing/MarketingShell';
 import Reveal from '../components/marketing/Reveal';
 import CodeSnippet from '../components/marketing/CodeSnippet';
 
-const API_DOMAIN = 'https://api.webpulse.app';
+const API_DOMAIN = 'https://api.webpulseanalytics.tech';
 
 const navItems = [
     { id: 'overview', label: 'Overview', icon: BookOpen },

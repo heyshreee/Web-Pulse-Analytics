@@ -1,4 +1,4 @@
-export const API_DOMAIN = 'https://api.webpulse.app';
+export const API_DOMAIN = 'https://api.webpulseanalytics.tech';
 
 export const docsContent = {
     'getting-started': {

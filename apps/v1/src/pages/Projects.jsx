@@ -390,7 +390,7 @@ export default function Projects() {
                             value={allowedOrigins}
                             onChange={(e) => setAllowedOrigins(e.target.value)}
                             className="input"
-                            placeholder={`https://example.com, ${(import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')}`}
+                            placeholder="https://example.com, https://app.example.com"
                         />
                         <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 mt-2">Comma separated list of domains allowed to track.</p>
                     </div>

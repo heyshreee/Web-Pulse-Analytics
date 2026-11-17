@@ -201,31 +201,32 @@ Current order:
 
 ## 4. Configure DNS, cookies, and HTTPS
 
-- Point the marketing domain (e.g. `www.example.com`) at the marketing project.
-- Point the V1 and V2 dashboard domains at their respective projects.
-- Point `api.example.com` at the backend host.
-- Use HTTPS everywhere.
+### Canonical Domains Configuration
+
+Configure your DNS records to route to the respective deployment targets:
+
+| Role | Domain | Target |
+| --- | --- | --- |
+| **Marketing** | `webpulseanalytics.tech` (and `www`) | Static host (Vercel / Cloudflare / Netlify) |
+| **Stable V1** | `app.webpulseanalytics.tech` | Static host (Vercel / Cloudflare / Netlify) |
+| **Beta V2** | `beta.webpulseanalytics.tech` | Static host (Vercel / Cloudflare / Netlify) |
+| **Backend API** | `api.webpulseanalytics.tech` | Node.js host (Render / Railway / VPS) |
 
 ### Cookies and cross-origin sessions
 
 In production the backend sets the auth cookie with `httpOnly`, `Secure`, and
-`SameSite=None`. This allows the dashboards and API to run on different origins, but it
-also means:
+`SameSite=None`, with optional shared domain support via `COOKIE_DOMAIN=.webpulseanalytics.tech`.
+Because all applications share the parent domain `webpulseanalytics.tech`:
 
+- Set `COOKIE_DOMAIN=.webpulseanalytics.tech` on the backend for unified subdomain authentication.
 - Every frontend and the API must be served over HTTPS.
-- Browser third-party-cookie blocking can break sessions when the dashboard and API are
-  on unrelated registrable domains (for example separate `*.vercel.app` hostnames).
-  Prefer custom domains under one parent domain, such as `app.example.com`,
-  `v1.example.com`, and `api.example.com`.
-- If V1 and V2 live on separate origins, verify **both** can authenticate and open a
-  Socket.IO connection. Update the Socket.IO allowlist as described above.
+- Both `app.webpulseanalytics.tech` (V1) and `beta.webpulseanalytics.tech` (V2) can authenticate and maintain persistent Socket.IO connections to `api.webpulseanalytics.tech`.
 
 ### Backend origin settings
 
-- Set `FRONTEND_URL` to the primary dashboard origin and `FRONTEND_URLS` to every
-  dashboard and marketing origin.
-- Update `VITE_API_URL` in each frontend to the backend origin plus `/api`.
-- If the API domain changes, update all three frontend projects and redeploy them.
+- The backend automatically permits the canonical `webpulseanalytics.tech` subdomains.
+- For custom deployments, `FRONTEND_URL` defaults to `https://app.webpulseanalytics.tech` and `FRONTEND_URLS` includes `https://webpulseanalytics.tech`, `https://www.webpulseanalytics.tech`, `https://app.webpulseanalytics.tech`, `https://beta.webpulseanalytics.tech`.
+- In each frontend, `VITE_API_URL` defaults to `https://api.webpulseanalytics.tech/api` when hosted on `*.webpulseanalytics.tech`.
 
 ## 5. Post-deploy checks
 

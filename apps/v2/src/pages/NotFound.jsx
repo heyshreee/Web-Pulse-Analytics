@@ -4,6 +4,12 @@ import Logo from '../components/Logo';
 import { Button } from '../components/ui/Button';
 
 export default function NotFound() {
+    const defaultMarketing = typeof window !== 'undefined' &&
+        (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'))
+        ? 'https://webpulseanalytics.tech'
+        : 'http://localhost:5174';
+    const marketingUrl = import.meta.env.VITE_MARKETING_URL || defaultMarketing;
+
     return (
         <div
             className="min-h-screen flex flex-col font-sans transition-colors duration-300"
@@ -35,7 +41,7 @@ export default function NotFound() {
                         <Home className="h-4 w-4" />
                         Back to dashboard
                     </Link>
-                    <a href={import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174'} className="btn btn--outline">
+                    <a href={marketingUrl} className="btn btn--outline">
                         <ArrowLeft className="h-4 w-4" />
                         Back to site
                     </a>
