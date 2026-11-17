@@ -49,3 +49,27 @@ export function isAuthenticated() {
     return false;
   }
 }
+
+/**
+ * Validates a return URL to prevent open redirect vulnerabilities.
+ * Only allows relative application paths (e.g., /dashboard/settings)
+ * and disallows protocol-relative URLs (//attacker.com) or backslash tricks.
+ */
+export function getSafeReturnUrl(target, fallback = '/dashboard') {
+  if (!target || typeof target !== 'string') return fallback;
+  const trimmed = target.trim();
+  if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.startsWith('/\\')) {
+    return trimmed;
+  }
+  try {
+    if (typeof window !== 'undefined') {
+      const parsed = new URL(trimmed, window.location.origin);
+      if (parsed.origin === window.location.origin) {
+        return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+    }
+  } catch {
+    // Invalid URL string
+  }
+  return fallback;
+}

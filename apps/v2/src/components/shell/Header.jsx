@@ -133,9 +133,15 @@ export default function Header({
           <span className="kbd">{isMac ? '⌘' : 'Ctrl'} K</span>
         </button>
 
-        <Link to="/docs" className="icon-btn" aria-label="Help and documentation">
+        <a
+          href={`${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="icon-btn"
+          aria-label="Help and documentation"
+        >
           <Icon name="help" size={17} />
-        </Link>
+        </a>
 
         <button
           type="button"
@@ -203,10 +209,21 @@ export default function Header({
             icon="book"
             onClick={() => {
               setUserMenuOpen(false);
-              navigate('/docs');
+              const mktDocs = `${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`;
+              window.open(mktDocs, '_blank', 'noopener,noreferrer');
             }}
           >
             Help & docs
+          </MenuItem>
+          <MenuItem
+            icon="external"
+            onClick={() => {
+              setUserMenuOpen(false);
+              const v1Url = import.meta.env.VITE_V1_APP_URL || 'http://localhost:5173';
+              window.location.assign(v1Url);
+            }}
+          >
+            Switch to Stable V1
           </MenuItem>
           <MenuSep />
           <MenuItem

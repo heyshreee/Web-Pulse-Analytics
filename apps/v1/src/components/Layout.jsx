@@ -13,7 +13,8 @@ import {
     BarChart2,
     Key,
     LifeBuoy,
-    Zap
+    Zap,
+    Sparkles
 } from 'lucide-react';
 import { apiRequest, getSocketUrl, isSocketEnabled } from '../utils/api';
 import { clearSession } from '../utils/auth';
@@ -285,13 +286,15 @@ export default function Layout() {
 
                     {/* Footer */}
                     <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800/80">
-                        <Link
-                            to="/help"
+                        <a
+                            href={`${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-colors"
                         >
                             <LifeBuoy className="h-[18px] w-[18px] text-slate-400 dark:text-slate-500" />
                             Help & Docs
-                        </Link>
+                        </a>
                     </div>
                 </aside>
             )}
@@ -315,6 +318,18 @@ export default function Layout() {
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-3">
+                        <a
+                            href={import.meta.env.VITE_V2_APP_URL || 'http://localhost:5175'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/60 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
+                        >
+                            <Sparkles className="h-3 w-3" />
+                            <span>Try V2 Beta</span>
+                        </a>
+
+                        <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />
+
                         <ThemeToggle />
 
                         <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />

@@ -47,7 +47,7 @@ const INITIAL_INTEGRATIONS = [
     initials: '?',
     desc: 'Read the tracking guide, API reference, and SDK options.',
     connected: false,
-    route: '/docs'
+    externalUrl: `${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`
   }
 ];
 
@@ -97,7 +97,12 @@ export default function Integrations() {
             <p className="integration-desc">{it.desc}</p>
 
             <div className="row-2">
-              {it.route ? (
+              {it.externalUrl ? (
+                <a href={it.externalUrl} target="_blank" rel="noopener noreferrer" className="btn btn--outline btn--sm">
+                  Open
+                  <Icon name="chevronRight" size={14} />
+                </a>
+              ) : it.route ? (
                 <Link to={it.route} className="btn btn--outline btn--sm">
                   Open
                   <Icon name="chevronRight" size={14} />

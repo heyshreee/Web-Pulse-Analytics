@@ -1,6 +1,6 @@
 import { Eye, Users, Database, Activity, Smartphone, Tablet, Monitor, ChevronRight, Search } from 'lucide-react';
 import Reveal from '../../Reveal';
-import AnimatedNumber from '../../landing/AnimatedNumber';
+import AnimatedNumber from '../../AnimatedNumber';
 
 export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
   return (

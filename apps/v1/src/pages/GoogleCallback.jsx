@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import AuthShell from '../components/marketing/AuthShell';
+import { getSafeReturnUrl } from '../utils/auth';
 
 export default function GoogleCallback() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl') || searchParams.get('state'));
 
     useEffect(() => {
         const handleCallback = async () => {
@@ -20,12 +22,8 @@ export default function GoogleCallback() {
                 // Simulate processing delay for visual effect
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                // Replace with actual API call
-                // const { token, user } = await apiRequest('/auth/google/callback', { method: 'POST', body: JSON.stringify({ code }) });
-                // localStorage.setItem('token', token);
-
                 showToast('Successfully connected Google account', 'success');
-                navigate('/dashboard');
+                navigate(returnUrl, { replace: true });
             } catch {
                 showToast('Failed to connect Google account', 'error');
                 navigate('/login');
@@ -33,7 +31,7 @@ export default function GoogleCallback() {
         };
 
         handleCallback();
-    }, [searchParams, navigate, showToast]);
+    }, [searchParams, navigate, showToast, returnUrl]);
 
     return (
         <AuthShell legal={false}>

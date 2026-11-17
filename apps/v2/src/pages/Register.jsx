@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Zap, Sparkles } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setToken } from '../utils/auth';
+import { setToken, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -21,6 +21,10 @@ export default function Register() {
     const [showVerification, setShowVerification] = useState(false);
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const location = useLocation();
+
+    const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl') || location.state?.from?.pathname);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -47,7 +51,7 @@ export default function Register() {
                 setToken(loginData.token);
             }
             showToast('Account created successfully!', 'success');
-            navigate('/dashboard');
+            navigate(returnUrl, { replace: true });
         } catch (err) {
             showToast(err.message || 'Registration failed', 'error');
         } finally {
@@ -70,7 +74,7 @@ export default function Register() {
                     setToken(data.token);
                 }
                 showToast('Account created successfully!', 'success');
-                navigate('/dashboard');
+                navigate(returnUrl, { replace: true });
             } catch (err) {
                 showToast(err.message || 'Google login failed', 'error');
                 setIsGoogleLoading(false);
@@ -92,13 +96,13 @@ export default function Register() {
                 <div className="auth-inner">
                     <div className="mb-6 flex items-center justify-between">
                         <Logo />
-                        <Link
-                            to="/"
+                        <a
+                            href={import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174'}
                             className="text-xs font-semibold hover:underline"
                             style={{ color: 'var(--muted-foreground)' }}
                         >
                             Back to site
-                        </Link>
+                        </a>
                     </div>
 
                     {!showVerification && (
@@ -125,7 +129,7 @@ export default function Register() {
                     {showVerification ? (
                         <OTPVerification
                             email={email}
-                            onSuccess={() => navigate('/dashboard')}
+                            onSuccess={() => navigate(returnUrl, { replace: true })}
                             onBack={() => setShowVerification(false)}
                         />
                     ) : (
