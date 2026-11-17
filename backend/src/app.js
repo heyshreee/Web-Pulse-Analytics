@@ -16,6 +16,7 @@ const createApp = () => {
   // Security headers
   app.use(
     helmet({
+      crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
       contentSecurityPolicy: {
         directives: {
           ...helmet.contentSecurityPolicy.getDefaultDirectives(),
@@ -74,6 +75,7 @@ const createApp = () => {
       'Accept',
       'Cache-Control',
       'Pragma',
+      'Expires',
     ],
   });
 
