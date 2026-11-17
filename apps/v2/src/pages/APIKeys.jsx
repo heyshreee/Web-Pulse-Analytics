@@ -198,7 +198,7 @@ export default function APIKeys() {
   );
 
   const activeTrackingId = currentProject?.tracking_id || projects[0]?.tracking_id || 'trk_91af20bc8e14';
-  const curlCode = `curl -X POST "https://api.webpulse.io/v1/track/events" \\\n  -H "Content-Type: application/json" \\\n  -H "x-api-key: ${activeTrackingId}" \\\n  -d '{"event":"signup_button_clicked","properties":{"plan":"pro"}}'`;
+  const curlCode = `curl -X POST "https://api.webpulseanalytics.tech/api/v1/track/events" \\\n  -H "Content-Type: application/json" \\\n  -H "x-api-key: ${activeTrackingId}" \\\n  -d '{"event":"signup_button_clicked","properties":{"plan":"pro"}}'`;
 
   return (
     <div className="page animate-fade-in">

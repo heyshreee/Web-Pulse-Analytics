@@ -209,7 +209,10 @@ export default function Header({
             icon="book"
             onClick={() => {
               setUserMenuOpen(false);
-              const mktDocs = `${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`;
+              const isProdDomain = typeof window !== 'undefined' &&
+                (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+              const defaultMkt = isProdDomain ? 'https://webpulseanalytics.tech' : 'http://localhost:5174';
+              const mktDocs = `${(import.meta.env.VITE_MARKETING_URL || defaultMkt).replace(/\/+$/, '')}/docs`;
               window.open(mktDocs, '_blank', 'noopener,noreferrer');
             }}
           >
@@ -219,7 +222,10 @@ export default function Header({
             icon="external"
             onClick={() => {
               setUserMenuOpen(false);
-              const v1Url = import.meta.env.VITE_V1_APP_URL || 'http://localhost:5173';
+              const isProdDomain = typeof window !== 'undefined' &&
+                (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+              const defaultV1 = isProdDomain ? 'https://app.webpulseanalytics.tech' : 'http://localhost:5173';
+              const v1Url = import.meta.env.VITE_V1_APP_URL || defaultV1;
               window.location.assign(v1Url);
             }}
           >

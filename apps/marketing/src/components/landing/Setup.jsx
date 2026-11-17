@@ -23,7 +23,7 @@ const STEPS = [
 ];
 
 const SNIPPET = `<script
-  src="https://api.webpulse.app/api/v1/track/script.js"
+  src="https://api.webpulseanalytics.tech/api/v1/track/script.js"
 ></script>
 <script>
   tracker('init', 'YOUR_TRACKING_ID');

@@ -6,7 +6,7 @@ export default function ProjectCodeModal({ project, open, onClose }) {
   if (!project) return null;
 
   const trackingId = project.tracking_id || project.trackingId || 'trk_sample';
-  const snippet = `<!-- WebPulse Analytics · Add before </body> -->\n<script defer src="https://cdn.webpulse.io/p.js" data-site="${trackingId}"></script>`;
+  const snippet = `<!-- WebPulse Analytics · Add before </body> -->\n<script defer src="https://api.webpulseanalytics.tech/api/v1/track/script.js" data-site="${trackingId}"></script>`;
 
   return (
     <Dialog
@@ -31,7 +31,7 @@ export default function ProjectCodeModal({ project, open, onClose }) {
           <div className="py-3">
             <div className="font-medium text-sm text-foreground">Content security policy</div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Allow <code>cdn.webpulse.io</code> in your <code>script-src</code> and <code>connect-src</code> directives.
+              Allow <code>api.webpulseanalytics.tech</code> in your <code>script-src</code> and <code>connect-src</code> directives.
             </p>
           </div>
           <div className="py-3">

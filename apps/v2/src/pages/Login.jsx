@@ -82,6 +82,12 @@ export default function Login() {
         return <GoogleLoading />;
     }
 
+    const defaultMarketing = typeof window !== 'undefined' &&
+        (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'))
+        ? 'https://webpulseanalytics.tech'
+        : 'http://localhost:5174';
+    const marketingUrl = import.meta.env.VITE_MARKETING_URL || defaultMarketing;
+
     return (
         <div className="auth-layout">
             <div className="auth-panel">
@@ -89,7 +95,7 @@ export default function Login() {
                     <div className="mb-6 flex items-center justify-between">
                         <Logo />
                         <a
-                            href={import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174'}
+                            href={marketingUrl}
                             className="text-xs font-semibold hover:underline"
                             style={{ color: 'var(--muted-foreground)' }}
                         >

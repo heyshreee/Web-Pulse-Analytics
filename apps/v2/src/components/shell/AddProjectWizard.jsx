@@ -108,7 +108,7 @@ export default function AddProjectWizard({ open, onClose }) {
 
   const getSnippetCode = () => {
     const trackingId = createdProject?.tracking_id || 'trk_your_id';
-    return `<!-- WebPulse Analytics · Add before </body> -->\n<script defer src="https://cdn.webpulse.io/p.js" data-site="${trackingId}"></script>`;
+    return `<!-- WebPulse Analytics · Add before </body> -->\n<script defer src="https://api.webpulseanalytics.tech/api/v1/track/script.js" data-site="${trackingId}"></script>`;
   };
 
   const renderSteps = () => {

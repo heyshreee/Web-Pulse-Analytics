@@ -5,6 +5,13 @@ import { PageHead } from '../components/ui/Page';
 import { Badge } from '../components/ui/Display';
 import { useToast } from '../context/ToastContext';
 
+const getDocsUrl = () => {
+  const isProd = typeof window !== 'undefined' &&
+    (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+  const defaultMarketing = isProd ? 'https://webpulseanalytics.tech' : 'http://localhost:5174';
+  return `${(import.meta.env.VITE_MARKETING_URL || defaultMarketing).replace(/\/+$/, '')}/docs`;
+};
+
 const INITIAL_INTEGRATIONS = [
   {
     id: 'next',
@@ -47,7 +54,7 @@ const INITIAL_INTEGRATIONS = [
     initials: '?',
     desc: 'Read the tracking guide, API reference, and SDK options.',
     connected: false,
-    externalUrl: `${(import.meta.env.VITE_MARKETING_URL || 'http://localhost:5174').replace(/\/+$/, '')}/docs`
+    externalUrl: getDocsUrl()
   }
 ];
 
