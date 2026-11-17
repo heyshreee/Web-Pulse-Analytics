@@ -1,0 +1,173 @@
+name: Deploy Backend API
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target GitHub Environment (development or production)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Validate build and configuration without invoking deployment provider'
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target GitHub Environment'
+        required: true
+        type: choice
+        options:
+          - development
+          - production
+        default: 'development'
+      dry_run:
+        description: 'Validate build and configuration without invoking deployment provider'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-backend-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate Environment Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard Environment
+        run: |
+          ENV="${{ inputs.environment }}"
+          if [ "$ENV" = "beta" ]; then
+            echo "::notice::Backend does not maintain a separate beta environment. The V2 Beta dashboard communicates with the primary API at https://api.webpulseanalytics.tech or development API."
+          fi
+          if [ "$ENV" != "development" ] && [ "$ENV" != "production" ] && [ "$ENV" != "beta" ]; then
+            echo "::error::Invalid deployment environment: '$ENV'. Allowed environments are 'development' and 'production'."
+            exit 1
+          fi
+
+  test:
+    name: Backend Test Suite
+    needs: validate
+    if: inputs.environment != 'beta'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node 22
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Syntax check backend source files
+        run: node scripts/check-syntax.mjs backend/src
+
+      - name: Run backend unit tests
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-only-secret-jwt
+          CSRF_SECRET: test-only-secret-csrf
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SERVICE_KEY: test-only-service-key
+          RESEND_API_KEY: test-only-resend-key
+          RAZORPAY_KEY_ID: test-only-razorpay-id
+          RAZORPAY_KEY_SECRET: test-only-razorpay-secret
+          FRONTEND_URL: http://localhost:5173
+        run: npm test
+
+  deploy:
+    name: Deploy Backend (${{ inputs.environment }})
+    needs: [validate, test]
+    if: inputs.environment != 'beta'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Execute Persistent Host Deployment
+        id: provider_deploy
+        env:
+          TARGET_ENV: ${{ inputs.environment }}
+          IS_DRY_RUN: ${{ inputs.dry_run }}
+          DEPLOY_WEBHOOK: ${{ secrets.BACKEND_DEPLOY_WEBHOOK_URL || secrets.RENDER_DEPLOY_HOOK_URL }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          if [ "$IS_DRY_RUN" = "true" ]; then
+            echo "status=dry_run" >> "$GITHUB_OUTPUT"
+            echo "url=https://api.webpulseanalytics.tech (dry-run)" >> "$GITHUB_OUTPUT"
+            echo "Dry-run validation successful. Backend tests passed. Deployment skipped."
+            exit 0
+          fi
+
+          # The backend requires a persistent Node.js host with WebSockets (Render, Railway, Fly.io, VPS).
+          # It must NEVER be deployed to serverless environments (Vercel Serverless).
+          if [ -n "$DEPLOY_WEBHOOK" ]; then
+            echo "Triggering deployment webhook on persistent Node.js host..."
+            HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" -X POST "$DEPLOY_WEBHOOK")
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+              echo "Deployment webhook triggered successfully (HTTP $HTTP_CODE)."
+              echo "status=success" >> "$GITHUB_OUTPUT"
+              echo "url=https://api.webpulseanalytics.tech" >> "$GITHUB_OUTPUT"
+            else
+              echo "::error::Deployment webhook failed with HTTP $HTTP_CODE"
+              cat response.txt
+              echo "status=failed" >> "$GITHUB_OUTPUT"
+              exit 1
+            fi
+          elif [ -n "$RAILWAY_TOKEN" ]; then
+            echo "Deploying to Railway persistent service..."
+            npx --yes @railway/cli up --detach
+            echo "status=success" >> "$GITHUB_OUTPUT"
+            echo "url=https://api.webpulseanalytics.tech" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No persistent Node.js hosting deployment provider or webhook is configured in GitHub Environment '$TARGET_ENV'."
+            echo "status=pending_configuration" >> "$GITHUB_OUTPUT"
+            echo "url=https://api.webpulseanalytics.tech (existing deployment untouched)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Record Deployment Summary
+        if: always()
+        run: |
+          TARGET_DOMAIN="${{ inputs.environment == 'production' && 'https://api.webpulseanalytics.tech' || 'Development API' }}"
+          STATUS="${{ steps.provider_deploy.outputs.status || (inputs.dry_run && 'Dry Run (Tests Passed)' || 'Pending Configuration') }}"
+          URL="${{ steps.provider_deploy.outputs.url || 'https://api.webpulseanalytics.tech' }}"
+
+          echo "### 🌐 Backend API Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Application** | Backend API (\`backend\` - Persistent Node.js 22 + Socket.IO) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **GitHub Environment** | \`${{ inputs.environment }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Target Domain** | $TARGET_DOMAIN |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Commit SHA** | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Runtime Profile** | Long-lived process, WebSockets enabled, non-serverless |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Deployment Status** | **$STATUS** |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Deployment Endpoint** | $URL |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$STATUS" = "pending_configuration" ]; then
+            echo "> [!NOTE]" >> "$GITHUB_STEP_SUMMARY"
+            echo "> Backend hosting credentials (\`BACKEND_DEPLOY_WEBHOOK_URL\` or \`RAILWAY_TOKEN\`) are not yet configured in GitHub Environment \`${{ inputs.environment }}\`. The existing deployment was left unchanged and database migrations were not executed." >> "$GITHUB_STEP_SUMMARY"
+          fi

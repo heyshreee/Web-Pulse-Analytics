@@ -94,7 +94,12 @@ export default function Sidebar({ user, onLogout }) {
             <Icon name="activity" size={17} />
           </span>
           <span className="brand-text">
-            <span className="brand-name">WebPulse</span>
+            <span className="brand-name flex items-center gap-1.5">
+              WebPulse
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                Beta
+              </span>
+            </span>
             <span className="brand-sub">Real-time web analytics</span>
           </span>
         </NavLink>

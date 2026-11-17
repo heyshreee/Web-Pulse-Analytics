@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, development, marketing, v1, v1-dev, v2, v2-dev, chore/monorepo-restructure]
+    branches: [main, development, beta]
   pull_request:
-    branches: [main, development, marketing, v1, v1-dev, v2, v2-dev, chore/monorepo-restructure]
+    branches: [main, development, beta]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Check workspace exists
         id: check_workspace
@@ -32,7 +32,7 @@ jobs:
 
       - name: Setup Node
         if: steps.check_workspace.outputs.present == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 22
           cache: npm
@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload build artifact
         if: steps.check_workspace.outputs.present == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: marketing-dist
           path: apps/marketing/dist
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Check workspace exists
         id: check_workspace
@@ -80,7 +80,7 @@ jobs:
 
       - name: Setup Node
         if: steps.check_workspace.outputs.present == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 22
           cache: npm
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload build artifact
         if: steps.check_workspace.outputs.present == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: v1-dist
           path: apps/v1/dist
@@ -115,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Check workspace exists
         id: check_workspace
@@ -128,7 +128,7 @@ jobs:
 
       - name: Setup Node
         if: steps.check_workspace.outputs.present == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 22
           cache: npm
@@ -151,7 +151,7 @@ jobs:
 
       - name: Upload build artifact
         if: steps.check_workspace.outputs.present == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: v2-dist
           path: apps/v2/dist
@@ -163,10 +163,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 22
           cache: npm
@@ -200,10 +200,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 22
 
@@ -223,12 +223,10 @@ jobs:
     steps:
       - name: All required checks passed
         run: |
-          if [ "${{ needs.marketing.result }}" = "failure" ] || \
-             [ "${{ needs.v1.result }}" = "failure" ] || \
-             [ "${{ needs.v2.result }}" = "failure" ] || \
-             [ "${{ needs.backend.result }}" = "failure" ] || \
-             [ "${{ needs.repo.result }}" = "failure" ]; then
-            echo "One or more required checks failed."
-            exit 1
-          fi
-          echo "All active workspace checks passed."
+          for result in "${{ needs.marketing.result }}" "${{ needs.v1.result }}" "${{ needs.v2.result }}" "${{ needs.backend.result }}" "${{ needs.repo.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "One or more required checks failed or were not successful (status: $result)."
+              exit 1
+            fi
+          done
+          echo "All active workspace checks passed successfully."

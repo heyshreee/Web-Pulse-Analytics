@@ -1,0 +1,193 @@
+name: Deploy V1 Dashboard
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target GitHub Environment (development or production)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Validate build and configuration without invoking deployment provider'
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target GitHub Environment'
+        required: true
+        type: choice
+        options:
+          - development
+          - production
+        default: 'development'
+      dry_run:
+        description: 'Validate build and configuration without invoking deployment provider'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-v1-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate Environment Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard Environment
+        run: |
+          ENV="${{ inputs.environment }}"
+          if [ "$ENV" = "beta" ]; then
+            echo "::error::V1 Dashboard is the stable production dashboard and development preview; it cannot be deployed to the 'beta' environment."
+            exit 1
+          fi
+          if [ "$ENV" != "development" ] && [ "$ENV" != "production" ]; then
+            echo "::error::Invalid deployment environment: '$ENV'. Allowed environments are 'development' and 'production'."
+            exit 1
+          fi
+          echo "Environment '$ENV' validated for V1 Dashboard deployment."
+
+  build:
+    name: Build V1 Dashboard
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      digest: ${{ steps.checksum.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node 22
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/v1/package-lock.json
+
+      - name: Install dependencies
+        working-directory: apps/v1
+        run: npm ci
+
+      - name: Lint
+        working-directory: apps/v1
+        run: npm run lint
+
+      - name: Build
+        working-directory: apps/v1
+        env:
+          NODE_ENV: production
+          VITE_API_URL: ${{ inputs.environment == 'production' && 'https://api.webpulseanalytics.tech/api' || 'http://localhost:3000/api' }}
+          VITE_MARKETING_URL: ${{ inputs.environment == 'production' && 'https://webpulseanalytics.tech' || 'http://localhost:5174' }}
+          VITE_V2_APP_URL: ${{ inputs.environment == 'production' && 'https://beta.webpulseanalytics.tech' || 'http://localhost:5175' }}
+          VITE_SOCKET_URL: ${{ inputs.environment == 'production' && 'https://api.webpulseanalytics.tech' || 'http://localhost:3000' }}
+        run: npm run build
+
+      - name: Compute artifact checksum
+        id: checksum
+        working-directory: apps/v1/dist
+        run: |
+          DIGEST=$(find . -type f -exec sha256sum {} + | sort | sha256sum | awk '{print $1}')
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "V1 build artifact digest: $DIGEST"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: v1-dist-${{ inputs.environment }}-${{ github.sha }}
+          path: apps/v1/dist
+          retention-days: 7
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy V1 Dashboard (${{ inputs.environment }})
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout deployment configuration
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            apps/v1/vercel.json
+            apps/v1/package.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Download build artifact
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
+        with:
+          name: v1-dist-${{ inputs.environment }}-${{ github.sha }}
+          path: apps/v1/dist
+
+      - name: Setup Node 22
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22
+
+      - name: Execute Deployment
+        id: provider_deploy
+        working-directory: apps/v1
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_V1 || secrets.VERCEL_PROJECT_ID }}
+          IS_DRY_RUN: ${{ inputs.dry_run }}
+          TARGET_ENV: ${{ inputs.environment }}
+        run: |
+          if [ "$IS_DRY_RUN" = "true" ]; then
+            echo "mode=dry_run" >> "$GITHUB_OUTPUT"
+            echo "url=https://app.webpulseanalytics.tech (dry-run)" >> "$GITHUB_OUTPUT"
+            echo "Dry-run validation successful. Provider deployment skipped."
+            exit 0
+          fi
+
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::error::Vercel deployment credentials (VERCEL_TOKEN and VERCEL_PROJECT_ID_V1) are not configured in GitHub Environment '$TARGET_ENV'."
+            echo "status=unconfigured" >> "$GITHUB_OUTPUT"
+            echo "url=N/A (provider unconfigured)" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          echo "Deploying V1 Dashboard to Vercel ($TARGET_ENV)..."
+          if [ "$TARGET_ENV" = "production" ]; then
+            DEPLOY_URL=$(npx --yes vercel@latest deploy --prod --token="$VERCEL_TOKEN" --yes)
+          else
+            DEPLOY_URL=$(npx --yes vercel@latest deploy --token="$VERCEL_TOKEN" --yes)
+          fi
+
+          echo "status=success" >> "$GITHUB_OUTPUT"
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Record Deployment Summary
+        if: always()
+        run: |
+          TARGET_DOMAIN="${{ inputs.environment == 'production' && 'https://app.webpulseanalytics.tech' || 'Preview Environment' }}"
+          STATUS="${{ steps.provider_deploy.outputs.status || (inputs.dry_run && 'Dry Run (Verified)' || 'Failed') }}"
+          URL="${{ steps.provider_deploy.outputs.url || 'N/A' }}"
+
+          echo "### ⚡ V1 Dashboard Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Application** | V1 Dashboard (\`apps/v1\` - Stable Production) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **GitHub Environment** | \`${{ inputs.environment }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Target Domain** | $TARGET_DOMAIN |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Commit SHA** | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Artifact Digest** | \`${{ needs.build.outputs.digest }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Deployment Status** | **$STATUS** |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Deployment URL** | $URL |" >> "$GITHUB_STEP_SUMMARY"
