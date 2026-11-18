@@ -88,7 +88,8 @@ export async function apiRequest(endpoint, options = {}) {
     if (response.status === 401 && !endpoint.startsWith('/auth/')) {
       clearSession();
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-        window.location.assign('/login');
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.assign(`/login?returnUrl=${returnUrl}`);
       }
     }
 

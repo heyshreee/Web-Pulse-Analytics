@@ -1,5 +1,5 @@
 /**
- * Session state for the console.
+ * Session state for the V1 Stable console.
  *
  * The session token itself is delivered by the API as an HttpOnly cookie and
  * is never readable from page scripts. What the browser keeps is only a
@@ -33,7 +33,7 @@ export function isAuthenticated() {
     }
 }
 
-const TRUSTED_HOSTS = new Set([
+export const TRUSTED_HOSTS = new Set([
     'localhost',
     '127.0.0.1',
     'webpulseanalytics.tech',
@@ -52,18 +52,43 @@ const TRUSTED_HOSTS = new Set([
 export function getSafeReturnUrl(target, fallback = '/dashboard') {
     if (!target || typeof target !== 'string') return fallback;
     const trimmed = target.trim();
+
+    // Block protocol-relative (//evil.com) and backslash schemes (/\evil.com, \\evil.com)
     if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.startsWith('/\\')) {
         return trimmed;
     }
+
     try {
         if (typeof window !== 'undefined') {
             const parsed = new URL(trimmed, window.location.origin);
-            if (parsed.origin === window.location.origin || TRUSTED_HOSTS.has(parsed.hostname)) {
+            if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+                return fallback;
+            }
+            if (parsed.origin === window.location.origin) {
                 return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+            }
+            if (TRUSTED_HOSTS.has(parsed.hostname)) {
+                return `${parsed.origin}${parsed.pathname}${parsed.search}${parsed.hash}`;
             }
         }
     } catch {
         // Invalid URL string
     }
     return fallback;
+}
+
+/**
+ * Helper to determine default base URL based on runtime environment.
+ */
+export function getCanonicalAppUrl(type = 'v1') {
+    const isProdDomain = typeof window !== 'undefined' &&
+        (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+
+    if (type === 'v2' || type === 'beta') {
+        return (import.meta.env.VITE_V2_APP_URL || (isProdDomain ? 'https://beta.webpulseanalytics.tech' : 'http://localhost:5175')).replace(/\/+$/, '');
+    }
+    if (type === 'marketing') {
+        return (import.meta.env.VITE_MARKETING_URL || (isProdDomain ? 'https://webpulseanalytics.tech' : 'http://localhost:5174')).replace(/\/+$/, '');
+    }
+    return (import.meta.env.VITE_V1_APP_URL || import.meta.env.VITE_APP_URL || (isProdDomain ? 'https://app.webpulseanalytics.tech' : 'http://localhost:5173')).replace(/\/+$/, '');
 }
