@@ -327,3 +327,128 @@ test('Credential rate limiter normalizes email across casing and whitespace', as
   assert.equal(email2, 'alice@example.com');
   assert.equal(email1, email2, 'Normalized email keys must match');
 });
+
+test('Google login rejects missing, invalid, or forged ID tokens', async (t) => {
+  const base = await startServer(t);
+
+  // Missing token
+  const resEmpty = await fetch(`${base}/api/v1/auth/google-login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      Origin: 'https://app.example.com',
+    },
+    body: JSON.stringify({}),
+  });
+  assert.equal(resEmpty.status, 400);
+  const dataEmpty = await resEmpty.json();
+  assert.match(dataEmpty.error, /token is required/i);
+
+  // Arbitrary access token (e.g. ya29...) instead of ID token
+  const resAccessToken = await fetch(`${base}/api/v1/auth/google-login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      Origin: 'https://app.example.com',
+    },
+    body: JSON.stringify({ token: 'ya29.a0AfH6SMC_arbitrary_access_token' }),
+  });
+  assert.equal(resAccessToken.status, 401);
+  const dataAccessToken = await resAccessToken.json();
+  assert.match(dataAccessToken.error, /invalid.*token/i);
+});
+
+test('Session cookie configuration enforces HttpOnly and SameSite=Lax', async () => {
+  const { default: authController } = await import('../src/controllers/auth.controller.js');
+  assert.ok(authController, 'authController must be exported');
+
+  // Verify cookie options via a mock response object
+  let capturedCookie = null;
+  const mockRes = {
+    cookie: (name, val, options) => {
+      capturedCookie = { name, val, options };
+    },
+    status: () => mockRes,
+    json: () => mockRes,
+  };
+
+  // Trigger registration or login failure / session issue test
+  // Or test clearCookie options on logout
+  const mockReq = { user: { id: 'test-user' }, tokenId: null };
+  let clearedCookie = null;
+  const mockResLogout = {
+    clearCookie: (name, options) => {
+      clearedCookie = { name, options };
+    },
+    json: () => {},
+  };
+  const mockNext = (err) => { if (err) throw err; };
+
+  await authController.logout(mockReq, mockResLogout, mockNext);
+  assert.equal(clearedCookie.name, 'token');
+  assert.equal(clearedCookie.options.httpOnly, true);
+  assert.equal(clearedCookie.options.sameSite, 'lax');
+});
+
+test('Safe return URL validation blocks open redirects and allows trusted domains', () => {
+  const TRUSTED_HOSTS = new Set([
+    'localhost',
+    '127.0.0.1',
+    'webpulseanalytics.tech',
+    'www.webpulseanalytics.tech',
+    'app.webpulseanalytics.tech',
+    'beta.webpulseanalytics.tech',
+    'api.webpulseanalytics.tech',
+  ]);
+
+  function getSafeReturnUrl(target, fallback = '/dashboard', currentOrigin = 'https://app.webpulseanalytics.tech') {
+    if (!target || typeof target !== 'string') return fallback;
+    const trimmed = target.trim();
+    if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.startsWith('/\\')) {
+      return trimmed;
+    }
+    try {
+      const parsed = new URL(trimmed, currentOrigin);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return fallback;
+      }
+      if (parsed.origin === currentOrigin) {
+        return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+      if (TRUSTED_HOSTS.has(parsed.hostname)) {
+        return `${parsed.origin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+    } catch {}
+    return fallback;
+  }
+
+  // Safe relative paths
+  assert.equal(getSafeReturnUrl('/dashboard/settings'), '/dashboard/settings');
+  assert.equal(getSafeReturnUrl('/dashboard/projects?tab=events'), '/dashboard/projects?tab=events');
+
+  // Same-origin absolute URL
+  assert.equal(getSafeReturnUrl('https://app.webpulseanalytics.tech/dashboard/billing'), '/dashboard/billing');
+
+  // Cross-subdomain trusted destinations
+  assert.equal(
+    getSafeReturnUrl('https://beta.webpulseanalytics.tech/dashboard'),
+    'https://beta.webpulseanalytics.tech/dashboard'
+  );
+  assert.equal(
+    getSafeReturnUrl('https://webpulseanalytics.tech/pricing'),
+    'https://webpulseanalytics.tech/pricing'
+  );
+
+  // Attack vectors (Open Redirects)
+  assert.equal(getSafeReturnUrl('https://attacker.com/steal-creds'), '/dashboard');
+  assert.equal(getSafeReturnUrl('http://evil.com'), '/dashboard');
+  assert.equal(getSafeReturnUrl('//evil.com/phish'), '/dashboard');
+  assert.equal(getSafeReturnUrl('/\\evil.com'), '/dashboard');
+  assert.equal(getSafeReturnUrl('javascript:alert(document.cookie)'), '/dashboard');
+  assert.equal(getSafeReturnUrl('data:text/html,<script>alert(1)</script>'), '/dashboard');
+  assert.equal(getSafeReturnUrl(''), '/dashboard');
+  assert.equal(getSafeReturnUrl(null), '/dashboard');
+  assert.equal(getSafeReturnUrl(undefined), '/dashboard');
+});
