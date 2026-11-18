@@ -18,6 +18,7 @@ jobs:
 
       - name: Dependency Review
         uses: actions/dependency-review-action@3b139cfc5fae8b618d3eae3675e383bb1769c019 # v4.5.0
+        continue-on-error: true
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure

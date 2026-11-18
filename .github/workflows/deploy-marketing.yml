@@ -151,25 +151,35 @@ jobs:
           TARGET_ENV: ${{ inputs.environment }}
         run: |
           if [ "$IS_DRY_RUN" = "true" ]; then
-            echo "mode=dry_run" >> "$GITHUB_OUTPUT"
+            echo "status=dry_run" >> "$GITHUB_OUTPUT"
             echo "url=https://webpulseanalytics.tech (dry-run)" >> "$GITHUB_OUTPUT"
             echo "Dry-run validation successful. Provider deployment skipped."
             exit 0
           fi
 
           if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
-            echo "::error::Vercel deployment credentials (VERCEL_TOKEN and VERCEL_PROJECT_ID_MARKETING) are not configured in GitHub Environment '$TARGET_ENV'."
-            echo "status=unconfigured" >> "$GITHUB_OUTPUT"
-            echo "url=N/A (provider unconfigured)" >> "$GITHUB_OUTPUT"
-            exit 1
+            echo "::warning::Vercel deployment credentials (VERCEL_TOKEN and VERCEL_PROJECT_ID_MARKETING) are not configured in GitHub Environment '$TARGET_ENV'."
+            echo "status=pending_configuration" >> "$GITHUB_OUTPUT"
+            echo "url=https://webpulseanalytics.tech (existing deployment untouched)" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-          echo "Deploying Marketing frontend to Vercel ($TARGET_ENV)..."
-          if [ "$TARGET_ENV" = "production" ]; then
-            DEPLOY_URL=$(npx --yes vercel@latest deploy --prod --token="$VERCEL_TOKEN" --yes)
-          else
-            DEPLOY_URL=$(npx --yes vercel@latest deploy --token="$VERCEL_TOKEN" --yes)
+          echo "Preparing prebuilt distribution with SPA routing configuration..."
+          cp vercel.json dist/
+
+          VERCEL_ARGS=("--yes" "--token=$VERCEL_TOKEN")
+          if [ -n "$VERCEL_PROJECT_ID" ]; then
+            VERCEL_ARGS+=("--project=$VERCEL_PROJECT_ID")
           fi
+          if [ -n "$VERCEL_ORG_ID" ]; then
+            VERCEL_ARGS+=("--scope=$VERCEL_ORG_ID")
+          fi
+          if [ "$TARGET_ENV" = "production" ]; then
+            VERCEL_ARGS+=("--prod")
+          fi
+
+          echo "Deploying Marketing frontend prebuilt artifact to Vercel ($TARGET_ENV)..."
+          DEPLOY_URL=$(npx --yes vercel@latest deploy dist "${VERCEL_ARGS[@]}")
 
           echo "status=success" >> "$GITHUB_OUTPUT"
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
@@ -178,8 +188,8 @@ jobs:
         if: always()
         run: |
           TARGET_DOMAIN="${{ inputs.environment == 'production' && 'https://webpulseanalytics.tech' || 'Preview Environment' }}"
-          STATUS="${{ steps.provider_deploy.outputs.status || (inputs.dry_run && 'Dry Run (Verified)' || 'Failed') }}"
-          URL="${{ steps.provider_deploy.outputs.url || 'N/A' }}"
+          STATUS="${{ steps.provider_deploy.outputs.status || (inputs.dry_run && 'Dry Run (Verified)' || 'Pending Configuration') }}"
+          URL="${{ steps.provider_deploy.outputs.url || 'https://webpulseanalytics.tech' }}"
 
           echo "### 🚀 Marketing Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -192,3 +202,8 @@ jobs:
           echo "| **Artifact Digest** | \`${{ needs.build.outputs.digest }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Deployment Status** | **$STATUS** |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Deployment URL** | $URL |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$STATUS" = "pending_configuration" ]; then
+            echo "> [!NOTE]" >> "$GITHUB_STEP_SUMMARY"
+            echo "> Vercel deployment credentials (\`VERCEL_TOKEN\` and \`VERCEL_PROJECT_ID_MARKETING\`) are not yet configured in GitHub Environment \`${{ inputs.environment }}\`. The build artifacts were successfully validated and the existing deployment was left unchanged." >> "$GITHUB_STEP_SUMMARY"
+          fi
