@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import PreviewFrame from './PreviewFrame';
 import Reveal from '../marketing/Reveal';
@@ -8,6 +7,7 @@ import ChartPreview from './ChartPreview';
 import LiveEventStream from './LiveEventStream';
 import AnimatedNumber from './AnimatedNumber';
 import { SAMPLE_KPIS, SAMPLE_REFERRERS, makeTrafficSeries, TRAFFIC_RANGES } from './sampleData';
+import { getCanonicalAppUrl } from '../../utils/urls';
 
 function KpiTile({ label, value, accent, decimals = 0, suffix = '' }) {
   const isNumeric = typeof value === 'number';
@@ -56,10 +56,10 @@ export default function Hero() {
           </p>
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/register" className="mkt-btn mkt-btn-primary mkt-btn-lg w-full sm:w-auto">
+            <a href={`${getCanonicalAppUrl('v1')}/register`} className="mkt-btn mkt-btn-primary mkt-btn-lg w-full sm:w-auto">
               Start tracking free
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            </a>
             <a
               href="#product-preview"
               className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full sm:w-auto"

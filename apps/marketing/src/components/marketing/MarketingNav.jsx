@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Logo from '../Logo';
 import { MARKETING_LINKS } from '../../data/marketingNav';
+import { getCanonicalAppUrl } from '../../utils/urls';
 
 /**
  * Primary navigation for every marketing page.
@@ -10,6 +11,7 @@ import { MARKETING_LINKS } from '../../data/marketingNav';
  */
 export default function MarketingNav() {
   const { pathname } = useLocation();
+  const v1Url = getCanonicalAppUrl('v1');
   // Store the pathname the panel was opened at so navigation closes it
   // without an effect (the panel is "open" only on the route it opened from).
   const [openPath, setOpenPath] = useState(null);
@@ -54,12 +56,12 @@ export default function MarketingNav() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Link to="/login" className="mkt-btn mkt-btn-ghost mkt-btn-md">
+          <a href={`${v1Url}/login`} className="mkt-btn mkt-btn-ghost mkt-btn-md">
             Log in
-          </Link>
-          <Link to="/register" className="mkt-btn mkt-btn-primary mkt-btn-md">
+          </a>
+          <a href={`${v1Url}/register`} className="mkt-btn mkt-btn-primary mkt-btn-md">
             Start tracking
-          </Link>
+          </a>
         </div>
 
         <button
@@ -93,12 +95,12 @@ export default function MarketingNav() {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 border-t border-white/[0.07] pt-4">
-              <Link to="/login" className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full">
+              <a href={`${v1Url}/login`} className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full text-center">
                 Log in
-              </Link>
-              <Link to="/register" className="mkt-btn mkt-btn-primary mkt-btn-lg w-full">
+              </a>
+              <a href={`${v1Url}/register`} className="mkt-btn mkt-btn-primary mkt-btn-lg w-full text-center">
                 Start tracking
-              </Link>
+              </a>
             </div>
           </nav>
         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { apiRequest, getSocketUrl, isSocketEnabled } from '../utils/api';
+import { clearSession } from '../utils/auth';
 import Sidebar from './shell/Sidebar';
 import Header from './shell/Header';
 import MobileNav from './shell/MobileNav';
@@ -161,7 +162,7 @@ export default function Layout() {
     } catch {
       // ignore
     }
-    localStorage.removeItem('token');
+    clearSession();
     navigate('/login');
   };
 

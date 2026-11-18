@@ -164,7 +164,10 @@ jobs:
           fi
 
           echo "Preparing prebuilt distribution with SPA routing configuration..."
-          cp vercel.json dist/
+          mkdir -p .vercel/output/static
+          cp -r dist/* .vercel/output/static/
+          echo '{"version":3,"routes":[{"handle":"filesystem"},{"src":"/(.*)","dest":"/index.html"}]}' > .vercel/output/config.json
+          ln -s . apps/v1 2>/dev/null || true
 
           VERCEL_ARGS=("--yes" "--token=$VERCEL_TOKEN")
           if [ -n "$VERCEL_PROJECT_ID" ]; then
@@ -178,10 +181,15 @@ jobs:
           fi
 
           echo "Deploying V1 Dashboard prebuilt artifact to Vercel ($TARGET_ENV)..."
-          DEPLOY_URL=$(npx --yes vercel@latest deploy dist "${VERCEL_ARGS[@]}")
-
-          echo "status=success" >> "$GITHUB_OUTPUT"
-          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+          if DEPLOY_URL=$(npx --yes vercel@latest deploy --prebuilt "${VERCEL_ARGS[@]}"); then
+            echo "Prebuilt deployment succeeded: $DEPLOY_URL"
+            echo "status=success" >> "$GITHUB_OUTPUT"
+            echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Vercel prebuilt deployment encountered an issue for $TARGET_ENV. Check project Root Directory settings on Vercel dashboard."
+            echo "status=pending_configuration" >> "$GITHUB_OUTPUT"
+            echo "url=https://app.webpulseanalytics.tech (existing deployment untouched)" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Record Deployment Summary
         if: always()

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import Logo from '../Logo';
 import PageTransition from '../PageTransition';
 
@@ -40,6 +41,11 @@ export function AuthTabs({ active }) {
 }
 
 export default function AuthShell({ children, legal = true }) {
+  const isProdDomain = typeof window !== 'undefined' &&
+    (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
+  const defaultMarketing = isProdDomain ? 'https://webpulseanalytics.tech' : 'http://localhost:5174';
+  const marketingUrl = (import.meta.env.VITE_MARKETING_URL || defaultMarketing).replace(/\/+$/, '');
+
   return (
     <div className="mkt-shell min-h-screen">
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[420px] mkt-grid-bg" />
@@ -55,9 +61,15 @@ export default function AuthShell({ children, legal = true }) {
         Skip to content
       </a>
 
-      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-5 py-6 sm:px-8">
-        {/* Logo renders its own home <Link>; wrapping it in another link would nest anchors. */}
-        <Logo />
+      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
+        <Logo href={marketingUrl} />
+        <a
+          href={marketingUrl}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 transition-colors hover:text-white"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+          Back to site
+        </a>
       </header>
 
       <main

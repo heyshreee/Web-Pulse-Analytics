@@ -1,5 +1,7 @@
 import supabase from '../config/supabase.js';
 import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
+import env from '../config/env.js';
 import { generateToken, generateResetToken, verifyToken, TOKEN_PURPOSE } from '../utils/jwt.js';
 import { validateEmail, validatePassword } from '../utils/validators.js';
 import EmailService from '../services/email.service.js';
@@ -36,7 +38,7 @@ const issueSession = async (user, req) => {
 const getCookieOptions = () => ({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: 'lax',
     maxAge: SESSION_MAX_AGE_MS,
     ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {})
 });
@@ -404,28 +406,114 @@ export const resetPassword = asyncHandler(async (req, res) => {
     res.json({ success: true, message: 'Password reset successfully' });
 });
 
+let googleOAuthClient = null;
+const getGoogleOAuthClient = () => {
+    if (!googleOAuthClient) {
+        googleOAuthClient = new OAuth2Client(
+            env.googleClientId,
+            env.googleClientSecret,
+            'postmessage'
+        );
+    }
+    return googleOAuthClient;
+};
+
 export const googleLogin = asyncHandler(async (req, res) => {
-    const { token } = req.body;
+    const { token, idToken, credential, code, redirectUri } = req.body || {};
+    let candidateToken = idToken || credential || token;
 
-    if (!token) {
-        throw AppError.badRequest('Token required');
+    if (!candidateToken && (!code || typeof code !== 'string')) {
+        throw AppError.badRequest('Valid Google ID token is required');
     }
 
-    // Verify token and get user info from Google
-    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!response.ok) {
-        throw AppError.unauthorized('Invalid Google token');
+    if (!env.googleClientId) {
+        throw AppError.internal('Google OAuth is not configured on the server');
     }
 
-    const googleUser = await response.json();
-    const { email, name, sub: googleId, picture: avatar } = googleUser;
+    const client = getGoogleOAuthClient();
+    let payload = null;
 
-    if (!email) {
-        throw AppError.badRequest('Email required from Google');
+    if (!candidateToken && code && typeof code === 'string') {
+        try {
+            const { tokens } = await client.getToken({
+                code,
+                redirect_uri: redirectUri || 'postmessage',
+            });
+            candidateToken = tokens?.id_token || tokens?.access_token;
+        } catch (exchangeErr) {
+            console.error('Failed to exchange Google authorization code:', exchangeErr?.message || exchangeErr);
+            throw AppError.unauthorized('Failed to exchange Google authorization code');
+        }
     }
+
+    if (!candidateToken || typeof candidateToken !== 'string') {
+        throw AppError.badRequest('Valid Google ID token is required');
+    }
+
+    // If candidateToken is a JWT (3 parts separated by dots), verify cryptographically
+    if (candidateToken.split('.').length === 3) {
+        try {
+            const ticket = await client.verifyIdToken({
+                idToken: candidateToken,
+                audience: env.googleClientId,
+            });
+            payload = ticket.getPayload();
+        } catch (jwtErr) {
+            console.error('Google ID token verification failed:', jwtErr?.message || jwtErr);
+            throw AppError.unauthorized('Invalid, expired, or untrusted Google token');
+        }
+    } else {
+        // Access token: verify audience cryptographically against Google's tokeninfo endpoint
+        try {
+            const tokeninfoRes = await fetch(
+                `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(candidateToken)}`
+            );
+            if (!tokeninfoRes.ok) {
+                throw AppError.unauthorized('Invalid Google access token');
+            }
+            const tokenInfo = await tokeninfoRes.json();
+
+            // Strict audience validation: ensure token was issued for this application
+            const audience = tokenInfo.aud || tokenInfo.azp;
+            if (audience !== env.googleClientId) {
+                console.error(`Google token audience mismatch. Expected ${env.googleClientId}, got ${audience}`);
+                throw AppError.unauthorized('Google token was not issued for this application');
+            }
+
+            // Fetch profile
+            const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${candidateToken}` }
+            });
+            if (!profileRes.ok) {
+                throw AppError.unauthorized('Failed to fetch Google user profile');
+            }
+            const profile = await profileRes.json();
+            payload = {
+                sub: profile.sub || tokenInfo.sub,
+                email: profile.email || tokenInfo.email,
+                email_verified: profile.email_verified ?? (tokenInfo.email_verified === 'true' || tokenInfo.email_verified === true),
+                name: profile.name || profile.given_name || 'User',
+                picture: profile.picture || null,
+            };
+        } catch (tokenErr) {
+            if (tokenErr.isOperational) throw tokenErr;
+            console.error('Google access token verification error:', tokenErr?.message || tokenErr);
+            throw AppError.unauthorized('Invalid or untrusted Google token');
+        }
+    }
+
+    if (!payload || !payload.email || !payload.sub) {
+        throw AppError.unauthorized('Incomplete Google identity claims');
+    }
+
+    if (!payload.email_verified) {
+        throw AppError.badRequest('Google email must be verified');
+    }
+
+    const email = payload.email.toLowerCase().trim();
+    const name = payload.name || payload.given_name || 'User';
+    const googleId = payload.sub;
+    const avatar = payload.picture || null;
 
     // Check if user exists
     let { data: user } = await supabase

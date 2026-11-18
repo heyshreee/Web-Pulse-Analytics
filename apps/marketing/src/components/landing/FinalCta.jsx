@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Reveal from '../marketing/Reveal';
+import { getCanonicalAppUrl } from '../../utils/urls';
 
 export default function FinalCta() {
+  const v1Url = getCanonicalAppUrl('v1');
   return (
     <section className="relative overflow-hidden py-24 sm:py-28">
       <div
@@ -22,13 +23,13 @@ export default function FinalCta() {
           </p>
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link to="/register" className="mkt-btn mkt-btn-primary mkt-btn-lg w-full sm:w-auto">
+            <a href={`${v1Url}/register`} className="mkt-btn mkt-btn-primary mkt-btn-lg w-full sm:w-auto">
               Start tracking free
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <Link to="/login" className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full sm:w-auto">
+            </a>
+            <a href={`${v1Url}/login`} className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full sm:w-auto">
               Log in to your dashboard
-            </Link>
+            </a>
           </div>
 
           <p className="mt-5 text-xs text-slate-500">

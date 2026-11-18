@@ -77,14 +77,15 @@ export default function Login() {
     };
 
     const handleGoogleLogin = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
+        onSuccess: async (response) => {
             setIsGoogleLoading(true);
             try {
-                // Send access token to backend to verify and login/register
                 await apiRequest('/auth/google-login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        token: tokenResponse.access_token
+                        token: response.access_token,
+                        code: response.code,
+                        idToken: response.id_token
                     }),
                 });
 

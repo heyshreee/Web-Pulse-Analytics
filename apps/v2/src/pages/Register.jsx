@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Zap, Sparkles } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setToken, setSession, isAuthenticated, getSafeReturnUrl } from '../utils/auth';
+import { setSession, isAuthenticated, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -67,13 +67,11 @@ export default function Register() {
             }
 
             // Auto-login after registration (fallback if no verification needed)
-            const loginData = await apiRequest('/auth/login', {
+            await apiRequest('/auth/login', {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
             });
-            if (loginData.token) {
-                setToken(loginData.token);
-            }
+            setSession();
             showToast('Account created successfully!', 'success');
             navigate(returnUrl, { replace: true });
         } catch (err) {
@@ -84,19 +82,19 @@ export default function Register() {
     };
 
     const handleGoogleLogin = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
+        onSuccess: async (response) => {
             setIsGoogleLoading(true);
             try {
-                const data = await apiRequest('/auth/google-login', {
+                await apiRequest('/auth/google-login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        token: tokenResponse.access_token
+                        token: response.access_token,
+                        code: response.code,
+                        idToken: response.id_token
                     }),
                 });
 
-                if (data.token) {
-                    setToken(data.token);
-                }
+                setSession();
                 showToast('Account created successfully!', 'success');
                 navigate(returnUrl, { replace: true });
             } catch (err) {
@@ -125,7 +123,7 @@ export default function Register() {
             <div className="auth-panel">
                 <div className="auth-inner">
                     <div className="mb-6 flex items-center justify-between">
-                        <Logo />
+                        <Logo href={marketingUrl} />
                         <a
                             href={marketingUrl}
                             className="text-xs font-semibold hover:underline"
