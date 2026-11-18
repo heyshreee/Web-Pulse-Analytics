@@ -192,6 +192,8 @@ jobs:
           RESEND_API_KEY: test-only-resend-key
           RAZORPAY_KEY_ID: test-only-razorpay-id
           RAZORPAY_KEY_SECRET: test-only-razorpay-secret
+          GOOGLE_CLIENT_ID: test-google-client-id.apps.googleusercontent.com
+          GOOGLE_CLIENT_SECRET: test-google-client-secret
           FRONTEND_URL: http://localhost:5173
         run: npm test
 

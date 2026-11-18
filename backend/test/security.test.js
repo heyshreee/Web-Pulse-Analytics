@@ -12,6 +12,8 @@ process.env.FRONTEND_URLS = 'http://localhost:5173,https://app.example.com';
 process.env.RESEND_API_KEY = 'test-only-resend-key';
 process.env.RAZORPAY_KEY_ID = 'test-only-razorpay-id';
 process.env.RAZORPAY_KEY_SECRET = 'test-only-razorpay-secret';
+process.env.GOOGLE_CLIENT_ID = 'test-google-client-id.apps.googleusercontent.com';
+process.env.GOOGLE_CLIENT_SECRET = 'test-google-client-secret';
 
 const { default: createApp } = await import('../src/app.js');
 const { allowedOrigins, isAllowedOrigin } = await import('../src/config/origins.js');

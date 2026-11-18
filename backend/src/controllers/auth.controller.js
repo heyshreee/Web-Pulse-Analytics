@@ -422,6 +422,10 @@ export const googleLogin = asyncHandler(async (req, res) => {
     const { token, idToken, credential, code, redirectUri } = req.body || {};
     let candidateToken = idToken || credential || token;
 
+    if (!candidateToken && (!code || typeof code !== 'string')) {
+        throw AppError.badRequest('Valid Google ID token is required');
+    }
+
     if (!env.googleClientId) {
         throw AppError.internal('Google OAuth is not configured on the server');
     }
