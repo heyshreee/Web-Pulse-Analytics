@@ -45,6 +45,8 @@ const createApp = () => {
             'https://*.basemaps.cartocdn.com',
             'https://*.tile.openstreetmap.org',
             'https://*.vercel.app',
+            'https://*.webpulseanalytics.tech',
+            'https://webpulseanalytics.tech',
             'https://accounts.google.com',
             'https://*.googleapis.com',
             'https://api.ipify.org',
