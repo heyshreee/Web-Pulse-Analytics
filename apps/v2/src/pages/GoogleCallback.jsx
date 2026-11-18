@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
-import { getSafeReturnUrl } from '../utils/auth';
+import { getSafeReturnUrl, setSession } from '../utils/auth';
+import { apiRequest } from '../utils/api';
 
 export default function GoogleCallback() {
     const [searchParams] = useSearchParams();
@@ -12,20 +13,28 @@ export default function GoogleCallback() {
     useEffect(() => {
         const handleCallback = async () => {
             const code = searchParams.get('code');
-            if (!code) {
-                navigate('/login');
+            const credential = searchParams.get('credential');
+            if (!code && !credential) {
+                navigate('/login', { replace: true });
                 return;
             }
 
             try {
-                // Simulate processing delay for visual effect
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                await apiRequest('/auth/google-login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        code: code || undefined,
+                        credential: credential || undefined,
+                        redirectUri: window.location.origin + window.location.pathname,
+                    }),
+                });
 
-                showToast('Successfully connected Google account', 'success');
+                setSession();
+                showToast('Successfully signed in with Google', 'success');
                 navigate(returnUrl, { replace: true });
-            } catch {
-                showToast('Failed to connect Google account', 'error');
-                navigate('/login');
+            } catch (err) {
+                showToast(err.message || 'Failed to sign in with Google', 'error');
+                navigate('/login', { replace: true });
             }
         };
 
