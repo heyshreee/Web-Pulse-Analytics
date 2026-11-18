@@ -16,7 +16,7 @@ export default function ExternalRedirect({ to }) {
   const targetUrl = `${marketingBase}${targetPath.startsWith('/') ? targetPath : `/${targetPath}`}`;
 
   useEffect(() => {
-    window.location.assign(targetUrl);
+    window.location.replace(targetUrl);
   }, [targetUrl]);
 
   return (
