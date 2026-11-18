@@ -7,6 +7,7 @@ import { env } from './config/env.js';
 import { isAllowedOrigin } from './config/origins.js';
 import v1Routes from './routes/v1/index.js';
 import trackRoutes from './routes/v1/track.routes.js';
+import csrf from './middleware/csrf.js';
 import { notFound, errorHandler } from './middlewares/errorHandler.js';
 
 const createApp = () => {
@@ -58,7 +59,24 @@ const createApp = () => {
     })
   );
 
+  // Public tracking ingestion and the public live-count endpoint are called
+  // directly from customer sites, so they use the non-credentialed public CORS
+  // policy instead of the dashboard allowlist.
+  const isTrackingPath = (path) =>
+    path === '/api/track' ||
+    path.startsWith('/api/track/') ||
+    path === '/api/v1/track' ||
+    path.startsWith('/api/v1/track/') ||
+    path === '/api/v1/analytics/count' ||
+    path === '/api/v1/analytics/count/';
+
   app.use(cookieParser());
+
+  // CSRF protection for cookie-authenticated state-changing requests
+  app.use((req, res, next) => {
+    if (isTrackingPath(req.path)) return next();
+    return csrf(req, res, next);
+  });
 
   // Credentialed CORS for the authenticated API. Only explicitly configured
   // dashboard/marketing origins are allowed. Public tracking routes are skipped
@@ -80,17 +98,6 @@ const createApp = () => {
       'Expires',
     ],
   });
-
-  // Public tracking ingestion and the public live-count endpoint are called
-  // directly from customer sites, so they use the non-credentialed public CORS
-  // policy instead of the dashboard allowlist.
-  const isTrackingPath = (path) =>
-    path === '/api/track' ||
-    path.startsWith('/api/track/') ||
-    path === '/api/v1/track' ||
-    path.startsWith('/api/v1/track/') ||
-    path === '/api/v1/analytics/count' ||
-    path === '/api/v1/analytics/count/';
 
   app.use((req, res, next) => {
     if (isTrackingPath(req.path)) return next();
