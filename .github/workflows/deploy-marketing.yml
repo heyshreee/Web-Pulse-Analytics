@@ -167,15 +167,7 @@ jobs:
           echo "Preparing prebuilt distribution with SPA routing configuration..."
           mkdir -p .vercel/output/static
           cp -r dist/* .vercel/output/static/
-          cat << 'EOF' > .vercel/output/config.json
-{
-  "version": 3,
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
-}
-EOF
+          echo '{"version":3,"routes":[{"handle":"filesystem"},{"src":"/(.*)","dest":"/index.html"}]}' > .vercel/output/config.json
           mkdir -p dist/apps/marketing
           cp -r dist/* dist/apps/marketing/ 2>/dev/null || true
 
