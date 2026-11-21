@@ -190,15 +190,17 @@ npm --prefix apps/v2 run lint
 npm --prefix apps/v2 run build
 ```
 
-From the repository root you can run all frontend checks at once:
+From the repository root you can run all frontend checks and tests:
 
 ```bash
 npm run lint:all
 npm run build:all
+npm run test:v1       # Vitest runner in apps/v1
+npm run test:v2       # Vitest runner in apps/v2
+npm run test:all      # Backend + all frontend test suites
 ```
 
-A component/unit test runner is **not yet configured** for any frontend app. If you add
-one, wire it into `.github/workflows/ci.yml` and document the command here.
+Smoke tests run via Vitest in `apps/v1` and `apps/v2` and are integrated into the `CI` workflow.
 
 ### Backend (`backend/`)
 

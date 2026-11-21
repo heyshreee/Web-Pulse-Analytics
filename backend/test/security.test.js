@@ -454,3 +454,133 @@ test('Safe return URL validation blocks open redirects and allows trusted domain
   assert.equal(getSafeReturnUrl(null), '/dashboard');
   assert.equal(getSafeReturnUrl(undefined), '/dashboard');
 });
+
+test('tracking ingestion validates API keys and filters bots', async (t) => {
+  const base = await startServer(t);
+
+  // 1. Missing API key or tracking ID -> 401
+  const resMissing = await fetch(`${base}/api/track/events`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Origin: 'https://app.example.com',
+    },
+    body: JSON.stringify({ event: 'button_click' }),
+  });
+  assert.equal(resMissing.status, 401);
+  const dataMissing = await resMissing.json();
+  assert.match(dataMissing.error || dataMissing.message, /Missing API key or tracking ID/i);
+
+  // 2. Bot filtering on events endpoint
+  const resBotEvent = await fetch(`${base}/api/track/events`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Googlebot/2.1 (+http://www.google.com/bot.html)',
+      'x-api-key': 'test-key',
+    },
+    body: JSON.stringify({ event: 'pageview' }),
+  });
+  assert.equal(resBotEvent.status, 200);
+  const dataBotEvent = await resBotEvent.json();
+  assert.equal(dataBotEvent.bot, true);
+
+  // 3. Bot filtering on public tracking endpoint
+  const resBotPublic = await fetch(`${base}/api/track/test-tracking-id`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
+    },
+    body: JSON.stringify({ pageUrl: 'https://example.com' }),
+  });
+  assert.equal(resBotPublic.status, 200);
+  const dataBotPublic = await resBotPublic.json();
+  assert.equal(dataBotPublic.bot, true);
+
+  // 4. Invalid tracking ID -> 404
+  const resInvalid = await fetch(`${base}/api/track/00000000-0000-0000-0000-000000000000`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+    },
+    body: JSON.stringify({ pageUrl: 'https://example.com' }),
+  });
+  assert.equal(resInvalid.status, 404);
+  const dataInvalid = await resInvalid.json();
+  assert.match(dataInvalid.error || dataInvalid.message, /INVALID_TRACKING_ID|Invalid tracking code/i);
+});
+
+test('CSRF protection rejects state-changing routes without custom headers across multiple endpoints', async (t) => {
+  const base = await startServer(t);
+  const origin = { Origin: 'https://app.example.com' };
+
+  const endpoints = [
+    ['POST', '/api/v1/projects', { name: 'New Project', domain: 'example.com' }],
+    ['PUT', '/api/v1/user/profile', { name: 'Alice' }],
+    ['DELETE', '/api/v1/projects/00000000-0000-0000-0000-000000000000', null],
+  ];
+
+  for (const [method, path, body] of endpoints) {
+    // Without custom header -> 403 CSRF_PROTECTION
+    const resBlocked = await fetch(`${base}${path}`, {
+      method,
+      headers: {
+        ...origin,
+        'Content-Type': 'application/json',
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    assert.equal(resBlocked.status, 403, `${method} ${path} must reject without CSRF header`);
+    const blockedData = await resBlocked.json();
+    assert.equal(blockedData.error, 'CSRF_PROTECTION');
+
+    // With custom header -> bypasses CSRF (proceeds to auth: 401)
+    const resAllowed = await fetch(`${base}${path}`, {
+      method,
+      headers: {
+        ...origin,
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    assert.equal(resAllowed.status, 401, `${method} ${path} with CSRF header must reach auth`);
+  }
+});
+
+test('authLimiter blocks excessive requests with HTTP 429', async (t) => {
+  const base = await startServer(t);
+  const testIp = '198.51.100.42';
+
+  // Send requests up to limit (20) with a dedicated test IP
+  for (let i = 0; i < 20; i++) {
+    const res = await fetch(`${base}/api/v1/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-Forwarded-For': testIp,
+        Origin: 'https://app.example.com',
+      },
+      body: JSON.stringify({ email: `test-${i}@example.com` }),
+    });
+    assert.notEqual(res.status, 429, `Request ${i + 1} within window should not be rate-limited`);
+  }
+
+  // 21st request from same IP exceeds authLimiter (max: 20 per 15 min) -> 429
+  const resLimit = await fetch(`${base}/api/v1/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-Forwarded-For': testIp,
+      Origin: 'https://app.example.com',
+    },
+    body: JSON.stringify({ email: 'test-exceeded@example.com' }),
+  });
+  assert.equal(resLimit.status, 429, '21st request must trigger HTTP 429');
+  const limitBody = await resLimit.text();
+  assert.match(limitBody, /Too many attempts from this IP, please try again later/);
+});
