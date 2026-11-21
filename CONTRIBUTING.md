@@ -122,31 +122,30 @@ Supabase project. Migrations are never applied automatically by CI or a release.
 
 ## Branching and release lines
 
-We keep V1 and V2 source separate so ongoing V2 work cannot destabilize the V1
-release.
+We keep V1 and V2 source separate within the monorepo (`apps/v1` and `apps/v2`) so ongoing V2 work cannot destabilize the stable V1 production release.
 
-| Branch | Purpose |
-| --- | --- |
-| `main` | Latest reviewed, stable integrated release |
-| `development` | Integration branch for day-to-day work |
-| `v1` | Stable V1 release line |
-| `v1-dev` | V1 development |
-| `v2` | V2 release line |
-| `v2-dev` | V2 development |
+| Branch | Purpose | Status |
+| --- | --- | --- |
+| `main` | Latest reviewed, stable integrated release | Active (default production) |
+| `development` | Integration branch for day-to-day work | Active (integration base) |
+| `beta` | Dedicated staging & release track for `apps/v2` Beta Dashboard | Planned / Pre-configured in CI |
+
+> [!NOTE]
+> There are no separate `v1` or `v2` release branches in git. The V1 dashboard (`apps/v1`) and V2 dashboard (`apps/v2`) are maintained as independent workspace directories in the monorepo.
 
 Rules:
 
 - **Do not merge V1 and V2 source into each other.** Each app under `apps/` is the
   source of truth for its release line.
-- Target V1 fixes at the V1 line (`v1`/`v1-dev`) and V2 work at the V2 line
-  (`v2`/`v2-dev`). Use `development` for shared/tooling work.
+- Target all day-to-day feature and bugfix work via pull requests targeting `development`.
 - Never commit directly to `main`.
 - Keep all existing branches; do not rewrite history or force-push.
 
-Create a branch from the line you are targeting:
+Create a branch from `development`:
 
 ```bash
-git checkout v1-dev
+git checkout development
+git pull origin development
 git checkout -b fix/tracking-origin-check
 ```
 
