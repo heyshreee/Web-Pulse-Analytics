@@ -14,6 +14,7 @@ than a large, unclear one.
 - [Branching and release lines](#branching-and-release-lines)
 - [Making a change](#making-a-change)
 - [Testing and quality checks](#testing-and-quality-checks)
+- [Dependencies and Dependabot Policy](#dependencies-and-dependabot-policy)
 - [Commit and PR conventions](#commit-and-pr-conventions)
 - [Security-sensitive areas](#security-sensitive-areas)
 - [Database changes](#database-changes)
@@ -221,6 +222,15 @@ same PR.
 The frontend jobs run `npm ci`, lint, build, and upload `dist`; the backend job runs
 `npm ci`, the syntax checker, and `npm test`. Security workflows run `npm audit`,
 CodeQL, and gitleaks. A PR cannot merge while a required check is failing.
+
+## Dependencies and Dependabot Policy
+
+We manage dependencies actively across our monorepo packages (`apps/marketing`, `apps/v1`, `apps/v2`, and `backend`):
+
+- **Grouped minor and patch updates**: Dependabot is configured (`.github/dependabot.yml`) to group minor and patch version updates weekly per package, keeping PR volume manageable (`open-pull-requests-limit: 3`).
+- **Deliberate major migrations**: Major dependency upgrades (such as Tailwind CSS 4, ESLint 10, Vite major bumps, and framework updates) often include breaking syntax, deprecated configurations, and architectural changes. **Majors are migrated deliberately, not auto-merged**.
+- **Ignore rules**: Known major version jumps requiring dedicated engineering migrations are explicitly excluded in `.github/dependabot.yml` until a formal upgrade PR is scheduled.
+- **Verification standard**: Every dependency update must pass `npm ci`, lint (`npm run lint:all`), build (`npm run build:all`), and test suites (`npm run test:backend`) prior to review and merge.
 
 ## Commit and PR conventions
 
