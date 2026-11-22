@@ -454,3 +454,74 @@ test('Safe return URL validation blocks open redirects and allows trusted domain
   assert.equal(getSafeReturnUrl(null), '/dashboard');
   assert.equal(getSafeReturnUrl(undefined), '/dashboard');
 });
+
+test('Content-Security-Policy header tightens connect-src, removes bare ws, and derives dynamic Supabase host', async (t) => {
+  const base = await startServer(t);
+
+  const res = await fetch(`${base}/`);
+  assert.equal(res.status, 200);
+
+  const csp = res.headers.get('content-security-policy') || '';
+  assert.ok(csp, 'CSP header must be present');
+
+  // Hardcoded Supabase project ref must be eliminated
+  assert.ok(
+    !csp.includes('brjltpxgthgjiaufycvc.supabase.co'),
+    'Hardcoded Supabase project ref must not exist in CSP'
+  );
+
+  // Dynamic Supabase host from SUPABASE_URL must be included
+  assert.ok(
+    csp.includes('https://example.supabase.co'),
+    'Dynamic Supabase HTTPS host must be in CSP'
+  );
+  assert.ok(
+    csp.includes('wss://example.supabase.co'),
+    'Dynamic Supabase WSS host must be in CSP'
+  );
+
+  // Bare ws: and wss: must not exist in connect-src
+  assert.ok(
+    !/\bconnect-src[^;]*\bws:\s/i.test(csp) && !/\bconnect-src[^;]*\bws:;/i.test(csp),
+    'Bare ws: protocol must not be in connect-src'
+  );
+  assert.ok(
+    !/\bconnect-src[^;]*\bwss:\s/i.test(csp) && !/\bconnect-src[^;]*\bwss:;/i.test(csp),
+    'Bare wss: protocol must not be in connect-src'
+  );
+
+  // Wildcard vercel.app must be removed
+  assert.ok(
+    !csp.includes('*.vercel.app'),
+    'Wildcard *.vercel.app must be removed from CSP'
+  );
+});
+
+test('production Content-Security-Policy excludes localhost entries', async () => {
+  const originalEnv = process.env.NODE_ENV;
+  try {
+    process.env.NODE_ENV = 'production';
+    const { default: createApp } = await import('../src/app.js');
+    const prodApp = createApp();
+    const server = prodApp.listen(0);
+    await new Promise((resolve) => server.once('listening', resolve));
+    const port = server.address().port;
+
+    const res = await fetch(`http://127.0.0.1:${port}/`);
+    const csp = res.headers.get('content-security-policy') || '';
+
+    server.closeAllConnections?.();
+    await new Promise((resolve) => server.close(resolve));
+
+    assert.ok(
+      !csp.includes('localhost'),
+      'Production CSP must strictly exclude localhost entries'
+    );
+    assert.ok(
+      !csp.includes('127.0.0.1'),
+      'Production CSP must strictly exclude 127.0.0.1 entries'
+    );
+  } finally {
+    process.env.NODE_ENV = originalEnv;
+  }
+});
