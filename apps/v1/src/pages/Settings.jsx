@@ -28,21 +28,21 @@ export default function Settings() {
     ];
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3 font-sans">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-line">
                 <div className="flex items-center gap-2.5">
                     <div className="p-1.5 rounded border border-line bg-subtle text-ink">
                         <SettingsIcon className="h-4 w-4" />
                     </div>
                     <div>
-                        <h1 className="text-sm font-semibold tracking-tight text-ink">Account Settings</h1>
-                        <p className="text-xs text-ink-muted">Manage your profile, security, and project preferences.</p>
+                        <h1 className="wp-title-page">Account Settings</h1>
+                        <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">Manage your profile, security, and project preferences.</p>
                     </div>
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 items-start">
+            <div className="flex flex-col md:flex-row gap-3 items-start">
                 {/* Control Rail / Sidebar */}
                 <div className="w-full md:w-56 flex-shrink-0">
                     <div className="wp-panel p-1.5 space-y-0.5 sticky top-20">

@@ -14,7 +14,7 @@ export default function IntegrationTab({
   saving, usageStats, onSaveSecurity
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 font-sans">
       {/* Integration Panel */}
       <div className="wp-panel p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">

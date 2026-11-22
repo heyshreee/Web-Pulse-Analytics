@@ -26,8 +26,8 @@ export default function AnalyticsTab({
   const totalDeviceSignals = deviceData.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div className="space-y-3 font-sans">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Main Telemetry Flow */}
         <div className="lg:col-span-2 wp-panel flex flex-col">
           <div className="wp-panel-header">
@@ -94,7 +94,7 @@ export default function AnalyticsTab({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Top Pages */}
         <div className="lg:col-span-2 wp-panel flex flex-col">
           <div className="wp-panel-header">

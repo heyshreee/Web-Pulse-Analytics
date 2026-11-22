@@ -3,68 +3,68 @@ import AnimatedNumber from '../../AnimatedNumber';
 
 export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 font-sans">
       {/* Unified 4-Column KPI Bar */}
-      <div className="wp-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-line">
+      <div className="wp-panel min-h-[82px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[var(--wp-border-default)] bg-[var(--wp-bg-surface)]">
         {/* Total Views */}
-        <div className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-ink-secondary">Total views</span>
-            <Eye className="h-3.5 w-3.5 text-ink-muted" />
+        <div className="p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-[var(--wp-text-secondary)]">Total views</span>
+            <Eye className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
           </div>
           <div>
-            <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+            <div className="text-2xl font-semibold tracking-tight text-[var(--wp-text-primary)] tabular-nums font-mono">
               <AnimatedNumber end={stats?.total_views || 0} duration={1.2} />
             </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[var(--wp-text-muted)] font-mono">
+              <span className="wp-live-dot" />
               <span>Live feed</span>
             </div>
           </div>
         </div>
 
         {/* Unique Visitors */}
-        <div className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-ink-secondary">Unique visitors</span>
-            <Users className="h-3.5 w-3.5 text-ink-muted" />
+        <div className="p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-[var(--wp-text-secondary)]">Unique visitors</span>
+            <Users className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
           </div>
           <div>
-            <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+            <div className="text-2xl font-semibold tracking-tight text-[var(--wp-text-primary)] tabular-nums font-mono">
               <AnimatedNumber end={overviewStats.uniqueVisitors || 0} duration={1.2} />
             </div>
-            <p className="mt-1 text-[11px] text-ink-muted font-mono">Last 30-day window</p>
+            <p className="mt-1 text-[11px] text-[var(--wp-text-muted)] font-mono">Last 30-day window</p>
           </div>
         </div>
 
         {/* Active Now */}
-        <div className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-ink-secondary">Active now</span>
+        <div className="p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-[var(--wp-text-secondary)]">Active now</span>
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--wp-status-live)]" />
             </span>
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+              <div className="text-2xl font-semibold tracking-tight text-[var(--wp-text-primary)] tabular-nums font-mono">
                 <AnimatedNumber end={overviewStats.realTimeVisitors || 0} duration={1.0} />
               </div>
-              <span className="text-xs text-emerald-500 font-mono">active</span>
+              <span className="text-xs text-[var(--wp-status-live)] font-mono">active</span>
             </div>
-            <p className="mt-1 text-[11px] text-ink-muted font-mono">Real-time synchronized</p>
+            <p className="mt-1 text-[11px] text-[var(--wp-text-muted)] font-mono">Real-time synchronized</p>
           </div>
         </div>
 
         {/* Storage Used */}
-        <div className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-ink-secondary">Storage used</span>
-            <Database className="h-3.5 w-3.5 text-ink-muted" />
+        <div className="p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-[var(--wp-text-secondary)]">Storage used</span>
+            <Database className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
           </div>
           <div>
-            <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+            <div className="text-2xl font-semibold tracking-tight text-[var(--wp-text-primary)] tabular-nums font-mono">
               {stats?.storageUsed < 1024 * 1024
                 ? `${(stats?.storageUsed / 1024 || 0).toFixed(1)} KB`
                 : stats?.storageUsed < 1024 * 1024 * 1024
@@ -72,13 +72,13 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
                   : `${((stats?.storageUsed || 0) / (1024 * 1024 * 1024)).toFixed(2)} GB`
               }
             </div>
-            <p className="mt-1 text-[11px] text-ink-muted font-mono">Used of allocated quota</p>
+            <p className="mt-1 text-[11px] text-[var(--wp-text-muted)] font-mono">Used of allocated quota</p>
           </div>
         </div>
       </div>
 
       {/* 2-Column Split Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {/* Recent Activity */}
         <div className="wp-panel flex flex-col min-h-[380px]">
           <div className="wp-panel-header">

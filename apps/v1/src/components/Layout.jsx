@@ -442,42 +442,65 @@ export default function Layout() {
 
                     {/* Recessed Capacity Card */}
                     <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)] shrink-0">
-                        <div>
-                            <div className="flex items-center justify-between text-[11px] mb-1">
-                                <span className="text-[var(--wp-text-secondary)]">Events</span>
-                                <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
-                                    {formatUsagePercent(usageStats.totalViews, usageStats.monthlyLimit)}
-                                </span>
+                        {isSidebarBusy ? (
+                            <div className="space-y-2.5 animate-pulse" aria-label="Loading capacity">
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <div className="h-2.5 w-12 bg-[var(--wp-border-subtle)] rounded" />
+                                        <div className="h-2.5 w-8 bg-[var(--wp-border-subtle)] rounded" />
+                                    </div>
+                                    <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
+                                    <div className="h-2 w-24 bg-[var(--wp-border-subtle)] rounded mt-1.5" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <div className="h-2.5 w-12 bg-[var(--wp-border-subtle)] rounded" />
+                                        <div className="h-2.5 w-14 bg-[var(--wp-border-subtle)] rounded" />
+                                    </div>
+                                    <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
+                                </div>
+                                <div className="h-7 w-full bg-[var(--wp-border-subtle)] rounded mt-1" />
                             </div>
-                            <div className="wp-meter-track">
-                                <div
-                                    className="wp-meter-bar"
-                                    style={{ width: `${Math.max(usagePercentage, usageStats.totalViews > 0 ? 2 : 0)}%` }}
-                                />
-                            </div>
-                            <p className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] mt-1">
-                                {usageStats.totalViews.toLocaleString()} / {formatCompactLimit(usageStats.monthlyLimit)} views
-                            </p>
-                        </div>
+                        ) : (
+                            <>
+                                <div>
+                                    <div className="flex items-center justify-between text-[11px] mb-1">
+                                        <span className="text-[var(--wp-text-secondary)]">Events</span>
+                                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                                            {formatUsagePercent(usageStats.totalViews, usageStats.monthlyLimit)}
+                                        </span>
+                                    </div>
+                                    <div className="wp-meter-track">
+                                        <div
+                                            className="wp-meter-bar"
+                                            style={{ width: `${Math.max(usagePercentage, usageStats.totalViews > 0 ? 2 : 0)}%` }}
+                                        />
+                                    </div>
+                                    <p className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] mt-1">
+                                        {usageStats.totalViews.toLocaleString()} / {formatCompactLimit(usageStats.monthlyLimit)} views
+                                    </p>
+                                </div>
 
-                        <div>
-                            <div className="flex items-center justify-between text-[11px] mb-1">
-                                <span className="text-[var(--wp-text-secondary)]">Storage</span>
-                                <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
-                                    {formatBytes(usageStats.storageUsed)}
-                                </span>
-                            </div>
-                            <div className="wp-meter-track">
-                                <div
-                                    className="wp-meter-bar"
-                                    style={{ width: `${Math.max(storagePct, usageStats.storageUsed > 0 ? 2 : 0)}%` }}
-                                />
-                            </div>
-                        </div>
+                                <div>
+                                    <div className="flex items-center justify-between text-[11px] mb-1">
+                                        <span className="text-[var(--wp-text-secondary)]">Storage</span>
+                                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                                            {formatBytes(usageStats.storageUsed)}
+                                        </span>
+                                    </div>
+                                    <div className="wp-meter-track">
+                                        <div
+                                            className="wp-meter-bar"
+                                            style={{ width: `${Math.max(storagePct, usageStats.storageUsed > 0 ? 2 : 0)}%` }}
+                                        />
+                                    </div>
+                                </div>
 
-                        <Link to="/dashboard/billing" className="wp-btn wp-btn-secondary h-7 w-full text-xs justify-center mt-1">
-                            Manage plan
-                        </Link>
+                                <Link to="/dashboard/billing" className="wp-btn wp-btn-secondary h-7 w-full text-xs justify-center mt-1">
+                                    Manage plan
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </aside>
             )}

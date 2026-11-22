@@ -187,46 +187,80 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="space-y-6 animate-pulse">
+      <div className="space-y-3 font-sans animate-pulse">
         {/* Header Skeleton */}
-        <div className="flex justify-between items-center pb-4 border-b border-line">
-          <div>
-            <div className="h-3 w-28 bg-subtle rounded mb-2" />
-            <div className="h-6 w-48 bg-subtle rounded" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--wp-border-subtle)]">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <div className="h-3 w-16 bg-[var(--wp-border-subtle)] rounded" />
+              <span className="text-[var(--wp-border-strong)] text-xs">/</span>
+              <div className="h-3 w-24 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="h-6 w-44 bg-[var(--wp-border-default)] rounded" />
+              <div className="h-5 w-20 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-5 w-32 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
+            </div>
           </div>
-          <div className="h-7 w-20 bg-subtle rounded" />
+          <div className="h-7 w-20 bg-[var(--wp-border-default)] rounded self-start sm:self-auto" />
         </div>
 
         {/* Tabs Bar Skeleton */}
-        <div className="flex gap-4 border-b border-line pb-2.5">
-          {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="h-4 w-16 bg-subtle rounded" />
+        <div className="flex gap-5 border-b border-[var(--wp-border-subtle)] pb-2">
+          {['Overview', 'Analytics', 'Integration', 'Settings'].map((tabLabel, idx) => (
+            <div key={idx} className="h-4 w-16 bg-[var(--wp-border-subtle)] rounded" />
           ))}
         </div>
 
         {/* Unified 4-Column KPI Bar Skeleton */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="wp-panel min-h-[82px] grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-[var(--wp-border-default)] bg-[var(--wp-bg-surface)]">
           {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="p-3.5 rounded-lg border border-line bg-surface space-y-2">
-              <div className="h-3 w-20 bg-subtle rounded" />
-              <div className="h-6 w-24 bg-subtle rounded" />
+            <div key={n} className="p-3.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
+                <div className="h-3.5 w-3.5 bg-[var(--wp-border-subtle)] rounded" />
+              </div>
+              <div className="h-6 w-24 bg-[var(--wp-border-default)] rounded font-mono" />
+              <div className="h-2.5 w-28 bg-[var(--wp-border-subtle)] rounded" />
             </div>
           ))}
         </div>
 
-        {/* Detail Grid Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="rounded-lg border border-line bg-surface p-4 h-[380px] space-y-3">
-            <div className="h-4 w-32 bg-subtle rounded mb-4" />
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="h-8 bg-subtle/50 rounded" />
-            ))}
+        {/* Split Workspace Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-[420px]">
+          {/* Left: Live Activity / Main Panel (7 cols) */}
+          <div className="col-span-12 lg:col-span-7 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+              <div className="h-3.5 w-32 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-3.5 w-20 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+            <div className="p-3.5 space-y-2 flex-1">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="h-9 rounded bg-[var(--wp-bg-subtle)]/70 flex items-center px-3 justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-3.5 w-3.5 bg-[var(--wp-border-subtle)] rounded" />
+                    <div className="h-3 w-28 bg-[var(--wp-border-subtle)] rounded" />
+                  </div>
+                  <div className="h-3 w-16 bg-[var(--wp-border-subtle)] rounded" />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="rounded-lg border border-line bg-surface p-4 h-[380px] space-y-3">
-            <div className="h-4 w-32 bg-subtle rounded mb-4" />
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="h-8 bg-subtle/50 rounded" />
-            ))}
+
+          {/* Right: Telemetry / Status Ingress (5 cols) */}
+          <div className="col-span-12 lg:col-span-5 wp-panel flex flex-col justify-between bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+              <div className="h-3.5 w-28 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-3.5 w-16 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+            <div className="py-12 flex flex-col items-center justify-center space-y-2">
+              <div className="h-10 w-24 bg-[var(--wp-border-default)] rounded" />
+              <div className="h-3 w-36 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+            <div className="p-3 border-t border-[var(--wp-border-subtle)] flex items-center justify-between">
+              <div className="h-2.5 w-20 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-2.5 w-24 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
           </div>
         </div>
       </div>
@@ -239,7 +273,7 @@ export default function ProjectDetail() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-3 font-sans">
       <ProjectHeader 
         project={project} 
         onShowShare={() => setShowShareModal(true)} 
