@@ -38,14 +38,17 @@ policy.
 
 ## Supported versions
 
-Web Pulse Analytics is pre-1.0. Security fixes are provided for the latest released
-version and the maintained release branches (`main`, `v1`, `v2`).
+Security fixes are provided for the latest stable release on `main` and actively integrated on `development`.
 
-| Version | Supported |
-| --- | --- |
-| Latest release (`main`) | ✅ |
-| `v1` / `v2` release branches | ✅ |
-| Older / historical versions | ❌ |
+| Branch / Track | Supported | Status & Description |
+| --- | :---: | --- |
+| `main` (`v1.0.0` / Latest release) | ✅ | Stable production release (`apps/v1` dashboard) |
+| `development` | ✅ | Active integration and pre-release branch |
+| `beta` | ℹ️ | Planned staging track for upcoming V2 beta testing |
+| Historical untagged commits | ❌ | Not supported; please upgrade to `main` |
+
+> [!NOTE]
+> There are no independent `v1` or `v2` git branches. V1 and V2 exist as isolated workspace applications inside the monorepo under `apps/v1` and `apps/v2`.
 
 If you depend on a specific commit, please state it in your report.
 
