@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import projectController from '../controllers/project.controller.js';
 import visitorController from '../controllers/visitor.controller.js';
-import auth from '../middleware/auth.js';
+import auth from '../middlewares/auth.js';
 
 router.use(auth); // Protect all project routes
 

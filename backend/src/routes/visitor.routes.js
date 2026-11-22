@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 import visitorController from '../controllers/visitor.controller.js';
-import rateLimiter from '../middleware/rateLimiter.js';
-import auth from '../middleware/auth.js';
+import rateLimiter from '../middlewares/rateLimiter.js';
+import auth from '../middlewares/auth.js';
 
 // Public endpoint for tracking (no auth required)
 router.post('/track', rateLimiter, visitorController.trackVisitor);

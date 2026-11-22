@@ -2,8 +2,8 @@ import express from 'express';
 const router = express.Router();
 import projectController from '../../controllers/project.controller.js';
 import visitorController from '../../controllers/visitor.controller.js';
-import trackingCors from '../../middleware/trackingCors.js';
-import auth from '../../middleware/auth.js';
+import trackingCors from '../../middlewares/trackingCors.js';
+import auth from '../../middlewares/auth.js';
 
 // Public Analytics (Standard SaaS API). Customer sites call this with an
 // x-api-key header, so it uses the public, non-credentialed CORS policy.
