@@ -140,7 +140,7 @@ Rules:
   source of truth for its release line.
 - Target V1 fixes at the V1 line (`v1`/`v1-dev`) and V2 work at the V2 line
   (`v2`/`v2-dev`). Use `development` for shared/tooling work.
-- Never commit directly to `main`.
+- Never commit directly to `main`. Protection rules require all changes to merge via pull request after passing CI; see [docs/branch-protection.md](docs/branch-protection.md) for configuration and ruleset details.
 - Keep all existing branches; do not rewrite history or force-push.
 
 Create a branch from the line you are targeting:

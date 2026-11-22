@@ -128,7 +128,9 @@ In the event of an urgent production issue:
 
 ## 6. Branch Protection Governance
 
-Configure branch protection rules under **Settings** → **Branches** for `main`, `beta`, and `development`:
+For the ready-to-import ruleset JSON and exact administrative setup steps for `main`, see [docs/branch-protection.md](branch-protection.md).
+
+Configure branch protection rules under **Settings** → **Branches** or **Settings** → **Rules** for `main`, `beta`, and `development`:
 
 - **Require a pull request before merging**: Enabled (minimum 1 approval for `main`).
 - **Require status checks to pass before merging**: Enabled.
