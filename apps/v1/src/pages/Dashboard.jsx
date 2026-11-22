@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { Plus, ArrowUpRight, Loader2, Copy } from 'lucide-react';
+import { Plus, ArrowUpRight, Loader2, Copy, X } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -44,6 +44,7 @@ export default function Dashboard() {
   const [globeError, setGlobeError] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
+  const [showSnippetOverlay, setShowSnippetOverlay] = useState(true);
 
   useEffect(() => {
     loadData();
@@ -495,67 +496,90 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="wp-studio-canvas flex-1 min-h-[380px] relative flex flex-col items-center justify-center p-3">
-            {realTimeVisitors > 0 ? (
-              <div className="w-full h-full relative">
-                <ErrorBoundary scoped title="Live globe temporarily unavailable" message="Real-time map telemetry could not be loaded.">
-                  <NetworkGlobe
-                    activityData={liveActivity}
-                    loading={false}
-                    error={globeError}
-                    onRetry={() => loadData(false)}
-                    realTimeVisitors={realTimeVisitors}
-                    selectedLocation={selectedLocation}
-                    onSelectLocation={setSelectedLocation}
-                    isDark={isDark}
-                  />
-                </ErrorBoundary>
-              </div>
-            ) : (
-              <div className="w-full max-w-sm border border-dashed border-[var(--wp-border-strong)] rounded-lg p-4 sm:p-5 text-center space-y-3 bg-[var(--wp-bg-surface)]/90 backdrop-blur-sm">
-                <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-[var(--wp-text-secondary)]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--wp-border-strong)] animate-pulse" />
-                  <span>Ready to stream</span>
-                </div>
-                <p className="text-[11.5px] text-[var(--wp-text-muted)] leading-relaxed">
-                  Embed the telemetry snippet on your website to capture real-time visitor geography and events.
-                </p>
-                <div className="text-left bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] rounded p-2 relative group">
-                  <div className="text-[10px] font-mono text-[var(--wp-text-muted)] uppercase mb-1">Snippet</div>
-                  <pre className="text-[10.5px] font-mono text-[var(--wp-text-secondary)] overflow-x-auto whitespace-pre p-0 m-0">
-                    {`<script defer src="https://cdn.webpulseanalytics.tech/tracker.js" data-site="auto"></script>`}
-                  </pre>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText('<script defer src="https://cdn.webpulseanalytics.tech/tracker.js" data-site="auto"></script>');
-                      setCopiedSnippet(true);
-                      setTimeout(() => setCopiedSnippet(false), 2000);
-                    }}
-                    className="absolute top-2 right-2 p-1 rounded bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] transition-colors text-[10px]"
-                    title="Copy snippet"
-                  >
-                    {copiedSnippet ? 'Copied' : 'Copy'}
-                  </button>
-                </div>
-                <div className="pt-1 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => loadData(true)}
-                    className="wp-btn wp-btn-secondary text-xs w-full justify-center"
-                  >
-                    Verify telemetry
-                  </button>
-                  <button
-                    type="button"
-                    onClick={openIntegrationGuide}
-                    className="wp-btn wp-btn-secondary text-xs w-full justify-center"
-                  >
-                    Integration guide
-                  </button>
-                </div>
-              </div>
-            )}
+          <div className="wp-studio-canvas flex-1 min-h-[380px] relative flex flex-col items-center justify-center p-0 overflow-hidden">
+            <div className="w-full h-full relative min-h-[380px]">
+              <ErrorBoundary scoped title="Live globe temporarily unavailable" message="Real-time map telemetry could not be loaded.">
+                <NetworkGlobe
+                  activityData={liveActivity}
+                  loading={false}
+                  error={globeError}
+                  onRetry={() => loadData(false)}
+                  realTimeVisitors={realTimeVisitors}
+                  selectedLocation={selectedLocation}
+                  onSelectLocation={setSelectedLocation}
+                  isDark={isDark}
+                />
+              </ErrorBoundary>
+
+              {/* Ready to stream snippet floating overlay when 0 visitors */}
+              {realTimeVisitors === 0 && (
+                showSnippetOverlay ? (
+                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-4 z-20">
+                    <div className="pointer-events-auto w-full max-w-xs border border-dashed border-[var(--wp-border-strong)] rounded-lg p-3.5 text-center space-y-2.5 bg-[var(--wp-bg-surface)]/90 backdrop-blur-md shadow-2xl relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowSnippetOverlay(false)}
+                        className="absolute top-2 right-2 p-1 rounded text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] transition-colors"
+                        title="Minimize snippet"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                      <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-[var(--wp-text-secondary)]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>Ready to stream</span>
+                      </div>
+                      <p className="text-[11px] text-[var(--wp-text-muted)] leading-relaxed">
+                        Embed telemetry snippet to stream real-time visitor geography on the globe.
+                      </p>
+                      <div className="text-left bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] rounded p-2 relative group">
+                        <div className="text-[9.5px] font-mono text-[var(--wp-text-muted)] uppercase mb-0.5">Snippet</div>
+                        <pre className="text-[10px] font-mono text-[var(--wp-text-secondary)] overflow-x-auto whitespace-pre p-0 m-0">
+                          {`<script defer src="https://cdn.webpulseanalytics.tech/tracker.js" data-site="auto"></script>`}
+                        </pre>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('<script defer src="https://cdn.webpulseanalytics.tech/tracker.js" data-site="auto"></script>');
+                            setCopiedSnippet(true);
+                            setTimeout(() => setCopiedSnippet(false), 2000);
+                          }}
+                          className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] transition-colors text-[9.5px] font-mono"
+                          title="Copy snippet"
+                        >
+                          {copiedSnippet ? 'Copied' : 'Copy'}
+                        </button>
+                      </div>
+                      <div className="pt-0.5 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => loadData(true)}
+                          className="wp-btn wp-btn-secondary text-[11px] h-6 w-full justify-center"
+                        >
+                          Verify telemetry
+                        </button>
+                        <button
+                          type="button"
+                          onClick={openIntegrationGuide}
+                          className="wp-btn wp-btn-secondary text-[11px] h-6 w-full justify-center"
+                        >
+                          Guide
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="absolute bottom-3 right-3 z-20 pointer-events-auto">
+                    <button
+                      type="button"
+                      onClick={() => setShowSnippetOverlay(true)}
+                      className="wp-btn wp-btn-secondary h-6 px-2 text-[10px] font-mono inline-flex items-center gap-1 bg-[var(--wp-bg-surface)]/90 backdrop-blur-sm"
+                    >
+                      <span>Embed snippet</span>
+                    </button>
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
       </div>
