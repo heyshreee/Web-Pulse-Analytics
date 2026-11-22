@@ -6,12 +6,11 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
-import Spinner from '../components/Spinner';
 import Reveal from '../components/Reveal';
 import { useToast } from '../context/ToastContext';
 
 export default function Projects() {
-    const { user, loadUser, usageStats } = useOutletContext();
+    const { user, loadUser, usageStats, setIsPageLoading } = useOutletContext();
     const [projects, setProjects] = useState([]);
     const [stats, setStats] = useState({});
     const [showModal, setShowModal] = useState(false);
@@ -52,7 +51,10 @@ export default function Projects() {
         } catch (err) {
             showToast(err.message, 'error');
         } finally {
-            setLoading(false);
+            if (showLoading) {
+                setLoading(false);
+                setIsPageLoading?.(false);
+            }
         }
     };
 
@@ -86,13 +88,75 @@ export default function Projects() {
     };
 
 
-    if (loading) return <Spinner />;
+    if (loading) {
+        return (
+            <div className="space-y-8 animate-pulse">
+                {/* Header Skeleton */}
+                <div className="page-header">
+                    <div className="page-header-title">
+                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
+                        <div className="space-y-2">
+                            <div className="h-6 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                            <div className="h-3.5 w-72 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="h-6 w-20 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                        <div className="h-9 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    </div>
+                </div>
+
+                {/* Stat Cards Skeleton */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((n) => (
+                        <div key={n} className="card card-pad p-6 space-y-4">
+                            <div className="flex justify-between items-start">
+                                <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800" />
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                                <div className="h-8 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-4 w-12 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                            </div>
+                            <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Controls Skeleton */}
+                <div className="card p-3.5 flex flex-col md:flex-row gap-3 justify-between items-center">
+                    <div className="h-10 w-full md:w-80 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="h-10 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                </div>
+
+                {/* Projects Grid Skeleton */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((n) => (
+                        <div key={n} className="card card-pad p-6 flex flex-col justify-between space-y-6">
+                            <div className="flex justify-between items-start">
+                                <div className="w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                                <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                            </div>
+                            <div className="space-y-2 flex-1">
+                                <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-3.5 w-44 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                            </div>
+                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                                <div className="h-4 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-4 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     const projectLimit = usageStats?.projectLimit || 5;
     const projectsUsed = projects.length;
 
-    // Calculate total monthly views across all projects
-    const totalMonthlyViews = Object.values(stats).reduce((acc, curr) => acc + (curr?.current_month_views || 0), 0);
+    // Calculate total monthly views across all projects (fall back to viewCount or total_views if usages table is yet to sync)
+    const totalMonthlyViews = Object.values(stats).reduce((acc, curr) => acc + (curr?.current_month_views || curr?.viewCount || curr?.total_views || 0), 0);
     const viewLimit = usageStats?.monthlyLimit || 1000;
 
     const filteredProjects = projects.filter(p =>
@@ -134,7 +198,7 @@ export default function Projects() {
         <div className="space-y-8">
             {(deletingId || creating) && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-950/80 backdrop-blur-md">
-                    <Spinner fullScreen={false} />
+                    <Loader2 className="h-8 w-8 text-slate-500 animate-spin" />
                 </div>
             )}
 
@@ -146,7 +210,7 @@ export default function Projects() {
                     </div>
                     <div>
                         <h1 className="page-title">Your Projects</h1>
-                        <p className="page-sub">Manage and monitor your connected domains and tracking infrastructure.</p>
+                        <p className="page-sub">Manage and monitor connected domains and tracking endpoints.</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -158,7 +222,7 @@ export default function Projects() {
                             className="btn-primary btn-md"
                         >
                             <Plus className="h-4 w-4" />
-                            Launch Project
+                            New Project
                         </button>
                         {projectsUsed >= projectLimit && (
                             <div className="absolute top-full right-0 mt-2 w-48 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lift text-xs text-slate-600 dark:text-slate-300 hidden group-hover/btn:block z-50">
@@ -172,24 +236,26 @@ export default function Projects() {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
                 {statCards.map((card) => (
-                    <div key={card.label} className="card card-pad relative overflow-hidden">
-                        <div className="flex justify-between items-start mb-6">
-                            <span className="eyebrow">{card.label}</span>
-                            {card.icon}
+                    <div key={card.label} className="card card-pad flex flex-col justify-between">
+                        <div>
+                            <div className="flex justify-between items-start mb-5">
+                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{card.label}</span>
+                                {card.icon}
+                            </div>
+                            <div className="flex items-baseline gap-2 mb-4">
+                                <span className={`text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums ${card.label === 'Storage Load' ? '!text-2xl' : ''}`}>{card.value}</span>
+                                <span className="text-sm font-normal text-slate-400 dark:text-slate-500">{card.suffix}</span>
+                            </div>
                         </div>
-                        <div className="flex items-baseline gap-2">
-                            <span className={`text-4xl font-bold text-slate-900 dark:text-white tracking-tight ${card.label === 'Storage Load' ? '!text-2xl' : ''}`}>{card.value}</span>
-                            <span className="text-base font-medium text-slate-400 dark:text-slate-500">{card.suffix}</span>
-                        </div>
-                        <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800/60">
-                            <div className={`h-full ${card.bar} transition-all duration-700 ease-out`} style={{ width: `${card.pct}%` }} />
+                        <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden">
+                            <div className={`h-full ${card.bar} rounded-full transition-all duration-700 ease-out`} style={{ width: `${card.pct}%` }} />
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* Controls */}
-            <Reveal delay={40} className="card p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <Reveal delay={40} className="card p-3.5 flex flex-col md:flex-row gap-3 justify-between items-center">
                 <div className="relative w-full md:w-80">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
@@ -230,18 +296,18 @@ export default function Projects() {
                             onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
                             className="card card-pad card-hover relative flex flex-col cursor-pointer group/card"
                         >
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="p-3 bg-slate-900 dark:bg-violet-500 text-white rounded-xl group-hover/card:scale-105 transition-transform">
-                                    <BarChart2 className="h-5 w-5" />
+                            <div className="flex justify-between items-start mb-5">
+                                <div className="p-2.5 bg-slate-900 dark:bg-violet-600 text-white rounded-lg group-hover/card:scale-105 transition-transform">
+                                    <BarChart2 className="h-4 w-4" />
                                 </div>
                                 <span className="badge-green">Active</span>
                             </div>
 
-                            <div className="mb-8 flex-1">
-                                <h3 className="font-bold text-slate-900 dark:text-white text-xl tracking-tight group-hover/card:text-violet-600 dark:group-hover/card:text-violet-400 transition-colors mb-1">{project.name}</h3>
-                                <div className="eyebrow !tracking-[0.14em] flex items-center gap-1.5">
+                            <div className="mb-6 flex-1">
+                                <h3 className="font-semibold text-slate-900 dark:text-white text-lg tracking-tight group-hover/card:text-violet-600 dark:group-hover/card:text-violet-400 transition-colors mb-1">{project.name}</h3>
+                                <div className="text-xs text-slate-400 dark:text-slate-500 font-mono flex items-center gap-1.5">
                                     <Database className="h-3 w-3" />
-                                    {project.tracking_id}
+                                    {project.tracking_id?.toLowerCase()}
                                 </div>
                             </div>
 

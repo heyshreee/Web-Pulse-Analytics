@@ -67,7 +67,11 @@ function PrivateRoute({ children }) {
     }, [authed]);
 
     if (checking) {
-        return <Spinner />;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070A10]">
+                <div className="h-6 w-6 rounded-full border-2 border-slate-300 dark:border-slate-700 border-t-transparent animate-spin" />
+            </div>
+        );
     }
 
     if (!authed) {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars -- motion is only used as a JSX member expression
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     User, Shield, Bell, BarChart2, Briefcase,
@@ -9,7 +10,6 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Spinner from '../components/Spinner';
 import { formatINR, getPlanById } from '../data/plans';
 
 export default function Settings() {
@@ -380,7 +380,18 @@ function SecuritySection({ showToast }) {
         }
     };
 
-    if (loadingSessions) return <Spinner />;
+    if (loadingSessions) {
+        return (
+            <div className="card card-pad p-6 space-y-4 animate-pulse">
+                <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="space-y-3">
+                    {[1, 2, 3].map((n) => (
+                        <div key={n} className="h-16 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -561,7 +572,17 @@ function NotificationsSection({ user, showToast }) {
 function UsageSection() {
     const { usageStats } = useOutletContext();
 
-    if (!usageStats) return <Spinner />;
+    if (!usageStats) {
+        return (
+            <div className="card card-pad p-6 space-y-6 animate-pulse">
+                <div className="h-5 w-40 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="h-24 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                    <div className="h-24 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                </div>
+            </div>
+        );
+    }
 
     const getPercentage = (used, limit) => {
         if (limit === Infinity) return 0;
@@ -582,10 +603,10 @@ function UsageSection() {
                     <div className="card card-pad">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="eyebrow">Monthly Views</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">{usageStats.totalViews.toLocaleString()}</p>
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Monthly views</p>
+                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">{usageStats.totalViews.toLocaleString()}</p>
                             </div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 tabular-nums">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
                         </div>
                         <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div
@@ -598,8 +619,8 @@ function UsageSection() {
                     <div className="card card-pad">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="eyebrow">Storage Used</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage used</p>
+                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">
                                     {usageStats.storageUsed < 1024 * 1024
                                         ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
                                         : usageStats.storageUsed < 1024 * 1024 * 1024
@@ -621,8 +642,8 @@ function UsageSection() {
                     <div className="card card-pad">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="eyebrow">Total Projects</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">{usageStats.projectCount}</p>
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total projects</p>
+                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">{usageStats.projectCount}</p>
                             </div>
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Limit: {usageStats.projectLimit}</p>
                         </div>
@@ -637,8 +658,8 @@ function UsageSection() {
                     <div className="card card-pad">
                         <div className="flex justify-between items-end mb-4">
                             <div>
-                                <p className="eyebrow">Shared Reports</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">{usageStats.share_report?.used || 0}</p>
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Shared reports</p>
+                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">{usageStats.share_report?.used || 0}</p>
                             </div>
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}</p>
                         </div>
@@ -703,7 +724,18 @@ function ProjectsSection() {
         }
     };
 
-    if (loading) return <Spinner />;
+    if (loading) {
+        return (
+            <div className="card card-pad p-6 space-y-4 animate-pulse">
+                <div className="h-5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="space-y-3">
+                    {[1, 2, 3].map((n) => (
+                        <div key={n} className="h-14 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="card card-pad">
@@ -851,7 +883,18 @@ function BillingSection({ user }) {
         }
     };
 
-    if (loading) return <Spinner />;
+    if (loading) {
+        return (
+            <div className="card card-pad p-6 space-y-4 animate-pulse">
+                <div className="h-5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="space-y-3">
+                    {[1, 2, 3].map((n) => (
+                        <div key={n} className="h-14 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -865,7 +908,7 @@ function BillingSection({ user }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
                     <div className="card card-pad card-hover">
-                        <p className="eyebrow mb-2">Current Plan</p>
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Current plan</p>
                         <div className="flex items-center gap-2">
                             <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{currentPlan.name}</span>
                             <span className="badge-green">Active</span>
@@ -875,8 +918,8 @@ function BillingSection({ user }) {
                         </p>
                     </div>
                     <div className="card card-pad card-hover">
-                        <p className="eyebrow mb-2">Billing</p>
-                        <p className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Billing terms</p>
+                        <p className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">
                             One-time monthly order
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -884,10 +927,10 @@ function BillingSection({ user }) {
                         </p>
                     </div>
                     <div className="card card-pad card-hover">
-                        <p className="eyebrow mb-2">Payments</p>
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Payment gateway</p>
                         <div className="flex items-center gap-2">
-                            <CreditCard className="h-5 w-5 text-slate-500 dark:text-slate-300" />
-                            <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Razorpay</span>
+                            <CreditCard className="h-4 w-4 text-slate-500 dark:text-slate-300" />
+                            <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Razorpay</span>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                             INR · amounts exclude taxes
@@ -895,18 +938,18 @@ function BillingSection({ user }) {
                     </div>
                 </div>
 
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-6">Payment History</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-5">Payment history</h3>
 
-                <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Invoice ID</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Date</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Description</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Amount</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Status</th>
-                                <th className="px-6 py-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                            <tr className="table-head">
+                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Invoice ID</th>
+                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Date</th>
+                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Description</th>
+                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Amount</th>
+                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Status</th>
+                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1041,7 +1084,18 @@ function LinkedAccountsSection({ showToast }) {
         }
     };
 
-    if (loading) return <Spinner />;
+    if (loading) {
+        return (
+            <div className="card card-pad p-6 space-y-4 animate-pulse">
+                <div className="h-5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="space-y-3">
+                    {[1, 2, 3].map((n) => (
+                        <div key={n} className="h-14 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

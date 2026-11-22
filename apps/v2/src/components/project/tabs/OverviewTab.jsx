@@ -24,7 +24,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
 
         <div className="card card-pad">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="eyebrow">Unique Entities</h3>
+            <h3 className="eyebrow whitespace-nowrap">Unique Entities</h3>
             <div className="p-3 rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400">
               <Users className="h-5 w-5" />
             </div>
@@ -60,7 +60,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums whitespace-nowrap">
               {stats?.storageUsed < 1024 * 1024
                 ? `${(stats?.storageUsed / 1024).toFixed(1)} KB`
                 : stats?.storageUsed < 1024 * 1024 * 1024
@@ -68,7 +68,6 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
                   : `${(stats?.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
               }
             </span>
-            <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-widest">used</span>
           </div>
           <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">Relational data overhead</p>
         </div>
@@ -77,7 +76,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
-        <div className="card card-pad flex flex-col min-h-[420px]">
+        <div className="card card-pad flex flex-col min-h-[420px] min-w-0">
           <div className="flex items-center justify-between mb-6">
             <h3 className="section-title">Live Activity Feed</h3>
             <button
@@ -129,17 +128,17 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
         </div>
 
         {/* Top Referrers */}
-        <div className="card card-pad min-h-[420px] flex flex-col">
+        <div className="card card-pad min-h-[420px] flex flex-col min-w-0">
           <h3 className="section-title mb-6">Ingress Sources</h3>
           <div className="space-y-6 flex-1">
             {overviewStats.topReferrers?.map((referrer, i) => (
               <div key={i} className="group">
-                <div className="flex justify-between text-sm mb-2 items-baseline">
-                  <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex justify-between text-sm mb-2 items-baseline gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: referrer.color }}></div>
                     <span className="text-slate-900 dark:text-white font-medium truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors" title={referrer.name}>{referrer.name}</span>
                   </div>
-                  <span className="text-slate-500 dark:text-slate-400 font-semibold tabular-nums">{referrer.value.toLocaleString()} <span className="opacity-40 font-normal">Pulses</span></span>
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold tabular-nums shrink-0 whitespace-nowrap">{referrer.value.toLocaleString()} <span className="opacity-40 font-normal">Pulses</span></span>
                 </div>
                 <div className="h-1.5 bg-slate-100 dark:bg-slate-800/60 rounded-full overflow-hidden">
                   <div

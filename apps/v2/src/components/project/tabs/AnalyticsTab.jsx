@@ -64,20 +64,29 @@ export default function AnalyticsTab({
         </div>
 
         {/* Real-time Pulse Ingress */}
-        <div className="card card-pad flex flex-col justify-center items-center">
-          <div className="text-center flex flex-col items-center">
-            <div className="badge-green mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="uppercase tracking-widest text-[10px] font-semibold">Live Pulse</span>
-            </div>
+        <div className="card card-pad flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Live Telemetry</span>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${overviewStats?.realTimeVisitors > 0 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${overviewStats?.realTimeVisitors > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+              {overviewStats?.realTimeVisitors > 0 ? 'Active Stream' : 'Idle'}
+            </span>
+          </div>
 
-            <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight tabular-nums">
+          <div className="py-6 text-center">
+            <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight tabular-nums">
               {overviewStats?.realTimeVisitors || 0}
             </div>
-            <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest">Active Visitors Now</p>
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              {overviewStats?.realTimeVisitors > 0 ? 'Active visitors on site' : 'No active pulses detected'}
+            </p>
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+            <span>Socket Feed</span>
+            <span className="font-medium text-slate-600 dark:text-slate-300">
+              {overviewStats?.realTimeVisitors > 0 ? 'Synchronized' : 'Last seen moments ago'}
+            </span>
           </div>
         </div>
       </div>

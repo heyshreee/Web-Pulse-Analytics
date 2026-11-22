@@ -56,21 +56,21 @@ export default function IntegrationTab({
         {/* Endpoint Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pt-8 border-t border-slate-100 dark:border-slate-800">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Tracking API (POST)</label>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Tracking API (POST)</label>
             <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg">
               <code className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/track/events')}</code>
               <CopyButton text={trackingUrl.replace(/\/track\/[^/]+$/, '/track/events')} size="sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Analytics API (GET)</label>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Analytics API (GET)</label>
             <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg">
               <code className="text-xs text-blue-600 dark:text-blue-400 font-semibold font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/analytics/count')}</code>
               <CopyButton text={trackingUrl.replace(/\/track\/[^/]+$/, '/analytics/count')} size="sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Standard Script URL</label>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Standard script URL</label>
             <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg">
               <code className="text-xs text-amber-600 dark:text-amber-400 font-semibold font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/track/script.js')}</code>
               <CopyButton text={trackingUrl.replace(/\/track\/[^/]+$/, '/track/script.js')} size="sm" />
@@ -84,15 +84,15 @@ export default function IntegrationTab({
             <>
               {[
                 { id: 'vanilla', label: 'Vanilla JS' },
-                { id: 'vanilla-count', label: 'Live Counter' },
-                { id: 'react', label: 'React Hooks' },
-                { id: 'react-footer', label: 'Counter Footer' },
+                { id: 'vanilla-count', label: 'Live counter' },
+                { id: 'react', label: 'React hooks' },
+                { id: 'react-footer', label: 'Counter footer' },
                 { id: 'vue', label: 'Vue.js' }
               ].map(opt => (
                 <button
                   key={opt.id}
                   onClick={() => setSnippetType(opt.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${snippetType === opt.id ? 'bg-slate-900 dark:bg-violet-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'}`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${snippetType === opt.id ? 'bg-slate-900 dark:bg-violet-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'}`}
                 >
                   {opt.label}
                 </button>

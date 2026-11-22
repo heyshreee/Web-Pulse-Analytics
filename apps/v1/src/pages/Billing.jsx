@@ -1,15 +1,15 @@
 import { useOutletContext } from 'react-router-dom';
 import { Check, Zap, CreditCard, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars -- motion is only used as a JSX member expression
 import { motion } from 'framer-motion';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Spinner from '../components/Spinner';
 import Reveal from '../components/Reveal';
 import { plans, formatINR, getPlanById } from '../data/plans';
 
 export default function Billing() {
-    const { user, loadUser } = useOutletContext();
+    const { user, loadUser, setIsPageLoading } = useOutletContext();
     const [stats, setStats] = useState(null);
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
@@ -36,6 +36,7 @@ export default function Billing() {
                 console.error('Failed to load billing data:', error);
             } finally {
                 setPageLoading(false);
+                setIsPageLoading?.(false);
             }
         };
         init();
@@ -77,13 +78,13 @@ export default function Billing() {
         }
     };
 
-    const viewLimit = usageStats.monthlyLimit || 1000;
-    const totalViewsUsed = usageStats.totalViews || 0;
+    const viewLimit = usageStats?.monthlyLimit || 1000;
+    const totalViewsUsed = usageStats?.totalViews || 0;
     const viewPercentage = Math.min((totalViewsUsed / viewLimit) * 100, 100);
     const projectsCount = stats?.projectsCount || 0;
     const projectLimit = usageStats?.projectLimit || 5;
     const projectPercentage = Math.min((projectsCount / projectLimit) * 100, 100);
-    const currentPlan = getPlanById(usageStats.plan) || getPlanById('free');
+    const currentPlan = getPlanById(usageStats?.plan) || getPlanById('free') || { id: 'free', name: 'Free', amount: 0, description: 'Free Tier', limits: [], features: [] };
 
     const getNextResetDate = () => {
         const now = new Date();
@@ -197,7 +198,56 @@ export default function Billing() {
         }
     };
 
-    if (pageLoading) return <Spinner />;
+    if (pageLoading) {
+        return (
+            <div className="space-y-8 animate-pulse">
+                {/* Header Skeleton */}
+                <div className="page-header">
+                    <div className="page-header-title">
+                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
+                        <div className="space-y-2">
+                            <div className="h-6 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
+                            <div className="h-3.5 w-72 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Top Section Skeleton */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 card card-pad p-6 space-y-6">
+                        <div className="flex justify-between items-start">
+                            <div className="space-y-2">
+                                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-7 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="h-9 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                            <div className="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                        </div>
+                    </div>
+                    <div className="card card-pad p-6 space-y-4">
+                        <div className="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                        <div className="h-8 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                        <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                    </div>
+                </div>
+
+                {/* Plans Skeleton */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((n) => (
+                        <div key={n} className="card card-pad p-6 space-y-4">
+                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                            <div className="h-8 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                            <div className="h-24 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                            <div className="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -221,7 +271,7 @@ export default function Billing() {
                     <div className="absolute inset-0 bg-violet-500/[0.03] pointer-events-none" />
                     <div className="flex justify-between items-start gap-4 mb-8 relative z-10">
                         <div>
-                            <p className="eyebrow mb-2">Current Plan</p>
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Current plan</p>
                             <div className="flex items-center gap-3">
                                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{currentPlan.name} Plan</h2>
                                 <span className="badge-slate">Current</span>
@@ -239,12 +289,12 @@ export default function Billing() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40">
-                            <p className="eyebrow mb-2">Monthly Limit</p>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{viewLimit.toLocaleString()} <span className="text-sm text-slate-500 ml-1">tracked events</span></p>
+                        <div className="card-subtle p-4">
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Monthly limit</p>
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums">{viewLimit.toLocaleString()} <span className="text-sm font-normal text-slate-500 ml-1">tracked events</span></p>
                         </div>
-                        <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40">
-                            <p className="eyebrow mb-2">Next Reset</p>
+                        <div className="card-subtle p-4">
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Next reset</p>
                             <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{getNextResetDate()}</p>
                         </div>
                     </div>
@@ -252,22 +302,22 @@ export default function Billing() {
 
                 {/* Usage Card */}
                 <div className="card card-pad flex flex-col">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                            <Zap className="h-5 w-5 text-violet-500" />
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 dark:bg-violet-500/10">
+                            <Zap className="h-4 w-4 text-violet-500" />
                         </div>
-                        <h3 className="eyebrow">Usage This Month</h3>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Usage this month</h3>
                     </div>
 
-                    <div className="space-y-8 flex-1">
+                    <div className="space-y-6 flex-1">
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Tracked Events</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Tracked events</p>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight tabular-nums">
                                     {totalViewsUsed.toLocaleString()} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {viewLimit.toLocaleString()}</span>
                                 </p>
                             </div>
-                            <div className="h-2 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${viewPercentage}%` }}
@@ -278,12 +328,12 @@ export default function Billing() {
 
                         <div>
                             <div className="flex justify-between items-end mb-2">
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Active Projects</p>
-                                <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Active projects</p>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight tabular-nums">
                                     {projectsCount} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {projectLimit}</span>
                                 </p>
                             </div>
-                            <div className="h-2 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${projectPercentage}%` }}
@@ -293,7 +343,7 @@ export default function Billing() {
                         </div>
                     </div>
 
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-8 italic leading-relaxed">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 leading-relaxed">
                         Resets on the first day of each calendar month.
                     </p>
                 </div>
@@ -301,9 +351,9 @@ export default function Billing() {
 
             {/* Plan Comparison Section */}
             <div id="choose-plan" className="scroll-mt-24">
-                <h2 className="section-title mb-2">Choose your plan</h2>
+                <h2 className="section-title mb-1.5">Choose your plan</h2>
                 <p className="page-sub">Pick the plan that fits your traffic and project needs.</p>
-                <p className="mb-8 mt-2 max-w-3xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                <p className="mb-6 mt-1.5 max-w-2xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                     Prices are in INR per month of allowance. Paid plans are one-time orders with no
                     subscription and no automatic renewal; the plan stays active until you change it,
                     and amounts exclude applicable taxes.
@@ -336,14 +386,14 @@ export default function Billing() {
                                             : 'card-hover'}
                                 `}>
                                     {isPro && (
-                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                                            <span className="px-3 py-1 bg-violet-500 text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm">Most popular</span>
+                                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-20">
+                                            <span className="px-2.5 py-0.5 bg-violet-500 text-white text-[11px] font-medium rounded-full shadow-sm">Popular</span>
                                         </div>
                                     )}
 
-                                    <div className="mb-5">
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{plan.name}</h3>
-                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                                    <div className="mb-4">
+                                        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">{plan.name}</h3>
+                                        <p className="text-xs font-normal text-slate-500 dark:text-slate-400 leading-normal">
                                             {plan.description}
                                         </p>
                                     </div>

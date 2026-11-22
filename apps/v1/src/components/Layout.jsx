@@ -12,7 +12,6 @@ import {
     Activity,
     BarChart2,
     Key,
-    LifeBuoy,
     Zap,
     Sparkles
 } from 'lucide-react';
@@ -27,6 +26,8 @@ import PageTransition from './PageTransition';
 export default function Layout() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [sidebarLoading, setSidebarLoading] = useState(true);
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [pinnedProjects, setPinnedProjects] = useState([]);
     const [usageStats, setUsageStats] = useState({
@@ -48,12 +49,16 @@ export default function Layout() {
 
     useEffect(() => {
         loadUser();
+        const timer = setTimeout(() => {
+            setIsPageLoading(false);
+        }, 1200);
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
         if (!user) return;
 
-        loadSidebarData();
+        loadSidebarData(true);
 
         if (isSocketEnabled()) {
             const newSocket = io(getSocketUrl(), {
@@ -118,7 +123,7 @@ export default function Layout() {
         }
     };
 
-    const loadSidebarData = async () => {
+    const loadSidebarData = async (initial = false) => {
         try {
             const [projects, usage] = await Promise.all([
                 apiRequest('/projects'),
@@ -134,6 +139,10 @@ export default function Layout() {
             }
         } catch (error) {
             console.error('Failed to load sidebar data', error);
+        } finally {
+            if (initial) {
+                setSidebarLoading(false);
+            }
         }
     };
 
@@ -156,8 +165,89 @@ export default function Layout() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070A10]">
-                <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
+            <div className="h-screen overflow-hidden bg-slate-50 dark:bg-[#070A10] flex font-sans text-slate-900 dark:text-slate-200">
+                {/* Left Sidebar Workspace Skeleton */}
+                <aside className="w-72 bg-white dark:bg-space-900 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden lg:flex animate-pulse">
+                    <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/80">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            <div className="h-5 w-24 rounded bg-slate-200 dark:bg-slate-800" />
+                        </div>
+                    </div>
+                    <div className="flex-1 px-3 py-5 space-y-6">
+                        <div>
+                            <div className="px-3 mb-2.5">
+                                <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="space-y-1.5">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg">
+                                        <div className="h-4 w-4 rounded bg-slate-200 dark:bg-slate-800" />
+                                        <div className={`h-3.5 rounded bg-slate-200 dark:bg-slate-800 ${i === 1 ? 'w-24' : i === 2 ? 'w-20' : i === 3 ? 'w-28' : i === 4 ? 'w-20' : 'w-16'}`} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="px-3 mb-2.5">
+                                <div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="space-y-1.5">
+                                {[1, 2].map((i) => (
+                                    <div key={i} className="flex items-center gap-2.5 px-3 py-2">
+                                        <div className="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-800" />
+                                        <div className="h-3.5 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="px-3 mb-2.5">
+                                <div className="h-3 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="card-subtle p-3.5 space-y-3.5">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                        <div className="h-3 w-8 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                    </div>
+                                    <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <div className="h-3 w-14 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                        <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                    </div>
+                                    <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                </div>
+                                <div className="h-8 w-full bg-slate-200 dark:bg-slate-700/40 rounded-lg" />
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                {/* Main Content Area Skeleton */}
+                <div className="flex-1 flex flex-col min-w-0">
+                    <header className="h-16 bg-white/80 dark:bg-space-900/75 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6">
+                        <div className="h-5 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            <div className="h-8 w-8 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                            <div className="h-8 w-24 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                        </div>
+                    </header>
+                    <main className="flex-1 p-6 space-y-6 animate-pulse">
+                        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="card card-pad h-32 bg-slate-100 dark:bg-slate-900/50 rounded-xl" />
+                            ))}
+                        </div>
+                        <div className="card h-96 bg-slate-100 dark:bg-slate-900/50 rounded-xl" />
+                    </main>
+                </div>
             </div>
         );
     }
@@ -172,12 +262,11 @@ export default function Layout() {
     };
 
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
+    const isSidebarBusy = sidebarLoading || isPageLoading;
 
     const isProdDomain = typeof window !== 'undefined' &&
         (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
-    const defaultMarketingUrl = isProdDomain ? 'https://webpulseanalytics.tech' : 'http://localhost:5174';
     const defaultV2Url = isProdDomain ? 'https://beta.webpulseanalytics.tech' : 'http://localhost:5175';
-    const marketingUrl = (import.meta.env.VITE_MARKETING_URL || defaultMarketingUrl).replace(/\/+$/, '');
     const v2AppUrl = import.meta.env.VITE_V2_APP_URL || defaultV2Url;
 
     return (
@@ -204,106 +293,169 @@ export default function Layout() {
                     {/* Main Navigation */}
                     <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
                         <div>
-                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Menu</h3>
-                            <div className="space-y-1">
-                                {navItems.map((item) => {
-                                    const Icon = item.icon;
-                                    const isActive = location.pathname === item.path ||
-                                        (item.path === '/dashboard/projects' && location.pathname.startsWith('/dashboard/projects'));
-                                    return (
-                                        <Link
-                                            key={item.path}
-                                            to={item.path}
-                                            onClick={() => setSidebarOpen(false)}
-                                            className={`group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
-                                                ? 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
-                                                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
-                                                }`}
+                            <div className="px-3 mb-2 text-xs font-medium text-slate-400 dark:text-slate-500">Workspace</div>
+                            {isSidebarBusy ? (
+                                <div className="space-y-1 animate-pulse" aria-label="Loading navigation">
+                                    {[
+                                        { path: '/dashboard', labelWidth: 'w-24', isRoute: location.pathname === '/dashboard' },
+                                        { path: '/dashboard/projects', labelWidth: 'w-20', isRoute: location.pathname.startsWith('/dashboard/projects') },
+                                        { path: '/dashboard/activity', labelWidth: 'w-28', isRoute: location.pathname === '/dashboard/activity' },
+                                        { path: '/dashboard/api-key', labelWidth: 'w-20', isRoute: location.pathname === '/dashboard/api-key' },
+                                        { path: '/dashboard/billing', labelWidth: 'w-16', isRoute: location.pathname === '/dashboard/billing' },
+                                    ].map((item, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg ${
+                                                item.isRoute
+                                                    ? 'bg-violet-50/70 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
+                                                    : 'bg-transparent'
+                                            }`}
                                         >
-                                            <span
-                                                aria-hidden="true"
-                                                className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-violet-500 transition-all duration-300 ease-out ${isActive ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'}`}
+                                            {item.isRoute && (
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-full bg-violet-500"
+                                                />
+                                            )}
+                                            <div
+                                                className={`h-[18px] w-[18px] rounded ${
+                                                    item.isRoute
+                                                        ? 'bg-violet-300/60 dark:bg-violet-500/30'
+                                                        : 'bg-slate-200 dark:bg-slate-800'
+                                                }`}
                                             />
-                                            <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-violet-600 dark:text-violet-300' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300'}`} />
-                                            <span>{item.label}</span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
+                                            <div
+                                                className={`h-3.5 rounded ${item.labelWidth} ${
+                                                    item.isRoute
+                                                        ? 'bg-violet-300/60 dark:bg-violet-500/30'
+                                                        : 'bg-slate-200 dark:bg-slate-800'
+                                                }`}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-1">
+                                    {navItems.map((item) => {
+                                        const Icon = item.icon;
+                                        const isActive = location.pathname === item.path ||
+                                            (item.path === '/dashboard/projects' && location.pathname.startsWith('/dashboard/projects'));
+                                        return (
+                                            <Link
+                                                key={item.path}
+                                                to={item.path}
+                                                onClick={() => setSidebarOpen(false)}
+                                                className={`group relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive
+                                                    ? 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
+                                                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+                                                    }`}
+                                            >
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={`absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-full bg-violet-500 transition-all duration-200 ease-out ${isActive ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'}`}
+                                                />
+                                                <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-violet-600 dark:text-violet-300' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} />
+                                                <span>{item.label}</span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         {/* Pinned Projects */}
                         <div>
-                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Pinned Projects</h3>
-                            <div className="space-y-0.5">
-                                {pinnedProjects.length > 0 ? (
-                                    pinnedProjects.map((project) => (
-                                        <Link
-                                            key={project.id}
-                                            to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
-                                            className="group flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
-                                        >
-                                            <span className="flex items-center gap-2.5">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                                <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white truncate">{project.name}</span>
-                                            </span>
-                                        </Link>
-                                    ))
-                                ) : (
-                                    <p className="px-3 py-2 text-xs text-slate-400 dark:text-slate-600">No pinned projects yet</p>
-                                )}
-                            </div>
+                            <div className="px-3 mb-2 text-xs font-medium text-slate-400 dark:text-slate-500">Pinned domains</div>
+                            {isSidebarBusy ? (
+                                <div className="space-y-1 px-1 animate-pulse">
+                                    <div className="flex items-center gap-2.5 px-3 py-2">
+                                        <div className="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-700/60" />
+                                        <div className="h-3 w-24 rounded bg-slate-200 dark:bg-slate-700/60" />
+                                    </div>
+                                    <div className="flex items-center gap-2.5 px-3 py-2">
+                                        <div className="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-700/60" />
+                                        <div className="h-3 w-32 rounded bg-slate-200 dark:bg-slate-700/60" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-0.5">
+                                    {pinnedProjects.length > 0 ? (
+                                        pinnedProjects.map((project) => (
+                                            <Link
+                                                key={project.id}
+                                                to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
+                                                className="group flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition-colors"
+                                            >
+                                                <span className="flex items-center gap-2.5">
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                    <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white truncate">{project.name}</span>
+                                                </span>
+                                            </Link>
+                                        ))
+                                    ) : (
+                                        <p className="px-3 py-1.5 text-xs text-slate-400 dark:text-slate-600">No pinned projects yet</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Usage widget */}
                         <div>
-                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Usage</h3>
-                            <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40 space-y-4">
-                                <div>
-                                    <div className="flex items-center justify-between mb-1.5">
-                                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Events tracked</span>
-                                        <span className="text-xs font-semibold text-slate-900 dark:text-white">{Math.round(usagePercentage)}%</span>
+                            <div className="px-3 mb-2 text-xs font-medium text-slate-400 dark:text-slate-500">Resource capacity</div>
+                            {isSidebarBusy ? (
+                                <div className="card-subtle p-3.5 space-y-3.5 animate-pulse">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <div className="h-3 w-20 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                            <div className="h-3 w-8 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                        </div>
+                                        <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                        <div className="h-2.5 w-24 bg-slate-200 dark:bg-slate-700/50 rounded" />
                                     </div>
-                                    <div className="h-1.5 rounded-full bg-slate-200/70 dark:bg-slate-700/60 overflow-hidden">
-                                        <div className="h-full rounded-full bg-violet-500 transition-all duration-500" style={{ width: `${usagePercentage}%` }} />
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <div className="h-3 w-14 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                            <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700/60 rounded" />
+                                        </div>
+                                        <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
                                     </div>
-                                    <p className="mt-1.5 text-[11px] text-slate-400 dark:text-slate-500">
-                                        {usageStats.totalViews.toLocaleString()} / {usageStats.monthlyLimit.toLocaleString()} views
-                                    </p>
+                                    <div className="h-8 w-full bg-slate-200 dark:bg-slate-700/40 rounded-lg" />
                                 </div>
+                            ) : (
+                                <div className="card-subtle p-3.5 space-y-3.5">
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Events tracked</span>
+                                            <span className="text-xs font-semibold tabular-nums text-slate-900 dark:text-white">{Math.round(usagePercentage)}%</span>
+                                        </div>
+                                        <div className="h-1.5 rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
+                                            <div className="h-full rounded-full bg-violet-500 transition-all duration-300" style={{ width: `${usagePercentage}%` }} />
+                                        </div>
+                                        <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">
+                                            {usageStats.totalViews.toLocaleString()} / {usageStats.monthlyLimit.toLocaleString()} views
+                                        </p>
+                                    </div>
 
-                                <div>
-                                    <div className="flex items-center justify-between mb-1.5">
-                                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage</span>
-                                        <span className="text-xs font-semibold text-slate-900 dark:text-white">
-                                            {formatBytes(usageStats.storageUsed)} <span className="font-normal text-slate-400">/ {formatBytes(usageStats.storageLimit)}</span>
-                                        </span>
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Storage</span>
+                                            <span className="text-xs font-semibold tabular-nums text-slate-900 dark:text-white">
+                                                {formatBytes(usageStats.storageUsed)} <span className="font-normal text-slate-400">/ {formatBytes(usageStats.storageLimit)}</span>
+                                            </span>
+                                        </div>
+                                        <div className="h-1.5 rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden">
+                                            <div className="h-full rounded-full bg-emerald-500 transition-all duration-300" style={{ width: `${storagePct}%` }} />
+                                        </div>
                                     </div>
-                                    <div className="h-1.5 rounded-full bg-slate-200/70 dark:bg-slate-700/60 overflow-hidden">
-                                        <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${storagePct}%` }} />
-                                    </div>
+
+                                    <Link to="/dashboard/billing" className="btn-secondary btn-sm w-full justify-center">
+                                        <Zap className="h-3.5 w-3.5 text-violet-500" />
+                                        Manage plan
+                                    </Link>
                                 </div>
-
-                                <Link to="/dashboard/billing" className="btn-primary btn-sm w-full">
-                                    <Zap className="h-3.5 w-3.5" />
-                                    Upgrade plan
-                                </Link>
-                            </div>
+                            )}
                         </div>
                     </nav>
-
-                    {/* Footer */}
-                    <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800/80">
-                        <a
-                            href={`${marketingUrl}/docs`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-colors"
-                        >
-                            <LifeBuoy className="h-[18px] w-[18px] text-slate-400 dark:text-slate-500" />
-                            Help & Docs
-                        </a>
-                    </div>
                 </aside>
             )}
 
@@ -388,7 +540,7 @@ export default function Layout() {
                 <main className="flex-1 overflow-auto layout-scroll-content">
                     <div className="container-app py-6 sm:py-8">
                         <PageTransition>
-                            <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
+                            <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket, isPageLoading, setIsPageLoading }} />
                         </PageTransition>
                     </div>
                 </main>

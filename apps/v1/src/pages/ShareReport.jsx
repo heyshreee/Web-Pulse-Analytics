@@ -9,7 +9,6 @@ import {
 } from 'recharts';
 import { apiRequest } from '../utils/api';
 import TrafficTrendsChart from '../components/TrafficTrendsChart';
-import Spinner from '../components/Spinner';
 import { useTheme } from '../context/ThemeContext';
 import Logo from '../components/Logo';
 import { Tablet, Smartphone } from 'lucide-react';
@@ -38,7 +37,15 @@ export default function ShareReport() {
     }, [shareToken]);
 
     if (loading) {
-        return <Spinner />;
+        return (
+            <div className="min-h-screen bg-slate-50 dark:bg-[#070A10] p-6 max-w-7xl mx-auto space-y-8 animate-pulse">
+                <div className="h-20 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map(n => <div key={n} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl" />)}
+                </div>
+                <div className="h-[400px] w-full bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+            </div>
+        );
     }
 
     if (error) {

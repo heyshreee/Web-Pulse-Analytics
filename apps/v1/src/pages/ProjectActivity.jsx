@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import {
-    Search, Download, ChevronLeft, ChevronRight,
+    Search, Download, ChevronLeft, ChevronRight, ChevronDown,
     Key, Shield, AlertTriangle, Settings, Lock, Activity,
     RefreshCw, Zap
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Spinner from '../components/Spinner';
 
 export default function ProjectActivity() {
     const { idOrName } = useParams();
@@ -39,7 +38,7 @@ export default function ProjectActivity() {
     const [totalLogs, setTotalLogs] = useState(0);
     const [isLive, setIsLive] = useState(false);
     const { showToast } = useToast();
-    const { socket, user } = useOutletContext(); // Get user to check plan
+    const { socket, user, setIsPageLoading } = useOutletContext() || {}; // Get user to check plan
 
     useEffect(() => {
         loadData();
@@ -104,6 +103,7 @@ export default function ProjectActivity() {
             showToast('Failed to load activity logs', 'error');
         } finally {
             setLoading(false);
+            setIsPageLoading?.(false);
         }
     };
 
@@ -151,6 +151,81 @@ export default function ProjectActivity() {
         a.download = `activity-log-${project?.name || 'project'}-${new Date().toISOString()}.csv`;
         a.click();
     };
+
+    if (loading && logs.length === 0) {
+        return (
+            <div className="space-y-8 animate-pulse">
+                {/* Header Skeleton */}
+                <div className="page-header">
+                    <div className="page-header-title">
+                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
+                        <div className="space-y-2">
+                            <div className="h-6 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                            <div className="h-3.5 w-80 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                        </div>
+                    </div>
+                    <div className="h-9 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                </div>
+
+                {/* Controls Skeleton */}
+                <div className="card card-pad flex flex-col lg:flex-row gap-4 items-center justify-between p-4">
+                    <div className="h-10 w-full lg:max-w-md bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="flex flex-wrap gap-2.5 w-full lg:w-auto">
+                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    </div>
+                </div>
+
+                {/* Table Skeleton */}
+                <div className="card overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="table-head">
+                                    <th className="px-4 py-3">Timestamp</th>
+                                    {!idOrName && <th className="px-4 py-3">Project</th>}
+                                    <th className="px-4 py-3">Event type</th>
+                                    <th className="px-4 py-3">User</th>
+                                    <th className="px-4 py-3">Details</th>
+                                    <th className="px-4 py-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                {[1, 2, 3, 4, 5, 6].map((n) => (
+                                    <tr key={n} className="text-xs">
+                                        <td className="px-4 py-4">
+                                            <div className="space-y-1.5">
+                                                <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                                                <div className="h-3 w-14 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                                            </div>
+                                        </td>
+                                        {!idOrName && (
+                                            <td className="px-4 py-4">
+                                                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                                            </td>
+                                        )}
+                                        <td className="px-4 py-4">
+                                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="h-3.5 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-4 text-right">
+                                            <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full ml-auto" />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -202,30 +277,32 @@ export default function ProjectActivity() {
                 </div>
 
                 <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                    <div className="relative flex-1 sm:flex-none">
                         <select
                             value={eventType}
                             onChange={(e) => setEventType(e.target.value)}
-                            className="input w-full sm:w-auto cursor-pointer"
+                            className="input w-full sm:w-auto appearance-none pr-8 cursor-pointer"
                         >
                             <option value="all">All Events</option>
                             <option value="success">Success</option>
                             <option value="warning">Warning</option>
                             <option value="failure">Failure</option>
                         </select>
+                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     </div>
 
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                    <div className="relative flex-1 sm:flex-none">
                         <select
                             value={timeRange}
                             onChange={(e) => setTimeRange(e.target.value)}
-                            className="input w-full sm:w-auto cursor-pointer"
+                            className="input w-full sm:w-auto appearance-none pr-8 cursor-pointer"
                         >
                             <option value="24h">Last 24h</option>
                             <option value="7d">Last 7 Days</option>
                             <option value="30d">Last 30 Days</option>
                             <option value="all">All Time</option>
                         </select>
+                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     </div>
 
                     <div className="flex gap-2 w-full sm:w-auto items-center">
@@ -264,13 +341,31 @@ export default function ProjectActivity() {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr>
-                                    <td colSpan={idOrName ? 5 : 6} className="px-4 py-12 text-center">
-                                        <div className="flex justify-center">
-                                            <Spinner fullScreen={false} />
-                                        </div>
-                                    </td>
-                                </tr>
+                                [1, 2, 3, 4, 5].map((n) => (
+                                    <tr key={n} className="border-b border-slate-100 dark:border-slate-800/60 animate-pulse text-xs">
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded mb-1" />
+                                            <div className="h-3 w-14 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                                        </td>
+                                        {!idOrName && (
+                                            <td className="px-4 py-3.5">
+                                                <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                                            </td>
+                                        )}
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5 text-right">
+                                            <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full ml-auto" />
+                                        </td>
+                                    </tr>
+                                ))
                             ) : logs.length === 0 ? (
                                 <tr>
                                     <td colSpan={idOrName ? 5 : 6} className="px-4 py-12 text-center">

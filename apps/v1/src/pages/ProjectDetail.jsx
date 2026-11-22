@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { apiRequest, getApiUrl } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Spinner from '../components/Spinner';
 
 // Hooks
 import useProjectData from '../hooks/useProjectData';
@@ -31,7 +30,7 @@ import ActivityModal from '../components/project/modals/ActivityModal';
 export default function ProjectDetail() {
   const { idOrName, tab } = useParams();
   const navigate = useNavigate();
-  const { user, loadUser, usageStats } = useOutletContext();
+  const { user, loadUser, usageStats, setIsPageLoading } = useOutletContext();
   const { showToast } = useToast();
 
   // Tab State
@@ -72,6 +71,12 @@ export default function ProjectDetail() {
   useEffect(() => {
     if (tab) setActiveTab(tab);
   }, [tab]);
+
+  useEffect(() => {
+    if (!loading) {
+      setIsPageLoading?.(false);
+    }
+  }, [loading, setIsPageLoading]);
 
   // Derived Values
   const trackingId = project?.tracking_id;
@@ -180,11 +185,72 @@ export default function ProjectDetail() {
     }
   };
 
-  if (loading) return (
-    <div className="flex h-[80vh] items-center justify-center">
-      <Spinner />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="page-header">
+          <div>
+            <div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2" />
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-5 w-20 bg-slate-200 dark:bg-slate-800 rounded-full" />
+            </div>
+          </div>
+          <div className="h-9 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        </div>
+
+        {/* Tabs Bar Skeleton */}
+        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+          {[1, 2, 3, 4].map((n) => (
+            <div key={n} className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+          ))}
+        </div>
+
+        {/* KPI Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((n) => (
+            <div key={n} className="card card-pad p-6 space-y-4">
+              <div className="flex justify-between items-start">
+                <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800" />
+              </div>
+              <div className="h-8 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800/60 rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Detail Grid Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="card card-pad p-6 h-[420px] space-y-4">
+            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded mb-6" />
+            {[1, 2, 3, 4, 5].map((n) => (
+              <div key={n} className="flex justify-between items-center py-2">
+                <div className="space-y-1">
+                  <div className="h-3.5 w-40 bg-slate-200 dark:bg-slate-800 rounded" />
+                  <div className="h-2.5 w-24 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                </div>
+                <div className="h-3.5 w-12 bg-slate-200 dark:bg-slate-800 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="card card-pad p-6 h-[420px] space-y-4">
+            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded mb-6" />
+            {[1, 2, 3, 4, 5].map((n) => (
+              <div key={n} className="space-y-2 py-1">
+                <div className="flex justify-between">
+                  <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                  <div className="h-3.5 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+                </div>
+                <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!project) return (
     <div className="flex h-screen items-center justify-center px-6 text-center text-red-600 dark:text-red-400 font-bold">
       Project not found or access denied.

@@ -167,16 +167,16 @@ export default function Notifications() {
                             <div className="flex items-center gap-3">
                                 <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Notifications</h3>
                                 {unreadCount > 0 && (
-                                    <span className="badge-violet text-[10px] font-bold uppercase tracking-wider">
+                                    <span className="badge-violet text-xs font-medium">
                                         {unreadCount} new
                                     </span>
                                 )}
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-                                <X className="h-5 w-5" />
+                            <button onClick={() => setIsOpen(false)} aria-label="Close notifications" className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                                <X className="h-4 w-4" />
                             </button>
                         </div>
-                        <p className="eyebrow">Manage your system alerts and signals</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Manage your system alerts and activity signals</p>
 
                         {/* Tabs */}
                         <div className="flex items-center gap-1 p-1 mt-5 bg-slate-100 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 overflow-x-auto no-scrollbar">

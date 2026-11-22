@@ -3,7 +3,7 @@ import { useOutletContext, Link, useNavigate } from 'react-router-dom';
 import { Plus, Globe, Code, Activity, ArrowUpRight, TrendingUp, X, MapPin, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
-import Spinner from '../components/Spinner';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { useToast } from '../context/ToastContext';
 import NetworkGlobe from '../components/dashboard/NetworkGlobe';
 import { useTheme } from '../context/ThemeContext';
@@ -24,7 +24,7 @@ import {
 } from 'recharts';
 
 export default function Dashboard() {
-  const { user, loadUser, usageStats, socket } = useOutletContext();
+  const { user, loadUser, usageStats, socket, setIsPageLoading } = useOutletContext();
   const [projects, setProjects] = useState([]);
   const [stats, setStats] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -109,7 +109,10 @@ export default function Dashboard() {
       if (showLoading) showToast(err.message, 'error');
       console.error(err);
     } finally {
-      if (showLoading) setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+        setIsPageLoading?.(false);
+      }
     }
   };
 
@@ -171,7 +174,61 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="page-header">
+          <div className="page-header-title">
+            <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
+            <div className="space-y-2">
+              <div className="h-6 w-40 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-3.5 w-64 bg-slate-200 dark:bg-slate-800/60 rounded" />
+            </div>
+          </div>
+          <div className="h-10 w-32 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        </div>
+
+        {/* Hero Section Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3 card h-[400px] lg:h-[520px] bg-slate-100/60 dark:bg-slate-900/40 p-6 flex flex-col justify-between">
+            <div className="flex justify-between items-center">
+              <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="w-48 h-48 rounded-full border border-slate-200 dark:border-slate-800/80" />
+            </div>
+            <div className="h-4 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+          </div>
+
+          <div className="space-y-6">
+            <div className="card card-pad space-y-4">
+              <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-8 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+            </div>
+            <div className="card card-pad space-y-4">
+              <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="card card-pad space-y-3">
+              <div className="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-8 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-3 w-40 bg-slate-200 dark:bg-slate-800/60 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const totalViewsUsed = stats?.reduce((acc, curr) => acc + curr.views, 0) || 0;
   const viewLimit = usageStats?.monthlyLimit || 1000;
@@ -237,7 +294,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="page-title">Global Insights</h1>
-            <p className="page-sub">Real-time visitor activity from across all tracked domains.</p>
+            <p className="page-sub">Real-time visitor telemetry across connected domains.</p>
           </div>
         </div>
         <button onClick={openCreateProject} className="btn-primary btn-md">
@@ -251,16 +308,18 @@ export default function Dashboard() {
           <div className="card overflow-hidden h-[400px] lg:h-[520px] relative flex">
             <div className="absolute inset-0 bg-violet-500/[0.03] pointer-events-none" />
             <div className="relative flex-1">
-              <NetworkGlobe
-                activityData={liveActivity}
-                loading={false}
-                error={globeError}
-                onRetry={() => loadData(false)}
-                realTimeVisitors={realTimeVisitors}
-                selectedLocation={selectedLocation}
-                onSelectLocation={setSelectedLocation}
-                isDark={isDark}
-              />
+              <ErrorBoundary scoped title="Live globe temporarily unavailable" message="Real-time map telemetry could not be loaded.">
+                <NetworkGlobe
+                  activityData={liveActivity}
+                  loading={false}
+                  error={globeError}
+                  onRetry={() => loadData(false)}
+                  realTimeVisitors={realTimeVisitors}
+                  selectedLocation={selectedLocation}
+                  onSelectLocation={setSelectedLocation}
+                  isDark={isDark}
+                />
+              </ErrorBoundary>
             </div>
           </div>
 
@@ -269,7 +328,7 @@ export default function Dashboard() {
             <div className="card card-pad animate-fade-in">
               <div className="flex items-start justify-between gap-6">
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1.5">
                     <span className="badge-green">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -285,17 +344,17 @@ export default function Dashboard() {
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white truncate">
                     {selectedLocation.location || 'Unknown Location'}
                   </h3>
-                  <p className="eyebrow mt-1">Location detail</p>
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">Location detail</p>
                 </div>
 
                 <div className="text-right flex-shrink-0">
-                  <span className="text-4xl font-bold text-violet-600 dark:text-violet-400 tabular-nums tracking-tight">
+                  <span className="text-3xl font-bold text-violet-600 dark:text-violet-400 tabular-nums tracking-tight">
                     {selectedLocation.count.toLocaleString()}
                   </span>
-                  <p className="eyebrow mt-1">Active Visitors</p>
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">Active visitors</p>
                 </div>
               </div>
 
@@ -325,18 +384,18 @@ export default function Dashboard() {
           <div className="card card-pad flex flex-col justify-between h-[240px] relative overflow-hidden">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="eyebrow">Live Visitors</h3>
-                <div className="flex items-center gap-2 mt-3">
+                <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400">Live visitors</h3>
+                <div className="flex items-center gap-2 mt-2">
                   <span className="badge-green">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    Active Now
+                    Active now
                   </span>
                 </div>
               </div>
-              <div className="p-3 bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 rounded-xl">
+              <div className="p-2.5 bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 rounded-lg">
                 <Activity className="h-5 w-5" />
               </div>
             </div>
@@ -344,17 +403,18 @@ export default function Dashboard() {
               <AnimatedNumber
                 end={realTimeVisitors}
                 duration={1.2}
-                className="text-[2rem] font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+                className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
               />
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Real-time concurrent sessions</p>
             </div>
           </div>
 
           <div className="card card-pad h-[240px] flex flex-col">
-            <h3 className="eyebrow mb-6">Traffic Momentum</h3>
+            <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-4">Traffic momentum</h3>
             <div className="flex-1 w-full min-h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={sparkline || []}>
-                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {(sparkline || []).map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={index === (sparkline?.length - 1) ? '#10B981' : isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'} />
                     ))}
@@ -374,11 +434,11 @@ export default function Dashboard() {
       <Reveal className="card card-pad h-full min-h-[420px] flex flex-col">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h3 className="section-title flex items-center gap-2.5">
-              <TrendingUp className="h-5 w-5 text-violet-500" />
-              Traffic Trends
+            <h3 className="section-title flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-violet-500" />
+              Traffic trends
             </h3>
-            <p className="page-sub">Cross-domain historical analytics</p>
+            <p className="page-sub">Historical analytics across all connected sources</p>
           </div>
           <div className="segmented">
             {['24h', '7d', '30d'].map((range) => (
@@ -395,7 +455,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-        <div className="flex-1 w-full min-h-[280px] bg-slate-50 dark:bg-slate-950/40 rounded-xl p-4 sm:p-6 border border-slate-100 dark:border-slate-800">
+        <div className="flex-1 w-full min-h-[280px] bg-slate-50 dark:bg-slate-950/40 rounded-lg p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={trafficData}>
               <defs>
@@ -421,20 +481,20 @@ export default function Dashboard() {
                   border: '1px solid',
                   borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                   color: isDark ? '#f8fafc' : '#1e293b',
-                  borderRadius: '12px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                  fontWeight: 'bold',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                  fontWeight: '500',
                   fontSize: '12px',
-                  padding: '10px 14px'
+                  padding: '8px 12px'
                 }}
                 itemStyle={{ color: '#8b5cf6' }}
-                cursor={{ stroke: '#8b5cf6', strokeWidth: 2, strokeDasharray: '5 5' }}
+                cursor={{ stroke: '#8b5cf6', strokeWidth: 1.5, strokeDasharray: '4 4' }}
               />
               <Area
                 type="monotone"
                 dataKey="views"
                 stroke="#8b5cf6"
-                strokeWidth={3}
+                strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorViews)"
               />
@@ -447,20 +507,20 @@ export default function Dashboard() {
       <Reveal delay={60} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 3. Top Referral Sources */}
         <div className="card card-pad h-full flex flex-col">
-          <h3 className="eyebrow mb-6">Top Referral Sources</h3>
-          <div className="space-y-5 flex-1 overflow-y-auto pr-2">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-5">Top referral sources</h3>
+          <div className="space-y-4 flex-1 overflow-y-auto pr-1">
             {sourceData.map((source) => (
               <div key={source.name} className="group">
-                <div className="flex justify-between text-sm mb-2 items-baseline">
+                <div className="flex justify-between text-sm mb-1.5 items-baseline">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: source.color }}></span>
                     <span className={`text-sm font-medium truncate ${strong} group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors`}>{source.name}</span>
                   </div>
-                  <span className={`text-sm font-semibold tabular-nums ${muted}`}>{source.value.toLocaleString()}</span>
+                  <span className={`text-sm font-medium tabular-nums ${muted}`}>{source.value.toLocaleString()}</span>
                 </div>
                 <div className="h-1.5 bg-slate-100 dark:bg-slate-800/60 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-1000 ease-out"
+                    className="h-full rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${(source.value / (sourceData[0]?.value || 1)) * 100}%`, backgroundColor: source.color }}
                   ></div>
                 </div>
@@ -468,7 +528,7 @@ export default function Dashboard() {
             ))}
             {sourceData.length === 0 && (
               <div className="flex flex-col items-center justify-center h-40 text-slate-400 dark:text-slate-600">
-                <Globe className="h-10 w-10 mb-3" />
+                <Globe className="h-8 w-8 mb-2.5 opacity-60" />
                 <p className="text-xs font-medium">No referral data yet</p>
               </div>
             )}
@@ -477,16 +537,16 @@ export default function Dashboard() {
 
         {/* 4. Live Activity */}
         <div className="card card-pad h-full flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="eyebrow">Live Activity</h3>
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Live activity</h3>
             <span className="badge-green">Live Feed</span>
           </div>
-          <div className="space-y-5 relative flex-1 overflow-hidden">
+          <div className="space-y-4 relative flex-1 overflow-hidden">
             <div className="absolute left-[7px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-800"></div>
 
             {liveActivity.slice(0, 5).map((activity) => (
-              <div key={activity.id} className="flex gap-5 relative group">
-                <div className={`w-3 h-3 rounded-full mt-1.5 border-2 border-white dark:border-slate-900 z-10 flex-shrink-0 transition-transform group-hover:scale-125 duration-300 ${activity.type === 'session' ? 'bg-violet-500' :
+              <div key={activity.id} className="flex gap-4 relative group">
+                <div className={`w-2.5 h-2.5 rounded-full mt-1 border-2 border-white dark:border-slate-900 z-10 flex-shrink-0 ${activity.type === 'session' ? 'bg-violet-500' :
                   activity.type === 'view' ? 'bg-emerald-500' : 'bg-amber-500'
                   }`}></div>
                 <div className="min-w-0 flex-1">
@@ -501,7 +561,7 @@ export default function Dashboard() {
             ))}
             {liveActivity.length === 0 && (
               <div className="flex flex-col items-center justify-center h-40 text-slate-400 dark:text-slate-600">
-                <Activity className="h-10 w-10 mb-3" />
+                <Activity className="h-8 w-8 mb-2.5 opacity-60" />
                 <p className="text-xs font-medium">Waiting for activity...</p>
               </div>
             )}
@@ -510,15 +570,15 @@ export default function Dashboard() {
 
         {/* 5. Monthly Usage */}
         <div className="card card-pad flex flex-col items-center justify-center text-center h-full relative overflow-hidden">
-          <div className="relative w-44 h-44 mb-6">
+          <div className="relative w-40 h-40 mb-5">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie
                   data={pieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={70}
-                  outerRadius={90}
+                  innerRadius={65}
+                  outerRadius={82}
                   startAngle={90}
                   endAngle={-270}
                   dataKey="value"
@@ -535,14 +595,14 @@ export default function Dashboard() {
                 end={Math.round(viewPercentage)}
                 suffix="%"
                 duration={1.4}
-                className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
+                className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
               />
-              <span className="eyebrow mt-1">Capacity</span>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">Capacity</span>
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Monthly Usage</h3>
-            <p className={`text-sm mb-5 ${muted}`}>{totalViewsUsed.toLocaleString()} / {viewLimit.toLocaleString()} events</p>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">Monthly usage</h3>
+            <p className={`text-sm mb-4 tabular-nums ${muted}`}>{totalViewsUsed.toLocaleString()} / {viewLimit.toLocaleString()} events</p>
             <Link to="/dashboard/billing" className="btn-secondary btn-sm">
               Upgrade capacity <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
@@ -554,8 +614,8 @@ export default function Dashboard() {
       <Reveal delay={80} className="card card-pad flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-violet-500/[0.02] pointer-events-none" />
         <div className="relative z-10 text-center md:text-left">
-          <h3 className="section-title mb-1.5">Expand Your Reach</h3>
-          <p className={`${muted} text-sm`}>Deploy the global tracker script or integrate new domains in seconds.</p>
+          <h3 className="section-title mb-1">Expand your reach</h3>
+          <p className={`${muted} text-sm max-w-xl`}>Deploy the tracking script or integrate new domains in seconds.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 relative z-10 w-full md:w-auto">
         <button
@@ -624,10 +684,10 @@ export default function Dashboard() {
         </form>
       </Modal>
 
-      {/* Global Spinner for creation */}
+      {/* Loading overlay for creation */}
       {creating && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
-          <Spinner fullScreen={false} />
+          <Loader2 className="h-8 w-8 text-slate-500 animate-spin" />
         </div>
       )}
     </div>
