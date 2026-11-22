@@ -96,17 +96,17 @@ export default function AnalyticsTab({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Top Pages */}
-        <div className="lg:col-span-2 wp-panel flex flex-col">
+        <div className="lg:col-span-2 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
           <div className="wp-panel-header">
             <div className="flex items-center gap-2">
-              <MousePointer className="h-4 w-4 text-ink-muted" />
+              <MousePointer className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
               <span className="wp-title-card">Top Pages</span>
             </div>
             <button
               onClick={onViewAllPages}
-              className="inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink transition-colors font-mono"
+              className="inline-flex items-center gap-1 text-xs text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)] transition-colors font-mono"
             >
-              View All
+              <span>View All</span>
               <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -114,32 +114,32 @@ export default function AnalyticsTab({
           <div className="overflow-x-auto flex-1">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-line bg-subtle text-ink-muted font-mono uppercase text-[10px] tracking-wider">
-                  <th className="px-4 py-2.5 font-medium">Page Path</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Views</th>
-                  <th className="px-4 py-2.5 text-right font-medium">Share</th>
+                <tr className="border-b border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] text-[var(--wp-text-muted)] font-mono uppercase text-[10px] tracking-wider">
+                  <th className="px-3.5 py-2 font-medium">Page Path</th>
+                  <th className="px-3.5 py-2 text-right font-medium">Views</th>
+                  <th className="px-3.5 py-2 text-right font-medium">Share</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y divide-[var(--wp-border-subtle)]">
                 {overviewStats?.topPages?.map((page, i) => {
                   const maxViews = overviewStats?.topPages[0]?.views || 1;
                   const pct = Math.min(100, Math.round(((page.views || 0) / maxViews) * 100));
                   return (
-                    <tr key={i} className="hover:bg-hover transition-colors">
-                      <td className="px-4 py-3">
-                        <span className="font-medium text-ink truncate max-w-[320px] block font-mono" title={page.title}>
+                    <tr key={i} className="hover:bg-[var(--wp-bg-hover)] transition-colors">
+                      <td className="px-3.5 py-2.5">
+                        <span className="font-medium text-[var(--wp-text-primary)] truncate max-w-[320px] block font-mono" title={page.title}>
                           {page.title || 'Untitled'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <span className="text-ink font-mono tabular-nums">{page.views?.toLocaleString()}</span>
+                      <td className="px-3.5 py-2.5 text-right">
+                        <span className="text-[var(--wp-text-primary)] font-mono tabular-nums">{page.views?.toLocaleString()}</span>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3.5 py-2.5 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <div className="w-16 wp-meter-track">
                             <div className="wp-meter-bar" style={{ width: `${Math.max(pct, 2)}%` }} />
                           </div>
-                          <span className="w-8 text-[11px] text-ink-muted font-mono tabular-nums">{pct}%</span>
+                          <span className="w-8 text-[11px] text-[var(--wp-text-muted)] font-mono tabular-nums">{pct}%</span>
                         </div>
                       </td>
                     </tr>
@@ -148,8 +148,8 @@ export default function AnalyticsTab({
               </tbody>
             </table>
             {(!overviewStats?.topPages || overviewStats.topPages.length === 0) && (
-              <div className="py-12 text-center text-ink-muted">
-                <Search className="h-6 w-6 mx-auto mb-2 opacity-40" />
+              <div className="py-10 text-center text-[var(--wp-text-muted)]">
+                <Search className="h-5 w-5 mx-auto mb-2 opacity-40" />
                 <p className="text-xs font-mono">No page data available</p>
               </div>
             )}
@@ -157,27 +157,27 @@ export default function AnalyticsTab({
         </div>
 
         {/* Devices */}
-        <div className="wp-panel flex flex-col">
+        <div className="wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
           <div className="wp-panel-header">
             <div className="flex items-center gap-2">
-              <Monitor className="h-4 w-4 text-ink-muted" />
+              <Monitor className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
               <span className="wp-title-card">Devices</span>
             </div>
-            <span className="text-[10px] text-ink-muted font-mono tabular-nums">
+            <span className="text-[10px] text-[var(--wp-text-muted)] font-mono tabular-nums">
               {totalDeviceSignals.toLocaleString()} signals
             </span>
           </div>
 
-          <div className="p-4 flex-1 flex flex-col justify-center">
-            <div className="h-[160px] w-full mb-4 relative">
+          <div className="p-3.5 flex-1 flex flex-col justify-center">
+            <div className="h-[150px] w-full mb-3 relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={deviceData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={68}
+                    innerRadius={46}
+                    outerRadius={64}
                     paddingAngle={2}
                     dataKey="value"
                     stroke="none"
@@ -200,23 +200,23 @@ export default function AnalyticsTab({
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-lg font-semibold text-ink font-mono tabular-nums">
+                <span className="text-base font-medium text-[var(--wp-text-primary)] font-mono tabular-nums">
                   {totalDeviceSignals.toLocaleString()}
                 </span>
-                <span className="text-[10px] text-ink-muted font-mono">Total</span>
+                <span className="text-[10px] text-[var(--wp-text-muted)] font-mono uppercase tracking-wider">Total</span>
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {deviceData.map((device, i) => (
-                <div key={i} className="flex items-center justify-between p-2 rounded border border-line bg-subtle text-xs">
+                <div key={i} className="flex items-center justify-between p-2 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)] text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-ink-secondary">{device.icon}</span>
-                    <span className="text-ink font-medium">{device.name}</span>
+                    <span className="text-[var(--wp-text-muted)]">{device.icon}</span>
+                    <span className="text-[var(--wp-text-primary)] font-medium">{device.name}</span>
                   </div>
                   <div className="flex items-center gap-3 font-mono">
-                    <span className="text-ink-muted tabular-nums">{device.value.toLocaleString()}</span>
-                    <span className="text-ink font-medium w-10 text-right tabular-nums">
+                    <span className="text-[var(--wp-text-muted)] tabular-nums">{device.value.toLocaleString()}</span>
+                    <span className="text-[var(--wp-text-primary)] font-medium w-10 text-right tabular-nums">
                       {Math.round((device.value / (totalDeviceSignals || 1)) * 100)}%
                     </span>
                   </div>

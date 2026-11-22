@@ -9,20 +9,24 @@ export default function ProjectTabs({ activeTab, onTabChange }) {
   ];
 
   return (
-    <div className="flex gap-5 border-b border-[var(--wp-border-subtle)] pb-2 mb-1">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`pb-1 text-xs font-mono font-medium transition-colors border-b-2 -mb-[9px] ${
-            activeTab === tab.id
-              ? 'text-[var(--wp-text-primary)] border-[var(--wp-text-primary)] font-semibold'
-              : 'text-[var(--wp-text-secondary)] border-transparent hover:text-[var(--wp-text-primary)] hover:border-[var(--wp-border-default)]'
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className="inline-flex items-center p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs mb-1">
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onTabChange(tab.id)}
+            className={`h-6 px-3 rounded text-[11px] font-mono transition-colors focus:outline-none ${
+              isActive
+                ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium'
+                : 'text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

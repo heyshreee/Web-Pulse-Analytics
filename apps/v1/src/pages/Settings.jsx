@@ -3,7 +3,7 @@ import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
 import {
     User, Shield, Bell, BarChart2, Briefcase,
     Save, Loader, Upload, Trash2, Monitor, Smartphone,
-    Check, Settings as SettingsIcon, Edit2, CreditCard, Download,
+    Check, Edit2, CreditCard, Download,
     MessageSquare, Send, Lock, X
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
@@ -30,23 +30,20 @@ export default function Settings() {
     return (
         <div className="space-y-3 font-sans">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-line">
-                <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded border border-line bg-subtle text-ink">
-                        <SettingsIcon className="h-4 w-4" />
-                    </div>
-                    <div>
-                        <h1 className="wp-title-page">Account Settings</h1>
-                        <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">Manage your profile, security, and project preferences.</p>
-                    </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div>
+                    <h1 className="wp-title-page">Account Settings</h1>
+                    <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">
+                        Manage your profile, security, and workspace preferences.
+                    </p>
                 </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-3 items-start">
                 {/* Control Rail / Sidebar */}
-                <div className="w-full md:w-56 flex-shrink-0">
-                    <div className="wp-panel p-1.5 space-y-0.5 sticky top-20">
-                        <div className="px-2.5 py-1 text-[11px] font-medium text-ink-muted uppercase tracking-wider font-mono">
+                <div className="w-full md:w-52 flex-shrink-0">
+                    <div className="wp-panel p-1.5 space-y-0.5 sticky top-20 bg-[var(--wp-bg-surface)]">
+                        <div className="px-2.5 py-1 wp-label-section uppercase">
                             Preferences
                         </div>
                         <nav className="space-y-0.5">
@@ -54,14 +51,14 @@ export default function Settings() {
                                 <button
                                     key={t.id}
                                     onClick={() => navigate(`/dashboard/settings/${t.id}`)}
-                                    className={`flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                                    className={`flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-xs transition-colors ${
                                         activeTab === t.id
-                                            ? 'bg-ink text-canvas font-semibold'
-                                            : 'text-ink-secondary hover:text-ink hover:bg-hover'
+                                            ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium border border-[var(--wp-border-default)]'
+                                            : 'text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]'
                                     }`}
                                 >
-                                    <t.icon className={`h-3.5 w-3.5 ${activeTab === t.id ? 'text-canvas' : 'text-ink-muted'}`} />
-                                    {t.label}
+                                    <t.icon className={`h-3.5 w-3.5 ${activeTab === t.id ? 'text-[var(--wp-text-primary)]' : 'text-[var(--wp-text-muted)]'}`} />
+                                    <span>{t.label}</span>
                                 </button>
                             ))}
                         </nav>
@@ -150,150 +147,152 @@ function ProfileSection({ user, loadUser, showToast }) {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="wp-panel p-5">
-                <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <h3 className="text-sm font-medium text-ink">Profile Information</h3>
-                        <p className="text-xs text-ink-muted">Update your display information and account identity.</p>
-                    </div>
+        <div className="space-y-3">
+            <div className="wp-panel bg-[var(--wp-bg-surface)]">
+                <div className="wp-panel-header">
+                    <span className="wp-title-card">Profile Information</span>
                     <button
+                        type="button"
                         onClick={() => setIsEditing(!isEditing)}
-                        className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+                        className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1.5"
                     >
                         {isEditing ? (
                             <>
-                                <X className="h-3.5 w-3.5" />
-                                Cancel
+                                <X className="h-3 w-3" />
+                                <span>Cancel</span>
                             </>
                         ) : (
                             <>
-                                <Edit2 className="h-3.5 w-3.5" />
-                                Edit
+                                <Edit2 className="h-3 w-3" />
+                                <span>Edit</span>
                             </>
                         )}
                     </button>
                 </div>
 
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-line bg-subtle text-lg font-bold text-ink font-mono shrink-0">
-                        {user?.avatar_url ? (
-                            <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
-                        ) : (
-                            (user?.name?.[0] || user?.email?.[0] || '?').toUpperCase()
+                <div className="p-3.5 sm:p-4 space-y-4">
+                    <div className="flex items-center gap-3.5">
+                        <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[var(--wp-border-default)] bg-[var(--wp-bg-subtle)] text-base font-bold text-[var(--wp-text-primary)] font-mono shrink-0">
+                            {user?.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
+                            ) : (
+                                (user?.name?.[0] || user?.email?.[0] || '?').toUpperCase()
+                            )}
+                        </div>
+                        <div>
+                            <span className="wp-label-section uppercase block mb-0.5">Avatar Image</span>
+                            <p className="text-[11px] text-[var(--wp-text-muted)] font-mono mb-2">JPG, GIF or PNG. Max size 5MB</p>
+                            <div className="flex gap-2">
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                />
+                                <button
+                                    type="button"
+                                    disabled={!isEditing || uploading}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="wp-btn wp-btn-secondary h-6 px-2 text-xs inline-flex items-center gap-1.5 disabled:opacity-50"
+                                >
+                                    {uploading ? <Loader className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                    <span>{uploading ? 'Uploading...' : 'Upload'}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={!isEditing}
+                                    className="wp-btn wp-btn-secondary h-6 px-2 text-xs inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300 hover:border-rose-500/40 disabled:opacity-50"
+                                >
+                                    <Trash2 className="h-3 w-3" />
+                                    <span>Remove</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-3 pt-2 border-t border-[var(--wp-border-subtle)]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label className="wp-label-section uppercase block mb-1">Full Name</label>
+                                <input
+                                    type="text"
+                                    disabled={!isEditing}
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
+                                />
+                            </div>
+                            <div>
+                                <label className="wp-label-section uppercase block mb-1">Job Title</label>
+                                <input
+                                    type="text"
+                                    disabled={!isEditing}
+                                    value={formData.job_title}
+                                    onChange={e => setFormData({ ...formData, job_title: e.target.value })}
+                                    className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
+                                    placeholder="e.g. Senior Developer"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="wp-label-section uppercase block mb-1">Bio</label>
+                            <textarea
+                                value={formData.bio}
+                                disabled={!isEditing}
+                                onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                                rows={3}
+                                className="w-full p-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50 resize-none"
+                                placeholder="Tell us a little about yourself..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label className="wp-label-section uppercase block mb-1">Language</label>
+                                <select
+                                    value={formData.language}
+                                    disabled={!isEditing}
+                                    onChange={e => setFormData({ ...formData, language: e.target.value })}
+                                    className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
+                                >
+                                    <option value="en-US">English (US)</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="wp-label-section uppercase block mb-1">Timezone</label>
+                                <select
+                                    value={formData.timezone}
+                                    disabled={!isEditing}
+                                    onChange={e => setFormData({ ...formData, timezone: e.target.value })}
+                                    className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
+                                >
+                                    <option value="UTC">UTC</option>
+                                    <option value="EST">Eastern Standard Time (EST)</option>
+                                    <option value="PST">Pacific Standard Time (PST)</option>
+                                    <option value="IST">India Standard Time (IST)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {isEditing && (
+                            <div className="flex justify-end pt-3 border-t border-[var(--wp-border-subtle)]">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="wp-btn wp-btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+                                >
+                                    {loading ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
                         )}
-                    </div>
-                    <div>
-                        <h4 className="text-xs font-medium text-ink mb-0.5">Avatar Image</h4>
-                        <p className="text-[11px] text-ink-muted mb-2 font-mono">JPG, GIF or PNG. Max size 5MB</p>
-                        <div className="flex gap-2">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                            />
-                            <button
-                                disabled={!isEditing || uploading}
-                                onClick={() => fileInputRef.current?.click()}
-                                className="btn-secondary h-6 px-2 text-xs inline-flex items-center gap-1.5 disabled:opacity-50"
-                            >
-                                {uploading ? <Loader className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
-                                {uploading ? 'Uploading...' : 'Upload'}
-                            </button>
-                            <button
-                                disabled={!isEditing}
-                                className="btn-secondary h-6 px-2 text-xs inline-flex items-center gap-1.5 text-ink-muted hover:text-red-500 disabled:opacity-50"
-                            >
-                                <Trash2 className="h-3 w-3" />
-                                Remove
-                            </button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-xs font-mono text-ink-secondary mb-1">Full Name</label>
-                            <input
-                                type="text"
-                                disabled={!isEditing}
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                className="input font-mono text-xs h-8 disabled:opacity-50"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-mono text-ink-secondary mb-1">Job Title</label>
-                            <input
-                                type="text"
-                                disabled={!isEditing}
-                                value={formData.job_title}
-                                onChange={e => setFormData({ ...formData, job_title: e.target.value })}
-                                className="input font-mono text-xs h-8 disabled:opacity-50"
-                                placeholder="e.g. Senior Developer"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-mono text-ink-secondary mb-1">Bio</label>
-                        <textarea
-                            value={formData.bio}
-                            disabled={!isEditing}
-                            onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                            rows={3}
-                            className="input font-mono text-xs resize-none disabled:opacity-50"
-                            placeholder="Tell us a little about yourself..."
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label className="block text-xs font-mono text-ink-secondary mb-1">Language</label>
-                            <select
-                                value={formData.language}
-                                disabled={!isEditing}
-                                onChange={e => setFormData({ ...formData, language: e.target.value })}
-                                className="input font-mono text-xs h-8 disabled:opacity-50"
-                            >
-                                <option value="en-US">English (US)</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-mono text-ink-secondary mb-1">Timezone</label>
-                            <select
-                                value={formData.timezone}
-                                disabled={!isEditing}
-                                onChange={e => setFormData({ ...formData, timezone: e.target.value })}
-                                className="input font-mono text-xs h-8 disabled:opacity-50"
-                            >
-                                <option value="UTC">UTC</option>
-                                <option value="EST">Eastern Standard Time (EST)</option>
-                                <option value="PST">Pacific Standard Time (PST)</option>
-                                <option value="IST">India Standard Time (IST)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {isEditing && (
-                        <div className="flex justify-end pt-3 border-t border-line">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
-                            >
-                                {loading ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-                                Save Changes
-                            </button>
-                        </div>
-                    )}
-                </form>
             </div>
         </div>
     );
@@ -358,11 +357,15 @@ function SecuritySection({ showToast }) {
 
     if (loadingSessions) {
         return (
-            <div className="wp-panel p-5 space-y-3 animate-pulse">
-                <div className="h-4 w-32 bg-subtle rounded" />
-                <div className="space-y-2">
-                    {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-12 bg-subtle/50 rounded" />
+            <div className="space-y-3 animate-pulse">
+                <div className="wp-panel bg-[var(--wp-bg-surface)] p-4 space-y-3">
+                    <div className="h-4 w-32 bg-[var(--wp-border-subtle)] rounded" />
+                    <div className="h-8 w-full bg-[var(--wp-bg-subtle)] rounded" />
+                </div>
+                <div className="wp-panel bg-[var(--wp-bg-surface)] p-4 space-y-2">
+                    <div className="h-4 w-28 bg-[var(--wp-border-subtle)] rounded" />
+                    {[1, 2].map((n) => (
+                        <div key={n} className="h-10 bg-[var(--wp-bg-subtle)] rounded" />
                     ))}
                 </div>
             </div>
@@ -370,95 +373,102 @@ function SecuritySection({ showToast }) {
     }
 
     return (
-        <div className="space-y-4">
-            <div className="wp-panel p-5">
-                <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <h3 className="text-sm font-medium text-ink">Change Password</h3>
-                        <p className="text-xs text-ink-muted">Keep your account credentials secure.</p>
-                    </div>
+        <div className="space-y-3">
+            <div className="wp-panel bg-[var(--wp-bg-surface)]">
+                <div className="wp-panel-header">
+                    <span className="wp-title-card">Change Password</span>
                     <button
+                        type="button"
                         onClick={() => setIsEditing(!isEditing)}
-                        className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+                        className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1.5"
                     >
                         {isEditing ? (
                             <>
-                                <X className="h-3.5 w-3.5" />
-                                Cancel
+                                <X className="h-3 w-3" />
+                                <span>Cancel</span>
                             </>
                         ) : (
                             <>
-                                <Edit2 className="h-3.5 w-3.5" />
-                                Edit
+                                <Edit2 className="h-3 w-3" />
+                                <span>Edit</span>
                             </>
                         )}
                     </button>
                 </div>
-                <form onSubmit={handlePasswordUpdate} className="space-y-4">
-                    <div>
-                        <label className="block text-xs font-mono text-ink-secondary mb-1">Current Password</label>
-                        <input
-                            type="password"
-                            disabled={!isEditing}
-                            value={passwords.current}
-                            onChange={e => setPasswords({ ...passwords, current: e.target.value })}
-                            className="input font-mono text-xs h-8 disabled:opacity-50"
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-3.5 sm:p-4">
+                    <form onSubmit={handlePasswordUpdate} className="space-y-3">
                         <div>
-                            <label className="block text-xs font-mono text-ink-secondary mb-1">New Password</label>
+                            <label className="wp-label-section uppercase block mb-1">Current Password</label>
                             <input
                                 type="password"
                                 disabled={!isEditing}
-                                value={passwords.new}
-                                onChange={e => setPasswords({ ...passwords, new: e.target.value })}
-                                className="input font-mono text-xs h-8 disabled:opacity-50"
+                                value={passwords.current}
+                                onChange={e => setPasswords({ ...passwords, current: e.target.value })}
+                                className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-mono text-ink-secondary mb-1">Confirm New Password</label>
-                            <input
-                                type="password"
-                                disabled={!isEditing}
-                                value={passwords.confirm}
-                                onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
-                                className="input font-mono text-xs h-8 disabled:opacity-50"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label className="wp-label-section uppercase block mb-1">New Password</label>
+                                <input
+                                    type="password"
+                                    disabled={!isEditing}
+                                    value={passwords.new}
+                                    onChange={e => setPasswords({ ...passwords, new: e.target.value })}
+                                    className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
+                                />
+                            </div>
+                            <div>
+                                <label className="wp-label-section uppercase block mb-1">Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    disabled={!isEditing}
+                                    value={passwords.confirm}
+                                    onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
+                                    className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    {isEditing && (
-                        <div className="flex justify-end pt-3 border-t border-line">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
-                            >
-                                {loading ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-                                Update Password
-                            </button>
-                        </div>
-                    )}
-                </form>
+                        {isEditing && (
+                            <div className="flex justify-end pt-3 border-t border-[var(--wp-border-subtle)]">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="wp-btn wp-btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+                                >
+                                    {loading ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                                    <span>Update Password</span>
+                                </button>
+                            </div>
+                        )}
+                    </form>
+                </div>
             </div>
 
-            <div className="wp-panel p-5">
-                <h3 className="text-sm font-medium text-ink mb-4">Active Sessions</h3>
-                <div className="space-y-2">
+            <div className="wp-panel bg-[var(--wp-bg-surface)]">
+                <div className="wp-panel-header">
+                    <span className="wp-title-card">Active Sessions</span>
+                    <span className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)]">
+                        {sessions.length} registered
+                    </span>
+                </div>
+                <div className="p-3.5 sm:p-4 space-y-2">
                     {sessions.map((session, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border border-line rounded bg-surface">
+                        <div key={index} className="flex items-center justify-between p-2.5 border border-[var(--wp-border-subtle)] rounded bg-[var(--wp-bg-surface)]">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 rounded border border-line bg-subtle text-ink-muted">
-                                    {session.device?.includes('Mobile') ? <Smartphone className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
+                                <div className="p-1.5 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] text-[var(--wp-text-muted)]">
+                                    {session.device?.includes('Mobile') ? <Smartphone className="h-3.5 w-3.5" /> : <Monitor className="h-3.5 w-3.5" />}
                                 </div>
                                 <div>
-                                    <p className="text-xs font-medium text-ink">{session.device || 'Unknown Device'}</p>
-                                    <div className="flex items-center gap-2 text-[11px] text-ink-muted mt-0.5 font-mono">
+                                    <p className="text-xs font-medium text-[var(--wp-text-primary)]">{session.device || 'Unknown Device'}</p>
+                                    <div className="flex items-center gap-2 text-[11px] text-[var(--wp-text-muted)] mt-0.5 font-mono">
                                         <span>{session.location}</span>
                                         <span>•</span>
                                         <span>{new Date(session.lastActive).toLocaleDateString()}</span>
                                         {session.isCurrent && (
-                                            <span className="text-emerald-500 font-semibold">• Current</span>
+                                            <span className="text-emerald-400 font-mono text-[10.5px] flex items-center gap-1">
+                                                <span className="wp-live-dot" /> Current
+                                            </span>
                                         )}
                                     </div>
                                 </div>
@@ -468,7 +478,7 @@ function SecuritySection({ showToast }) {
                                     type="button"
                                     onClick={() => handleRevokeSession(session.id)}
                                     aria-label={`Revoke session for ${session.device || 'this device'}`}
-                                    className="btn-secondary h-6 px-2 text-xs text-ink-muted hover:text-red-500"
+                                    className="wp-btn wp-btn-secondary h-6 px-2 text-xs text-rose-400 hover:text-rose-300 hover:border-rose-500/40"
                                 >
                                     Revoke
                                 </button>
@@ -507,30 +517,28 @@ function NotificationsSection({ user, showToast }) {
     };
 
     return (
-        <div className="wp-panel p-5">
-            <div className="flex justify-between items-start mb-6">
-                <div>
-                    <h3 className="text-sm font-medium text-ink">Notification Preferences</h3>
-                    <p className="text-xs text-ink-muted">Configure your event alerts and scheduled digests.</p>
-                </div>
+        <div className="wp-panel bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+                <span className="wp-title-card">Notification Preferences</span>
                 <button
+                    type="button"
                     onClick={() => setIsEditing(!isEditing)}
-                    className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+                    className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1.5"
                 >
                     {isEditing ? (
                         <>
-                            <Check className="h-3.5 w-3.5" />
-                            Done
+                            <Check className="h-3 w-3" />
+                            <span>Done</span>
                         </>
                     ) : (
                         <>
-                            <Edit2 className="h-3.5 w-3.5" />
-                            Edit
+                            <Edit2 className="h-3 w-3" />
+                            <span>Edit</span>
                         </>
                     )}
                 </button>
             </div>
-            <div className="space-y-2 divide-y divide-line">
+            <div className="p-3.5 sm:p-4 space-y-2 divide-y divide-[var(--wp-border-subtle)]">
                 {[
                     { id: 'email', label: 'Email Notifications', desc: 'Receive daily summaries and critical alerts via email.' },
                     { id: 'email_reports', label: 'Email Reports', desc: 'Receive weekly performance reports for your projects.' },
@@ -538,21 +546,22 @@ function NotificationsSection({ user, showToast }) {
                     { id: 'security', label: 'Security Alerts', desc: 'Get notified about new logins and password changes.' },
                     { id: 'marketing', label: 'Product Updates', desc: 'Receive news about new features and improvements.' }
                 ].map((item) => (
-                    <div key={item.id} className="flex items-center justify-between pt-3 first:pt-0">
+                    <div key={item.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
                         <div>
-                            <p className="text-xs font-medium text-ink">{item.label}</p>
-                            <p className="text-[11px] text-ink-muted">{item.desc}</p>
+                            <p className="text-xs font-medium text-[var(--wp-text-primary)]">{item.label}</p>
+                            <p className="text-[11px] text-[var(--wp-text-muted)] mt-0.5">{item.desc}</p>
                         </div>
                         <button
+                            type="button"
                             onClick={() => handleToggle(item.id)}
                             disabled={!isEditing}
                             className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
-                                preferences[item.id] ? 'bg-ink' : 'bg-subtle border border-line'
+                                preferences[item.id] ? 'bg-[var(--wp-accent-solid)]' : 'bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)]'
                             }`}
                         >
                             <span
                                 className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform ${
-                                    preferences[item.id] ? 'bg-canvas translate-x-4' : 'bg-ink-muted translate-x-1'
+                                    preferences[item.id] ? 'bg-[var(--wp-text-inverted)] translate-x-4' : 'bg-[var(--wp-text-muted)] translate-x-1'
                                 }`}
                             />
                         </button>
@@ -568,11 +577,11 @@ function UsageSection() {
 
     if (!usageStats) {
         return (
-            <div className="wp-panel p-5 space-y-4 animate-pulse">
-                <div className="h-4 w-36 bg-subtle rounded" />
+            <div className="wp-panel bg-[var(--wp-bg-surface)] p-4 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-[var(--wp-border-subtle)] rounded" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="h-20 bg-subtle/50 rounded" />
-                    <div className="h-20 bg-subtle/50 rounded" />
+                    <div className="h-20 bg-[var(--wp-bg-subtle)] rounded" />
+                    <div className="h-20 bg-[var(--wp-bg-subtle)] rounded" />
                 </div>
             </div>
         );
@@ -584,92 +593,101 @@ function UsageSection() {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="wp-panel p-5">
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 className="text-sm font-medium text-ink">Usage & Quota</h3>
-                        <p className="text-xs text-ink-muted">Track resource consumption against your plan limits.</p>
+        <div className="wp-panel bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+                <span className="wp-title-card">Usage & Quota</span>
+                <span className="wp-metric-mono text-[10.5px] uppercase px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] text-[var(--wp-text-primary)]">
+                    {usageStats.plan} Plan
+                </span>
+            </div>
+
+            <div className="p-3.5 sm:p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Monthly Views */}
+                <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                    <div className="flex justify-between items-end mb-2">
+                        <div>
+                            <span className="wp-label-section uppercase">Monthly views</span>
+                            <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
+                                {usageStats.totalViews.toLocaleString()}
+                            </div>
+                        </div>
+                        <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)] tabular-nums">
+                            Limit: {usageStats.monthlyLimit.toLocaleString()}
+                        </p>
                     </div>
-                    <span className="px-2 py-0.5 rounded border border-line bg-subtle text-xs font-mono uppercase tracking-wider text-ink font-semibold">
-                        {usageStats.plan} Plan
-                    </span>
+                    <div className="wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.max(getPercentage(usageStats.totalViews, usageStats.monthlyLimit), usageStats.totalViews > 0 ? 2 : 0)}%` }}
+                        />
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/* Monthly Views */}
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <div className="flex justify-between items-end mb-2">
-                            <div>
-                                <p className="text-[11px] text-ink-muted">Monthly views</p>
-                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">{usageStats.totalViews.toLocaleString()}</p>
+                {/* Storage Used */}
+                <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                    <div className="flex justify-between items-end mb-2">
+                        <div>
+                            <span className="wp-label-section uppercase">Storage used</span>
+                            <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
+                                {usageStats.storageUsed < 1024 * 1024
+                                    ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
+                                    : usageStats.storageUsed < 1024 * 1024 * 1024
+                                        ? `${(usageStats.storageUsed / (1024 * 1024)).toFixed(2)} MB`
+                                        : `${(usageStats.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
+                                }
                             </div>
-                            <p className="text-xs text-ink-muted font-mono tabular-nums">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
                         </div>
-                        <div className="wp-meter-track">
-                            <div
-                                className="wp-meter-bar"
-                                style={{ width: `${Math.max(getPercentage(usageStats.totalViews, usageStats.monthlyLimit), usageStats.totalViews > 0 ? 2 : 0)}%` }}
-                            />
-                        </div>
+                        <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
+                            Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}
+                        </p>
                     </div>
-
-                    {/* Storage Used */}
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <div className="flex justify-between items-end mb-2">
-                            <div>
-                                <p className="text-[11px] text-ink-muted">Storage used</p>
-                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">
-                                    {usageStats.storageUsed < 1024 * 1024
-                                        ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
-                                        : usageStats.storageUsed < 1024 * 1024 * 1024
-                                            ? `${(usageStats.storageUsed / (1024 * 1024)).toFixed(2)} MB`
-                                            : `${(usageStats.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
-                                    }
-                                </p>
-                            </div>
-                            <p className="text-xs text-ink-muted font-mono">Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</p>
-                        </div>
-                        <div className="wp-meter-track">
-                            <div
-                                className="wp-meter-bar"
-                                style={{ width: `${Math.max(getPercentage(usageStats.storageUsed, usageStats.storageLimit), usageStats.storageUsed > 0 ? 2 : 0)}%` }}
-                            />
-                        </div>
+                    <div className="wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.max(getPercentage(usageStats.storageUsed, usageStats.storageLimit), usageStats.storageUsed > 0 ? 2 : 0)}%` }}
+                        />
                     </div>
+                </div>
 
-                    {/* Total Projects */}
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <div className="flex justify-between items-end mb-2">
-                            <div>
-                                <p className="text-[11px] text-ink-muted">Total projects</p>
-                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">{usageStats.projectCount}</p>
+                {/* Total Projects */}
+                <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                    <div className="flex justify-between items-end mb-2">
+                        <div>
+                            <span className="wp-label-section uppercase">Total projects</span>
+                            <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
+                                {usageStats.projectCount}
                             </div>
-                            <p className="text-xs text-ink-muted font-mono">Limit: {usageStats.projectLimit}</p>
                         </div>
-                        <div className="wp-meter-track">
-                            <div
-                                className="wp-meter-bar"
-                                style={{ width: `${Math.max(getPercentage(usageStats.projectCount, usageStats.projectLimit), usageStats.projectCount > 0 ? 2 : 0)}%` }}
-                            />
-                        </div>
+                        <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
+                            Limit: {usageStats.projectLimit}
+                        </p>
                     </div>
+                    <div className="wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.max(getPercentage(usageStats.projectCount, usageStats.projectLimit), usageStats.projectCount > 0 ? 2 : 0)}%` }}
+                        />
+                    </div>
+                </div>
 
-                    {/* Shared Reports */}
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <div className="flex justify-between items-end mb-2">
-                            <div>
-                                <p className="text-[11px] text-ink-muted">Shared reports</p>
-                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">{usageStats.share_report?.used || 0}</p>
+                {/* Shared Reports */}
+                <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                    <div className="flex justify-between items-end mb-2">
+                        <div>
+                            <span className="wp-label-section uppercase">Shared reports</span>
+                            <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
+                                {usageStats.share_report?.used || 0}
                             </div>
-                            <p className="text-xs text-ink-muted font-mono">Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}</p>
                         </div>
-                        <div className="wp-meter-track">
-                            <div
-                                className="wp-meter-bar"
-                                style={{ width: `${Math.max(getPercentage(usageStats.share_report?.used || 0, usageStats.share_report?.limit || 1), (usageStats.share_report?.used || 0) > 0 ? 2 : 0)}%` }}
-                            />
-                        </div>
+                        <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
+                            Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}
+                        </p>
+                    </div>
+                    <div className="wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.max(getPercentage(usageStats.share_report?.used || 0, usageStats.share_report?.limit || 1), (usageStats.share_report?.used || 0) > 0 ? 2 : 0)}%` }}
+                        />
                     </div>
                 </div>
             </div>
@@ -727,11 +745,11 @@ function ProjectsSection() {
 
     if (loading) {
         return (
-            <div className="wp-panel p-5 space-y-3 animate-pulse">
-                <div className="h-4 w-36 bg-subtle rounded" />
+            <div className="wp-panel bg-[var(--wp-bg-surface)] p-4 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-[var(--wp-border-subtle)] rounded" />
                 <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-12 bg-subtle/50 rounded" />
+                        <div key={n} className="h-12 bg-[var(--wp-bg-subtle)] rounded" />
                     ))}
                 </div>
             </div>
@@ -739,47 +757,47 @@ function ProjectsSection() {
     }
 
     return (
-        <div className="wp-panel p-5">
-            <div className="flex justify-between items-start mb-6">
-                <div>
-                    <h3 className="text-sm font-medium text-ink">Projects & Teams</h3>
-                    <p className="text-xs text-ink-muted">Manage your registered domains and telemetry access scopes.</p>
-                </div>
+        <div className="wp-panel bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+                <span className="wp-title-card">Projects & Teams</span>
+                <span className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)]">
+                    {projects.length} active
+                </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="p-3.5 sm:p-4 space-y-2">
                 {projects.length === 0 ? (
-                    <div className="py-12 text-center text-ink-muted font-mono text-xs">
+                    <div className="py-8 text-center text-[var(--wp-text-muted)] font-mono text-xs">
                         No projects found. Create one to get started.
                     </div>
                 ) : (
                     projects.map((project) => (
-                        <div key={project.id} className="flex items-center justify-between p-3 border border-line rounded bg-surface">
+                        <div key={project.id} className="flex items-center justify-between p-2.5 border border-[var(--wp-border-subtle)] rounded bg-[var(--wp-bg-surface)]">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-line bg-subtle text-ink text-xs font-mono font-bold">
+                                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] text-xs font-mono font-medium">
                                     {project.name[0].toUpperCase()}
                                 </div>
                                 {editingId === project.id ? (
-                                    <div className="flex-1 grid gap-2 mr-3">
+                                    <div className="flex-1 grid gap-1.5 mr-3">
                                         <input
                                             type="text"
                                             value={editForm.name}
                                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                            className="input font-mono text-xs h-7"
+                                            className="w-full h-7 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none"
                                             placeholder="Project Name"
                                         />
                                         <input
                                             type="text"
                                             value={editForm.allowedOrigins}
                                             onChange={(e) => setEditForm({ ...editForm, allowedOrigins: e.target.value })}
-                                            className="input font-mono text-xs h-7"
+                                            className="w-full h-7 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none"
                                             placeholder="Allowed Origins (comma separated)"
                                         />
                                     </div>
                                 ) : (
                                     <div className="truncate">
-                                        <p className="text-xs font-medium text-ink truncate">{project.name}</p>
-                                        <p className="text-[11px] text-ink-muted font-mono truncate">{project.allowed_origins || 'All origins allowed'}</p>
+                                        <p className="text-xs font-medium text-[var(--wp-text-primary)] truncate">{project.name}</p>
+                                        <p className="text-[11px] text-[var(--wp-text-muted)] font-mono truncate">{project.allowed_origins || 'All origins allowed'}</p>
                                     </div>
                                 )}
                             </div>
@@ -787,28 +805,34 @@ function ProjectsSection() {
                                 {editingId === project.id ? (
                                     <div className="flex gap-1.5">
                                         <button
+                                            type="button"
                                             onClick={() => handleSave(project.id)}
-                                            className="p-1 rounded bg-ink text-canvas hover:opacity-90 transition-opacity"
+                                            className="wp-btn wp-btn-primary h-6 w-6 p-0 justify-center"
+                                            title="Save"
                                         >
                                             <Check className="h-3.5 w-3.5" />
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={cancelEditing}
-                                            className="p-1 rounded border border-line text-ink-muted hover:text-ink hover:bg-hover transition-colors"
+                                            className="wp-btn wp-btn-secondary h-6 w-6 p-0 justify-center"
+                                            title="Cancel"
                                         >
                                             <X className="h-3.5 w-3.5" />
                                         </button>
                                     </div>
                                 ) : (
                                     <>
-                                        <span className="px-1.5 py-0.5 rounded border border-line bg-subtle text-[10px] font-mono text-ink-muted">
+                                        <span className="px-1.5 py-0.5 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] text-[10px] font-mono text-[var(--wp-text-muted)]">
                                             Owner
                                         </span>
                                         <button
+                                            type="button"
                                             onClick={() => startEditing(project)}
-                                            className="p-1 rounded text-ink-muted hover:text-ink hover:bg-hover transition-colors"
+                                            className="wp-btn wp-btn-secondary h-6 w-6 p-0 justify-center"
+                                            title="Edit project"
                                         >
-                                            <Edit2 className="h-3.5 w-3.5" />
+                                            <Edit2 className="h-3 w-3" />
                                         </button>
                                     </>
                                 )}
@@ -884,11 +908,11 @@ function BillingSection({ user }) {
 
     if (loading) {
         return (
-            <div className="wp-panel p-5 space-y-3 animate-pulse">
-                <div className="h-4 w-36 bg-subtle rounded" />
+            <div className="wp-panel bg-[var(--wp-bg-surface)] p-4 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-[var(--wp-border-subtle)] rounded" />
                 <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-12 bg-subtle/50 rounded" />
+                        <div key={n} className="h-12 bg-[var(--wp-bg-subtle)] rounded" />
                     ))}
                 </div>
             </div>
@@ -896,100 +920,108 @@ function BillingSection({ user }) {
     }
 
     return (
-        <div className="space-y-4">
-            <div className="wp-panel p-5">
-                <div className="mb-6">
-                    <h3 className="text-sm font-medium text-ink">Subscription Summary</h3>
-                    <p className="text-xs text-ink-muted">Manage your active billing tier and invoice records.</p>
+        <div className="space-y-3">
+            <div className="wp-panel bg-[var(--wp-bg-surface)]">
+                <div className="wp-panel-header">
+                    <span className="wp-title-card">Subscription Summary</span>
+                    <span className="wp-metric-mono text-[10.5px] uppercase px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] text-[var(--wp-text-primary)]">
+                        {currentPlan.name} Tier
+                    </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <p className="text-[11px] text-ink-muted mb-1 font-mono">Current tier</p>
-                        <div className="flex items-center gap-2">
-                            <span className="text-lg font-semibold text-ink font-mono">{currentPlan.name}</span>
-                            <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-500">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                Active
-                            </span>
+                <div className="p-3.5 sm:p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                            <span className="wp-label-section uppercase mb-1">Current tier</span>
+                            <div className="flex items-center gap-2 mt-0.5">
+                                <span className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)]">{currentPlan.name}</span>
+                                <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400">
+                                    <span className="wp-live-dot" />
+                                    Active
+                                </span>
+                            </div>
+                            <p className="mt-1 text-xs text-[var(--wp-text-muted)] font-mono">
+                                {formatINR(currentPlan.amount)} / month
+                            </p>
                         </div>
-                        <p className="mt-1 text-xs text-ink-secondary font-mono">
-                            {formatINR(currentPlan.amount)} / month
-                        </p>
-                    </div>
 
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <p className="text-[11px] text-ink-muted mb-1 font-mono">Billing terms</p>
-                        <p className="text-xs font-medium text-ink">One-time monthly order</p>
-                        <p className="text-[11px] text-ink-muted mt-0.5">No automatic renewal</p>
-                    </div>
-
-                    <div className="p-3.5 rounded border border-line bg-surface">
-                        <p className="text-[11px] text-ink-muted mb-1 font-mono">Payment gateway</p>
-                        <div className="flex items-center gap-1.5">
-                            <CreditCard className="h-3.5 w-3.5 text-ink-muted" />
-                            <span className="text-xs font-medium text-ink">Razorpay</span>
+                        <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                            <span className="wp-label-section uppercase mb-1">Billing terms</span>
+                            <p className="text-xs font-medium text-[var(--wp-text-primary)] mt-0.5">One-time monthly order</p>
+                            <p className="text-[11px] text-[var(--wp-text-muted)] mt-0.5 font-mono">No automatic renewal</p>
                         </div>
-                        <p className="text-[11px] text-ink-muted mt-0.5 font-mono">INR · tax excluded</p>
+
+                        <div className="p-3 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                            <span className="wp-label-section uppercase mb-1">Payment gateway</span>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <CreditCard className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
+                                <span className="text-xs font-medium text-[var(--wp-text-primary)]">Razorpay</span>
+                            </div>
+                            <p className="text-[11px] text-[var(--wp-text-muted)] mt-0.5 font-mono">INR · tax excluded</p>
+                        </div>
                     </div>
-                </div>
 
-                <h4 className="text-xs font-semibold text-ink mb-3 font-mono uppercase tracking-wider">Payment History</h4>
+                    <div className="mb-2">
+                        <span className="wp-label-section uppercase">Payment History</span>
+                    </div>
 
-                <div className="overflow-x-auto rounded border border-line">
-                    <table className="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr className="bg-subtle border-b border-line text-[10px] font-mono uppercase tracking-wider text-ink-muted">
-                                <th className="px-3.5 py-2 font-medium">Invoice ID</th>
-                                <th className="px-3.5 py-2 font-medium">Date</th>
-                                <th className="px-3.5 py-2 font-medium">Description</th>
-                                <th className="px-3.5 py-2 font-medium">Amount</th>
-                                <th className="px-3.5 py-2 font-medium">Status</th>
-                                <th className="px-3.5 py-2 font-medium text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-line">
-                            {paymentHistory.length === 0 ? (
-                                <tr>
-                                    <td colSpan="6" className="px-4 py-8 text-center text-ink-muted font-mono text-xs">
-                                        No payment history found
-                                    </td>
+                    <div className="overflow-x-auto rounded border border-[var(--wp-border-subtle)]">
+                        <table className="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr className="bg-[var(--wp-bg-subtle)] border-b border-[var(--wp-border-subtle)] text-[10px] font-mono uppercase tracking-wider text-[var(--wp-text-muted)]">
+                                    <th className="px-3.5 py-2 font-medium">Invoice ID</th>
+                                    <th className="px-3.5 py-2 font-medium">Date</th>
+                                    <th className="px-3.5 py-2 font-medium">Description</th>
+                                    <th className="px-3.5 py-2 font-medium">Amount</th>
+                                    <th className="px-3.5 py-2 font-medium">Status</th>
+                                    <th className="px-3.5 py-2 font-medium text-right">Actions</th>
                                 </tr>
-                            ) : (
-                                paymentHistory.map((payment) => (
-                                    <tr key={payment.id} className="hover:bg-hover transition-colors font-mono">
-                                        <td className="px-3.5 py-2.5 text-ink-secondary">{payment.id && (payment.id.substring(0, 10) + '...')}</td>
-                                        <td className="px-3.5 py-2.5 text-ink-muted">
-                                            {new Date(payment.date).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-3.5 py-2.5 text-ink font-sans font-medium">{payment.description || 'Subscription'}</td>
-                                        <td className="px-3.5 py-2.5 text-ink tabular-nums">{payment.amount != null ? formatINR(payment.amount) : '—'}</td>
-                                        <td className="px-3.5 py-2.5">
-                                            <span className="text-emerald-500 capitalize font-medium">{payment.status}</span>
-                                        </td>
-                                        <td className="px-3.5 py-2.5 text-right">
-                                            <div className="flex items-center justify-end gap-1.5">
-                                                <button
-                                                    onClick={() => handleDownloadReceipt(payment.id)}
-                                                    className="p-1 rounded text-ink-muted hover:text-ink hover:bg-hover transition-colors"
-                                                    title="Download Receipt"
-                                                >
-                                                    <Download className="h-3.5 w-3.5" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleEmailReceipt(payment.id)}
-                                                    className="p-1 rounded text-ink-muted hover:text-ink hover:bg-hover transition-colors"
-                                                    title="Email Receipt"
-                                                >
-                                                    <Bell className="h-3.5 w-3.5" />
-                                                </button>
-                                            </div>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--wp-border-subtle)]">
+                                {paymentHistory.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="px-4 py-8 text-center text-[var(--wp-text-muted)] font-mono text-xs">
+                                            No payment history found
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    paymentHistory.map((payment) => (
+                                        <tr key={payment.id} className="hover:bg-[var(--wp-bg-hover)] transition-colors font-mono">
+                                            <td className="px-3.5 py-2.5 text-[var(--wp-text-secondary)]">{payment.id && (payment.id.substring(0, 10) + '...')}</td>
+                                            <td className="px-3.5 py-2.5 text-[var(--wp-text-muted)]">
+                                                {new Date(payment.date).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-3.5 py-2.5 text-[var(--wp-text-primary)] font-sans font-medium">{payment.description || 'Subscription'}</td>
+                                            <td className="px-3.5 py-2.5 text-[var(--wp-text-primary)] tabular-nums">{payment.amount != null ? formatINR(payment.amount) : '—'}</td>
+                                            <td className="px-3.5 py-2.5">
+                                                <span className="text-emerald-400 capitalize font-medium">{payment.status}</span>
+                                            </td>
+                                            <td className="px-3.5 py-2.5 text-right">
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDownloadReceipt(payment.id)}
+                                                        className="wp-btn wp-btn-secondary h-6 w-6 p-0 justify-center text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)]"
+                                                        title="Download Receipt"
+                                                    >
+                                                        <Download className="h-3 w-3" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleEmailReceipt(payment.id)}
+                                                        className="wp-btn wp-btn-secondary h-6 w-6 p-0 justify-center text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)]"
+                                                        title="Email Receipt"
+                                                    >
+                                                        <Bell className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1071,11 +1103,11 @@ function LinkedAccountsSection({ showToast }) {
 
     if (loading) {
         return (
-            <div className="wp-panel p-5 space-y-3 animate-pulse">
-                <div className="h-4 w-36 bg-subtle rounded" />
+            <div className="wp-panel bg-[var(--wp-bg-surface)] p-4 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-[var(--wp-border-subtle)] rounded" />
                 <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-12 bg-subtle/50 rounded" />
+                        <div key={n} className="h-12 bg-[var(--wp-bg-subtle)] rounded" />
                     ))}
                 </div>
             </div>
@@ -1083,98 +1115,107 @@ function LinkedAccountsSection({ showToast }) {
     }
 
     return (
-        <div className="space-y-4">
-            <div className="wp-panel p-5 relative overflow-hidden">
+        <div className="space-y-3">
+            <div className="wp-panel bg-[var(--wp-bg-surface)] relative overflow-hidden">
                 {!isPro && (
-                    <div className="absolute inset-0 bg-canvas/80 backdrop-blur-sm flex items-center justify-center z-10 p-4">
-                        <div className="text-center p-6 bg-surface border border-line rounded-lg shadow-2xl max-w-sm">
-                            <div className="flex h-10 w-10 items-center justify-center rounded border border-line bg-subtle mx-auto mb-3">
-                                <Lock className="h-5 w-5 text-ink" />
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-10 p-4">
+                        <div className="text-center p-6 bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-lg shadow-2xl max-w-sm">
+                            <div className="flex h-10 w-10 items-center justify-center rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-subtle)] mx-auto mb-3">
+                                <Lock className="h-5 w-5 text-[var(--wp-text-primary)]" />
                             </div>
-                            <h4 className="text-sm font-semibold text-ink mb-1">Pro Feature</h4>
-                            <p className="text-ink-muted text-xs mb-4">Telegram telemetry alerts are available on Pro and Business tiers.</p>
-                            <button className="w-full btn-primary h-7 text-xs">Upgrade Plan</button>
+                            <h4 className="wp-title-card mb-1">Pro Feature</h4>
+                            <p className="text-[var(--wp-text-muted)] text-xs mb-4">Telegram telemetry alerts are available on Pro and Business tiers.</p>
+                            <button
+                                type="button"
+                                onClick={() => window.location.href = '/dashboard/billing'}
+                                className="w-full wp-btn wp-btn-primary h-7 text-xs"
+                            >
+                                Upgrade Plan
+                            </button>
                         </div>
                     </div>
                 )}
 
-                <div className="flex justify-between items-start mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded border border-line bg-subtle text-ink">
-                            <Send className="h-4 w-4" />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-medium text-ink">Telegram Integration</h3>
-                            <p className="text-xs text-ink-muted">Receive live notifications directly through Telegram Bot.</p>
-                        </div>
+                <div className="wp-panel-header">
+                    <div className="flex items-center gap-2">
+                        <Send className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
+                        <span className="wp-title-card">Telegram Integration</span>
                     </div>
                     {accounts.telegram && (
-                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-line bg-subtle text-xs font-mono text-emerald-500">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="flex items-center gap-1.5 px-1.5 py-0.5 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] text-[10.5px] font-mono text-emerald-400">
+                            <span className="wp-live-dot" />
                             Linked
                         </span>
                     )}
                 </div>
 
-                {accounts.telegram ? (
-                    <div className="flex items-center justify-between p-3 border border-line rounded bg-surface">
-                        <div>
-                            <div className="text-xs font-medium text-ink font-mono">{accounts.telegram.username}</div>
-                            <div className="text-[11px] text-ink-muted font-mono mt-0.5">Chat ID: {accounts.telegram.chat_id}</div>
-                            {accounts.telegram.bot_token && (
-                                <div className="text-[10px] text-emerald-500 font-mono mt-1 flex items-center gap-1">
-                                    <Check className="h-3 w-3" /> Custom Bot Token Active
-                                </div>
-                            )}
-                        </div>
-                        <button onClick={() => unlink('telegram')} className="btn-secondary h-6 px-2 text-xs text-red-500">Unlink</button>
-                    </div>
-                ) : (
-                    <form onSubmit={linkTelegram} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-3.5 sm:p-4">
+                    {accounts.telegram ? (
+                        <div className="flex items-center justify-between p-2.5 border border-[var(--wp-border-subtle)] rounded bg-[var(--wp-bg-surface)]">
                             <div>
-                                <label className="block text-xs font-mono text-ink-secondary mb-1">Chat ID</label>
-                                <input
-                                    type="text"
-                                    placeholder="Enter Chat ID"
-                                    value={telegramChatId}
-                                    onChange={e => setTelegramChatId(e.target.value)}
-                                    className="input font-mono text-xs h-8"
-                                    required
-                                />
-                                <p className="text-[11px] text-ink-muted mt-1 font-mono">
-                                    Need your ID? Message <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-ink underline">@userinfobot</a>
-                                </p>
+                                <div className="text-xs font-medium text-[var(--wp-text-primary)] font-mono">{accounts.telegram.username}</div>
+                                <div className="text-[11px] text-[var(--wp-text-muted)] font-mono mt-0.5">Chat ID: {accounts.telegram.chat_id}</div>
+                                {accounts.telegram.bot_token && (
+                                    <div className="text-[10px] text-emerald-400 font-mono mt-1 flex items-center gap-1">
+                                        <Check className="h-3 w-3" /> Custom Bot Token Active
+                                    </div>
+                                )}
                             </div>
-                            <div>
-                                <label className="block text-xs font-mono text-ink-secondary mb-1">Username (Optional)</label>
-                                <input
-                                    type="text"
-                                    placeholder="Username"
-                                    value={telegramUsername}
-                                    onChange={e => setTelegramUsername(e.target.value)}
-                                    className="input font-mono text-xs h-8"
-                                />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-xs font-mono text-ink-secondary mb-1">Custom Bot Token (Optional)</label>
-                                <input
-                                    type="password"
-                                    placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
-                                    value={botToken}
-                                    onChange={e => setBotToken(e.target.value)}
-                                    className="input font-mono text-xs h-8"
-                                />
-                                <p className="text-[11px] text-ink-muted mt-1 font-mono">Leave blank to use default WebPulse alerts, or enter custom bot token.</p>
-                            </div>
-                        </div>
-                        <div className="flex justify-end pt-3 border-t border-line">
-                            <button type="submit" className="btn-primary h-7 px-3 text-xs">
-                                Link Telegram
+                            <button
+                                type="button"
+                                onClick={() => unlink('telegram')}
+                                className="wp-btn wp-btn-secondary h-6 px-2 text-xs text-rose-400 hover:text-rose-300 hover:border-rose-500/40"
+                            >
+                                Unlink
                             </button>
                         </div>
-                    </form>
-                )}
+                    ) : (
+                        <form onSubmit={linkTelegram} className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="wp-label-section uppercase block mb-1">Chat ID</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Chat ID"
+                                        value={telegramChatId}
+                                        onChange={e => setTelegramChatId(e.target.value)}
+                                        className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none"
+                                        required
+                                    />
+                                    <p className="text-[11px] text-[var(--wp-text-muted)] mt-1 font-mono">
+                                        Need your ID? Message <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-[var(--wp-text-primary)] underline">@userinfobot</a>
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="wp-label-section uppercase block mb-1">Username (Optional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Username"
+                                        value={telegramUsername}
+                                        onChange={e => setTelegramUsername(e.target.value)}
+                                        className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="wp-label-section uppercase block mb-1">Custom Bot Token (Optional)</label>
+                                    <input
+                                        type="password"
+                                        placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+                                        value={botToken}
+                                        onChange={e => setBotToken(e.target.value)}
+                                        className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none"
+                                    />
+                                    <p className="text-[11px] text-[var(--wp-text-muted)] mt-1 font-mono">Leave blank to use default WebPulse alerts, or enter custom bot token.</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-end pt-3 border-t border-[var(--wp-border-subtle)]">
+                                <button type="submit" className="wp-btn wp-btn-primary h-7 px-3 text-xs">
+                                    Link Telegram
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </div>
             </div>
         </div>
     );

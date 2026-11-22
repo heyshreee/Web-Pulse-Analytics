@@ -32,7 +32,7 @@ export default function IntegrationTab({
         </div>
 
         {/* Platform Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
           {[
             { id: 'frontend', type: 'vanilla', icon: <Globe className="h-4 w-4" />, title: 'Frontend', desc: 'React, Vue, SPAs & Static', activeTypes: ['vanilla', 'vanilla-count', 'react', 'react-footer', 'vue'] },
             { id: 'backend', type: 'node', icon: <Binary className="h-4 w-4" />, title: 'Backend', desc: 'Server-side API hit-tracking', activeTypes: ['node', 'php', 'python'] },
@@ -42,19 +42,20 @@ export default function IntegrationTab({
             return (
               <button
                 key={platform.id}
+                type="button"
                 onClick={() => setSnippetType(platform.type)}
-                className={`p-3.5 rounded-lg border text-left flex items-start gap-3 transition-colors ${
+                className={`p-3 rounded-lg border text-left flex items-start gap-2.5 transition-colors ${
                   isSelected
-                    ? 'border-ink bg-surface text-ink ring-1 ring-ink/20'
-                    : 'border-line bg-surface hover:bg-hover text-ink-secondary'
+                    ? 'border-[var(--wp-border-strong)] bg-[var(--wp-bg-active)]'
+                    : 'border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] hover:border-[var(--wp-border-strong)] hover:bg-[var(--wp-bg-hover)]'
                 }`}
               >
-                <div className={`p-1.5 rounded border ${isSelected ? 'border-line bg-subtle text-ink' : 'border-line bg-surface text-ink-muted'}`}>
+                <div className={`p-1.5 rounded border ${isSelected ? 'border-[var(--wp-border-strong)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)]' : 'border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] text-[var(--wp-text-muted)]'}`}>
                   {platform.icon}
                 </div>
                 <div>
-                  <h3 className={`text-xs font-medium mb-0.5 ${isSelected ? 'text-ink' : 'text-ink-secondary'}`}>{platform.title}</h3>
-                  <p className="text-[11px] text-ink-muted">{platform.desc}</p>
+                  <h3 className="wp-title-card text-xs mb-0.5">{platform.title}</h3>
+                  <p className="text-[11px] font-mono text-[var(--wp-text-muted)]">{platform.desc}</p>
                 </div>
               </button>
             );
@@ -62,32 +63,32 @@ export default function IntegrationTab({
         </div>
 
         {/* Endpoint Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 pt-5 border-t border-line">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5 pt-4 border-t border-[var(--wp-border-subtle)]">
           <div>
-            <label className="block text-[11px] font-mono text-ink-muted mb-1.5">Tracking API (POST)</label>
-            <div className="flex items-center justify-between gap-2 p-2 bg-subtle border border-line rounded">
-              <code className="text-xs text-ink font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/track/events')}</code>
+            <label className="wp-label-section uppercase block mb-1">Tracking API (POST)</label>
+            <div className="flex items-center justify-between gap-2 p-2 bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)] rounded">
+              <code className="text-xs text-[var(--wp-text-primary)] font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/track/events')}</code>
               <CopyButton text={trackingUrl.replace(/\/track\/[^/]+$/, '/track/events')} size="sm" />
             </div>
           </div>
           <div>
-            <label className="block text-[11px] font-mono text-ink-muted mb-1.5">Analytics API (GET)</label>
-            <div className="flex items-center justify-between gap-2 p-2 bg-subtle border border-line rounded">
-              <code className="text-xs text-ink font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/analytics/count')}</code>
+            <label className="wp-label-section uppercase block mb-1">Analytics API (GET)</label>
+            <div className="flex items-center justify-between gap-2 p-2 bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)] rounded">
+              <code className="text-xs text-[var(--wp-text-primary)] font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/analytics/count')}</code>
               <CopyButton text={trackingUrl.replace(/\/track\/[^/]+$/, '/analytics/count')} size="sm" />
             </div>
           </div>
           <div>
-            <label className="block text-[11px] font-mono text-ink-muted mb-1.5">Standard script URL</label>
-            <div className="flex items-center justify-between gap-2 p-2 bg-subtle border border-line rounded">
-              <code className="text-xs text-ink font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/track/script.js')}</code>
+            <label className="wp-label-section uppercase block mb-1">Standard script URL</label>
+            <div className="flex items-center justify-between gap-2 p-2 bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)] rounded">
+              <code className="text-xs text-[var(--wp-text-primary)] font-mono truncate text-left">{trackingUrl.replace(/\/track\/[^/]+$/, '/track/script.js')}</code>
               <CopyButton text={trackingUrl.replace(/\/track\/[^/]+$/, '/track/script.js')} size="sm" />
             </div>
           </div>
         </div>
 
         {/* Framework Selectors */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-4 border-t border-line pt-5">
+        <div className="flex flex-wrap items-center gap-1.5 mb-3.5 border-t border-[var(--wp-border-subtle)] pt-4">
           {['vanilla', 'vanilla-count', 'react', 'react-footer', 'vue'].includes(snippetType) ? (
             <>
               {[
@@ -99,11 +100,12 @@ export default function IntegrationTab({
               ].map(opt => (
                 <button
                   key={opt.id}
+                  type="button"
                   onClick={() => setSnippetType(opt.id)}
-                  className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                  className={`h-6 px-2.5 rounded text-[11px] font-mono transition-colors ${
                     snippetType === opt.id
-                      ? 'bg-ink text-canvas font-semibold'
-                      : 'border border-line bg-surface text-ink-secondary hover:text-ink hover:bg-hover'
+                      ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium border border-[var(--wp-border-strong)]'
+                      : 'border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]'
                   }`}
                 >
                   {opt.label}
@@ -119,11 +121,12 @@ export default function IntegrationTab({
               ].map(opt => (
                 <button
                   key={opt.id}
+                  type="button"
                   onClick={() => setSnippetType(opt.id)}
-                  className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                  className={`h-6 px-2.5 rounded text-[11px] font-mono transition-colors ${
                     snippetType === opt.id
-                      ? 'bg-ink text-canvas font-semibold'
-                      : 'border border-line bg-surface text-ink-secondary hover:text-ink hover:bg-hover'
+                      ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium border border-[var(--wp-border-strong)]'
+                      : 'border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]'
                   }`}
                 >
                   {opt.label}
@@ -131,13 +134,13 @@ export default function IntegrationTab({
               ))}
             </>
           ) : (
-            <span className="text-xs font-mono text-ink-muted">Direct API Endpoints</span>
+            <span className="text-xs font-mono text-[var(--wp-text-muted)]">Direct API Endpoints</span>
           )}
         </div>
 
         {/* Snippet Block */}
-        <div className="rounded-lg overflow-hidden border border-line bg-black">
-          <div className="flex items-center justify-between px-3.5 py-2 border-b border-line bg-surface">
+        <div className="rounded-md overflow-hidden border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)]">
+          <div className="wp-panel-header">
             <span className="text-[10px] font-medium text-ink-muted font-mono uppercase tracking-widest">
               {snippetLanguage} snippet
             </span>

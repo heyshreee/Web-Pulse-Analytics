@@ -203,9 +203,9 @@ export default function ProjectDetail() {
         </div>
 
         {/* Tab Strip Skeleton */}
-        <div className="flex gap-5 border-b border-[var(--wp-border-subtle)] pb-2">
+        <div className="inline-flex items-center gap-1 p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs mb-1">
           {['Overview', 'Analytics', 'Integration', 'Settings'].map((tabLabel, idx) => (
-            <div key={idx} className="h-4 w-16 bg-[var(--wp-border-subtle)] rounded" />
+            <div key={idx} className={`h-6 w-16 rounded ${idx === 0 ? 'bg-[var(--wp-border-default)]' : 'bg-[var(--wp-border-subtle)]/40'}`} />
           ))}
         </div>
 

@@ -14,54 +14,51 @@ export default function SettingsTab({
   return (
     <div className="space-y-3 font-sans">
       {/* Project Information */}
-      <div className="wp-panel p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-3 border-b border-[var(--wp-border-subtle)]">
-          <div>
-            <h2 className="wp-title-card text-sm mb-0.5">Project Information</h2>
-            <p className="text-[11.5px] text-[var(--wp-text-muted)]">Manage your project credentials and regional preferences.</p>
-          </div>
+      <div className="wp-panel bg-[var(--wp-bg-surface)]">
+        <div className="wp-panel-header">
+          <span className="wp-title-card">Project Information</span>
           {!editing && (
             <button
               onClick={() => setEditing(true)}
-              className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs self-start sm:self-auto inline-flex items-center gap-1.5"
+              className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1.5"
             >
               <Settings className="h-3.5 w-3.5" />
-              Edit
+              <span>Edit</span>
             </button>
           )}
         </div>
 
-        <div className="max-w-xl space-y-4">
+        <div className="p-3.5 sm:p-4 max-w-xl space-y-3">
           {/* Project Name */}
           <div>
-            <label className="block text-xs font-mono text-ink-secondary mb-1">Project Name</label>
+            <label className="wp-label-section uppercase block mb-1">Project Name</label>
             <input
               type="text"
               value={projectName}
               disabled={!editing}
               onChange={(e) => setProjectName(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
-              className="input font-mono text-xs h-8"
+              className="w-full h-8 px-2.5 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
               placeholder="my-project"
             />
-            <p className="text-[11px] text-ink-muted mt-1 font-mono">Only letters, numbers, hyphens, and underscores allowed.</p>
+            <p className="text-[11px] text-[var(--wp-text-muted)] mt-1 font-mono">Only letters, numbers, hyphens, and underscores allowed.</p>
           </div>
 
           {/* Time Zone */}
           <div>
-            <label className="block text-xs font-mono text-ink-secondary mb-1">Time Zone</label>
+            <label className="wp-label-section uppercase block mb-1">Time Zone</label>
             <div className="relative">
               <select
                 value={timezone}
                 disabled={!editing}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="input appearance-none cursor-pointer pr-10 text-xs h-8 font-mono"
+                className="w-full h-8 px-2.5 appearance-none cursor-pointer pr-10 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:border-[var(--wp-border-strong)] focus:outline-none disabled:opacity-50"
               >
                 <option value="Asia/Kolkata">(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
                 <option value="UTC">(GMT+00:00) UTC</option>
                 <option value="America/New_York">(GMT-05:00) Eastern Time (US & Canada)</option>
                 <option value="America/Los_Angeles">(GMT-08:00) Pacific Time (US & Canada)</option>
               </select>
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-ink-muted">
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--wp-text-muted)]">
                 <ChevronRight className="h-3.5 w-3.5 rotate-90" />
               </div>
             </div>
@@ -69,49 +66,49 @@ export default function SettingsTab({
 
           {/* Tracking ID */}
           <div>
-            <label className="block text-xs font-mono text-ink-secondary mb-1">Tracking ID</label>
-            <div className="flex items-center justify-between gap-3 p-2 bg-subtle border border-line rounded">
-              <code className="text-xs font-mono text-ink">{project.tracking_id}</code>
+            <label className="wp-label-section uppercase block mb-1">Tracking ID</label>
+            <div className="flex items-center justify-between gap-3 p-2 bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] rounded font-mono">
+              <code className="text-xs text-[var(--wp-text-primary)]">{project.tracking_id}</code>
               <CopyButton text={project.tracking_id} size="sm" />
             </div>
           </div>
-        </div>
 
-        {editing && (
-          <div className="flex items-center gap-2 pt-4 border-t border-line mt-6">
-            <button
-              onClick={onSave}
-              disabled={saving}
-              className="btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
-            >
-              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-              Save Changes
-            </button>
-            <button
-              onClick={() => {
-                setEditing(false);
-                setProjectName(project.name);
-                setTargetUrl(project.target_url || '');
-                setTimezone(project.timezone || '(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi');
-              }}
-              disabled={saving}
-              className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
-            >
-              <X className="h-3.5 w-3.5" />
-              Cancel
-            </button>
-          </div>
-        )}
+          {editing && (
+            <div className="flex items-center gap-2 pt-3 border-t border-[var(--wp-border-subtle)] mt-4">
+              <button
+                onClick={onSave}
+                disabled={saving}
+                className="wp-btn wp-btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+              >
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                <span>Save Changes</span>
+              </button>
+              <button
+                onClick={() => {
+                  setEditing(false);
+                  setProjectName(project.name);
+                  setTargetUrl(project.target_url || '');
+                  setTimezone(project.timezone || '(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi');
+                }}
+                disabled={saving}
+                className="wp-btn wp-btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
+              >
+                <X className="h-3.5 w-3.5" />
+                <span>Cancel</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Notification Preferences */}
-      <div className="wp-panel p-5">
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-ink mb-1">Notification Preferences</h2>
-          <p className="text-xs text-ink-muted">Configure telemetry alert channels and weekly performance recaps.</p>
+      <div className="wp-panel bg-[var(--wp-bg-surface)]">
+        <div className="wp-panel-header">
+          <span className="wp-title-card">Notification Preferences</span>
+          <span className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)]">Alerts & digests</span>
         </div>
 
-        <div className="space-y-3 divide-y divide-line">
+        <div className="p-3.5 sm:p-4 space-y-2 divide-y divide-[var(--wp-border-subtle)]">
           {[
             {
               id: 'trafficSpikes',
@@ -124,16 +121,20 @@ export default function SettingsTab({
               desc: 'Summary of top performing domains, routes, and visitor momentum.',
             }
           ].map((item) => (
-            <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 first:pt-0">
+            <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
               <div>
-                <h3 className="text-xs font-medium text-ink mb-0.5">{item.title}</h3>
-                <p className="text-[11px] text-ink-muted">{item.desc}</p>
+                <p className="text-xs font-medium text-[var(--wp-text-primary)]">{item.title}</p>
+                <p className="text-[11px] text-[var(--wp-text-muted)] mt-0.5">{item.desc}</p>
               </div>
               <button
                 onClick={() => setNotifications(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
-                className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${notifications[item.id] ? 'bg-ink' : 'bg-subtle border border-line'}`}
+                className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                  notifications[item.id] ? 'bg-[var(--wp-accent-solid)]' : 'bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)]'
+                }`}
               >
-                <span className={`inline-block h-3.5 w-3.5 transform rounded-full ${notifications[item.id] ? 'bg-canvas translate-x-4' : 'bg-ink-muted translate-x-1'} transition-transform`} />
+                <span className={`inline-block h-3.5 w-3.5 transform rounded-full ${
+                  notifications[item.id] ? 'bg-[var(--wp-text-inverted)] translate-x-4' : 'bg-[var(--wp-text-muted)] translate-x-1'
+                } transition-transform`} />
               </button>
             </div>
           ))}
@@ -141,36 +142,36 @@ export default function SettingsTab({
       </div>
 
       {/* Danger Zone */}
-      <div className="wp-panel border-red-500/20 overflow-hidden">
-        <div className="p-4 border-b border-red-500/10 bg-red-500/5 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-red-500" />
-          <h2 className="text-xs font-semibold text-red-500 uppercase tracking-wider font-mono">Danger Zone</h2>
+      <div className="wp-panel border-rose-500/20 overflow-hidden bg-[var(--wp-bg-surface)]">
+        <div className="wp-panel-header bg-rose-500/5 border-b border-rose-500/20">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-rose-400" />
+            <span className="wp-title-card text-rose-400">Danger Zone</span>
+          </div>
         </div>
 
-        <div className="p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-3.5 sm:p-4 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-xs font-medium text-ink mb-0.5">{isActive ? 'Disable Project' : 'Enable Project'}</h4>
-              <p className="text-[11px] text-ink-muted">Temporarily halt telemetry ingestion for this project ID.</p>
+              <p className="text-xs font-medium text-[var(--wp-text-primary)]">{isActive ? 'Disable Project' : 'Enable Project'}</p>
+              <p className="text-[11px] text-[var(--wp-text-muted)] mt-0.5">Temporarily halt telemetry ingestion for this project ID.</p>
             </div>
             <button
               onClick={onToggleActive}
-              className="btn-secondary h-7 px-3 text-xs self-start sm:self-auto"
+              className="wp-btn wp-btn-secondary h-7 px-3 text-xs self-start sm:self-auto"
             >
               {isActive ? 'Disable Project' : 'Enable Project'}
             </button>
           </div>
 
-          <div className="h-px bg-line" />
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="border-t border-[var(--wp-border-subtle)] pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-xs font-medium text-red-500 mb-0.5">Delete Project</h4>
-              <p className="text-[11px] text-ink-muted">Permanently erase this project and all associated telemetry records.</p>
+              <p className="text-xs font-medium text-rose-400">Delete Project</p>
+              <p className="text-[11px] text-[var(--wp-text-muted)] mt-0.5">Permanently erase this project and all associated telemetry records.</p>
             </div>
             <button
               onClick={onDelete}
-              className="btn-danger h-7 px-3 text-xs self-start sm:self-auto"
+              className="wp-btn wp-btn-secondary h-7 px-3 text-xs text-rose-400 hover:text-rose-300 hover:border-rose-500/40 self-start sm:self-auto"
             >
               Delete Project
             </button>
