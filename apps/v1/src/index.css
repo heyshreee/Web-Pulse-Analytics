@@ -412,32 +412,32 @@
    not required here; the dashboard keeps its own light/dark tokens above.
    =========================================================================== */
 :root {
-  /* Surfaces — same values as the space-* scale in tailwind.config.js */
-  --mkt-bg: #070A10;
-  --mkt-bg-soft: #0B0F17;
-  --mkt-surface: #101522;
-  --mkt-surface-2: #151B29;
+  /* Surfaces — aligned with studio tokens */
+  --mkt-bg: #000000;
+  --mkt-bg-soft: #0a0a0a;
+  --mkt-surface: #0a0a0a;
+  --mkt-surface-2: #111111;
 
   /* Structure */
-  --mkt-line: rgba(148, 163, 184, 0.13);
-  --mkt-line-strong: rgba(148, 163, 184, 0.22);
+  --mkt-line: #222222;
+  --mkt-line-strong: #333333;
 
-  /* Text — slate scale already used across the product */
-  --mkt-text: #F1F5F9;
-  --mkt-text-2: #CBD5E1;
-  --mkt-text-3: #94A3B8;
-  --mkt-text-4: #64748B;
+  /* Text — studio scale */
+  --mkt-text: #ededed;
+  --mkt-text-2: #a1a1a1;
+  --mkt-text-3: #737373;
+  --mkt-text-4: #525252;
 
-  /* Brand — exact WebPulse palette */
-  --mkt-brand: #8B5CF6;
-  --mkt-brand-2: #7C6CE0;
-  --mkt-brand-3: #A78BFA;
-  --mkt-live: #48E6A1;
-  --mkt-warn: #F59E0B;
+  /* Brand — monochrome studio */
+  --mkt-brand: #ffffff;
+  --mkt-brand-2: #ededed;
+  --mkt-brand-3: #ededed;
+  --mkt-live: #10b981;
+  --mkt-warn: #f59e0b;
 
   --mkt-container: 75rem;      /* 1200px content width */
-  --mkt-radius: 1rem;
-  --mkt-radius-lg: 1.25rem;
+  --mkt-radius: 0.5rem;
+  --mkt-radius-lg: 0.5rem;
 }
 
 /* ---- Page shell ---------------------------------------------------------- */
@@ -583,24 +583,26 @@
 .mkt-btn-lg { padding: 0.8125rem 1.375rem; font-size: 0.9375rem; }
 
 .mkt-btn-primary {
-  color: #fff;
-  background: linear-gradient(180deg, #8B5CF6 0%, #7C3AED 100%);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 8px 24px -12px rgba(139, 92, 246, 0.9);
+  color: #000000;
+  background: #ffffff;
+  box-shadow: none;
+  border-radius: 6px;
 }
 .mkt-btn-primary:hover {
-  background: linear-gradient(180deg, #9D74F7 0%, #8B5CF6 100%);
-  transform: translateY(-1px);
+  background: #e5e5e5;
+  transform: none;
 }
 
 .mkt-btn-secondary {
-  color: var(--mkt-text-2);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--mkt-line-strong);
+  color: var(--mkt-text);
+  background: transparent;
+  border: 1px solid var(--mkt-line);
+  border-radius: 6px;
 }
 .mkt-btn-secondary:hover {
   color: var(--mkt-text);
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(167, 139, 250, 0.45);
+  background: #171717;
+  border-color: var(--mkt-line-strong);
 }
 
 .mkt-btn-ghost {
@@ -655,10 +657,10 @@
 }
 
 .mkt-panel {
-  border-radius: var(--mkt-radius-lg);
+  border-radius: 8px;
   border: 1px solid var(--mkt-line);
-  background: var(--mkt-bg-soft);
-  box-shadow: 0 32px 64px -32px rgba(0, 0, 0, 0.85);
+  background: var(--mkt-surface);
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -747,25 +749,25 @@
    Shared by /login, /register, /verify-email, /forgot-password, /reset-password. */
 .mkt-field {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid var(--mkt-line-strong);
-  background: rgba(7, 10, 16, 0.6);
-  padding: 0.8125rem 1rem;
-  font-size: 0.9375rem;
+  border-radius: 6px;
+  border: 1px solid var(--mkt-line);
+  background: #000000;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
   color: var(--mkt-text);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .mkt-field::placeholder {
-  color: #4B5A75;
+  color: #666666;
 }
 .mkt-field:hover {
-  border-color: rgba(148, 163, 184, 0.32);
+  border-color: var(--mkt-line-strong);
 }
 .mkt-field:focus {
   outline: none;
-  border-color: rgba(139, 92, 246, 0.65);
-  background: rgba(7, 10, 16, 0.85);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  border-color: var(--mkt-line-strong);
+  background: #000000;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 .mkt-field[aria-invalid='true'] {
   border-color: rgba(239, 68, 68, 0.55);

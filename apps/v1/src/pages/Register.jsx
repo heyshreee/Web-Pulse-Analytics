@@ -154,7 +154,7 @@ export default function Register() {
                                             placeholder="John Doe"
                                         />
                                         <User
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
                                             aria-hidden="true"
                                         />
                                     </div>
@@ -173,7 +173,7 @@ export default function Register() {
                                             placeholder="name@company.com"
                                         />
                                         <Mail
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
                                             aria-hidden="true"
                                         />
                                     </div>
@@ -193,16 +193,16 @@ export default function Register() {
                                             placeholder="••••••••"
                                         />
                                         <Lock
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
                                             aria-hidden="true"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             aria-label={showPassword ? "Hide password" : "Show password"}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-ink-muted transition-colors hover:text-ink focus-visible:outline-none"
                                         >
-                                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
                                     </div>
                                 </div>
