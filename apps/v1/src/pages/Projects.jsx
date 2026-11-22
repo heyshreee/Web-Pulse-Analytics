@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext, Link, useNavigate } from 'react-router-dom';
 import {
-    Plus, BarChart2, Loader2, Search, Grid, List, Folder, Zap,
-    Database, ArrowRight, Eye, Users, Settings
+    Plus, Loader2, Search, Grid, List, ArrowRight, Settings
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
-import Reveal from '../components/Reveal';
 import { useToast } from '../context/ToastContext';
 
 export default function Projects() {
@@ -90,61 +88,46 @@ export default function Projects() {
 
     if (loading) {
         return (
-            <div className="space-y-8 animate-pulse">
+            <div className="space-y-3 font-sans animate-pulse">
                 {/* Header Skeleton */}
-                <div className="page-header">
-                    <div className="page-header-title">
-                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
-                        <div className="space-y-2">
-                            <div className="h-6 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
-                            <div className="h-3.5 w-72 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                        </div>
+                <div className="flex justify-between items-center h-8">
+                    <div className="space-y-1">
+                        <div className="h-4 w-32 bg-[var(--wp-border-default)] rounded" />
+                        <div className="h-3 w-48 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="h-6 w-20 bg-slate-200 dark:bg-slate-800 rounded-full" />
-                        <div className="h-9 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="flex items-center gap-2">
+                        <div className="h-6 w-16 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-7 w-24 bg-[var(--wp-border-default)] rounded" />
                     </div>
                 </div>
 
-                {/* Stat Cards Skeleton */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Stat Bar Skeleton */}
+                <div className="wp-panel min-h-[76px] grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="card card-pad p-6 space-y-4">
-                            <div className="flex justify-between items-start">
-                                <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
-                                <div className="w-5 h-5 rounded bg-slate-200 dark:bg-slate-800" />
-                            </div>
-                            <div className="flex items-baseline gap-2">
-                                <div className="h-8 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                                <div className="h-4 w-12 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                            </div>
-                            <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                        <div key={n} className="p-3 space-y-2">
+                            <div className="h-3 w-24 bg-[var(--wp-border-subtle)] rounded" />
+                            <div className="h-5 w-28 bg-[var(--wp-border-default)] rounded" />
+                            <div className="h-1.5 w-full bg-[var(--wp-border-subtle)] rounded-full" />
                         </div>
                     ))}
                 </div>
 
                 {/* Controls Skeleton */}
-                <div className="card p-3.5 flex flex-col md:flex-row gap-3 justify-between items-center">
-                    <div className="h-10 w-full md:w-80 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                    <div className="h-10 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                <div className="flex justify-between items-center h-8">
+                    <div className="h-7 w-64 bg-[var(--wp-border-subtle)] rounded" />
+                    <div className="h-7 w-16 bg-[var(--wp-border-subtle)] rounded" />
                 </div>
 
                 {/* Projects Grid Skeleton */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[1, 2, 3, 4, 5, 6].map((n) => (
-                        <div key={n} className="card card-pad p-6 flex flex-col justify-between space-y-6">
+                        <div key={n} className="wp-panel h-[160px] p-3 flex flex-col justify-between bg-[var(--wp-bg-surface)]">
                             <div className="flex justify-between items-start">
-                                <div className="w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-800" />
-                                <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                                <div className="h-4 w-28 bg-[var(--wp-border-default)] rounded" />
+                                <div className="h-4 w-12 bg-[var(--wp-border-subtle)] rounded" />
                             </div>
-                            <div className="space-y-2 flex-1">
-                                <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
-                                <div className="h-3.5 w-44 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                            </div>
-                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                                <div className="h-4 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                                <div className="h-4 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                            </div>
+                            <div className="h-3 w-36 bg-[var(--wp-border-subtle)] rounded" />
+                            <div className="h-4 w-full bg-[var(--wp-border-subtle)] rounded" />
                         </div>
                     ))}
                 </div>
@@ -163,237 +146,262 @@ export default function Projects() {
         p.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const statCards = [
-        {
-            label: 'Project Capacity',
-            icon: <Folder className="h-5 w-5 text-violet-500" />,
-            value: projectsUsed,
-            suffix: `/ ${projectLimit}`,
-            pct: (projectsUsed / projectLimit) * 100,
-            bar: 'bg-violet-500'
-        },
-        {
-            label: 'Monthly Pulse',
-            icon: <Zap className="h-5 w-5 text-amber-500" />,
-            value: totalMonthlyViews > 1000 ? (totalMonthlyViews / 1000).toFixed(1) + 'K' : totalMonthlyViews,
-            suffix: `/ ${viewLimit >= 1000 ? (viewLimit / 1000).toFixed(0) + 'K' : viewLimit}`,
-            pct: Math.min((totalMonthlyViews / viewLimit) * 100, 100),
-            bar: 'bg-amber-500'
-        },
-        {
-            label: 'Storage Load',
-            icon: <Database className="h-5 w-5 text-emerald-500" />,
-            value: usageStats?.storageUsed < 1024 * 1024
-                ? `${(usageStats?.storageUsed / 1024).toFixed(1)} KB`
-                : usageStats?.storageUsed < 1024 * 1024 * 1024
-                    ? `${(usageStats?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
-                    : `${(usageStats?.storageUsed / (1024 * 1024 * 1024)).toFixed(1)} GB`,
-            suffix: `of ${usageStats?.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats?.storageLimit / (1024 * 1024)).toFixed(0)}MB` : `${(usageStats?.storageLimit / (1024 * 1024 * 1024)).toFixed(0)}GB`}`,
-            pct: Math.min((usageStats?.storageUsed / usageStats?.storageLimit) * 100, 100),
-            bar: 'bg-emerald-500'
-        },
-    ];
+
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-3 font-sans">
             {(deletingId || creating) && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-950/80 backdrop-blur-md">
-                    <Loader2 className="h-8 w-8 text-slate-500 animate-spin" />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <Loader2 className="h-7 w-7 text-[var(--wp-text-primary)] animate-spin" />
                 </div>
             )}
 
             {/* Header */}
-            <div className="page-header">
-                <div className="page-header-title">
-                    <div className="page-header-icon">
-                        <Folder className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <h1 className="page-title">Your Projects</h1>
-                        <p className="page-sub">Manage and monitor connected domains and tracking endpoints.</p>
-                    </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div>
+                    <h1 className="wp-title-page">Your Projects</h1>
+                    <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">
+                        Manage and monitor connected domains and tracking endpoints.
+                    </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="badge-slate capitalize">{user?.plan ? user.plan : 'Free'} Tier</span>
-                    <div className="relative group/btn">
-                        <button
-                            onClick={() => setShowModal(true)}
-                            disabled={projectsUsed >= projectLimit}
-                            className="btn-primary btn-md"
-                        >
-                            <Plus className="h-4 w-4" />
-                            New Project
-                        </button>
-                        {projectsUsed >= projectLimit && (
-                            <div className="absolute top-full right-0 mt-2 w-48 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lift text-xs text-slate-600 dark:text-slate-300 hidden group-hover/btn:block z-50">
-                                Project limit reached. Please upgrade to Pro to create more projects.
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
-                {statCards.map((card) => (
-                    <div key={card.label} className="card card-pad flex flex-col justify-between">
-                        <div>
-                            <div className="flex justify-between items-start mb-5">
-                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{card.label}</span>
-                                {card.icon}
-                            </div>
-                            <div className="flex items-baseline gap-2 mb-4">
-                                <span className={`text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums ${card.label === 'Storage Load' ? '!text-2xl' : ''}`}>{card.value}</span>
-                                <span className="text-sm font-normal text-slate-400 dark:text-slate-500">{card.suffix}</span>
-                            </div>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden">
-                            <div className={`h-full ${card.bar} rounded-full transition-all duration-700 ease-out`} style={{ width: `${card.pct}%` }} />
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Controls */}
-            <Reveal delay={40} className="card p-3.5 flex flex-col md:flex-row gap-3 justify-between items-center">
-                <div className="relative w-full md:w-80">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <input
-                        type="text"
-                        placeholder="Search projects..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input pl-10"
-                    />
-                </div>
-                <div className="segmented">
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={`segmented-btn ${viewMode === 'grid'
-                            ? 'text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-700 shadow-sm'
-                            : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                    >
-                        <Grid className="h-4 w-4" />
-                    </button>
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`segmented-btn ${viewMode === 'list'
-                            ? 'text-violet-600 dark:text-violet-400 bg-white dark:bg-slate-700 shadow-sm'
-                            : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                    >
-                        <List className="h-4 w-4" />
-                    </button>
-                </div>
-            </Reveal>
-
-            {/* Projects View */}
-            {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProjects.map((project, index) => (
-                        <Reveal
-                            key={project.id}
-                            delay={(index % 3) * 70}
-                            onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
-                            className="card card-pad card-hover relative flex flex-col cursor-pointer group/card"
-                        >
-                            <div className="flex justify-between items-start mb-5">
-                                <div className="p-2.5 bg-slate-900 dark:bg-violet-600 text-white rounded-lg group-hover/card:scale-105 transition-transform">
-                                    <BarChart2 className="h-4 w-4" />
-                                </div>
-                                <span className="badge-green">Active</span>
-                            </div>
-
-                            <div className="mb-6 flex-1">
-                                <h3 className="font-semibold text-slate-900 dark:text-white text-lg tracking-tight group-hover/card:text-violet-600 dark:group-hover/card:text-violet-400 transition-colors mb-1">{project.name}</h3>
-                                <div className="text-xs text-slate-400 dark:text-slate-500 font-mono flex items-center gap-1.5">
-                                    <Database className="h-3 w-3" />
-                                    {project.tracking_id?.toLowerCase()}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-5 border-t border-slate-100 dark:border-slate-800">
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-400">
-                                        <Eye className="h-4 w-4 text-slate-400" />
-                                        <span className="font-medium">{stats[project.id]?.total_views?.toLocaleString() || 0} Pulses</span>
-                                    </div>
-                                    <div className="flex items-center gap-2.5 text-sm text-slate-600 dark:text-slate-400">
-                                        <Users className="h-4 w-4 text-slate-400" />
-                                        <span className="font-medium">{stats[project.id]?.sessionCount?.toLocaleString() || 0} Sessions</span>
-                                    </div>
-                                </div>
-                                <Link
-                                    to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="btn-secondary btn-sm"
-                                >
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-                        </Reveal>
-                    ))}
-
-                    {/* New Project Card */}
+                <div className="flex items-center gap-2">
+                    <span className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase">
+                        {user?.plan || 'Free'} Plan
+                    </span>
                     <button
                         onClick={() => setShowModal(true)}
                         disabled={projectsUsed >= projectLimit}
-                        className="border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 flex flex-col items-center justify-center gap-4 hover:border-violet-400 hover:bg-violet-50/40 dark:hover:bg-violet-500/5 transition-all group min-h-[250px] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="wp-btn wp-btn-primary h-7 text-xs px-2.5 gap-1.5"
                     >
-                        <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-full group-hover:scale-110 transition-transform">
-                            <Plus className="h-6 w-6 text-slate-400 group-hover:text-violet-500 dark:group-hover:text-violet-400" />
+                        <Plus className="h-3.5 w-3.5" />
+                        <span>New Project</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* 3-Column Unified Metric Bar */}
+            <div className="wp-panel grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                {/* 1: Project Capacity */}
+                <div className="p-3 sm:p-3.5 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-[11px]">
+                        <span className="wp-label-section uppercase">Project capacity</span>
+                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                            {projectsUsed} / {projectLimit}
+                        </span>
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                        <span className="wp-kpi-value text-xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
+                            {projectsUsed}
+                        </span>
+                        <span className="text-xs font-mono text-[var(--wp-text-muted)]">
+                            active domains
+                        </span>
+                    </div>
+                    <div className="mt-1.5 wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.min((projectsUsed / projectLimit) * 100, 100)}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* 2: Monthly Pulse */}
+                <div className="p-3 sm:p-3.5 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-[11px]">
+                        <span className="wp-label-section uppercase">Monthly pulse</span>
+                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                            {totalMonthlyViews.toLocaleString()} / {viewLimit >= 1000 ? `${(viewLimit / 1000).toFixed(0)}k` : viewLimit}
+                        </span>
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                        <span className="wp-kpi-value text-xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
+                            {totalMonthlyViews.toLocaleString()}
+                        </span>
+                        <span className="text-xs font-mono text-[var(--wp-text-muted)]">
+                            events tracked
+                        </span>
+                    </div>
+                    <div className="mt-1.5 wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.min((totalMonthlyViews / viewLimit) * 100, 100)}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* 3: Storage Load */}
+                <div className="p-3 sm:p-3.5 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-[11px]">
+                        <span className="wp-label-section uppercase">Storage load</span>
+                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                            {usageStats?.storageUsed < 1024 * 1024
+                                ? `${(usageStats?.storageUsed / 1024).toFixed(1)} KB`
+                                : `${(usageStats?.storageUsed / (1024 * 1024)).toFixed(1)} MB`}
+                        </span>
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                        <span className="wp-kpi-value text-xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
+                            {usageStats?.storageUsed < 1024 * 1024
+                                ? `${(usageStats?.storageUsed / 1024).toFixed(1)} KB`
+                                : `${(usageStats?.storageUsed / (1024 * 1024)).toFixed(1)} MB`}
+                        </span>
+                        <span className="text-xs font-mono text-[var(--wp-text-muted)]">
+                            / {usageStats?.storageLimit >= 1024 * 1024 * 1024 ? `${(usageStats?.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB` : `${(usageStats?.storageLimit / (1024 * 1024)).toFixed(0)} MB`}
+                        </span>
+                    </div>
+                    <div className="mt-1.5 wp-meter-track">
+                        <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.min((usageStats?.storageUsed / usageStats?.storageLimit) * 100, 100)}%` }}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Controls Bar */}
+            <div className="flex items-center justify-between gap-3">
+                <div className="relative w-full max-w-xs">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
+                    <input
+                        type="text"
+                        placeholder="Filter projects..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="input pl-8 h-7 text-xs"
+                    />
+                </div>
+                <div className="inline-flex items-center p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs">
+                    <button
+                        onClick={() => setViewMode('grid')}
+                        className={`h-6 px-2 rounded text-[11px] flex items-center justify-center transition-colors ${
+                            viewMode === 'grid'
+                                ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)]'
+                                : 'text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)]'
+                        }`}
+                        title="Grid View"
+                    >
+                        <Grid className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`h-6 px-2 rounded text-[11px] flex items-center justify-center transition-colors ${
+                            viewMode === 'list'
+                                ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)]'
+                                : 'text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)]'
+                        }`}
+                        title="List View"
+                    >
+                        <List className="h-3.5 w-3.5" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Projects View */}
+            {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {filteredProjects.map((project) => (
+                        <div
+                            key={project.id}
+                            onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
+                            className="wp-panel group hover:border-[var(--wp-border-strong)] transition-colors cursor-pointer flex flex-col justify-between"
+                        >
+                            <div className="wp-panel-header">
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <span className="wp-live-dot" />
+                                    <span className="wp-title-card truncate font-medium">{project.name}</span>
+                                </div>
+                                <span className="inline-flex items-center gap-1 text-[10.5px] font-mono text-[var(--wp-text-muted)]">
+                                    Active
+                                </span>
+                            </div>
+
+                            <div className="p-3 space-y-2 flex-1">
+                                <div className="text-[11px] text-[var(--wp-text-muted)] font-mono flex items-center gap-1.5 truncate">
+                                    <span className="px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] truncate">
+                                        {project.tracking_id?.toLowerCase() || 'trk_pending'}
+                                    </span>
+                                </div>
+                                {project.allowed_origins && (
+                                    <p className="text-[11px] text-[var(--wp-text-muted)] truncate">
+                                        {project.allowed_origins}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="px-3 py-2 border-t border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)]/40 flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-3 text-[11px] font-mono text-[var(--wp-text-secondary)]">
+                                    <span>{stats[project.id]?.total_views?.toLocaleString() || 0} hits</span>
+                                    <span>•</span>
+                                    <span>{stats[project.id]?.sessionCount?.toLocaleString() || 0} sessions</span>
+                                </div>
+                                <ArrowRight className="h-3.5 w-3.5 text-[var(--wp-text-muted)] group-hover:text-[var(--wp-text-primary)] transition-colors" />
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <h3 className="text-slate-900 dark:text-white font-semibold mb-1">New Project</h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm">
-                                {projectsUsed >= projectLimit ? 'Project limit reached' : 'Create a new tracking project'}
-                            </p>
+                    ))}
+
+                    {/* New Project Dropzone Frame */}
+                    <button
+                        onClick={() => setShowModal(true)}
+                        disabled={projectsUsed >= projectLimit}
+                        className="wp-studio-canvas border border-dashed border-[var(--wp-border-strong)] rounded-lg min-h-[140px] flex flex-col items-center justify-center p-4 hover:border-[var(--wp-text-secondary)] transition-colors text-center group disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <div className="w-7 h-7 rounded-md bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] flex items-center justify-center text-[var(--wp-text-muted)] group-hover:text-[var(--wp-text-primary)] transition-colors mb-2">
+                            <Plus className="h-4 w-4" />
                         </div>
+                        <span className="text-xs font-medium text-[var(--wp-text-primary)]">New Project</span>
+                        <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] mt-0.5">
+                            {projectsUsed >= projectLimit ? 'Quota reached' : 'Connect domain or API'}
+                        </span>
                     </button>
                 </div>
             ) : (
                 <div className="space-y-3">
-                    <div className="card overflow-hidden">
+                    <div className="wp-panel overflow-hidden">
                         <table className="table">
                             <thead>
-                                <tr className="table-head border-b border-slate-200 dark:border-slate-800">
+                                <tr className="table-head">
                                     <th className="table-th">Project Name</th>
-                                    <th className="table-th text-right">Total Views</th>
+                                    <th className="table-th font-mono">Tracking ID</th>
+                                    <th className="table-th text-right">Views</th>
                                     <th className="table-th text-right">Sessions</th>
                                     <th className="table-th text-right">Storage</th>
                                     <th className="table-th">Status</th>
                                     <th className="table-th text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                            <tbody>
                                 {filteredProjects.map((project) => (
                                     <tr
                                         key={project.id}
                                         onClick={() => navigate(`/dashboard/projects/${encodeURIComponent(project.name)}`)}
-                                        className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
+                                        className="hover:bg-[var(--wp-bg-hover)] transition-colors cursor-pointer group"
                                     >
                                         <td className="table-td whitespace-nowrap">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2.5 bg-slate-900 dark:bg-violet-500 text-white rounded-lg group-hover:scale-105 transition-transform">
-                                                    <BarChart2 className="h-4 w-4" />
-                                                </div>
-                                                <span className="font-semibold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors truncate max-w-[200px]" title={project.name}>{project.name}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="wp-live-dot" />
+                                                <span className="font-medium text-[var(--wp-text-primary)] truncate max-w-[200px]" title={project.name}>
+                                                    {project.name}
+                                                </span>
                                             </div>
                                         </td>
-                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
+                                        <td className="table-td whitespace-nowrap font-mono text-[11px] text-[var(--wp-text-muted)]">
+                                            {project.tracking_id?.toLowerCase() || 'trk_pending'}
+                                        </td>
+                                        <td className="table-td whitespace-nowrap text-right font-mono tabular-nums">
                                             {stats[project.id]?.total_views?.toLocaleString() || 0}
                                         </td>
-                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
+                                        <td className="table-td whitespace-nowrap text-right font-mono tabular-nums">
                                             {stats[project.id]?.sessionCount?.toLocaleString() || 0}
                                         </td>
-                                        <td className="table-td whitespace-nowrap text-right font-medium tabular-nums">
+                                        <td className="table-td whitespace-nowrap text-right font-mono tabular-nums">
                                             {stats[project.id]?.storageUsed < 1024 * 1024
                                                 ? `${(stats[project.id]?.storageUsed / 1024).toFixed(1)} KB`
                                                 : `${(stats[project.id]?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
                                             }
                                         </td>
                                         <td className="table-td whitespace-nowrap">
-                                            <span className="badge-green">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                            <span className="inline-flex items-center gap-1.5 text-[10.5px] font-mono text-emerald-400">
+                                                <span className="wp-live-dot" />
                                                 Operational
                                             </span>
                                         </td>
@@ -403,10 +411,10 @@ export default function Projects() {
                                                     e.stopPropagation();
                                                     navigate(`/dashboard/projects/${encodeURIComponent(project.name)}/settings`);
                                                 }}
-                                                className="btn-ghost btn-sm"
+                                                className="wp-btn wp-btn-secondary h-6 px-2 text-[11px]"
                                                 title="Project Settings"
                                             >
-                                                <Settings className="h-4 w-4" />
+                                                <Settings className="h-3 w-3" />
                                             </button>
                                         </td>
                                     </tr>
@@ -414,16 +422,6 @@ export default function Projects() {
                             </tbody>
                         </table>
                     </div>
-                    <button
-                        onClick={() => setShowModal(true)}
-                        disabled={projectsUsed >= projectLimit}
-                        className="w-full py-4 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:border-violet-400 hover:bg-slate-50 dark:hover:bg-violet-500/5 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Plus className="h-4 w-4" />
-                        <span className="text-sm font-medium">
-                            {projectsUsed >= projectLimit ? 'Project Limit Reached' : 'Create New Project'}
-                        </span>
-                    </button>
                 </div>
             )}
 
@@ -436,8 +434,8 @@ export default function Projects() {
                 }}
                 title="Create New Project"
             >
-                <form onSubmit={handleCreateProject}>
-                    <div className="mb-5">
+                <form onSubmit={handleCreateProject} className="space-y-4">
+                    <div>
                         <label className="label">Project Name</label>
                         <input
                             type="text"
@@ -447,20 +445,20 @@ export default function Projects() {
                             className="input"
                             placeholder="my-portfolio"
                         />
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 mt-2">Only letters, numbers, hyphens, and underscores allowed.</p>
+                        <p className="field-hint">Only letters, numbers, hyphens, and underscores allowed.</p>
                     </div>
-                    <div className="mb-6">
+                    <div>
                         <label className="label">Allowed Origins (optional)</label>
                         <input
                             type="text"
                             value={allowedOrigins}
                             onChange={(e) => setAllowedOrigins(e.target.value)}
-                            className="input"
+                            className="input font-mono"
                             placeholder="https://example.com, https://app.example.com"
                         />
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 mt-2">Comma separated list of domains allowed to track.</p>
+                        <p className="field-hint">Comma separated list of domains allowed to track.</p>
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 pt-2">
                         <button
                             type="button"
                             onClick={() => {
@@ -468,13 +466,13 @@ export default function Projects() {
                                 setProjectName('');
                                 setAllowedOrigins('');
                             }}
-                            className="btn-ghost btn-md"
+                            className="wp-btn wp-btn-secondary text-xs h-7 px-3"
                         >
                             Cancel
                         </button>
-                        <button type="submit" disabled={creating} className="btn-primary btn-md">
-                            {creating && <Loader2 className="h-4 w-4 animate-spin" />}
-                            {creating ? 'Creating...' : 'Create'}
+                        <button type="submit" disabled={creating} className="wp-btn wp-btn-primary text-xs h-7 px-3">
+                            {creating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                            {creating ? 'Creating...' : 'Create Project'}
                         </button>
                     </div>
                 </form>
