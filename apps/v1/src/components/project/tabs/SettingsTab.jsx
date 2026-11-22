@@ -15,15 +15,15 @@ export default function SettingsTab({
     <div className="space-y-3 font-sans">
       {/* Project Information */}
       <div className="wp-panel p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-3 border-b border-[var(--wp-border-subtle)]">
           <div>
-            <h2 className="text-sm font-medium text-ink mb-1">Project Information</h2>
-            <p className="text-xs text-ink-muted">Manage your project credentials and regional preferences.</p>
+            <h2 className="wp-title-card text-sm mb-0.5">Project Information</h2>
+            <p className="text-[11.5px] text-[var(--wp-text-muted)]">Manage your project credentials and regional preferences.</p>
           </div>
           {!editing && (
             <button
               onClick={() => setEditing(true)}
-              className="btn-secondary h-7 px-3 text-xs self-start sm:self-auto inline-flex items-center gap-1.5"
+              className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs self-start sm:self-auto inline-flex items-center gap-1.5"
             >
               <Settings className="h-3.5 w-3.5" />
               Edit

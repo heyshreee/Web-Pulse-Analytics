@@ -19,12 +19,12 @@ export default function IntegrationTab({
       <div className="wp-panel p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-sm font-medium text-ink mb-1">Integration Snippets</h2>
-            <p className="text-xs text-ink-muted">Select your platform stack and embed telemetry tracking into your application.</p>
+            <h2 className="wp-title-card text-sm mb-0.5">Integration Snippets</h2>
+            <p className="text-[11.5px] text-[var(--wp-text-muted)]">Select your platform stack and embed telemetry tracking into your application.</p>
           </div>
           <Link
             to="/api"
-            className="btn-secondary h-7 px-3 text-xs self-start sm:self-auto inline-flex items-center gap-1.5"
+            className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs self-start sm:self-auto inline-flex items-center gap-1.5"
           >
             <BookOpen className="h-3.5 w-3.5" />
             Full API Reference

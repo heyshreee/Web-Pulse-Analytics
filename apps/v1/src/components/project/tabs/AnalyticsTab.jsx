@@ -32,19 +32,19 @@ export default function AnalyticsTab({
         <div className="lg:col-span-2 wp-panel flex flex-col">
           <div className="wp-panel-header">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-ink-muted" />
-              <span className="wp-title-card">Traffic Momentum</span>
+              <TrendingUp className="h-4 w-4 text-[var(--wp-text-muted)]" />
+              <span className="wp-title-card">Traffic momentum</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center rounded border border-line bg-surface p-0.5 text-xs font-mono">
+              <div className="flex items-center rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] p-0.5 text-xs font-mono">
                 {['24h', '7d', '30d'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setTimeRange(range)}
-                    className={`px-2.5 py-1 rounded transition-colors ${
+                    className={`h-5 px-2 rounded text-[10.5px] font-mono transition-colors ${
                       timeRange === range
-                        ? 'bg-hover text-ink font-semibold'
-                        : 'text-ink-secondary hover:text-ink'
+                        ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium'
+                        : 'text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)]'
                     }`}
                   >
                     {range}
@@ -53,7 +53,7 @@ export default function AnalyticsTab({
               </div>
               <button
                 onClick={onRefresh}
-                className="p-1 rounded border border-line text-ink-muted hover:text-ink hover:bg-hover transition-colors"
+                className="p-1 rounded border border-[var(--wp-border-default)] text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] transition-colors"
                 title="Refresh Data"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${loadingChart ? 'animate-spin' : ''}`} />
@@ -67,27 +67,27 @@ export default function AnalyticsTab({
         </div>
 
         {/* Real-time Pulse Ingress */}
-        <div className="wp-panel flex flex-col justify-between">
+        <div className="wp-panel flex flex-col justify-between bg-[var(--wp-bg-surface)]">
           <div className="wp-panel-header">
-            <span className="wp-title-card">Live Telemetry</span>
-            <div className="flex items-center gap-1.5 text-xs font-mono text-ink-secondary">
-              <span className={`w-1.5 h-1.5 rounded-full ${overviewStats?.realTimeVisitors > 0 ? 'bg-emerald-500' : 'bg-ink-muted'}`} />
+            <span className="wp-title-card">Live telemetry</span>
+            <div className="flex items-center gap-1.5 text-xs font-mono text-[var(--wp-text-secondary)]">
+              <span className={`w-1.5 h-1.5 rounded-full ${overviewStats?.realTimeVisitors > 0 ? 'bg-[var(--wp-status-live)]' : 'bg-[var(--wp-text-muted)]'}`} />
               <span>{overviewStats?.realTimeVisitors > 0 ? 'Active stream' : 'Idle'}</span>
             </div>
           </div>
 
           <div className="py-10 text-center">
-            <div className="text-4xl font-semibold text-ink mb-1 tracking-tight tabular-nums font-mono">
+            <div className="text-4xl font-semibold text-[var(--wp-text-primary)] mb-1 tracking-tight tabular-nums font-mono">
               {overviewStats?.realTimeVisitors || 0}
             </div>
-            <p className="text-xs text-ink-muted font-mono">
+            <p className="text-xs text-[var(--wp-text-muted)] font-mono">
               {overviewStats?.realTimeVisitors > 0 ? 'Active visitors right now' : 'No active pulses detected'}
             </p>
           </div>
 
-          <div className="p-3 border-t border-line flex items-center justify-between text-xs text-ink-muted font-mono">
+          <div className="p-3 border-t border-[var(--wp-border-subtle)] flex items-center justify-between text-xs text-[var(--wp-text-muted)] font-mono">
             <span>Socket feed</span>
-            <span className="text-ink-secondary">
+            <span className="text-[var(--wp-text-secondary)]">
               {overviewStats?.realTimeVisitors > 0 ? 'Synchronized' : 'Standby'}
             </span>
           </div>
