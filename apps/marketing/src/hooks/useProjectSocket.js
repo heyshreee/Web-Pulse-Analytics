@@ -13,7 +13,7 @@ export default function useProjectSocket(projectId, onUpdate) {
     if (isSocketEnabled()) {
       socket = io(SOCKET_URL, {
         withCredentials: true,
-        transports: ['websocket', 'polling']
+        transports: ['polling', 'websocket']
       });
 
       socket.on('visitor_update', (data) => {

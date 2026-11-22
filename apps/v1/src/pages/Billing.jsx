@@ -1,6 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 import { Check, Zap, CreditCard, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import Spinner from '../components/Spinner';

@@ -58,7 +58,7 @@ export default function Layout() {
         if (isSocketEnabled()) {
             const newSocket = io(getSocketUrl(), {
                 withCredentials: true,
-                transports: ['websocket', 'polling'],
+                transports: ['polling', 'websocket'],
                 reconnectionAttempts: 5
             });
 
@@ -97,11 +97,12 @@ export default function Layout() {
             if (socketRef.current) {
                 const s = socketRef.current;
                 socketRef.current = null;
-                // Small delay to avoid "WebSocket is closed before the connection is established" in dev
-                setTimeout(() => {
-                    if (s.connected) s.disconnect();
-                    else s.close();
-                }, 10);
+                if (s.connected) {
+                    s.disconnect();
+                } else {
+                    s.once('connect', () => s.disconnect());
+                    s.once('connect_error', () => s.disconnect());
+                }
             }
         };
     }, [user]);
