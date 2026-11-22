@@ -1,11 +1,8 @@
 import { useOutletContext } from 'react-router-dom';
-import { Check, Zap, CreditCard, Clock } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars -- motion is only used as a JSX member expression
-import { motion } from 'framer-motion';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Reveal from '../components/Reveal';
 import { plans, formatINR, getPlanById } from '../data/plans';
 
 export default function Billing() {
@@ -200,48 +197,37 @@ export default function Billing() {
 
     if (pageLoading) {
         return (
-            <div className="space-y-8 animate-pulse">
+            <div className="space-y-3 font-sans animate-pulse">
                 {/* Header Skeleton */}
-                <div className="page-header">
-                    <div className="page-header-title">
-                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
-                        <div className="space-y-2">
-                            <div className="h-6 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
-                            <div className="h-3.5 w-72 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                        </div>
+                <div className="flex justify-between items-center h-8">
+                    <div className="space-y-1">
+                        <div className="h-4 w-44 bg-[var(--wp-border-default)] rounded" />
+                        <div className="h-3 w-64 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
                     </div>
                 </div>
 
                 {/* Top Section Skeleton */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 card card-pad p-6 space-y-6">
-                        <div className="flex justify-between items-start">
-                            <div className="space-y-2">
-                                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                                <div className="h-7 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
-                            </div>
-                            <div className="h-9 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
-                            <div className="h-20 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
-                        </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    <div className="lg:col-span-2 wp-panel h-[130px] p-3 space-y-2 bg-[var(--wp-bg-surface)]">
+                        <div className="h-4 w-28 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-6 w-36 bg-[var(--wp-border-default)] rounded" />
+                        <div className="h-3 w-48 bg-[var(--wp-border-subtle)] rounded" />
                     </div>
-                    <div className="card card-pad p-6 space-y-4">
-                        <div className="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
-                        <div className="h-8 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                        <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
+                    <div className="wp-panel h-[130px] p-3 space-y-3 bg-[var(--wp-bg-surface)]">
+                        <div className="h-4 w-28 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-2 w-full bg-[var(--wp-border-subtle)] rounded-full" />
+                        <div className="h-2 w-full bg-[var(--wp-border-subtle)] rounded-full" />
                     </div>
                 </div>
 
                 {/* Plans Skeleton */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[1, 2, 3].map((n) => (
-                        <div key={n} className="card card-pad p-6 space-y-4">
-                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
-                            <div className="h-8 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
-                            <div className="h-24 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
-                            <div className="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[1, 2, 3, 4].map((n) => (
+                        <div key={n} className="wp-panel h-[280px] p-3 space-y-3 bg-[var(--wp-bg-surface)]">
+                            <div className="h-4 w-20 bg-[var(--wp-border-subtle)] rounded" />
+                            <div className="h-6 w-24 bg-[var(--wp-border-default)] rounded" />
+                            <div className="h-20 bg-[var(--wp-bg-subtle)] rounded" />
+                            <div className="h-7 w-full bg-[var(--wp-border-subtle)] rounded" />
                         </div>
                     ))}
                 </div>
@@ -250,121 +236,123 @@ export default function Billing() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-3 font-sans">
             {/* Header */}
-            <div className="page-header">
-                <div className="page-header-title">
-                    <div className="page-header-icon">
-                        <CreditCard className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <h1 className="page-title">Billing & Subscription</h1>
-                        <p className="page-sub">Manage your plan, track usage, and review billing terms.</p>
-                    </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div>
+                    <h1 className="wp-title-page">Billing & Subscription</h1>
+                    <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">
+                        Manage your workspace plan, track monthly quota, and review billing limits.
+                    </p>
                 </div>
             </div>
 
             {/* Top Section: Current Plan & Usage */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {/* Current Plan Card */}
-                <div className="lg:col-span-2 card card-pad relative overflow-hidden">
-                    <div className="absolute inset-0 bg-violet-500/[0.03] pointer-events-none" />
-                    <div className="flex justify-between items-start gap-4 mb-8 relative z-10">
+                <div className="lg:col-span-2 wp-panel flex flex-col justify-between bg-[var(--wp-bg-surface)]">
+                    <div className="wp-panel-header">
+                        <span className="wp-title-card">Current plan</span>
+                        <span className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase">
+                            Active
+                        </span>
+                    </div>
+
+                    <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Current plan</p>
-                            <div className="flex items-center gap-3">
-                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{currentPlan.name} Plan</h2>
-                                <span className="badge-slate">Current</span>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-xl font-bold tracking-tight text-[var(--wp-text-primary)]">{currentPlan.name} Tier</h2>
                             </div>
-                            <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
-                                {formatINR(currentPlan.amount)} / month
+                            <p className="text-xs font-mono text-[var(--wp-text-muted)] mt-0.5">
+                                {formatINR(currentPlan.amount)} / month allowance
                             </p>
                         </div>
                         <button
                             onClick={() => document.getElementById('choose-plan')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                            className="btn-secondary btn-md"
+                            className="wp-btn wp-btn-secondary text-xs h-7 px-3 self-start sm:self-auto"
                         >
-                            Compare plans
+                            Compare all tiers
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-                        <div className="card-subtle p-4">
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Monthly limit</p>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums">{viewLimit.toLocaleString()} <span className="text-sm font-normal text-slate-500 ml-1">tracked events</span></p>
+                    <div className="grid grid-cols-2 divide-x divide-[var(--wp-border-subtle)] border-t border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)]/30">
+                        <div className="p-3">
+                            <span className="wp-label-section uppercase">Monthly event limit</span>
+                            <div className="wp-kpi-value text-base font-bold text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
+                                {viewLimit.toLocaleString()} <span className="text-[11px] font-normal text-[var(--wp-text-muted)]">hits</span>
+                            </div>
                         </div>
-                        <div className="card-subtle p-4">
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Next reset</p>
-                            <p className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{getNextResetDate()}</p>
+                        <div className="p-3">
+                            <span className="wp-label-section uppercase">Next quota reset</span>
+                            <div className="wp-metric-mono text-base font-bold text-[var(--wp-text-primary)] mt-0.5">
+                                {getNextResetDate()}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Usage Card */}
-                <div className="card card-pad flex flex-col">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 dark:bg-violet-500/10">
-                            <Zap className="h-4 w-4 text-violet-500" />
-                        </div>
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Usage this month</h3>
+                <div className="wp-panel flex flex-col justify-between bg-[var(--wp-bg-surface)]">
+                    <div className="wp-panel-header">
+                        <span className="wp-title-card">Quota consumption</span>
+                        <span className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
+                            {viewPercentage > 0 && viewPercentage < 0.1 ? '<0.1%' : `${Math.round(viewPercentage)}%`}
+                        </span>
                     </div>
 
-                    <div className="space-y-6 flex-1">
+                    <div className="p-3 sm:p-4 space-y-3.5 flex-1">
                         <div>
-                            <div className="flex justify-between items-end mb-2">
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Tracked events</p>
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight tabular-nums">
-                                    {totalViewsUsed.toLocaleString()} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {viewLimit.toLocaleString()}</span>
-                                </p>
+                            <div className="flex justify-between items-baseline text-xs mb-1">
+                                <span className="text-[11.5px] text-[var(--wp-text-secondary)]">Tracked events</span>
+                                <span className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
+                                    {totalViewsUsed.toLocaleString()} / {viewLimit.toLocaleString()}
+                                </span>
                             </div>
-                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${viewPercentage}%` }}
-                                    className="h-full bg-violet-500 rounded-full"
+                            <div className="wp-meter-track">
+                                <div
+                                    className="wp-meter-bar"
+                                    style={{ width: `${Math.max(viewPercentage, totalViewsUsed > 0 ? 2 : 0)}%` }}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <div className="flex justify-between items-end mb-2">
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Active projects</p>
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight tabular-nums">
-                                    {projectsCount} <span className="text-slate-400 dark:text-slate-500 font-normal">/ {projectLimit}</span>
-                                </p>
+                            <div className="flex justify-between items-baseline text-xs mb-1">
+                                <span className="text-[11.5px] text-[var(--wp-text-secondary)]">Active projects</span>
+                                <span className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
+                                    {projectsCount} / {projectLimit}
+                                </span>
                             </div>
-                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${projectPercentage}%` }}
-                                    className="h-full bg-violet-500 rounded-full"
+                            <div className="wp-meter-track">
+                                <div
+                                    className="wp-meter-bar"
+                                    style={{ width: `${Math.max(projectPercentage, projectsCount > 0 ? 2 : 0)}%` }}
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 leading-relaxed">
-                        Resets on the first day of each calendar month.
-                    </p>
+                    <div className="px-3 py-2 border-t border-[var(--wp-border-subtle)] text-[10.5px] font-mono text-[var(--wp-text-muted)] bg-[var(--wp-bg-subtle)]/30">
+                        Resets on the 1st of each calendar month.
+                    </div>
                 </div>
             </div>
 
             {/* Plan Comparison Section */}
-            <div id="choose-plan" className="scroll-mt-24">
-                <h2 className="section-title mb-1.5">Choose your plan</h2>
-                <p className="page-sub">Pick the plan that fits your traffic and project needs.</p>
-                <p className="mb-6 mt-1.5 max-w-2xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                    Prices are in INR per month of allowance. Paid plans are one-time orders with no
-                    subscription and no automatic renewal; the plan stays active until you change it,
-                    and amounts exclude applicable taxes.
-                </p>
+            <div id="choose-plan" className="scroll-mt-12 pt-2">
+                <div className="mb-2.5">
+                    <h2 className="wp-title-card">Choose your plan</h2>
+                    <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">
+                        Prepaid allowances with fixed ceilings and zero surprise overages.
+                    </p>
+                </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-violet-500 border-t-transparent"></div>
+                    <div className="flex justify-center py-12">
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-[var(--wp-border-default)] border-t-[var(--wp-accent-solid)]" />
                     </div>
                 ) : (
-                    <Reveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         {plans.map((plan) => {
                             const isCurrentPlan = usageStats.plan === plan.id;
                             const isFree = plan.id === 'free';
@@ -377,60 +365,59 @@ export default function Billing() {
                                     : `${isDowngrade ? 'Switch' : 'Upgrade'} to ${plan.name}`;
 
                             return (
-                                <div key={plan.id} className={`
-                                    card card-pad flex flex-col h-full relative transition-all duration-200
-                                    ${isCurrentPlan
-                                        ? 'border-violet-300 dark:border-violet-500/40 ring-1 ring-violet-500/20'
-                                        : isPro
-                                            ? 'border-violet-200 dark:border-violet-500/30 card-hover'
-                                            : 'card-hover'}
-                                `}>
-                                    {isPro && (
-                                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-20">
-                                            <span className="px-2.5 py-0.5 bg-violet-500 text-white text-[11px] font-medium rounded-full shadow-sm">Popular</span>
+                                <div
+                                    key={plan.id}
+                                    className={`wp-panel p-3.5 flex flex-col justify-between transition-colors ${
+                                        isCurrentPlan
+                                            ? 'border-[var(--wp-border-strong)] bg-[var(--wp-bg-surface)]'
+                                            : 'hover:border-[var(--wp-border-strong)] bg-[var(--wp-bg-surface)]'
+                                    }`}
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between gap-2 mb-2">
+                                            <h3 className="text-sm font-semibold text-[var(--wp-text-primary)]">{plan.name}</h3>
+                                            {isCurrentPlan ? (
+                                                <span className="wp-metric-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase text-[var(--wp-text-muted)]">
+                                                    Current
+                                                </span>
+                                            ) : isPro ? (
+                                                <span className="wp-metric-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-strong)] uppercase text-[var(--wp-text-primary)]">
+                                                    Popular
+                                                </span>
+                                            ) : null}
                                         </div>
-                                    )}
 
-                                    <div className="mb-4">
-                                        <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">{plan.name}</h3>
-                                        <p className="text-xs font-normal text-slate-500 dark:text-slate-400 leading-normal">
+                                        <p className="text-[11px] text-[var(--wp-text-muted)] leading-relaxed mb-3">
                                             {plan.description}
                                         </p>
-                                    </div>
 
-                                    <div className="mb-5">
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                                                {formatINR(plan.amount)}
-                                            </span>
-                                            <span className="text-slate-500 font-semibold text-xs">/ month</span>
-                                        </div>
-                                    </div>
-
-                                    <dl className="mb-5 grid grid-cols-2 gap-x-3 gap-y-3 border-y border-slate-200/70 py-4 dark:border-slate-700/50">
-                                        {plan.limits.map((limit) => (
-                                            <div key={limit.label}>
-                                                <dt className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">{limit.label}</dt>
-                                                <dd className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">{limit.value}</dd>
+                                        <div className="mb-3">
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="wp-kpi-value text-2xl font-bold text-[var(--wp-text-primary)] tracking-tight tabular-nums">
+                                                    {formatINR(plan.amount)}
+                                                </span>
+                                                <span className="text-[11px] font-mono text-[var(--wp-text-muted)]">/ mo</span>
                                             </div>
-                                        ))}
-                                    </dl>
+                                        </div>
 
-                                    <ul className="mb-6 flex-1 space-y-2.5">
-                                        {plan.features.map((feature) => (
-                                            <li key={feature} className="flex items-start gap-2.5 text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
-                                                {feature}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                        <dl className="mb-3 grid grid-cols-2 gap-2 border-y border-[var(--wp-border-subtle)] py-2 text-[11px]">
+                                            {plan.limits.map((limit) => (
+                                                <div key={limit.label}>
+                                                    <dt className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">{limit.label}</dt>
+                                                    <dd className="font-mono text-xs font-medium text-[var(--wp-text-primary)] mt-0.5">{limit.value}</dd>
+                                                </div>
+                                            ))}
+                                        </dl>
 
-                                    {plan.plannedNote && (
-                                        <p className="mb-6 flex items-start gap-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                            <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden="true" />
-                                            {plan.plannedNote}
-                                        </p>
-                                    )}
+                                        <ul className="mb-4 space-y-1.5">
+                                            {plan.features.map((feature) => (
+                                                <li key={feature} className="flex items-start gap-2 text-[11.5px] text-[var(--wp-text-secondary)]">
+                                                    <Check className="mt-0.5 h-3 w-3 shrink-0 text-emerald-400" />
+                                                    <span>{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
 
                                     <button
                                         onClick={() => {
@@ -439,24 +426,21 @@ export default function Billing() {
                                             else handleUpgrade(plan.id);
                                         }}
                                         disabled={isCurrentPlan}
-                                        className={`
-                                            w-full btn-lg
-                                            ${isCurrentPlan
-                                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-default border border-slate-200 dark:border-slate-700'
+                                        className={`w-full text-xs h-7 rounded-md font-medium transition-colors ${
+                                            isCurrentPlan
+                                                ? 'wp-btn wp-btn-secondary opacity-50 cursor-default'
                                                 : plan.kind === 'primary'
-                                                    ? 'btn-primary'
-                                                    : 'btn-secondary'}
-                                            disabled:opacity-50 disabled:cursor-not-allowed
-                                        `}
+                                                    ? 'wp-btn wp-btn-primary'
+                                                    : 'wp-btn wp-btn-secondary'
+                                        }`}
                                     >
                                         {ctaLabel}
                                     </button>
                                 </div>
                             );
                         })}
-                    </Reveal>
+                    </div>
                 )}
-
             </div>
         </div>
     );
