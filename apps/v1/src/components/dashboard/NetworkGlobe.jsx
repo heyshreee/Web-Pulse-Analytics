@@ -1,14 +1,16 @@
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { X, MapPin, TrendingUp, RefreshCw, Loader2, Globe, Plus, Minus } from 'lucide-react';
+import { MapPin, RefreshCw, Loader2, Globe, Plus, Minus } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
-// Shared constants
+// Shared constants (v0 Studio Tokens)
 // ---------------------------------------------------------------------------
-const PURPLE = 0x8b5cf6;
-const BLUE = 0x60a5fa;
-const GRID = 0x334155;
+const LIVE_EMERALD = 0x10b981;
+const STUDIO_WHITE = 0xededed;
+const STUDIO_GRID = 0x222222;
+const STUDIO_SURFACE = 0x050505;
+const STUDIO_SLATE = 0x525252;
 
 // A visitor is considered "active" if they were seen within this window.
 const ACTIVE_WINDOW = 10 * 60 * 1000; // 10 minutes
@@ -289,7 +291,11 @@ const NetworkGlobe = ({
     controls.addEventListener('end', resumeRotate);
 
     // --- Grid lines + transparent globe surface ---
-    const gridMat = new THREE.LineBasicMaterial({ color: GRID, transparent: true, opacity: 0.18 });
+    const gridMat = new THREE.LineBasicMaterial({
+      color: isDark ? STUDIO_GRID : 0xe5e5e5,
+      transparent: true,
+      opacity: isDark ? 0.35 : 0.5,
+    });
     const grid = new THREE.LineSegments(
       new THREE.BufferGeometry().setFromPoints(createLatLngGrid(1, isLowPower ? 16 : 24)),
       gridMat
@@ -297,9 +303,9 @@ const NetworkGlobe = ({
     sceneGroup.add(grid);
 
     const surfaceMat = new THREE.MeshPhongMaterial({
-      color: 0x0b1020,
+      color: isDark ? STUDIO_SURFACE : 0xfcfcfc,
       transparent: true,
-      opacity: 0.5,
+      opacity: isDark ? 0.65 : 0.25,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
@@ -309,11 +315,11 @@ const NetworkGlobe = ({
     );
     sceneGroup.add(surface);
 
-    // --- Atmosphere halo (subtle) ---
+    // --- Atmosphere halo (subtle monochrome) ---
     const haloMat = new THREE.MeshBasicMaterial({
-      color: PURPLE,
+      color: isDark ? 0xffffff : 0x000000,
       transparent: true,
-      opacity: 0.06,
+      opacity: isDark ? 0.03 : 0.02,
       side: THREE.BackSide,
       depthWrite: false,
     });
@@ -334,13 +340,18 @@ const NetworkGlobe = ({
     }
     starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
     const starMat = new THREE.PointsMaterial({
-      color: 0x8b9bc0, size: 0.02, transparent: true, opacity: 0.6, depthWrite: false,
+      color: 0x555555, size: 0.018, transparent: true, opacity: 0.35, depthWrite: false,
     });
     const stars = new THREE.Points(starGeo, starMat);
     scene.add(stars);
     // --- Dot-matrix continents (instanced) ---
     const dotGeo = new THREE.SphereGeometry(0.008, 5, 5);
-    const dotMat = new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.6, depthWrite: false });
+    const dotMat = new THREE.MeshBasicMaterial({
+      color: isDark ? STUDIO_WHITE : STUDIO_SLATE,
+      transparent: true,
+      opacity: isDark ? 0.55 : 0.45,
+      depthWrite: false
+    });
     const landDots = new THREE.InstancedMesh(dotGeo, dotMat, 4096);
     landDots.frustumCulled = false;
     landDots.visible = false;
@@ -363,21 +374,21 @@ const NetworkGlobe = ({
     }
     ambientGeo.setAttribute('position', new THREE.BufferAttribute(ambientPos, 3));
     const ambientMat = new THREE.PointsMaterial({
-      color: 0x8b9bc0, size: 0.012, transparent: true, opacity: 0.5, depthWrite: false,
+      color: 0x666666, size: 0.012, transparent: true, opacity: 0.35, depthWrite: false,
     });
     const ambientPts = new THREE.Points(ambientGeo, ambientMat);
     sceneGroup.add(ambientPts);
 
     // --- Nodes (instanced spheres + additive glow sprites) ---
     const nodeGeo = new THREE.SphereGeometry(1, 12, 12);
-    const nodeMatInst = new THREE.MeshBasicMaterial({ color: PURPLE, transparent: true, depthWrite: false });
+    const nodeMatInst = new THREE.MeshBasicMaterial({ color: LIVE_EMERALD, transparent: true, depthWrite: false });
     const nodesInst = new THREE.InstancedMesh(nodeGeo, nodeMatInst, 64);
     nodesInst.frustumCulled = false;
     sceneGroup.add(nodesInst);
 
-    const glowTexture = createGlowTexture(PURPLE);
+    const glowTexture = createGlowTexture(LIVE_EMERALD);
     const nodeGlowMat = new THREE.SpriteMaterial({
-      map: glowTexture, color: PURPLE, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      map: glowTexture, color: LIVE_EMERALD, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     });
     const glowSprites = [];
     const glowGroup = new THREE.Group();
@@ -393,7 +404,7 @@ const NetworkGlobe = ({
     // --- Arcs ---
     const arcs = new THREE.LineSegments(
       new THREE.BufferGeometry(),
-      new THREE.LineBasicMaterial({ color: BLUE, transparent: true, opacity: 0.5, depthWrite: false })
+      new THREE.LineBasicMaterial({ color: LIVE_EMERALD, transparent: true, opacity: 0.45, depthWrite: false })
     );
     arcs.frustumCulled = false;
     sceneGroup.add(arcs);
@@ -404,7 +415,7 @@ const NetworkGlobe = ({
     const arcPartsPos = new Float32Array(arcCount * 3);
     arcPartsPts.setAttribute('position', new THREE.BufferAttribute(arcPartsPos, 3));
     const arcPartsMat = new THREE.PointsMaterial({
-      color: 0xbfdbfe, size: 0.018, transparent: true, opacity: 0.9, depthWrite: false,
+      color: 0x6ee7b7, size: 0.018, transparent: true, opacity: 0.9, depthWrite: false,
     });
     const arcParts = new THREE.Points(arcPartsPts, arcPartsMat);
     arcParts.visible = false;
@@ -662,24 +673,32 @@ const NetworkGlobe = ({
     const s = stateRef.current;
     if (!s) return;
     if (s.gridMat) {
-      s.gridMat.color.set(isDark ? 0x334155 : 0x94a3b8);
-      s.gridMat.opacity = isDark ? 0.18 : 0.4;
+      s.gridMat.color.set(isDark ? STUDIO_GRID : 0xe5e5e5);
+      s.gridMat.opacity = isDark ? 0.35 : 0.5;
     }
     if (s.surfaceMat) {
-      s.surfaceMat.color.set(isDark ? 0x0b1020 : 0xffffff);
-      s.surfaceMat.opacity = isDark ? 0.5 : 0.16;
+      s.surfaceMat.color.set(isDark ? STUDIO_SURFACE : 0xfcfcfc);
+      s.surfaceMat.opacity = isDark ? 0.65 : 0.25;
     }
     if (s.dotMat) {
-      s.dotMat.color.set(isDark ? BLUE : 0x64748b);
-      s.dotMat.opacity = isDark ? 0.6 : 0.5;
+      s.dotMat.color.set(isDark ? STUDIO_WHITE : STUDIO_SLATE);
+      s.dotMat.opacity = isDark ? 0.55 : 0.45;
       s.dotMat.needsUpdate = true;
     }
-    if (s.stars) s.stars.visible = isDark;
-    if (s.ambientPts) s.ambientPts.visible = isDark;
+    if (s.haloMat) {
+      s.haloMat.color.set(isDark ? 0xffffff : 0x000000);
+      s.haloMat.opacity = isDark ? 0.03 : 0.02;
+    }
+    if (s.stars) {
+      s.stars.visible = isDark;
+      if (s.starMat) s.starMat.color.set(0x555555);
+    }
+    if (s.ambientPts) {
+      s.ambientPts.visible = isDark;
+      if (s.ambientMat) s.ambientMat.color.set(0x666666);
+    }
     if (bgRef.current) {
-      bgRef.current.style.background = isDark
-        ? 'radial-gradient(ellipse 70% 60% at 50% 45%, rgba(139,92,246,0.10) 0%, rgba(96,165,250,0.05) 38%, rgba(6,8,15,0) 70%)'
-        : 'radial-gradient(ellipse 70% 60% at 50% 45%, rgba(139,92,246,0.08) 0%, rgba(96,165,250,0.04) 40%, rgba(255,255,255,0) 72%)';
+      bgRef.current.style.background = 'transparent';
     }
   }, [isDark]);
 
@@ -760,7 +779,7 @@ const NetworkGlobe = ({
   // -------------------------------------------------------------------------
   return (
     <div
-      className="relative w-full h-full overflow-hidden rounded-2xl"
+      className="relative w-full h-full overflow-hidden"
       style={{ cursor: 'grab' }}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
@@ -774,66 +793,52 @@ const NetworkGlobe = ({
       <div ref={containerRef} className="absolute inset-0" />
 
       {/* Zoom controls */}
-      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+      <div className="absolute top-3 right-3 z-20 flex flex-col gap-1.5">
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); handleZoom(1); }}
           aria-label="Zoom in"
           title="Zoom in"
-          className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/85 dark:bg-slate-900/85 backdrop-blur border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 shadow-sm transition-colors hover:text-violet-600 dark:hover:text-violet-400 hover:border-slate-300 dark:hover:border-slate-600"
+          className="h-6 w-6 flex items-center justify-center rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:border-[var(--wp-border-strong)] transition-colors shadow-sm"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3 w-3" />
         </button>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); handleZoom(-1); }}
           aria-label="Zoom out"
           title="Zoom out"
-          className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/85 dark:bg-slate-900/85 backdrop-blur border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 shadow-sm transition-colors hover:text-violet-600 dark:hover:text-violet-400 hover:border-slate-300 dark:hover:border-slate-600"
+          className="h-6 w-6 flex items-center justify-center rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:border-[var(--wp-border-strong)] transition-colors shadow-sm"
         >
-          <Minus className="h-4 w-4" />
+          <Minus className="h-3 w-3" />
         </button>
       </div>
 
       {/* Status overlays */}
       {loading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
-          <Loader2 className="h-8 w-8 text-violet-500 animate-spin mb-4" />
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 font-semibold">
-            Loading visitor data
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none bg-[var(--wp-bg-surface)]/60 backdrop-blur-sm">
+          <Loader2 className="h-6 w-6 text-[var(--wp-text-muted)] animate-spin mb-2" />
+          <p className="wp-metric-mono text-[10.5px] uppercase tracking-wider text-[var(--wp-text-secondary)]">
+            Loading geography telemetry…
           </p>
         </div>
       )}
 
       {!loading && error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-6">
-          <Globe className="h-10 w-10 text-slate-400 dark:text-slate-500 mb-4" />
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Global activity unavailable</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 max-w-[220px]">
-            We couldn't load visitor locations.
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-6 bg-[var(--wp-bg-surface)]/80 backdrop-blur-sm">
+          <Globe className="h-8 w-8 text-[var(--wp-text-muted)] mb-3" />
+          <h3 className="wp-title-card mb-1">Global activity unavailable</h3>
+          <p className="text-xs text-[var(--wp-text-muted)] mb-4 max-w-[220px]">
+            We couldn't load visitor telemetry locations.
           </p>
           {onRetry && (
             <button
               onClick={onRetry}
-              className="btn-secondary btn-sm pointer-events-auto"
+              className="wp-btn wp-btn-secondary h-7 px-3 text-xs pointer-events-auto inline-flex items-center gap-1.5"
             >
-              <RefreshCw className="h-3.5 w-3.5" /> Retry
+              <RefreshCw className="h-3 w-3" /> Retry
             </button>
           )}
-        </div>
-      )}
-
-      {!loading && !error && !hasData && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-6 pointer-events-none">
-          <div className="flex items-center gap-1.5 mb-4 text-violet-400/80">
-            <span className="block h-1.5 w-1.5 rounded-full bg-current" />
-            <span className="block h-1.5 w-1.5 rounded-full bg-current" />
-            <span className="block h-1.5 w-1.5 rounded-full bg-current" />
-          </div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5">Waiting for visitor activity</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[240px]">
-            Connect your tracker to see visitors appear in real time.
-          </p>
         </div>
       )}
 
@@ -844,43 +849,34 @@ const NetworkGlobe = ({
           style={{
             left: tooltip.left,
             top: tooltip.top,
-            transform: 'translate(-50%, calc(-100% - 14px))',
+            transform: 'translate(-50%, calc(-100% - 12px))',
           }}
         >
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl px-3.5 py-2.5 min-w-[190px]">
-            <div className="flex items-center gap-2 mb-1.5">
-              <MapPin className="h-3.5 w-3.5 text-violet-500" />
-              <span className="text-[11px] font-semibold text-slate-900 dark:text-white truncate">
-                {tooltip.node.location || 'Unknown Location'}
-              </span>
+          <div className="wp-panel bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded p-2.5 shadow-2xl min-w-[180px] font-sans">
+            <div className="flex items-center gap-1.5 mb-1.5 text-xs font-medium text-[var(--wp-text-primary)] truncate">
+              <MapPin className="h-3 w-3 text-emerald-400 shrink-0" />
+              <span className="truncate">{tooltip.node.location || 'Unknown Location'}</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-slate-500 dark:text-slate-400">Active visitors</span>
-                <span className="font-bold text-violet-600 dark:text-violet-400 tabular-nums">
-                  {tooltip.node.count.toLocaleString()}
-                </span>
+            <div className="space-y-1 text-[11px] font-mono">
+              <div className="flex items-center justify-between text-[var(--wp-text-secondary)]">
+                <span>Active pulses</span>
+                <span className="text-[var(--wp-text-primary)] font-medium tabular-nums">{tooltip.node.count}</span>
               </div>
               {tooltip.node.path && (
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 dark:text-slate-400">Current page</span>
-                  <span className="font-mono text-slate-700 dark:text-slate-300 truncate max-w-[110px]">
-                    {tooltip.node.path}
-                  </span>
+                <div className="flex items-center justify-between text-[var(--wp-text-muted)]">
+                  <span>Route</span>
+                  <span className="truncate max-w-[110px] text-[var(--wp-text-secondary)]">{tooltip.node.path}</span>
                 </div>
               )}
               {tooltip.node.device && (
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 dark:text-slate-400">Device</span>
-                  <span className="capitalize text-slate-700 dark:text-slate-300">{tooltip.node.device}</span>
+                <div className="flex items-center justify-between text-[var(--wp-text-muted)]">
+                  <span>Device</span>
+                  <span className="capitalize text-[var(--wp-text-secondary)]">{tooltip.node.device}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-semibold pt-0.5">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-                </span>
-                Active now
+              <div className="flex items-center gap-1.5 pt-1 text-[10.5px] text-emerald-400">
+                <span className="wp-live-dot" />
+                <span>Active now</span>
               </div>
             </div>
           </div>
@@ -888,28 +884,23 @@ const NetworkGlobe = ({
       )}
 
       {/* Bottom status pill */}
-      <div className="absolute bottom-3 left-4 z-10 pointer-events-none">
-        <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-950/70 backdrop-blur-xl border border-slate-200 dark:border-slate-800/60 px-3 py-1.5 rounded-full">
-          <span className={`relative flex h-2 w-2 ${error ? '' : 'true'}`}>
-            {error ? (
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
-            ) : hasData ? (
-              <>
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </>
+      <div className="absolute bottom-3 left-3 z-10 pointer-events-none">
+        <div className="flex items-center gap-2 bg-[var(--wp-bg-surface)]/85 backdrop-blur-md border border-[var(--wp-border-default)] px-2.5 py-1 rounded">
+          <span className="relative flex h-1.5 w-1.5">
+            {hasData ? (
+              <span className="wp-live-dot" />
             ) : (
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--wp-text-muted)]" />
             )}
           </span>
-          <span className="text-[10px] uppercase font-bold tracking-[0.18em] text-slate-600 dark:text-slate-300">
+          <span className="wp-metric-mono text-[10.5px] uppercase tracking-wider text-[var(--wp-text-secondary)]">
             {loading
-              ? 'Loading'
+              ? 'Loading…'
               : error
                 ? 'Unavailable'
                 : hasData
-                  ? `Live · ${realTimeVisitors.toLocaleString()} visitors`
-                  : 'Idle'}
+                  ? `Live · ${realTimeVisitors.toLocaleString()} signals`
+                  : 'Idle · Telemetry ready'}
           </span>
         </div>
       </div>

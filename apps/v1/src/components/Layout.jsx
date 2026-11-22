@@ -12,7 +12,6 @@ import {
     Activity,
     BarChart2,
     Key,
-    LifeBuoy,
     Zap,
     Sparkles
 } from 'lucide-react';
@@ -27,6 +26,8 @@ import PageTransition from './PageTransition';
 export default function Layout() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [sidebarLoading, setSidebarLoading] = useState(true);
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [pinnedProjects, setPinnedProjects] = useState([]);
     const [usageStats, setUsageStats] = useState({
@@ -48,17 +49,21 @@ export default function Layout() {
 
     useEffect(() => {
         loadUser();
+        const timer = setTimeout(() => {
+            setIsPageLoading(false);
+        }, 1200);
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
         if (!user) return;
 
-        loadSidebarData();
+        loadSidebarData(true);
 
         if (isSocketEnabled()) {
             const newSocket = io(getSocketUrl(), {
                 withCredentials: true,
-                transports: ['websocket', 'polling'],
+                transports: ['polling', 'websocket'],
                 reconnectionAttempts: 5
             });
 
@@ -97,11 +102,12 @@ export default function Layout() {
             if (socketRef.current) {
                 const s = socketRef.current;
                 socketRef.current = null;
-                // Small delay to avoid "WebSocket is closed before the connection is established" in dev
-                setTimeout(() => {
-                    if (s.connected) s.disconnect();
-                    else s.close();
-                }, 10);
+                if (s.connected) {
+                    s.disconnect();
+                } else {
+                    s.once('connect', () => s.disconnect());
+                    s.once('connect_error', () => s.disconnect());
+                }
             }
         };
     }, [user]);
@@ -117,7 +123,7 @@ export default function Layout() {
         }
     };
 
-    const loadSidebarData = async () => {
+    const loadSidebarData = async (initial = false) => {
         try {
             const [projects, usage] = await Promise.all([
                 apiRequest('/projects'),
@@ -133,6 +139,10 @@ export default function Layout() {
             }
         } catch (error) {
             console.error('Failed to load sidebar data', error);
+        } finally {
+            if (initial) {
+                setSidebarLoading(false);
+            }
         }
     };
 
@@ -153,10 +163,84 @@ export default function Layout() {
         { path: '/dashboard/billing', label: 'Billing', icon: CreditCard },
     ];
 
+    const formatUsagePercent = (used, limit) => {
+        if (!limit || limit === 0) return '0%';
+        const pct = (used / limit) * 100;
+        if (pct > 0 && pct < 0.1) return '<0.1%';
+        return `${Math.round(pct)}%`;
+    };
+
+    const formatCompactLimit = (limit) => {
+        if (!limit) return '0';
+        if (limit >= 1000000) return `${(limit / 1000000).toFixed(0)}M`;
+        if (limit >= 1000) return `${(limit / 1000).toFixed(0)}k`;
+        return limit.toLocaleString();
+    };
+
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070A10]">
-                <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
+            <div className="wp-shell font-sans text-[var(--wp-text-primary)]">
+                {/* Top Studio Bar Skeleton */}
+                <header className="col-span-full h-[46px] border-b border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] px-3 sm:px-4 flex items-center justify-between z-30 animate-pulse">
+                    <div className="flex items-center gap-2">
+                        <div className="w-[22px] h-[22px] rounded bg-[var(--wp-border-default)]" />
+                        <div className="h-4 w-20 bg-[var(--wp-border-default)] rounded" />
+                        <span className="text-[var(--wp-border-strong)] mx-1 text-xs select-none">/</span>
+                        <div className="h-4 w-32 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="h-7 w-16 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
+                        <div className="h-7 w-7 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-7 w-7 bg-[var(--wp-border-subtle)] rounded-full" />
+                    </div>
+                </header>
+
+                {/* Left Control Rail Skeleton */}
+                <aside className="w-[224px] min-w-[224px] max-w-[224px] border-r border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] flex flex-col justify-between p-2.5 hidden lg:flex animate-pulse">
+                    <div className="space-y-4">
+                        <div>
+                            <div className="h-3 w-14 bg-[var(--wp-border-subtle)] rounded mb-2 px-1" />
+                            <div className="space-y-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <div key={i} className="h-[30px] rounded-md px-2 flex items-center gap-2 bg-[var(--wp-bg-subtle)]/60">
+                                        <div className="h-3.5 w-3.5 rounded bg-[var(--wp-border-default)]" />
+                                        <div className={`h-3 rounded bg-[var(--wp-border-default)] ${i === 1 ? 'w-20' : i === 2 ? 'w-16' : i === 3 ? 'w-24' : 'w-14'}`} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded mb-2 px-1" />
+                            <div className="h-[28px] rounded-md bg-[var(--wp-bg-subtle)]/40" />
+                        </div>
+                    </div>
+
+                    <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)]">
+                        <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
+                        <div className="h-6 w-full bg-[var(--wp-border-subtle)] rounded" />
+                    </div>
+                </aside>
+
+                {/* Main Viewport Skeleton */}
+                <div className="flex flex-col min-w-0 h-full overflow-hidden bg-[var(--wp-bg-canvas)]">
+                    <main className="flex-1 p-3 sm:p-4 space-y-3 animate-pulse">
+                        <div className="flex justify-between items-center h-8">
+                            <div className="h-4 w-32 bg-[var(--wp-border-default)] rounded" />
+                            <div className="h-7 w-28 bg-[var(--wp-border-default)] rounded" />
+                        </div>
+                        <div className="wp-panel h-[82px] bg-[var(--wp-bg-surface)]" />
+                        <div className="grid grid-cols-12 gap-3 h-[420px]">
+                            <div className="col-span-7 wp-panel bg-[var(--wp-bg-surface)]" />
+                            <div className="col-span-5 wp-panel bg-[var(--wp-bg-surface)]" />
+                        </div>
+                    </main>
+                    <footer className="h-[28px] border-t border-[var(--wp-border-subtle)] px-4 flex items-center justify-between text-[11px] font-mono text-[var(--wp-text-muted)] bg-[var(--wp-bg-canvas)]">
+                        <div className="h-2.5 w-48 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-2.5 w-24 bg-[var(--wp-border-subtle)] rounded" />
+                    </footer>
+                </div>
             </div>
         );
     }
@@ -165,232 +249,284 @@ export default function Layout() {
     const storagePct = Math.min((usageStats.storageUsed / usageStats.storageLimit) * 100, 100);
 
     const formatBytes = (bytes) => {
+        if (!bytes || bytes === 0) return '0.0 MB';
         if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
         if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
         return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
     };
 
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
+    const isSidebarBusy = sidebarLoading || isPageLoading;
 
     const isProdDomain = typeof window !== 'undefined' &&
         (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'));
-    const defaultMarketingUrl = isProdDomain ? 'https://webpulseanalytics.tech' : 'http://localhost:5174';
     const defaultV2Url = isProdDomain ? 'https://beta.webpulseanalytics.tech' : 'http://localhost:5175';
-    const marketingUrl = (import.meta.env.VITE_MARKETING_URL || defaultMarketingUrl).replace(/\/+$/, '');
     const v2AppUrl = import.meta.env.VITE_V2_APP_URL || defaultV2Url;
 
     return (
-        <div className="h-screen overflow-hidden bg-slate-50 dark:bg-[#070A10] flex font-sans text-slate-900 dark:text-slate-200 transition-colors duration-300">
+        <div className="wp-shell font-sans text-[var(--wp-text-primary)]">
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && !isSettingsPage && (
                 <div
-                    className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar */}
+            {/* Top Studio Bar (46px) */}
+            <header className="col-span-full h-[46px] border-b border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] px-3 sm:px-4 flex items-center justify-between z-30 select-none">
+                <div className="flex items-center gap-2">
+                    {!isSettingsPage && (
+                        <button
+                            className="lg:hidden p-1.5 -ml-1 text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] rounded-md transition-colors"
+                            onClick={() => setSidebarOpen(true)}
+                            aria-label="Open navigation menu"
+                        >
+                            <Menu className="h-4 w-4" />
+                        </button>
+                    )}
+                    <Link to="/dashboard" className="flex items-center gap-2 group">
+                        <span className="wp-brand-mark">
+                            <Activity className="h-3 w-3" strokeWidth={2.5} />
+                        </span>
+                        <span className="text-[13px] font-semibold tracking-tight text-[var(--wp-text-primary)]">
+                            WebPulse
+                        </span>
+                    </Link>
+                    <span className="text-[var(--wp-border-strong)] mx-1 text-xs select-none">/</span>
+                    <span className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] hidden sm:inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)]">
+                        Powered by Edge Telemetry
+                    </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <a
+                        href={v2AppUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="wp-btn wp-btn-secondary h-7 text-xs px-2.5 gap-1.5 hidden sm:inline-flex"
+                    >
+                        <Sparkles className="h-3 w-3" />
+                        <span>V2 Beta</span>
+                    </a>
+
+                    <div className="h-4 w-px bg-[var(--wp-border-subtle)] hidden sm:block" />
+
+                    <ThemeToggle />
+
+                    <Notifications />
+
+                    {user && (
+                        <div className="flex items-center gap-2 pl-1 border-l border-[var(--wp-border-subtle)] ml-1">
+                            <div className="relative group">
+                                <button className="h-7 w-7 rounded-full border border-[var(--wp-border-default)] bg-[var(--wp-bg-subtle)] flex items-center justify-center text-[var(--wp-text-primary)] overflow-hidden hover:border-[var(--wp-border-strong)] transition-all">
+                                    {user.avatar_url ? (
+                                        <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
+                                    ) : (
+                                        <span className="text-[11px] font-medium font-mono uppercase">
+                                            {(user.name || user.email || 'U').charAt(0)}
+                                        </span>
+                                    )}
+                                </button>
+                                {/* Dropdown Menu */}
+                                <div className="absolute right-0 mt-2 w-48 bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-md shadow-2xl py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all origin-top-right z-50">
+                                    <div className="px-3 py-1.5 border-b border-[var(--wp-border-subtle)]">
+                                        <p className="text-xs font-medium text-[var(--wp-text-primary)] truncate">{user.email}</p>
+                                        <p className="text-[10.5px] text-[var(--wp-text-muted)] font-mono flex items-center gap-1 mt-0.5">
+                                            <span className="wp-live-dot" />
+                                            {user.plan ? user.plan.toUpperCase() : 'FREE'} PLAN
+                                        </p>
+                                    </div>
+                                    <Link to="/dashboard/settings" className="block px-3 py-1.5 text-xs text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]">Profile Settings</Link>
+                                    <Link to="/dashboard/billing" className="block px-3 py-1.5 text-xs text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]">Billing</Link>
+                                    <div className="my-1 border-t border-[var(--wp-border-subtle)]" />
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full text-left px-3 py-1.5 text-xs text-red-500 hover:bg-red-500/10"
+                                    >
+                                        Sign out
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </header>
+
+            {/* Left Control Rail (224px) */}
             {!isSettingsPage && (
                 <aside className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-space-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out flex flex-col
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          `}>
-                    {/* Logo */}
-                    <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800/80">
-                        <Logo to="/dashboard" />
+                    fixed lg:static inset-y-[46px] left-0 z-40 w-[224px] min-w-[224px] max-w-[224px] bg-[var(--wp-bg-canvas)] border-r border-[var(--wp-border-default)] transform transition-transform duration-200 ease-in-out flex flex-col justify-between p-2.5
+                    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                `}>
+                    <div className="space-y-4 overflow-y-auto">
+                        <div>
+                            <div className="wp-label-section px-2 mb-1.5 uppercase">Workspace</div>
+                            {isSidebarBusy ? (
+                                <div className="space-y-1 animate-pulse" aria-label="Loading navigation">
+                                    {[
+                                        { path: '/dashboard', labelWidth: 'w-20', isRoute: location.pathname === '/dashboard' },
+                                        { path: '/dashboard/projects', labelWidth: 'w-16', isRoute: location.pathname.startsWith('/dashboard/projects') },
+                                        { path: '/dashboard/activity', labelWidth: 'w-24', isRoute: location.pathname === '/dashboard/activity' },
+                                        { path: '/dashboard/api-key', labelWidth: 'w-16', isRoute: location.pathname === '/dashboard/api-key' },
+                                        { path: '/dashboard/billing', labelWidth: 'w-14', isRoute: location.pathname === '/dashboard/billing' },
+                                    ].map((item, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`h-[30px] rounded-md px-2 flex items-center gap-2 ${
+                                                item.isRoute ? 'bg-[var(--wp-bg-active)]' : 'bg-transparent'
+                                            }`}
+                                        >
+                                            <div className="h-3.5 w-3.5 rounded bg-[var(--wp-border-default)]" />
+                                            <div className={`h-3 rounded bg-[var(--wp-border-default)] ${item.labelWidth}`} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-0.5">
+                                    {navItems.map((item) => {
+                                        const Icon = item.icon;
+                                        const isActive = location.pathname === item.path ||
+                                            (item.path === '/dashboard/projects' && location.pathname.startsWith('/dashboard/projects'));
+                                        return (
+                                            <Link
+                                                key={item.path}
+                                                to={item.path}
+                                                onClick={() => setSidebarOpen(false)}
+                                                className={`h-[30px] px-2 rounded-md text-[12.5px] font-medium flex items-center gap-2 transition-colors ${isActive
+                                                    ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)]'
+                                                    : 'text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]'
+                                                    }`}
+                                            >
+                                                <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-[var(--wp-text-primary)]' : 'text-[var(--wp-text-muted)]'}`} />
+                                                <span>{item.label}</span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pinned domains */}
+                        <div>
+                            <div className="wp-label-section px-2 mb-1.5 uppercase">Pinned domains</div>
+                            {isSidebarBusy ? (
+                                <div className="h-[28px] rounded-md bg-[var(--wp-bg-subtle)] animate-pulse" />
+                            ) : (
+                                <div>
+                                    {pinnedProjects.length > 0 ? (
+                                        <div className="space-y-0.5">
+                                            {pinnedProjects.map((project) => (
+                                                <Link
+                                                    key={project.id}
+                                                    to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
+                                                    className="h-[28px] px-2 rounded-md text-[12px] flex items-center gap-2 text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] transition-colors truncate"
+                                                >
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--wp-status-live)] shrink-0" />
+                                                    <span className="truncate">{project.name}</span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <Link
+                                            to="/dashboard/projects"
+                                            className="h-[28px] px-2 rounded-md text-[11.5px] text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] flex items-center gap-1.5 transition-colors"
+                                        >
+                                            <span>Pin a domain</span>
+                                        </Link>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Main Navigation */}
-                    <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
-                        <div>
-                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Menu</h3>
-                            <div className="space-y-1">
-                                {navItems.map((item) => {
-                                    const Icon = item.icon;
-                                    const isActive = location.pathname === item.path ||
-                                        (item.path === '/dashboard/projects' && location.pathname.startsWith('/dashboard/projects'));
-                                    return (
-                                        <Link
-                                            key={item.path}
-                                            to={item.path}
-                                            onClick={() => setSidebarOpen(false)}
-                                            className={`group relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
-                                                ? 'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300'
-                                                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
-                                                }`}
-                                        >
-                                            <span
-                                                aria-hidden="true"
-                                                className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-violet-500 transition-all duration-300 ease-out ${isActive ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'}`}
-                                            />
-                                            <Icon className={`h-[18px] w-[18px] ${isActive ? 'text-violet-600 dark:text-violet-300' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300'}`} />
-                                            <span>{item.label}</span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Pinned Projects */}
-                        <div>
-                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Pinned Projects</h3>
-                            <div className="space-y-0.5">
-                                {pinnedProjects.length > 0 ? (
-                                    pinnedProjects.map((project) => (
-                                        <Link
-                                            key={project.id}
-                                            to={`/dashboard/projects/${encodeURIComponent(project.name)}`}
-                                            className="group flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
-                                        >
-                                            <span className="flex items-center gap-2.5">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                                <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white truncate">{project.name}</span>
-                                            </span>
-                                        </Link>
-                                    ))
-                                ) : (
-                                    <p className="px-3 py-2 text-xs text-slate-400 dark:text-slate-600">No pinned projects yet</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Usage widget */}
-                        <div>
-                            <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">Usage</h3>
-                            <div className="card card-pad bg-slate-50 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/40 space-y-4">
+                    {/* Recessed Capacity Card */}
+                    <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)] shrink-0">
+                        {isSidebarBusy ? (
+                            <div className="space-y-2.5 animate-pulse" aria-label="Loading capacity">
                                 <div>
                                     <div className="flex items-center justify-between mb-1.5">
-                                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Events tracked</span>
-                                        <span className="text-xs font-semibold text-slate-900 dark:text-white">{Math.round(usagePercentage)}%</span>
+                                        <div className="h-2.5 w-12 bg-[var(--wp-border-subtle)] rounded" />
+                                        <div className="h-2.5 w-8 bg-[var(--wp-border-subtle)] rounded" />
                                     </div>
-                                    <div className="h-1.5 rounded-full bg-slate-200/70 dark:bg-slate-700/60 overflow-hidden">
-                                        <div className="h-full rounded-full bg-violet-500 transition-all duration-500" style={{ width: `${usagePercentage}%` }} />
+                                    <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
+                                    <div className="h-2 w-24 bg-[var(--wp-border-subtle)] rounded mt-1.5" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <div className="h-2.5 w-12 bg-[var(--wp-border-subtle)] rounded" />
+                                        <div className="h-2.5 w-14 bg-[var(--wp-border-subtle)] rounded" />
                                     </div>
-                                    <p className="mt-1.5 text-[11px] text-slate-400 dark:text-slate-500">
-                                        {usageStats.totalViews.toLocaleString()} / {usageStats.monthlyLimit.toLocaleString()} views
+                                    <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
+                                </div>
+                                <div className="h-7 w-full bg-[var(--wp-border-subtle)] rounded mt-1" />
+                            </div>
+                        ) : (
+                            <>
+                                <div>
+                                    <div className="flex items-center justify-between text-[11px] mb-1">
+                                        <span className="text-[var(--wp-text-secondary)]">Events</span>
+                                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                                            {formatUsagePercent(usageStats.totalViews, usageStats.monthlyLimit)}
+                                        </span>
+                                    </div>
+                                    <div className="wp-meter-track">
+                                        <div
+                                            className="wp-meter-bar"
+                                            style={{ width: `${Math.max(usagePercentage, usageStats.totalViews > 0 ? 2 : 0)}%` }}
+                                        />
+                                    </div>
+                                    <p className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] mt-1">
+                                        {usageStats.totalViews.toLocaleString()} / {formatCompactLimit(usageStats.monthlyLimit)} views
                                     </p>
                                 </div>
 
                                 <div>
-                                    <div className="flex items-center justify-between mb-1.5">
-                                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage</span>
-                                        <span className="text-xs font-semibold text-slate-900 dark:text-white">
-                                            {formatBytes(usageStats.storageUsed)} <span className="font-normal text-slate-400">/ {formatBytes(usageStats.storageLimit)}</span>
+                                    <div className="flex items-center justify-between text-[11px] mb-1">
+                                        <span className="text-[var(--wp-text-secondary)]">Storage</span>
+                                        <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
+                                            {formatBytes(usageStats.storageUsed)}
                                         </span>
                                     </div>
-                                    <div className="h-1.5 rounded-full bg-slate-200/70 dark:bg-slate-700/60 overflow-hidden">
-                                        <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${storagePct}%` }} />
+                                    <div className="wp-meter-track">
+                                        <div
+                                            className="wp-meter-bar"
+                                            style={{ width: `${Math.max(storagePct, usageStats.storageUsed > 0 ? 2 : 0)}%` }}
+                                        />
                                     </div>
                                 </div>
 
-                                <Link to="/dashboard/billing" className="btn-primary btn-sm w-full">
-                                    <Zap className="h-3.5 w-3.5" />
-                                    Upgrade plan
+                                <Link to="/dashboard/billing" className="wp-btn wp-btn-secondary h-7 w-full text-xs justify-center mt-1">
+                                    Manage plan
                                 </Link>
-                            </div>
-                        </div>
-                    </nav>
-
-                    {/* Footer */}
-                    <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800/80">
-                        <a
-                            href={`${marketingUrl}/docs`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-colors"
-                        >
-                            <LifeBuoy className="h-[18px] w-[18px] text-slate-400 dark:text-slate-500" />
-                            Help & Docs
-                        </a>
+                            </>
+                        )}
                     </div>
                 </aside>
             )}
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0">
-                {/* Topbar */}
-                <header className="h-16 bg-white/80 dark:bg-space-900/75 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-colors duration-300">
-                    <div className="flex items-center gap-3">
-                        {!isSettingsPage && (
-                            <button
-                                className="lg:hidden p-2 -ml-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                onClick={() => setSidebarOpen(true)}
-                            >
-                                <Menu className="h-5 w-5" />
-                            </button>
-                        )}
-                        {isSettingsPage && (
-                            <Logo to="/dashboard" />
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        <a
-                            href={v2AppUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/60 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors"
-                        >
-                            <Sparkles className="h-3 w-3" />
-                            <span>Try V2 Beta</span>
-                        </a>
-
-                        <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />
-
-                        <ThemeToggle />
-
-                        <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />
-
-                        <Notifications />
-
-                        <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-800" />
-
-                        {user && (
-                            <div className="flex items-center gap-3 pl-1">
-                                <div className="text-right hidden md:block leading-tight">
-                                    <div className="text-sm font-medium text-slate-900 dark:text-white">{user.email}</div>
-                                    <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
-                                        <span className="inline-flex items-center gap-1">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                            {user.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) : 'Free'} Plan
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="relative group">
-                                    <button className="h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-white overflow-hidden hover:ring-2 hover:ring-violet-500/30 transition-all">
-                                        {user.avatar_url ? (
-                                            <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <User className="h-4 w-4" />
-                                        )}
-                                    </button>
-
-                                    {/* Dropdown Menu */}
-                                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lift py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all origin-top-right z-50">
-                                        <Link to="/dashboard/settings" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Profile Settings</Link>
-                                        <Link to="/dashboard/billing" className="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Billing</Link>
-                                        <div className="my-1 border-t border-slate-100 dark:border-slate-800"></div>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
-                                        >
-                                            Sign out
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </header>
-
-                {/* Page Content */}
-                <main className="flex-1 overflow-auto layout-scroll-content">
-                    <div className="container-app py-6 sm:py-8">
-                        <PageTransition>
-                            <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket }} />
-                        </PageTransition>
-                    </div>
+            {/* Main Studio Viewport */}
+            <div className="flex flex-col min-w-0 h-full overflow-hidden bg-[var(--wp-bg-canvas)]">
+                <main className="flex-1 overflow-auto layout-scroll-content p-3 sm:p-4 min-h-0">
+                    <PageTransition>
+                        <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket, isPageLoading, setIsPageLoading }} />
+                    </PageTransition>
                 </main>
+
+                {/* Minimal Studio Footer (28px) */}
+                <footer className="h-[28px] border-t border-[var(--wp-border-subtle)] px-4 flex items-center justify-between text-[11px] font-mono text-[var(--wp-text-muted)] bg-[var(--wp-bg-canvas)] select-none shrink-0">
+                    <div className="flex items-center gap-2">
+                        <span>WebPulse Studio</span>
+                        <span>•</span>
+                        <span>Realtime Edge</span>
+                        <span>•</span>
+                        <a href="/features" className="hover:text-[var(--wp-text-secondary)] transition-colors">How it works</a>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <span className="wp-live-dot" />
+                        <span>100% operational</span>
+                    </div>
+                </footer>
             </div>
         </div>
     );

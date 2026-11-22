@@ -10,48 +10,46 @@ export default function ActivityModal({ isOpen, onClose, loading, activityData }
       title="Recent Activity"
       maxWidth="max-w-2xl"
     >
-      <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+      <div className="max-h-[60vh] overflow-y-auto">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
-            <p className="text-sm font-medium text-slate-500">Loading activity data...</p>
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <Loader2 className="h-6 w-6 text-ink-muted animate-spin" />
+            <p className="text-xs font-mono text-ink-muted">Loading activity data...</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {activityData?.length > 0 ? (
               activityData.map((activity, i) => (
-                <div key={i} className="flex gap-4 p-5 bg-slate-50 dark:bg-slate-900/20 border border-slate-100 dark:border-slate-800/50 rounded-xl hover:bg-white dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700 transition-all group/item shadow-sm hover:shadow-md">
-                  <div className="relative flex-shrink-0 flex flex-col items-center">
-                    <div className="w-3 h-3 rounded-full bg-violet-600 dark:bg-violet-500 mt-2 shadow-[0_0_12px_rgba(139,92,246,0.3)] ring-4 ring-violet-100 dark:ring-violet-900/30"></div>
-                    {i !== activityData.length - 1 && (
-                      <div className="flex-1 w-px bg-slate-200 dark:bg-slate-800 my-3"></div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1 pb-1">
-                    <div className="flex items-start justify-between gap-4 mb-1">
-                      <p className="text-base font-semibold text-slate-900 dark:text-white truncate group-hover/item:text-violet-600 dark:group-hover/item:text-violet-400 transition-colors" title={activity.title || 'Unknown Page'}>
-                        {activity.title || 'Unknown Page'}
+                <div key={i} className="flex gap-3 p-3 bg-surface border border-line rounded hover:bg-hover transition-colors">
+                  <div className="w-1.5 h-1.5 rounded-full bg-ink shrink-0 mt-2" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-4 mb-0.5">
+                      <p className="text-xs font-medium text-ink truncate" title={activity.title || 'Untitled'}>
+                        {activity.title || 'Untitled'}
                       </p>
+                      <span className="text-[10px] text-ink-muted font-mono tabular-nums shrink-0">
+                        {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate mb-4 font-mono">{activity.site}{activity.path}</p>
+                    <p className="text-[11px] text-ink-muted truncate mb-2 font-mono">{activity.site}{activity.path}</p>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                        <MapPin className="h-3 w-3 text-violet-500" />
-                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{activity.location}</span>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-ink-secondary">
+                      <div className="flex items-center gap-1 px-1.5 py-0.5 bg-subtle rounded border border-line">
+                        <MapPin className="h-3 w-3 text-ink-muted" />
+                        <span>{activity.location}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700/50 shadow-sm">
-                        <Clock className="h-3 w-3 text-violet-500" />
-                        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">{new Date(activity.timestamp).toLocaleString()}</span>
+                      <div className="flex items-center gap-1 px-1.5 py-0.5 bg-subtle rounded border border-line">
+                        <Clock className="h-3 w-3 text-ink-muted" />
+                        <span>{new Date(activity.timestamp).toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="py-16 text-center">
-                <Search className="h-8 w-8 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-                <p className="text-sm text-slate-500">No recent activity found</p>
+              <div className="py-12 text-center text-ink-muted">
+                <Search className="h-6 w-6 mx-auto mb-2 opacity-40" />
+                <p className="text-xs font-mono">No recent activity found</p>
               </div>
             )}
           </div>

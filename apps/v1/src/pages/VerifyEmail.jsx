@@ -22,7 +22,6 @@ export default function VerifyEmail() {
         }
     }, [email, navigate, showToast]);
 
-    // Focus first input on mount
     useEffect(() => {
         if (inputRefs.current[0]) {
             inputRefs.current[0].focus();
@@ -30,25 +29,21 @@ export default function VerifyEmail() {
     }, []);
 
     const handleChange = (index, value) => {
-        // Allow only numbers
         if (!/^\d*$/.test(value)) return;
 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
-        // Move to next input if value is entered
         if (value && index < 5) {
             inputRefs.current[index + 1].focus();
         }
     };
 
     const handleKeyDown = (index, e) => {
-        // Move to previous input on backspace if current is empty
         if (e.key === 'Backspace' && !otp[index] && index > 0) {
             inputRefs.current[index - 1].focus();
         }
-        // Handle Enter key
         if (e.key === 'Enter') {
             e.preventDefault();
             if (otp.join('').length === 6) {
@@ -68,7 +63,6 @@ export default function VerifyEmail() {
         });
         setOtp(newOtp);
 
-        // Focus last filled input or the next empty one
         const lastIndex = Math.min(pastedData.length, 5);
         inputRefs.current[lastIndex].focus();
     };
@@ -83,16 +77,12 @@ export default function VerifyEmail() {
 
         setLoading(true);
         try {
-            // Real API call
             await apiRequest('/auth/verify-email', {
                 method: 'POST',
                 body: JSON.stringify({ code, email })
             });
 
-            // The session is delivered as an HttpOnly cookie; the browser
-            // only keeps a non-sensitive flag that a session exists.
             setSession();
-
             showToast('Email verified successfully!', 'success');
             navigate('/dashboard');
         } catch (error) {
@@ -116,20 +106,20 @@ export default function VerifyEmail() {
 
     return (
         <AuthShell legal={false}>
-            <div className="mkt-panel p-7 sm:p-8">
-                <div className="mb-8 text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10">
-                        <Mail className="h-6 w-6 text-violet-300" aria-hidden="true" />
+            <div className="mkt-panel p-6 sm:p-7">
+                <div className="mb-6 text-center">
+                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-subtle">
+                        <Mail className="h-5 w-5 text-ink" aria-hidden="true" />
                     </div>
-                    <h1 className="mkt-h3 !text-2xl">Verify your email</h1>
-                    <p className="mkt-body mt-2">
-                        We sent a code to your email address.<br />
+                    <h1 className="text-lg font-semibold text-ink">Verify your email</h1>
+                    <p className="text-xs text-ink-muted mt-1 leading-relaxed">
+                        We sent a code to <span className="font-mono text-ink">{email}</span>.<br />
                         Enter the 6-digit code below to continue.
                     </p>
                 </div>
 
-                <form onSubmit={handleVerify} className="space-y-6">
-                    <div className="flex justify-center gap-2">
+                <form onSubmit={handleVerify} className="space-y-5">
+                    <div className="flex justify-center gap-1.5">
                         {otp.map((digit, index) => (
                             <input
                                 key={index}
@@ -142,7 +132,7 @@ export default function VerifyEmail() {
                                 onChange={(e) => handleChange(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 onPaste={handlePaste}
-                                className="mkt-field !w-12 !px-0 h-14 text-center text-xl font-semibold"
+                                className="w-10 h-12 bg-black border border-line rounded text-center text-lg font-mono font-semibold text-ink focus:outline-none focus:border-line-strong transition-colors"
                             />
                         ))}
                     </div>
@@ -150,31 +140,33 @@ export default function VerifyEmail() {
                     <button
                         type="submit"
                         disabled={loading || otp.join('').length !== 6}
-                        className="mkt-btn mkt-btn-primary mkt-btn-lg w-full"
+                        className="mkt-btn mkt-btn-primary w-full h-8 text-xs disabled:opacity-50"
                     >
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+                        {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
                         {loading ? 'Verifying...' : 'Verify account'}
                     </button>
                 </form>
 
-                <div className="mt-8 space-y-6 text-center">
-                    <p className="text-xs font-medium text-slate-500">
-                        Didn't receive the code?{' '}
+                <div className="mt-5 text-center space-y-3">
+                    <p className="text-xs text-ink-muted">
+                        Didn't receive the email?{' '}
                         <button
                             onClick={handleResend}
-                            className="font-semibold text-violet-300 transition-colors hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 rounded"
+                            className="text-ink font-medium hover:underline"
                         >
                             Resend code
                         </button>
                     </p>
 
-                    <Link
-                        to="/login"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-violet-300"
-                    >
-                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                        Back to login
-                    </Link>
+                    <div>
+                        <Link
+                            to="/login"
+                            className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted transition-colors hover:text-ink"
+                        >
+                            <ArrowLeft className="h-3 w-3" />
+                            Back to sign in
+                        </Link>
+                    </div>
                 </div>
             </div>
         </AuthShell>

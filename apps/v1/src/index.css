@@ -5,9 +5,37 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* WebPulse Studio Tokens - Light Mode */
+    --wp-bg-canvas: #ffffff;
+    --wp-bg-surface: #ffffff;
+    --wp-bg-subtle: #fafafa;
+    --wp-bg-hover: #f5f5f5;
+    --wp-bg-active: #efefef;
+    --wp-border-subtle: #efefef;
+    --wp-border-default: #e5e5e5;
+    --wp-border-strong: #d4d4d4;
+    --wp-dot-color: rgba(0, 0, 0, 0.08);
+
+    --wp-text-primary: #0a0a0a;
+    --wp-text-secondary: #525252;
+    --wp-text-muted: #737373;
+    --wp-text-inverted: #ffffff;
+
+    --wp-accent-solid: #0a0a0a;
+    --wp-accent-hover: #262626;
+    --wp-status-live: #10b981;
+    --wp-chart-1: #0a0a0a;
+    --wp-chart-grid: #e5e5e5;
+    --wp-meter-bar: #0a0a0a;
+
+    --wp-nav-item-h: 30px;
+    --wp-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --wp-dur-fast: 120ms;
+    --wp-dur-base: 160ms;
+
     /* ---- Layout grid ---- */
-    --sidebar-width: 16rem;            /* 256px */
-    --topbar-height: 4rem;             /* 64px */
+    --sidebar-width: 224px;
+    --topbar-height: 46px;
     --page-padding: 1.5rem;            /* 24px horizontal */
     --page-gap: 2rem;                  /* 32px vertical between sections */
     /* ---- Spacing ---- */
@@ -28,113 +56,317 @@
     --control-radius: 0.625rem;        /* 10px */
   }
 
-  .dark {
+  .dark, [data-theme="dark"] {
     color-scheme: dark;
+    /* WebPulse Studio Tokens - Dark Mode (Default) */
+    --wp-bg-canvas: #000000;
+    --wp-bg-surface: #0a0a0a;
+    --wp-bg-subtle: #111111;
+    --wp-bg-hover: #171717;
+    --wp-bg-active: #1f1f1f;
+    --wp-border-subtle: #171717;
+    --wp-border-default: #222222;
+    --wp-border-strong: #333333;
+    --wp-dot-color: rgba(255, 255, 255, 0.075);
+
+    --wp-text-primary: #ededed;
+    --wp-text-secondary: #a1a1a1;
+    --wp-text-muted: #666666;
+    --wp-text-inverted: #000000;
+
+    --wp-accent-solid: #ffffff;
+    --wp-accent-hover: #e5e5e5;
+    --wp-status-live: #10b981;
+    --wp-chart-1: #ededed;
+    --wp-chart-grid: #1f1f1f;
+    --wp-meter-bar: #ededed;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased font-sans transition-colors duration-300;
+    background-color: var(--wp-bg-canvas);
+    color: var(--wp-text-primary);
+    font-family: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    transition: background-color var(--wp-dur-fast) var(--wp-ease-standard), color var(--wp-dur-fast) var(--wp-ease-standard);
   }
 
   .dark body {
-    @apply bg-slate-950 text-slate-100;
+    background-color: var(--wp-bg-canvas);
+    color: var(--wp-text-primary);
   }
 
   ::selection {
-    @apply bg-violet-500/20 text-violet-900 dark:text-violet-100;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--wp-text-primary);
   }
 }
 
 @layer components {
+  /* ========================================================
+     WebPulse Studio Design System (DESIGN.md) Primitives
+     ======================================================== */
+
+  /* ---- Typography Scale ---- */
+  .wp-title-page {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: var(--wp-text-primary);
+  }
+
+  .wp-title-card {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.30;
+    color: var(--wp-text-primary);
+  }
+
+  .wp-label-section {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.20;
+    color: var(--wp-text-muted);
+  }
+
+  .wp-kpi-value {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.10;
+    font-variant-numeric: tabular-nums;
+    color: var(--wp-text-primary);
+  }
+
+  .wp-metric-mono {
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.40;
+    font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Shell & Structural Surfaces ---- */
+  .wp-shell {
+    display: grid;
+    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-rows: 46px minmax(0, 1fr);
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--wp-bg-canvas);
+  }
+
+  @media (max-width: 768px) {
+    .wp-shell {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: 46px minmax(0, 1fr);
+    }
+  }
+
+  .wp-panel {
+    border: 1px solid var(--wp-border-default);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--wp-bg-surface);
+  }
+
+  .wp-panel-header {
+    height: 38px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--wp-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--wp-bg-surface);
+  }
+
+  .wp-studio-canvas {
+    background-color: var(--wp-bg-canvas);
+    background-image: radial-gradient(var(--wp-dot-color) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
   /* ---- Buttons ---- */
+  .wp-btn {
+    height: 30px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    transition: all var(--wp-dur-fast) var(--wp-ease-standard);
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    user-select: none;
+  }
+
+  .wp-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--wp-bg-canvas), 0 0 0 3.5px var(--wp-accent-solid);
+  }
+
+  .wp-btn-primary {
+    background-color: var(--wp-accent-solid);
+    color: var(--wp-text-inverted);
+    font-weight: 500;
+  }
+
+  .wp-btn-primary:hover {
+    background-color: var(--wp-accent-hover);
+  }
+
+  .wp-btn-secondary {
+    background-color: transparent;
+    border-color: var(--wp-border-default);
+    color: var(--wp-text-primary);
+  }
+
+  .wp-btn-secondary:hover {
+    background-color: var(--wp-bg-hover);
+    border-color: var(--wp-border-strong);
+  }
+
+  /* ---- Live Status & Quota Meters ---- */
+  .wp-live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: var(--wp-status-live);
+    flex-shrink: 0;
+  }
+
+  .wp-meter-track {
+    height: 3px;
+    background-color: var(--wp-border-default);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .wp-meter-bar {
+    height: 100%;
+    background-color: var(--wp-meter-bar);
+    border-radius: 9999px;
+    transition: width var(--wp-dur-base) var(--wp-ease-standard);
+  }
+
+  .wp-brand-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background-color: var(--wp-text-primary);
+    color: var(--wp-text-inverted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 11.5px;
+    flex-shrink: 0;
+  }
+
+  /* ---- Legacy Buttons Harmonized to Studio ---- */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors focus:outline-none focus:border-[var(--wp-border-strong)] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-900 text-white hover:bg-slate-800 shadow-sm dark:bg-violet-500 dark:hover:bg-violet-400 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors bg-[var(--wp-accent-solid)] text-[var(--wp-text-inverted)] hover:bg-[var(--wp-accent-hover)] border border-transparent shadow-none disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] border border-[var(--wp-border-default)] hover:bg-[var(--wp-bg-hover)] hover:border-[var(--wp-border-strong)] shadow-none disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-red-600 text-white hover:bg-red-500 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors bg-red-600/10 text-red-400 border border-red-500/20 hover:bg-red-600/20 shadow-none disabled:opacity-50 disabled:pointer-events-none;
   }
-  .btn-sm { @apply px-3 py-1.5 text-xs; }
-  .btn-md { @apply px-4 py-2 text-sm; }
-  .btn-lg { @apply px-5 py-3 text-sm; }
+  .btn-sm { @apply px-2.5 py-1 text-[11px] h-7; }
+  .btn-md { @apply px-3 py-1.5 text-xs h-8; }
+  .btn-lg { @apply px-4 py-2 text-xs h-9; }
 
-  /* ---- Cards ---- */
+  /* ---- Cards & Surfaces ---- */
   .card {
-    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl;
+    @apply bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-lg transition-colors;
   }
-  .card-pad { @apply p-5 sm:p-6; }
+  .card-hero {
+    @apply bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-lg shadow-none transition-colors;
+  }
+  .card-subtle {
+    @apply bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] rounded-lg;
+  }
+  .card-pad { @apply p-4 sm:p-5; }
+  .card-pad-compact { @apply p-3 sm:p-4; }
   .card-hover {
-    @apply transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-slate-950/80;
-  }
-  .card-hover:hover {
-    transform: translate3d(0, -2px, 0);
+    @apply transition-colors hover:border-[var(--wp-border-strong)];
   }
 
   /* ---- Inputs ---- */
   .input {
-    @apply w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all disabled:opacity-60;
+    @apply w-full rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] px-3 py-1.5 text-xs text-[var(--wp-text-primary)] placeholder:text-[var(--wp-text-muted)] focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors disabled:opacity-60;
   }
   .label {
-    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
+    @apply block text-[11px] font-mono uppercase tracking-[0.05em] text-[var(--wp-text-muted)] mb-1.5;
   }
   .field-hint {
-    @apply mt-1.5 text-xs text-slate-500 dark:text-slate-500;
+    @apply mt-1 text-[11px] text-[var(--wp-text-muted)];
   }
 
   /* ---- Badges ---- */
-  .badge-violet { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300; }
-  .badge-green { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300; }
-  .badge-amber { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300; }
-  .badge-red { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300; }
-  .badge-slate { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300; }
+  .badge-violet { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-[var(--wp-bg-subtle)] text-[var(--wp-text-secondary)] border border-[var(--wp-border-subtle)]; }
+  .badge-green { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
+  .badge-amber { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20; }
+  .badge-red { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-red-500/10 text-red-400 border border-red-500/20; }
+  .badge-slate { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-[var(--wp-bg-subtle)] text-[var(--wp-text-muted)] border border-[var(--wp-border-subtle)]; }
 
-  /* ---- Section headings ---- */
+  /* ---- Section headings & Typography hierarchy ---- */
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500;
+    @apply text-[11px] font-mono text-[var(--wp-text-muted)] tracking-normal normal-case;
+  }
+  .metric-label {
+    @apply text-[11px] font-mono uppercase text-[var(--wp-text-muted)];
   }
   .page-title {
-    @apply text-2xl sm:text-[1.75rem] font-bold tracking-tight text-slate-900 dark:text-white;
+    @apply text-[15px] font-semibold tracking-tight text-[var(--wp-text-primary)] leading-tight;
   }
   .page-sub {
-    @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
+    @apply mt-0.5 text-[11.5px] text-[var(--wp-text-muted)] max-w-xl leading-normal;
   }
 
   /* ---- Auth page heading (28–36px, larger than dashboard title) ---- */
   .auth-title {
-    @apply text-[1.75rem] sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-[var(--wp-text-primary)] leading-tight;
   }
 
   /* ---- Section / card heading (18–20px) ---- */
   .section-title {
-    @apply text-lg font-semibold tracking-tight text-slate-900 dark:text-white;
+    @apply text-sm font-semibold tracking-tight text-[var(--wp-text-primary)];
   }
 
   /* ---- Page header (standardized across app) ---- */
   .page-header {
-    @apply flex flex-col md:flex-row md:items-end justify-between gap-4;
+    @apply flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1;
   }
   .page-header-title {
-    @apply flex items-center gap-4;
+    @apply flex items-center gap-2.5;
   }
   .page-header-icon {
-    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400;
+    @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] text-[var(--wp-text-primary)];
   }
 
   /* ---- Segmented control (time range / view toggle) ---- */
   .segmented {
-    @apply inline-flex items-center gap-0.5 rounded-lg border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800/60;
+    @apply inline-flex items-center p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs;
   }
   .segmented-btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all;
+    @apply inline-flex items-center justify-center gap-1.5 rounded h-6 px-2.5 text-[11px] font-mono transition-colors;
   }
 
   /* ---- Tables ---- */
@@ -142,29 +374,29 @@
     @apply w-full text-left;
   }
   .table-head {
-    @apply bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/40 dark:text-slate-400;
+    @apply bg-[var(--wp-bg-subtle)] text-[10.5px] font-mono uppercase tracking-[0.06em] text-[var(--wp-text-muted)] border-b border-[var(--wp-border-subtle)];
   }
   .table-th {
-    @apply px-6 py-3.5 font-semibold;
+    @apply px-4 py-2 font-medium;
   }
   .table-td {
-    @apply px-6 py-4 text-sm text-slate-600 dark:text-slate-300;
+    @apply px-4 py-2.5 text-xs text-[var(--wp-text-secondary)] border-b border-[var(--wp-border-subtle)];
   }
 
   /* ---- Icon action button ---- */
   .icon-btn {
-    @apply inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white;
+    @apply inline-flex items-center justify-center rounded-md p-1.5 text-[var(--wp-text-muted)] transition-colors hover:bg-[var(--wp-bg-hover)] hover:text-[var(--wp-text-primary)];
   }
 
   /* ---- Wrappers ---- */
   .container-app {
-    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1440px] px-3 sm:px-4;
   }
   .container-page {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-[1440px] px-3 sm:px-4;
   }
   .prose-quiet {
-    @apply text-sm leading-relaxed text-slate-600 dark:text-slate-300;
+    @apply text-xs leading-relaxed text-[var(--wp-text-secondary)];
   }
 }
 
@@ -180,32 +412,32 @@
    not required here; the dashboard keeps its own light/dark tokens above.
    =========================================================================== */
 :root {
-  /* Surfaces — same values as the space-* scale in tailwind.config.js */
-  --mkt-bg: #070A10;
-  --mkt-bg-soft: #0B0F17;
-  --mkt-surface: #101522;
-  --mkt-surface-2: #151B29;
+  /* Surfaces — aligned with studio tokens */
+  --mkt-bg: #000000;
+  --mkt-bg-soft: #0a0a0a;
+  --mkt-surface: #0a0a0a;
+  --mkt-surface-2: #111111;
 
   /* Structure */
-  --mkt-line: rgba(148, 163, 184, 0.13);
-  --mkt-line-strong: rgba(148, 163, 184, 0.22);
+  --mkt-line: #222222;
+  --mkt-line-strong: #333333;
 
-  /* Text — slate scale already used across the product */
-  --mkt-text: #F1F5F9;
-  --mkt-text-2: #CBD5E1;
-  --mkt-text-3: #94A3B8;
-  --mkt-text-4: #64748B;
+  /* Text — studio scale */
+  --mkt-text: #ededed;
+  --mkt-text-2: #a1a1a1;
+  --mkt-text-3: #737373;
+  --mkt-text-4: #525252;
 
-  /* Brand — exact WebPulse palette */
-  --mkt-brand: #8B5CF6;
-  --mkt-brand-2: #7C6CE0;
-  --mkt-brand-3: #A78BFA;
-  --mkt-live: #48E6A1;
-  --mkt-warn: #F59E0B;
+  /* Brand — monochrome studio */
+  --mkt-brand: #ffffff;
+  --mkt-brand-2: #ededed;
+  --mkt-brand-3: #ededed;
+  --mkt-live: #10b981;
+  --mkt-warn: #f59e0b;
 
   --mkt-container: 75rem;      /* 1200px content width */
-  --mkt-radius: 1rem;
-  --mkt-radius-lg: 1.25rem;
+  --mkt-radius: 0.5rem;
+  --mkt-radius-lg: 0.5rem;
 }
 
 /* ---- Page shell ---------------------------------------------------------- */
@@ -351,24 +583,26 @@
 .mkt-btn-lg { padding: 0.8125rem 1.375rem; font-size: 0.9375rem; }
 
 .mkt-btn-primary {
-  color: #fff;
-  background: linear-gradient(180deg, #8B5CF6 0%, #7C3AED 100%);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 8px 24px -12px rgba(139, 92, 246, 0.9);
+  color: #000000;
+  background: #ffffff;
+  box-shadow: none;
+  border-radius: 6px;
 }
 .mkt-btn-primary:hover {
-  background: linear-gradient(180deg, #9D74F7 0%, #8B5CF6 100%);
-  transform: translateY(-1px);
+  background: #e5e5e5;
+  transform: none;
 }
 
 .mkt-btn-secondary {
-  color: var(--mkt-text-2);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--mkt-line-strong);
+  color: var(--mkt-text);
+  background: transparent;
+  border: 1px solid var(--mkt-line);
+  border-radius: 6px;
 }
 .mkt-btn-secondary:hover {
   color: var(--mkt-text);
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(167, 139, 250, 0.45);
+  background: #171717;
+  border-color: var(--mkt-line-strong);
 }
 
 .mkt-btn-ghost {
@@ -423,10 +657,10 @@
 }
 
 .mkt-panel {
-  border-radius: var(--mkt-radius-lg);
+  border-radius: 8px;
   border: 1px solid var(--mkt-line);
-  background: var(--mkt-bg-soft);
-  box-shadow: 0 32px 64px -32px rgba(0, 0, 0, 0.85);
+  background: var(--mkt-surface);
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -515,25 +749,25 @@
    Shared by /login, /register, /verify-email, /forgot-password, /reset-password. */
 .mkt-field {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid var(--mkt-line-strong);
-  background: rgba(7, 10, 16, 0.6);
-  padding: 0.8125rem 1rem;
-  font-size: 0.9375rem;
+  border-radius: 6px;
+  border: 1px solid var(--mkt-line);
+  background: #000000;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
   color: var(--mkt-text);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 .mkt-field::placeholder {
-  color: #4B5A75;
+  color: #666666;
 }
 .mkt-field:hover {
-  border-color: rgba(148, 163, 184, 0.32);
+  border-color: var(--mkt-line-strong);
 }
 .mkt-field:focus {
   outline: none;
-  border-color: rgba(139, 92, 246, 0.65);
-  background: rgba(7, 10, 16, 0.85);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  border-color: var(--mkt-line-strong);
+  background: #000000;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 .mkt-field[aria-invalid='true'] {
   border-color: rgba(239, 68, 68, 0.55);

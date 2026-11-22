@@ -12,7 +12,6 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
     const { showToast } = useToast();
     const navigate = useNavigate();
 
-    // Focus first input on mount
     useEffect(() => {
         if (inputRefs.current[0]) {
             inputRefs.current[0].focus();
@@ -20,25 +19,21 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
     }, []);
 
     const handleChange = (index, value) => {
-        // Allow only numbers
         if (!/^\d*$/.test(value)) return;
 
         const newOtp = [...otp];
         newOtp[index] = value;
         setOtp(newOtp);
 
-        // Move to next input if value is entered
         if (value && index < 5) {
             inputRefs.current[index + 1].focus();
         }
     };
 
     const handleKeyDown = (index, e) => {
-        // Move to previous input on backspace if current is empty
         if (e.key === 'Backspace' && !otp[index] && index > 0) {
             inputRefs.current[index - 1].focus();
         }
-        // Handle Enter key
         if (e.key === 'Enter') {
             e.preventDefault();
             if (otp.join('').length === 6) {
@@ -58,7 +53,6 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
         });
         setOtp(newOtp);
 
-        // Focus last filled input or the next empty one
         const lastIndex = Math.min(pastedData.length, 5);
         inputRefs.current[lastIndex].focus();
     };
@@ -78,7 +72,6 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 body: JSON.stringify({ code, email })
             });
 
-            // The session is delivered as an HttpOnly cookie.
             setSession();
 
             showToast('Email verified successfully!', 'success');
@@ -108,19 +101,19 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
 
     return (
         <div className="w-full">
-            <div className="text-center mb-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-500/10 mx-auto mb-5">
-                    <Mail className="h-6 w-6 text-violet-500" />
+            <div className="text-center mb-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-subtle mx-auto mb-3">
+                    <Mail className="h-5 w-5 text-ink" />
                 </div>
-                <h2 className="page-title !text-2xl mb-2">Verify your email</h2>
-                <p className="page-sub">
-                    We sent a code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>.<br />
+                <h2 className="text-lg font-semibold text-ink mb-1">Verify your email</h2>
+                <p className="text-xs text-ink-muted">
+                    We sent a code to <span className="font-mono text-ink">{email}</span>.<br />
                     Please enter the 6-digit code below to continue.
                 </p>
             </div>
 
-            <form onSubmit={handleVerify} className="space-y-6">
-                <div className="flex justify-center gap-2">
+            <form onSubmit={handleVerify} className="space-y-5">
+                <div className="flex justify-center gap-1.5">
                     {otp.map((digit, index) => (
                         <input
                             key={index}
@@ -131,7 +124,7 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             onPaste={handlePaste}
-                            className="w-12 h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-center text-xl font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                            className="w-10 h-12 bg-black border border-line rounded text-center text-lg font-mono font-semibold text-ink focus:outline-none focus:border-line-strong transition-colors"
                         />
                     ))}
                 </div>
@@ -139,25 +132,31 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <button
                     type="submit"
                     disabled={loading || otp.join('').length !== 6}
-                    className="btn-primary btn-lg w-full"
+                    className="mkt-btn mkt-btn-primary w-full h-8 text-xs disabled:opacity-50"
                 >
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
                     {loading ? 'Verifying...' : 'Verify account'}
                 </button>
             </form>
 
-            <div className="mt-6 text-center space-y-4">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Didn't receive the code?{' '}
-                    <button onClick={handleResend} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline underline-offset-4 transition-colors">
-                        Resend code
+            <div className="mt-5 text-center space-y-3">
+                <p className="text-xs text-ink-muted">
+                    Didn't receive code?{' '}
+                    <button
+                        onClick={handleResend}
+                        className="text-ink font-medium hover:underline"
+                    >
+                        Resend
                     </button>
                 </p>
 
                 {onBack && (
-                    <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to login
+                    <button
+                        onClick={onBack}
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted hover:text-ink transition-colors"
+                    >
+                        <ArrowLeft className="h-3 w-3" />
+                        Back
                     </button>
                 )}
             </div>

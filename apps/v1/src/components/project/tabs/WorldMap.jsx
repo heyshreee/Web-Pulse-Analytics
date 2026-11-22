@@ -25,16 +25,16 @@ const WorldMap = ({ activityData = [] }) => {
   const initialZoom = 2;
 
   return (
-    <div className="relative w-full h-[500px] min-h-[500px] bg-[#06080F] rounded-xl overflow-hidden map-container border border-[#1E293B]/50">
+    <div className="relative w-full h-[500px] min-h-[500px] bg-black rounded-lg overflow-hidden map-container border border-line">
       
       {/* Live Badge */}
-      <div className="absolute top-4 left-4 z-[1000] flex items-center gap-2 bg-[#0F172A]/80 backdrop-blur-md border border-[#1E293B] px-3 py-1.5 rounded-full shadow-lg pointer-events-none">
-        <div className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+      <div className="absolute top-3 left-3 z-[1000] flex items-center gap-2 bg-surface/90 backdrop-blur-sm border border-line px-2.5 py-1 rounded text-xs font-mono pointer-events-none">
+        <div className="relative flex h-1.5 w-1.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
         </div>
-        <span className="text-[10px] uppercase font-bold text-slate-300 tracking-widest">Live Activity</span>
-        <span className="text-[10px] text-slate-500 font-medium border-l border-[#1E293B] pl-2">
+        <span className="text-[11px] text-ink uppercase tracking-wider font-medium">Live Activity</span>
+        <span className="text-[11px] text-ink-muted border-l border-line pl-2 tabular-nums">
           {markers.length} Regions
         </span>
       </div>
@@ -45,7 +45,7 @@ const WorldMap = ({ activityData = [] }) => {
         zoom={initialZoom}
         zoomControl={false}
         scrollWheelZoom={true}
-        style={{ width: '100%', height: '100%', background: '#06080F' }}
+        style={{ width: '100%', height: '100%', background: '#000000' }}
         attributionControl={false}
       >
         <TileLayer
@@ -58,22 +58,22 @@ const WorldMap = ({ activityData = [] }) => {
           <CircleMarker
             key={activity.id || i}
             center={[activity.lat, activity.lng]}
-            radius={8}
+            radius={6}
             pathOptions={{
-              fillColor: '#8B5CF6',
-              fillOpacity: 0.6,
-              color: '#A78BFA',
-              weight: 2,
+              fillColor: '#10b981',
+              fillOpacity: 0.7,
+              color: '#10b981',
+              weight: 1.5,
               className: 'pulse-marker'
             }}
           >
-            <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-              <div className="bg-[#0F172A] border border-violet-500/30 rounded-lg p-2 text-center backdrop-blur-xl">
-                <p className="text-[10px] text-violet-400 font-bold tracking-widest uppercase mb-1">Incoming Hit</p>
-                <p className="text-sm text-white font-bold mb-0.5">
+            <Tooltip direction="top" offset={[0, -8]} opacity={1} permanent={false}>
+              <div className="bg-surface border border-line rounded p-2 text-center shadow-lg font-mono">
+                <p className="text-[10px] text-emerald-500 uppercase tracking-wider mb-0.5">Incoming Hit</p>
+                <p className="text-xs text-ink font-medium mb-0.5">
                   {activity.ip}
                 </p>
-                <p className="text-[10px] text-slate-400 font-medium">
+                <p className="text-[10px] text-ink-muted">
                   {activity.location || 'Unknown'}
                 </p>
               </div>
@@ -84,22 +84,22 @@ const WorldMap = ({ activityData = [] }) => {
 
       <style jsx="true">{`
         .leaflet-container {
-          background: #06080F !important;
+          background: #000000 !important;
         }
         .pulse-marker {
           animation: pulse 2s infinite;
         }
         @keyframes pulse {
           0% {
-            stroke-width: 2;
+            stroke-width: 1.5;
             fill-opacity: 0.6;
           }
           50% {
-            stroke-width: 6;
+            stroke-width: 4;
             fill-opacity: 0.9;
           }
           100% {
-            stroke-width: 2;
+            stroke-width: 1.5;
             fill-opacity: 0.6;
           }
         }

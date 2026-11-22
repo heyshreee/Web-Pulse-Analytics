@@ -20,9 +20,7 @@ export default function ForgotPassword() {
 
         setLoading(true);
         try {
-            // Real API call
             await apiRequest('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
-
             setSubmitted(true);
             showToast('Reset link sent successfully', 'success');
         } catch (error) {
@@ -35,17 +33,17 @@ export default function ForgotPassword() {
     if (submitted) {
         return (
             <AuthShell legal={false}>
-                <div className="mkt-panel p-7 text-center sm:p-8">
-                    <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10">
-                        <Mail className="h-7 w-7 text-emerald-300" aria-hidden="true" />
+                <div className="mkt-panel p-6 text-center sm:p-7">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-line bg-subtle">
+                        <Mail className="h-5 w-5 text-ink" aria-hidden="true" />
                     </div>
-                    <h1 className="mkt-h3 !text-2xl">Check your email</h1>
-                    <p className="mkt-body mb-8 mt-2">
+                    <h1 className="text-lg font-semibold text-ink">Check your email</h1>
+                    <p className="text-xs text-ink-muted mb-6 mt-1.5 leading-relaxed">
                         We have sent a password reset link to<br />
-                        <span className="font-semibold text-slate-100">{email}</span>
+                        <span className="font-mono text-ink">{email}</span>
                     </p>
-                    <Link to="/login" className="mkt-btn mkt-btn-primary mkt-btn-lg w-full">
-                        Back to login
+                    <Link to="/login" className="mkt-btn mkt-btn-primary w-full h-8 text-xs">
+                        Back to sign in
                     </Link>
                 </div>
             </AuthShell>
@@ -54,15 +52,15 @@ export default function ForgotPassword() {
 
     return (
         <AuthShell legal={false}>
-            <div className="mkt-panel p-7 sm:p-8">
-                <div className="mb-8 text-center">
-                    <h1 className="mkt-h3 !text-2xl">Reset password</h1>
-                    <p className="mkt-body mt-2">
+            <div className="mkt-panel p-6 sm:p-7">
+                <div className="mb-6 text-center">
+                    <h1 className="text-lg font-semibold text-ink">Reset password</h1>
+                    <p className="text-xs text-ink-muted mt-1">
                         Enter your email address and we'll send you a link to reset your password.
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label htmlFor="forgot-email" className="mkt-label">Email address</label>
                         <div className="relative">
@@ -72,11 +70,11 @@ export default function ForgotPassword() {
                                 autoComplete="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="mkt-field peer !pl-11"
+                                className="mkt-field peer !pl-9"
                                 placeholder="name@company.com"
                             />
                             <Mail
-                                className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
                                 aria-hidden="true"
                             />
                         </div>
@@ -85,20 +83,20 @@ export default function ForgotPassword() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mkt-btn mkt-btn-primary mkt-btn-lg w-full"
+                        className="mkt-btn mkt-btn-primary w-full h-8 text-xs"
                     >
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+                        {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" aria-hidden="true" /> : null}
                         {loading ? 'Sending...' : 'Send Reset Link'}
                     </button>
                 </form>
 
-                <div className="mt-8 text-center">
+                <div className="mt-6 text-center">
                     <Link
                         to="/login"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-violet-300"
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted transition-colors hover:text-ink"
                     >
-                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                        Back to login
+                        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                        Back to sign in
                     </Link>
                 </div>
             </div>

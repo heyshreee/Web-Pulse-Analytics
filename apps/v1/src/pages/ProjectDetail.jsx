@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { apiRequest, getApiUrl } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Spinner from '../components/Spinner';
 
 // Hooks
 import useProjectData from '../hooks/useProjectData';
@@ -31,7 +30,7 @@ import ActivityModal from '../components/project/modals/ActivityModal';
 export default function ProjectDetail() {
   const { idOrName, tab } = useParams();
   const navigate = useNavigate();
-  const { user, loadUser, usageStats } = useOutletContext();
+  const { user, loadUser, usageStats, setIsPageLoading } = useOutletContext();
   const { showToast } = useToast();
 
   // Tab State
@@ -72,6 +71,12 @@ export default function ProjectDetail() {
   useEffect(() => {
     if (tab) setActiveTab(tab);
   }, [tab]);
+
+  useEffect(() => {
+    if (!loading) {
+      setIsPageLoading?.(false);
+    }
+  }, [loading, setIsPageLoading]);
 
   // Derived Values
   const trackingId = project?.tracking_id;
@@ -180,19 +185,73 @@ export default function ProjectDetail() {
     }
   };
 
-  if (loading) return (
-    <div className="flex h-[80vh] items-center justify-center">
-      <Spinner />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="space-y-3 font-sans animate-pulse">
+        {/* Single-Row Studio Toolbar / Breadcrumb Skeleton */}
+        <div className="flex justify-between items-center h-8">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-16 bg-[var(--wp-border-default)] rounded" />
+            <span className="text-[var(--wp-border-strong)] text-xs select-none">/</span>
+            <div className="h-4 w-32 bg-[var(--wp-border-default)] rounded" />
+            <div className="h-5 w-20 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
+            <div className="h-5 w-28 bg-[var(--wp-border-subtle)] rounded hidden md:block" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-20 bg-[var(--wp-border-default)] rounded" />
+          </div>
+        </div>
+
+        {/* Tab Strip Skeleton */}
+        <div className="inline-flex items-center gap-1 p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs mb-1">
+          {['Overview', 'Analytics', 'Integration', 'Settings'].map((tabLabel, idx) => (
+            <div key={idx} className={`h-6 w-16 rounded ${idx === 0 ? 'bg-[var(--wp-border-default)]' : 'bg-[var(--wp-border-subtle)]/40'}`} />
+          ))}
+        </div>
+
+        {/* Unified 4-Column KPI Bar Skeleton (Normal Dashboard Loader) */}
+        <div className="wp-panel min-h-[82px] grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-[var(--wp-border-default)] bg-[var(--wp-bg-surface)]">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="p-3.5 space-y-2">
+              <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-6 w-24 bg-[var(--wp-border-default)] rounded" />
+              <div className="h-2.5 w-32 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Studio Split Workspace Skeleton (Normal Dashboard Loader) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-[460px]">
+          <div className="lg:col-span-7 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+              <div className="h-3.5 w-28 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+            <div className="wp-studio-canvas flex-1 min-h-[380px] p-4 flex items-center justify-center">
+              <div className="w-full h-full bg-[var(--wp-border-subtle)]/30 rounded" />
+            </div>
+          </div>
+          <div className="lg:col-span-5 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
+            <div className="wp-panel-header">
+              <div className="h-3.5 w-24 bg-[var(--wp-border-subtle)] rounded" />
+              <div className="h-3 w-16 bg-[var(--wp-border-subtle)] rounded" />
+            </div>
+            <div className="wp-studio-canvas flex-1 min-h-[380px] p-4 flex items-center justify-center">
+              <div className="w-40 h-40 rounded-full border border-[var(--wp-border-default)]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!project) return (
-    <div className="flex h-screen items-center justify-center px-6 text-center text-red-600 dark:text-red-400 font-bold">
+    <div className="flex h-96 items-center justify-center text-center text-ink-muted text-sm font-mono">
       Project not found or access denied.
     </div>
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-3 font-sans">
       <ProjectHeader 
         project={project} 
         onShowShare={() => setShowShareModal(true)} 

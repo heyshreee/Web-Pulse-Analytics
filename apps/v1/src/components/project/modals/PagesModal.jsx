@@ -10,40 +10,40 @@ export default function PagesModal({ isOpen, onClose, loading, pagesData }) {
       title="Top Pages"
       maxWidth="max-w-2xl"
     >
-      <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+      <div className="max-h-[60vh] overflow-y-auto">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <Loader2 className="h-8 w-8 text-violet-500 animate-spin" />
-            <p className="text-sm font-medium text-slate-500">Loading pages data...</p>
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <Loader2 className="h-6 w-6 text-ink-muted animate-spin" />
+            <p className="text-xs font-mono text-ink-muted">Loading pages data...</p>
           </div>
         ) : (
-          <div className="overflow-hidden">
-            <table className="table">
+          <div className="overflow-hidden border border-line rounded">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  <th className="px-4 py-3 font-semibold">Page Details</th>
-                  <th className="px-4 py-3 text-right font-semibold">Views</th>
+                <tr className="bg-subtle border-b border-line text-[10px] font-mono text-ink-muted uppercase tracking-wider">
+                  <th className="px-3.5 py-2.5 font-medium">Page Details</th>
+                  <th className="px-3.5 py-2.5 text-right font-medium">Views</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-line">
                 {pagesData?.map((page, i) => (
-                  <tr key={i} className="group hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-all border-t border-slate-100 dark:border-slate-800/50">
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-semibold text-slate-900 dark:text-slate-200 truncate max-w-[350px]" title={page.title}>{page.title || 'Unknown Page'}</span>
-                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate max-w-[350px] font-mono">{page.url}</span>
+                  <tr key={i} className="hover:bg-hover transition-colors">
+                    <td className="px-3.5 py-2.5">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-ink truncate max-w-[350px]" title={page.title}>{page.title || 'Untitled'}</span>
+                        <span className="text-[11px] text-ink-muted truncate max-w-[350px] font-mono">{page.url}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <span className="font-semibold text-violet-600 dark:text-violet-400 tabular-nums">{page.views?.toLocaleString()}</span>
+                    <td className="px-3.5 py-2.5 text-right">
+                      <span className="font-mono text-ink tabular-nums">{page.views?.toLocaleString()}</span>
                     </td>
                   </tr>
                 ))}
                 {(!pagesData || pagesData.length === 0) && (
                   <tr>
-                    <td colSpan="2" className="py-16 text-center">
-                      <Search className="h-8 w-8 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-                      <p className="text-sm text-slate-500">No page data available</p>
+                    <td colSpan="2" className="py-12 text-center">
+                      <Search className="h-6 w-6 text-ink-muted mx-auto mb-2 opacity-40" />
+                      <p className="text-xs font-mono text-ink-muted">No page data available</p>
                     </td>
                   </tr>
                 )}

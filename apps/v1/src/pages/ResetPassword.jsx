@@ -18,7 +18,7 @@ export default function ResetPassword() {
     const [success, setSuccess] = useState(false);
 
     const getStrength = (pass) => {
-        if (!pass) return { score: 0, label: 'None', color: 'bg-slate-700' };
+        if (!pass) return { score: 0, label: 'None', color: 'bg-subtle' };
         let score = 0;
         if (pass.length > 6) score++;
         if (pass.length > 10) score++;
@@ -27,8 +27,8 @@ export default function ResetPassword() {
         if (/[^A-Za-z0-9]/.test(pass)) score++;
 
         if (score <= 2) return { score: 1, label: 'Weak', color: 'bg-red-500' };
-        if (score <= 4) return { score: 2, label: 'Medium', color: 'bg-yellow-500' };
-        return { score: 3, label: 'Strong', color: 'bg-green-500' };
+        if (score <= 4) return { score: 2, label: 'Medium', color: 'bg-amber-500' };
+        return { score: 3, label: 'Strong', color: 'bg-emerald-500' };
     };
 
     const strength = getStrength(password);
@@ -65,17 +65,17 @@ export default function ResetPassword() {
     if (success) {
         return (
             <AuthShell legal={false}>
-                <div className="mkt-panel p-7 text-center sm:p-8">
-                    <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10">
-                        <CheckCircle2 className="h-7 w-7 text-emerald-300" aria-hidden="true" />
+                <div className="mkt-panel p-6 text-center sm:p-7">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-line bg-subtle">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                     </div>
-                    <h1 className="mkt-h3 !text-2xl">Password updated</h1>
-                    <p className="mkt-body mb-8 mt-2">
+                    <h1 className="text-lg font-semibold text-ink">Password updated</h1>
+                    <p className="text-xs text-ink-muted mb-6 mt-1.5 leading-relaxed">
                         Your password has been successfully reset.<br />
-                        You can now log in with your new password.
+                        You can now log in with your new credentials.
                     </p>
-                    <Link to="/login" className="mkt-btn mkt-btn-primary mkt-btn-lg w-full">
-                        Back to login
+                    <Link to="/login" className="mkt-btn mkt-btn-primary w-full h-8 text-xs">
+                        Back to sign in
                     </Link>
                 </div>
             </AuthShell>
@@ -84,13 +84,13 @@ export default function ResetPassword() {
 
     return (
         <AuthShell legal={false}>
-            <div className="mkt-panel p-7 sm:p-8">
-                <div className="mb-8 text-center">
-                    <h1 className="mkt-h3 !text-2xl">Create new password</h1>
-                    <p className="mkt-body mt-2">Choose a strong password to secure your account.</p>
+            <div className="mkt-panel p-6 sm:p-7">
+                <div className="mb-6 text-center">
+                    <h1 className="text-lg font-semibold text-ink">Create new password</h1>
+                    <p className="text-xs text-ink-muted mt-1">Choose a strong password to secure your account.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label htmlFor="reset-password" className="mkt-label">New password</label>
                         <div className="relative">
@@ -100,32 +100,32 @@ export default function ResetPassword() {
                                 autoComplete="new-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="mkt-field peer !pl-11 !pr-11"
+                                className="mkt-field peer !pl-9 !pr-9"
                                 placeholder="••••••••"
                             />
                             <Lock
-                                className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
                                 aria-hidden="true"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-3.5 flex items-center text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 rounded"
+                                className="absolute inset-y-0 right-3 flex items-center text-ink-muted transition-colors hover:text-ink rounded"
                                 aria-label="Toggle password visibility"
                             >
-                                {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
 
                         {password && (
                             <div className="pt-2">
-                                <div className="mb-1.5 flex h-1 gap-1.5">
-                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 1 ? strength.color : 'bg-white/[0.08]'}`}></div>
-                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 2 ? strength.color : 'bg-white/[0.08]'}`}></div>
-                                    <div className={`flex-1 rounded-full transition-all duration-500 ${strength.score >= 3 ? strength.color : 'bg-white/[0.08]'}`}></div>
+                                <div className="mb-1 flex h-1 gap-1">
+                                    <div className={`flex-1 rounded-full transition-colors ${strength.score >= 1 ? strength.color : 'bg-line'}`} />
+                                    <div className={`flex-1 rounded-full transition-colors ${strength.score >= 2 ? strength.color : 'bg-line'}`} />
+                                    <div className={`flex-1 rounded-full transition-colors ${strength.score >= 3 ? strength.color : 'bg-line'}`} />
                                 </div>
-                                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                                    Strength: <span className={strength.color.replace('bg-', 'text-')}>{strength.label}</span>
+                                <p className="text-[10px] font-mono text-ink-muted">
+                                    Strength: <span className="text-ink font-semibold">{strength.label}</span>
                                 </p>
                             </div>
                         )}
@@ -140,20 +140,20 @@ export default function ResetPassword() {
                                 autoComplete="new-password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="mkt-field peer !pl-11 !pr-11"
+                                className="mkt-field peer !pl-9 !pr-9"
                                 placeholder="••••••••"
                             />
                             <Lock
-                                className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500 transition-colors peer-focus:text-violet-300"
+                                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
                                 aria-hidden="true"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute inset-y-0 right-3.5 flex items-center text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 rounded"
+                                className="absolute inset-y-0 right-3 flex items-center text-ink-muted transition-colors hover:text-ink rounded"
                                 aria-label="Toggle password visibility"
                             >
-                                {showConfirmPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
                     </div>
@@ -161,20 +161,20 @@ export default function ResetPassword() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mkt-btn mkt-btn-primary mkt-btn-lg !mt-6 w-full"
+                        className="mkt-btn mkt-btn-primary w-full h-8 text-xs"
                     >
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
-                        {loading ? 'Updating...' : 'Update password'}
+                        {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" aria-hidden="true" /> : null}
+                        {loading ? 'Updating password...' : 'Update Password'}
                     </button>
                 </form>
 
-                <div className="mt-8 text-center">
+                <div className="mt-6 text-center">
                     <Link
                         to="/login"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-violet-300"
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted transition-colors hover:text-ink"
                     >
-                        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                        Back to login
+                        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                        Back to sign in
                     </Link>
                 </div>
             </div>

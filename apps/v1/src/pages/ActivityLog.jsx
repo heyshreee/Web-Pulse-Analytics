@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
-    Search, Download, ChevronLeft, ChevronRight,
+    Search, Download, ChevronLeft, ChevronRight, ChevronDown,
     Key, Shield, AlertTriangle, Settings, Lock, Activity
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Spinner from '../components/Spinner';
 
 export default function ActivityLog() {
     const { project, socket, usageStats } = useOutletContext();
@@ -120,9 +119,81 @@ export default function ActivityLog() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `activity-log-${project.name}-${new Date().toISOString()}.csv`;
+        a.download = `activity-log-${project?.name || 'project'}-${new Date().toISOString()}.csv`;
         a.click();
     };
+
+    if (loading && logs.length === 0) {
+        return (
+            <div className="space-y-6 animate-pulse">
+                {/* Header Skeleton */}
+                <div className="page-header">
+                    <div className="page-header-title">
+                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
+                        <div className="space-y-2">
+                            <div className="h-6 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                            <div className="h-3.5 w-80 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Controls Skeleton */}
+                <div className="card card-pad flex flex-col md:flex-row gap-4 items-center justify-between p-4">
+                    <div className="h-10 w-full md:w-80 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    </div>
+                </div>
+
+                {/* Table Skeleton */}
+                <div className="card overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-slate-50 dark:bg-slate-800/40 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-4 py-3">Timestamp</th>
+                                    <th className="px-4 py-3">Event/Action</th>
+                                    <th className="px-4 py-3">Project/User ID</th>
+                                    <th className="px-4 py-3">Resource</th>
+                                    <th className="px-4 py-3">Latency</th>
+                                    <th className="px-4 py-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                {[1, 2, 3, 4, 5, 6].map((n) => (
+                                    <tr key={n} className="text-xs">
+                                        <td className="px-4 py-4">
+                                            <div className="space-y-1.5">
+                                                <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                                                <div className="h-3 w-14 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="h-3.5 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-4">
+                                            <div className="h-3.5 w-14 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-4 text-right">
+                                            <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full ml-auto" />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -143,46 +214,52 @@ export default function ActivityLog() {
             </div>
 
             {/* Controls */}
-            <div className="card card-pad flex flex-col md:flex-row gap-4 items-center justify-between p-4">
-                <div className="relative flex-1 w-full md:w-auto">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+                <div className="relative flex-1 w-full max-w-sm">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
                     <input
                         type="text"
                         placeholder="Search logs..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="input pl-10"
+                        className="input pl-8 h-7 text-xs"
                     />
                 </div>
 
-                <div className="flex gap-3 w-full md:w-auto">
-                    <select
-                        value={eventType}
-                        onChange={(e) => setEventType(e.target.value)}
-                        className="input cursor-pointer"
-                    >
-                        <option value="all">All Events</option>
-                        <option value="success">Success</option>
-                        <option value="warning">Warning</option>
-                        <option value="failure">Failure</option>
-                    </select>
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative">
+                        <select
+                            value={eventType}
+                            onChange={(e) => setEventType(e.target.value)}
+                            className="h-7 text-xs rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors font-mono"
+                        >
+                            <option value="all">All Events</option>
+                            <option value="success">Success</option>
+                            <option value="warning">Warning</option>
+                            <option value="failure">Failure</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--wp-text-muted)]" />
+                    </div>
 
-                    <select
-                        value={timeRange}
-                        onChange={(e) => setTimeRange(e.target.value)}
-                        className="input cursor-pointer"
-                    >
-                        <option value="24h">Last 24h</option>
-                        <option value="7d">Last 7 Days</option>
-                        <option value="30d">Last 30 Days</option>
-                    </select>
+                    <div className="relative">
+                        <select
+                            value={timeRange}
+                            onChange={(e) => setTimeRange(e.target.value)}
+                            className="h-7 text-xs rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors font-mono"
+                        >
+                            <option value="24h">Last 24h</option>
+                            <option value="7d">Last 7d</option>
+                            <option value="30d">Last 30d</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--wp-text-muted)]" />
+                    </div>
 
                     <button
                         onClick={handleExport}
-                        className="btn-secondary btn-sm"
+                        className="wp-btn wp-btn-secondary h-7 text-xs px-2 gap-1.5"
                     >
-                        <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">Export CSV</span>
+                        <Download className="h-3 w-3" />
+                        <span>Export CSV</span>
                     </button>
                 </div>
             </div>
@@ -226,13 +303,41 @@ export default function ActivityLog() {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr>
-                                    <td colSpan="10" className="px-4 py-12 text-center">
-                                        <div className="flex justify-center">
-                                            <Spinner fullScreen={false} />
-                                        </div>
-                                    </td>
-                                </tr>
+                                [1, 2, 3, 4, 5].map((n) => (
+                                    <tr key={n} className="border-b border-slate-100 dark:border-slate-800/60 animate-pulse text-xs">
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded mb-1" />
+                                            <div className="h-3 w-14 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-12 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5">
+                                            <div className="h-3.5 w-12 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        </td>
+                                        <td className="px-4 py-3.5 text-right">
+                                            <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full ml-auto" />
+                                        </td>
+                                    </tr>
+                                ))
                             ) : logs.length === 0 ? (
                                 <tr>
                                     <td colSpan="10" className="px-4 py-12 text-center">
