@@ -272,104 +272,101 @@
     flex-shrink: 0;
   }
 
-  /* ---- Legacy Buttons ---- */
+  /* ---- Legacy Buttons Harmonized to Studio ---- */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors focus:outline-none focus:border-[var(--wp-border-strong)] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 bg-slate-900 text-white hover:bg-slate-800 shadow-sm dark:bg-violet-600 dark:hover:bg-violet-500 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99];
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors bg-[var(--wp-accent-solid)] text-[var(--wp-text-inverted)] hover:bg-[var(--wp-accent-hover)] border border-transparent shadow-none disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99];
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] border border-[var(--wp-border-default)] hover:bg-[var(--wp-bg-hover)] hover:border-[var(--wp-border-strong)] shadow-none disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 bg-red-600 text-white hover:bg-red-500 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99];
+    @apply inline-flex items-center justify-center gap-2 rounded-md text-xs font-medium transition-colors bg-red-600/10 text-red-400 border border-red-500/20 hover:bg-red-600/20 shadow-none disabled:opacity-50 disabled:pointer-events-none;
   }
-  .btn-sm { @apply px-3 py-1.5 text-xs; }
-  .btn-md { @apply px-3.5 py-2 text-sm; }
-  .btn-lg { @apply px-5 py-2.5 text-sm; }
+  .btn-sm { @apply px-2.5 py-1 text-[11px] h-7; }
+  .btn-md { @apply px-3 py-1.5 text-xs h-8; }
+  .btn-lg { @apply px-4 py-2 text-xs h-9; }
 
   /* ---- Cards & Surfaces ---- */
   .card {
-    @apply bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-xl transition-colors;
+    @apply bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-lg transition-colors;
   }
   .card-hero {
-    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors;
+    @apply bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-lg shadow-none transition-colors;
   }
   .card-subtle {
-    @apply bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/50 rounded-lg;
+    @apply bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] rounded-lg;
   }
-  .card-pad { @apply p-5 sm:p-6; }
-  .card-pad-compact { @apply p-4 sm:p-5; }
+  .card-pad { @apply p-4 sm:p-5; }
+  .card-pad-compact { @apply p-3 sm:p-4; }
   .card-hover {
-    @apply transition-all duration-150 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:shadow-slate-200/40 dark:hover:shadow-slate-950/60;
-  }
-  .card-hover:hover {
-    transform: translate3d(0, -1px, 0);
+    @apply transition-colors hover:border-[var(--wp-border-strong)];
   }
 
   /* ---- Inputs ---- */
   .input {
-    @apply w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/60 transition-all disabled:opacity-60;
+    @apply w-full rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] px-3 py-1.5 text-xs text-[var(--wp-text-primary)] placeholder:text-[var(--wp-text-muted)] focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors disabled:opacity-60;
   }
   .label {
-    @apply block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5;
+    @apply block text-[11px] font-mono uppercase tracking-[0.05em] text-[var(--wp-text-muted)] mb-1.5;
   }
   .field-hint {
-    @apply mt-1.5 text-xs text-slate-500 dark:text-slate-500;
+    @apply mt-1 text-[11px] text-[var(--wp-text-muted)];
   }
 
   /* ---- Badges ---- */
-  .badge-violet { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300; }
-  .badge-green { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300; }
-  .badge-amber { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300; }
-  .badge-red { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300; }
-  .badge-slate { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300; }
+  .badge-violet { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-[var(--wp-bg-subtle)] text-[var(--wp-text-secondary)] border border-[var(--wp-border-subtle)]; }
+  .badge-green { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
+  .badge-amber { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20; }
+  .badge-red { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-red-500/10 text-red-400 border border-red-500/20; }
+  .badge-slate { @apply inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10.5px] font-mono bg-[var(--wp-bg-subtle)] text-[var(--wp-text-muted)] border border-[var(--wp-border-subtle)]; }
 
   /* ---- Section headings & Typography hierarchy ---- */
   .eyebrow {
-    @apply text-xs font-medium text-slate-500 dark:text-slate-400 tracking-normal normal-case;
+    @apply text-[11px] font-mono text-[var(--wp-text-muted)] tracking-normal normal-case;
   }
   .metric-label {
-    @apply text-xs font-medium text-slate-500 dark:text-slate-400;
+    @apply text-[11px] font-mono uppercase text-[var(--wp-text-muted)];
   }
   .page-title {
-    @apply text-2xl sm:text-[1.75rem] font-bold tracking-tight text-slate-900 dark:text-white leading-tight;
+    @apply text-[15px] font-semibold tracking-tight text-[var(--wp-text-primary)] leading-tight;
   }
   .page-sub {
-    @apply mt-1 text-sm text-slate-500 dark:text-slate-400 max-w-xl leading-relaxed;
+    @apply mt-0.5 text-[11.5px] text-[var(--wp-text-muted)] max-w-xl leading-normal;
   }
 
   /* ---- Auth page heading (28–36px, larger than dashboard title) ---- */
   .auth-title {
-    @apply text-[1.75rem] sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight;
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-[var(--wp-text-primary)] leading-tight;
   }
 
   /* ---- Section / card heading (18–20px) ---- */
   .section-title {
-    @apply text-base sm:text-lg font-semibold tracking-tight text-slate-900 dark:text-white;
+    @apply text-sm font-semibold tracking-tight text-[var(--wp-text-primary)];
   }
 
   /* ---- Page header (standardized across app) ---- */
   .page-header {
-    @apply flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2;
+    @apply flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1;
   }
   .page-header-title {
-    @apply flex items-center gap-3.5;
+    @apply flex items-center gap-2.5;
   }
   .page-header-icon {
-    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400;
+    @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] text-[var(--wp-text-primary)];
   }
 
   /* ---- Segmented control (time range / view toggle) ---- */
   .segmented {
-    @apply inline-flex items-center gap-1 rounded-lg border border-slate-200/80 bg-slate-100/90 p-1 dark:border-slate-800 dark:bg-slate-800/50;
+    @apply inline-flex items-center p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs;
   }
   .segmented-btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all;
+    @apply inline-flex items-center justify-center gap-1.5 rounded h-6 px-2.5 text-[11px] font-mono transition-colors;
   }
 
   /* ---- Tables ---- */
@@ -377,29 +374,29 @@
     @apply w-full text-left;
   }
   .table-head {
-    @apply bg-slate-50/80 text-xs font-semibold text-slate-500 dark:bg-slate-800/40 dark:text-slate-400 tracking-normal border-b border-slate-200/80 dark:border-slate-800;
+    @apply bg-[var(--wp-bg-subtle)] text-[10.5px] font-mono uppercase tracking-[0.06em] text-[var(--wp-text-muted)] border-b border-[var(--wp-border-subtle)];
   }
   .table-th {
-    @apply px-5 py-3 font-semibold;
+    @apply px-4 py-2 font-medium;
   }
   .table-td {
-    @apply px-5 py-3.5 text-sm text-slate-600 dark:text-slate-300;
+    @apply px-4 py-2.5 text-xs text-[var(--wp-text-secondary)] border-b border-[var(--wp-border-subtle)];
   }
 
   /* ---- Icon action button ---- */
   .icon-btn {
-    @apply inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white;
+    @apply inline-flex items-center justify-center rounded-md p-1.5 text-[var(--wp-text-muted)] transition-colors hover:bg-[var(--wp-bg-hover)] hover:text-[var(--wp-text-primary)];
   }
 
   /* ---- Wrappers ---- */
   .container-app {
-    @apply mx-auto w-full max-w-[1360px] px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1440px] px-3 sm:px-4;
   }
   .container-page {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-[1440px] px-3 sm:px-4;
   }
   .prose-quiet {
-    @apply text-sm leading-relaxed text-slate-600 dark:text-slate-300;
+    @apply text-xs leading-relaxed text-[var(--wp-text-secondary)];
   }
 }
 
