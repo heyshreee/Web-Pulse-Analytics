@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars -- motion is only used as a JSX member expression
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     User, Shield, Bell, BarChart2, Briefcase,
-    Save, Loader, Upload, Trash2, Monitor, Smartphone, Globe,
-    Check, AlertTriangle, LogOut, Settings as SettingsIcon, Edit2, CreditCard, Download,
-    MessageSquare, Send, Lock
+    Save, Loader, Upload, Trash2, Monitor, Smartphone,
+    Check, Settings as SettingsIcon, Edit2, CreditCard, Download,
+    MessageSquare, Send, Lock, X
 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
@@ -30,34 +28,39 @@ export default function Settings() {
     ];
 
     return (
-        <div className="space-y-8">
-            <div className="page-header">
-                <div className="page-header-title">
-                    <div className="page-header-icon">
-                        <SettingsIcon className="h-5 w-5" />
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-line">
+                <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded border border-line bg-subtle text-ink">
+                        <SettingsIcon className="h-4 w-4" />
                     </div>
-                    <div className="flex flex-col">
-                        <h2 className="page-title">Account Settings</h2>
-                        <p className="page-sub">Manage your profile, security, and project preferences.</p>
+                    <div>
+                        <h1 className="text-sm font-semibold tracking-tight text-ink">Account Settings</h1>
+                        <p className="text-xs text-ink-muted">Manage your profile, security, and project preferences.</p>
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-                {/* Sidebar */}
-                <div className="w-full md:w-64 flex-shrink-0">
-                    <div className="card card-pad sticky top-24">
-                        <h2 className="mb-4 px-1 text-sm font-semibold text-slate-900 dark:text-white tracking-tight">Settings</h2>
-                        <nav className="space-y-1 p-0">
+
+            <div className="flex flex-col md:flex-row gap-4 items-start">
+                {/* Control Rail / Sidebar */}
+                <div className="w-full md:w-56 flex-shrink-0">
+                    <div className="wp-panel p-1.5 space-y-0.5 sticky top-20">
+                        <div className="px-2.5 py-1 text-[11px] font-medium text-ink-muted uppercase tracking-wider font-mono">
+                            Preferences
+                        </div>
+                        <nav className="space-y-0.5">
                             {tabs.map((t) => (
                                 <button
                                     key={t.id}
                                     onClick={() => navigate(`/dashboard/settings/${t.id}`)}
-                                    className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${activeTab === t.id
-                                        ? 'bg-slate-900 dark:bg-violet-500 text-white'
-                                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-                                        }`}
+                                    className={`flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                                        activeTab === t.id
+                                            ? 'bg-ink text-canvas font-semibold'
+                                            : 'text-ink-secondary hover:text-ink hover:bg-hover'
+                                    }`}
                                 >
-                                    <t.icon className={`h-[18px] w-[18px] ${activeTab === t.id ? 'text-white' : 'text-slate-400'}`} />
+                                    <t.icon className={`h-3.5 w-3.5 ${activeTab === t.id ? 'text-canvas' : 'text-ink-muted'}`} />
                                     {t.label}
                                 </button>
                             ))}
@@ -65,25 +68,15 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/* Content */}
+                {/* Main Content Area */}
                 <div className="flex-1 min-w-0">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            {activeTab === 'profile' && <ProfileSection user={user} loadUser={loadUser} showToast={showToast} />}
-                            {activeTab === 'security' && <SecuritySection user={user} showToast={showToast} />}
-                            {activeTab === 'notifications' && <NotificationsSection user={user} showToast={showToast} />}
-                            {activeTab === 'usage' && <UsageSection user={user} />}
-                            {activeTab === 'projects' && <ProjectsSection user={user} />}
-                            {activeTab === 'billing' && <BillingSection user={user} />}
-                            {activeTab === 'linked_accounts' && <LinkedAccountsSection user={user} showToast={showToast} />}
-                        </motion.div>
-                    </AnimatePresence>
+                    {activeTab === 'profile' && <ProfileSection user={user} loadUser={loadUser} showToast={showToast} />}
+                    {activeTab === 'security' && <SecuritySection showToast={showToast} />}
+                    {activeTab === 'notifications' && <NotificationsSection user={user} showToast={showToast} />}
+                    {activeTab === 'usage' && <UsageSection />}
+                    {activeTab === 'projects' && <ProjectsSection />}
+                    {activeTab === 'billing' && <BillingSection user={user} />}
+                    {activeTab === 'linked_accounts' && <LinkedAccountsSection showToast={showToast} />}
                 </div>
             </div>
         </div>
@@ -130,29 +123,18 @@ function ProfileSection({ user, loadUser, showToast }) {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('avatar', file);
+        const data = new FormData();
+        data.append('avatar', file);
 
         setUploading(true);
         try {
-            // We need to use fetch directly for FormData to handle headers correctly
-            // or ensure apiRequest handles FormData (it likely expects JSON)
-            // Let's check apiRequest implementation or just use fetch with auth token
-            // Assuming apiRequest handles JSON, we might need a custom call here.
-            // But let's try to use a modified apiRequest or just fetch.
-            // Since I can't see apiRequest implementation right now, I'll assume I need to handle it.
-            // Actually, I should check apiRequest.
-            // For now, I'll implement a direct fetch with the token from localStorage/cookie if needed.
-            // But wait, apiRequest probably sets Content-Type to application/json.
-            // I'll use a direct fetch here to be safe.
-
             const response = await fetch('/api/v1/user/avatar', {
                 method: 'PUT',
                 credentials: 'include',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: formData
+                body: data
             });
 
             if (!response.ok) throw new Error('Upload failed');
@@ -168,30 +150,33 @@ function ProfileSection({ user, loadUser, showToast }) {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="card card-pad">
-                <div className="flex justify-between items-start mb-8">
+        <div className="space-y-4">
+            <div className="wp-panel p-5">
+                <div className="flex justify-between items-start mb-6">
                     <div>
-                        <h3 className="font-semibold text-slate-900 dark:text-white">Profile Information</h3>
-                        <p className="page-sub">Update your profile basics.</p>
+                        <h3 className="text-sm font-medium text-ink">Profile Information</h3>
+                        <p className="text-xs text-ink-muted">Update your display information and account identity.</p>
                     </div>
                     <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className={`${isEditing ? 'btn-ghost' : 'btn-primary'} btn-sm`}
+                        className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
                     >
                         {isEditing ? (
-                            <>Cancel</>
+                            <>
+                                <X className="h-3.5 w-3.5" />
+                                Cancel
+                            </>
                         ) : (
                             <>
-                                <Edit2 className="h-4 w-4" />
+                                <Edit2 className="h-3.5 w-3.5" />
                                 Edit
                             </>
                         )}
                     </button>
                 </div>
 
-                <div className="flex items-center gap-6 mb-8">
-                    <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800 text-2xl font-bold text-slate-600 dark:text-slate-300">
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-line bg-subtle text-lg font-bold text-ink font-mono shrink-0">
                         {user?.avatar_url ? (
                             <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
                         ) : (
@@ -199,9 +184,9 @@ function ProfileSection({ user, loadUser, showToast }) {
                         )}
                     </div>
                     <div>
-                        <h4 className="font-semibold text-slate-900 dark:text-white mb-1">Profile Picture</h4>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">JPG, GIF or PNG. Max size 5MB</p>
-                        <div className="flex gap-3">
+                        <h4 className="text-xs font-medium text-ink mb-0.5">Avatar Image</h4>
+                        <p className="text-[11px] text-ink-muted mb-2 font-mono">JPG, GIF or PNG. Max size 5MB</p>
+                        <div className="flex gap-2">
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -212,76 +197,67 @@ function ProfileSection({ user, loadUser, showToast }) {
                             <button
                                 disabled={!isEditing || uploading}
                                 onClick={() => fileInputRef.current?.click()}
-                                className="btn-secondary btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="btn-secondary h-6 px-2 text-xs inline-flex items-center gap-1.5 disabled:opacity-50"
                             >
-                                {uploading ? <Loader className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                {uploading ? 'Uploading...' : 'Upload New'}
+                                {uploading ? <Loader className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                {uploading ? 'Uploading...' : 'Upload'}
                             </button>
                             <button
                                 disabled={!isEditing}
-                                className="btn-ghost btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="btn-secondary h-6 px-2 text-xs inline-flex items-center gap-1.5 text-ink-muted hover:text-red-500 disabled:opacity-50"
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-3 w-3" />
                                 Remove
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label className="label">Full Name</label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    disabled={!isEditing}
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    className="input pr-12 disabled:opacity-50 disabled:cursor-not-allowed"
-                                />
-                                {isEditing && <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />}
-                            </div>
+                            <label className="block text-xs font-mono text-ink-secondary mb-1">Full Name</label>
+                            <input
+                                type="text"
+                                disabled={!isEditing}
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                className="input font-mono text-xs h-8 disabled:opacity-50"
+                            />
                         </div>
                         <div>
-                            <label className="label">Job Title</label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    disabled={!isEditing}
-                                    value={formData.job_title}
-                                    onChange={e => setFormData({ ...formData, job_title: e.target.value })}
-                                    className="input pr-12 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    placeholder="e.g. Senior Developer"
-                                />
-                                {isEditing && <Edit2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />}
-                            </div>
+                            <label className="block text-xs font-mono text-ink-secondary mb-1">Job Title</label>
+                            <input
+                                type="text"
+                                disabled={!isEditing}
+                                value={formData.job_title}
+                                onChange={e => setFormData({ ...formData, job_title: e.target.value })}
+                                className="input font-mono text-xs h-8 disabled:opacity-50"
+                                placeholder="e.g. Senior Developer"
+                            />
                         </div>
                     </div>
 
                     <div>
-                        <label className="label">Bio</label>
-                        <div className="relative">
-                            <textarea
-                                value={formData.bio}
-                                disabled={!isEditing}
-                                onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                                rows={4}
-                                className="input resize-none pr-12 disabled:opacity-50 disabled:cursor-not-allowed"
-                                placeholder="Tell us a little about yourself..."
-                            />
-                            {isEditing && <Edit2 className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />}
-                        </div>
+                        <label className="block text-xs font-mono text-ink-secondary mb-1">Bio</label>
+                        <textarea
+                            value={formData.bio}
+                            disabled={!isEditing}
+                            onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                            rows={3}
+                            className="input font-mono text-xs resize-none disabled:opacity-50"
+                            placeholder="Tell us a little about yourself..."
+                        />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label className="label">Language</label>
+                            <label className="block text-xs font-mono text-ink-secondary mb-1">Language</label>
                             <select
                                 value={formData.language}
                                 disabled={!isEditing}
                                 onChange={e => setFormData({ ...formData, language: e.target.value })}
-                                className="input disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="input font-mono text-xs h-8 disabled:opacity-50"
                             >
                                 <option value="en-US">English (US)</option>
                                 <option value="es">Spanish</option>
@@ -290,12 +266,12 @@ function ProfileSection({ user, loadUser, showToast }) {
                             </select>
                         </div>
                         <div>
-                            <label className="label">Timezone</label>
+                            <label className="block text-xs font-mono text-ink-secondary mb-1">Timezone</label>
                             <select
                                 value={formData.timezone}
                                 disabled={!isEditing}
                                 onChange={e => setFormData({ ...formData, timezone: e.target.value })}
-                                className="input disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="input font-mono text-xs h-8 disabled:opacity-50"
                             >
                                 <option value="UTC">UTC</option>
                                 <option value="EST">Eastern Standard Time (EST)</option>
@@ -306,13 +282,13 @@ function ProfileSection({ user, loadUser, showToast }) {
                     </div>
 
                     {isEditing && (
-                        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                        <div className="flex justify-end pt-3 border-t border-line">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="btn-primary btn-md flex items-center gap-2"
+                                className="btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
                             >
-                                {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                {loading ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                                 Save Changes
                             </button>
                         </div>
@@ -382,11 +358,11 @@ function SecuritySection({ showToast }) {
 
     if (loadingSessions) {
         return (
-            <div className="card card-pad p-6 space-y-4 animate-pulse">
-                <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
-                <div className="space-y-3">
+            <div className="wp-panel p-5 space-y-3 animate-pulse">
+                <div className="h-4 w-32 bg-subtle rounded" />
+                <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-16 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                        <div key={n} className="h-12 bg-subtle/50 rounded" />
                     ))}
                 </div>
             </div>
@@ -394,63 +370,71 @@ function SecuritySection({ showToast }) {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="card card-pad">
+        <div className="space-y-4">
+            <div className="wp-panel p-5">
                 <div className="flex justify-between items-start mb-6">
-                    <h3 className="font-semibold text-slate-900 dark:text-white">Change Password</h3>
+                    <div>
+                        <h3 className="text-sm font-medium text-ink">Change Password</h3>
+                        <p className="text-xs text-ink-muted">Keep your account credentials secure.</p>
+                    </div>
                     <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className={`${isEditing ? 'btn-ghost' : 'btn-primary'} btn-sm`}
+                        className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
                     >
-                        {isEditing ? 'Cancel' : (
+                        {isEditing ? (
                             <>
-                                <Edit2 className="h-4 w-4" />
+                                <X className="h-3.5 w-3.5" />
+                                Cancel
+                            </>
+                        ) : (
+                            <>
+                                <Edit2 className="h-3.5 w-3.5" />
                                 Edit
                             </>
                         )}
                     </button>
                 </div>
-                <form onSubmit={handlePasswordUpdate} className="space-y-5">
+                <form onSubmit={handlePasswordUpdate} className="space-y-4">
                     <div>
-                        <label className="label">Current Password</label>
+                        <label className="block text-xs font-mono text-ink-secondary mb-1">Current Password</label>
                         <input
                             type="password"
                             disabled={!isEditing}
                             value={passwords.current}
                             onChange={e => setPasswords({ ...passwords, current: e.target.value })}
-                            className="input disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="input font-mono text-xs h-8 disabled:opacity-50"
                         />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label className="label">New Password</label>
+                            <label className="block text-xs font-mono text-ink-secondary mb-1">New Password</label>
                             <input
                                 type="password"
                                 disabled={!isEditing}
                                 value={passwords.new}
                                 onChange={e => setPasswords({ ...passwords, new: e.target.value })}
-                                className="input disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="input font-mono text-xs h-8 disabled:opacity-50"
                             />
                         </div>
                         <div>
-                            <label className="label">Confirm New Password</label>
+                            <label className="block text-xs font-mono text-ink-secondary mb-1">Confirm New Password</label>
                             <input
                                 type="password"
                                 disabled={!isEditing}
                                 value={passwords.confirm}
                                 onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
-                                className="input disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="input font-mono text-xs h-8 disabled:opacity-50"
                             />
                         </div>
                     </div>
                     {isEditing && (
-                        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                        <div className="flex justify-end pt-3 border-t border-line">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="btn-primary btn-md flex items-center gap-2"
+                                className="btn-primary h-7 px-3 text-xs inline-flex items-center gap-1.5"
                             >
-                                {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                {loading ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                                 Update Password
                             </button>
                         </div>
@@ -458,23 +442,23 @@ function SecuritySection({ showToast }) {
                 </form>
             </div>
 
-            <div className="card card-pad">
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-6">Active Sessions</h3>
-                <div className="space-y-4">
+            <div className="wp-panel p-5">
+                <h3 className="text-sm font-medium text-ink mb-4">Active Sessions</h3>
+                <div className="space-y-2">
                     {sessions.map((session, index) => (
-                        <div key={index} className="flex items-center justify-between p-5 border border-slate-100 dark:border-slate-800 rounded-2xl">
-                            <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10 text-slate-500 dark:text-slate-400">
-                                    {session.device?.includes('Mobile') ? <Smartphone className="h-5 w-5 text-violet-500" /> : <Monitor className="h-5 w-5 text-violet-500" />}
+                        <div key={index} className="flex items-center justify-between p-3 border border-line rounded bg-surface">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded border border-line bg-subtle text-ink-muted">
+                                    {session.device?.includes('Mobile') ? <Smartphone className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-900 dark:text-white">{session.device || 'Unknown Device'}</p>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+                                    <p className="text-xs font-medium text-ink">{session.device || 'Unknown Device'}</p>
+                                    <div className="flex items-center gap-2 text-[11px] text-ink-muted mt-0.5 font-mono">
                                         <span>{session.location}</span>
                                         <span>•</span>
                                         <span>{new Date(session.lastActive).toLocaleDateString()}</span>
                                         {session.isCurrent && (
-                                            <span className="badge-green">Current</span>
+                                            <span className="text-emerald-500 font-semibold">• Current</span>
                                         )}
                                     </div>
                                 </div>
@@ -484,9 +468,9 @@ function SecuritySection({ showToast }) {
                                     type="button"
                                     onClick={() => handleRevokeSession(session.id)}
                                     aria-label={`Revoke session for ${session.device || 'this device'}`}
-                                    className="btn-ghost btn-sm text-red-500 hover:text-red-600 dark:text-red-400"
+                                    className="btn-secondary h-6 px-2 text-xs text-ink-muted hover:text-red-500"
                                 >
-                                    <LogOut className="h-4 w-4" />
+                                    Revoke
                                 </button>
                             )}
                         </div>
@@ -523,22 +507,30 @@ function NotificationsSection({ user, showToast }) {
     };
 
     return (
-        <div className="card card-pad">
+        <div className="wp-panel p-5">
             <div className="flex justify-between items-start mb-6">
-                <h3 className="font-semibold text-slate-900 dark:text-white">Notification Preferences</h3>
+                <div>
+                    <h3 className="text-sm font-medium text-ink">Notification Preferences</h3>
+                    <p className="text-xs text-ink-muted">Configure your event alerts and scheduled digests.</p>
+                </div>
                 <button
                     onClick={() => setIsEditing(!isEditing)}
-                    className={`${isEditing ? 'btn-ghost' : 'btn-primary'} btn-sm`}
+                    className="btn-secondary h-7 px-3 text-xs inline-flex items-center gap-1.5"
                 >
-                    {isEditing ? 'Done' : (
+                    {isEditing ? (
                         <>
-                            <Edit2 className="h-4 w-4" />
+                            <Check className="h-3.5 w-3.5" />
+                            Done
+                        </>
+                    ) : (
+                        <>
+                            <Edit2 className="h-3.5 w-3.5" />
                             Edit
                         </>
                     )}
                 </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2 divide-y divide-line">
                 {[
                     { id: 'email', label: 'Email Notifications', desc: 'Receive daily summaries and critical alerts via email.' },
                     { id: 'email_reports', label: 'Email Reports', desc: 'Receive weekly performance reports for your projects.' },
@@ -546,20 +538,22 @@ function NotificationsSection({ user, showToast }) {
                     { id: 'security', label: 'Security Alerts', desc: 'Get notified about new logins and password changes.' },
                     { id: 'marketing', label: 'Product Updates', desc: 'Receive news about new features and improvements.' }
                 ].map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-5 border border-slate-100 dark:border-slate-800 rounded-2xl">
+                    <div key={item.id} className="flex items-center justify-between pt-3 first:pt-0">
                         <div>
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">{item.label}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{item.desc}</p>
+                            <p className="text-xs font-medium text-ink">{item.label}</p>
+                            <p className="text-[11px] text-ink-muted">{item.desc}</p>
                         </div>
                         <button
                             onClick={() => handleToggle(item.id)}
                             disabled={!isEditing}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${preferences[item.id] ? 'bg-slate-900 dark:bg-violet-500' : 'bg-slate-200 dark:bg-slate-700'
-                                }`}
+                            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+                                preferences[item.id] ? 'bg-ink' : 'bg-subtle border border-line'
+                            }`}
                         >
                             <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${preferences[item.id] ? 'translate-x-6' : 'translate-x-1'
-                                    }`}
+                                className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform ${
+                                    preferences[item.id] ? 'bg-canvas translate-x-4' : 'bg-ink-muted translate-x-1'
+                                }`}
                             />
                         </button>
                     </div>
@@ -574,53 +568,58 @@ function UsageSection() {
 
     if (!usageStats) {
         return (
-            <div className="card card-pad p-6 space-y-6 animate-pulse">
-                <div className="h-5 w-40 bg-slate-200 dark:bg-slate-800 rounded" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="h-24 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
-                    <div className="h-24 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+            <div className="wp-panel p-5 space-y-4 animate-pulse">
+                <div className="h-4 w-36 bg-subtle rounded" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="h-20 bg-subtle/50 rounded" />
+                    <div className="h-20 bg-subtle/50 rounded" />
                 </div>
             </div>
         );
     }
 
     const getPercentage = (used, limit) => {
-        if (limit === Infinity) return 0;
+        if (!limit || limit === Infinity) return 0;
         return Math.min((used / limit) * 100, 100);
     };
 
     return (
-        <div className="space-y-6">
-            <div className="card card-pad">
-                <div className="flex justify-between items-center mb-8">
-                    <h3 className="font-semibold text-slate-900 dark:text-white">Usage & Quota</h3>
-                    <span className="badge-violet capitalize">
+        <div className="space-y-4">
+            <div className="wp-panel p-5">
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 className="text-sm font-medium text-ink">Usage & Quota</h3>
+                        <p className="text-xs text-ink-muted">Track resource consumption against your plan limits.</p>
+                    </div>
+                    <span className="px-2 py-0.5 rounded border border-line bg-subtle text-xs font-mono uppercase tracking-wider text-ink font-semibold">
                         {usageStats.plan} Plan
                     </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="card card-pad">
-                        <div className="flex justify-between items-end mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Monthly Views */}
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <div className="flex justify-between items-end mb-2">
                             <div>
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Monthly views</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">{usageStats.totalViews.toLocaleString()}</p>
+                                <p className="text-[11px] text-ink-muted">Monthly views</p>
+                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">{usageStats.totalViews.toLocaleString()}</p>
                             </div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 tabular-nums">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
+                            <p className="text-xs text-ink-muted font-mono tabular-nums">Limit: {usageStats.monthlyLimit.toLocaleString()}</p>
                         </div>
-                        <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className="wp-meter-track">
                             <div
-                                className="h-full bg-violet-500 rounded-full transition-all duration-500"
-                                style={{ width: `${getPercentage(usageStats.totalViews, usageStats.monthlyLimit)}%` }}
+                                className="wp-meter-bar"
+                                style={{ width: `${Math.max(getPercentage(usageStats.totalViews, usageStats.monthlyLimit), usageStats.totalViews > 0 ? 2 : 0)}%` }}
                             />
                         </div>
                     </div>
 
-                    <div className="card card-pad">
-                        <div className="flex justify-between items-end mb-4">
+                    {/* Storage Used */}
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <div className="flex justify-between items-end mb-2">
                             <div>
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage used</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">
+                                <p className="text-[11px] text-ink-muted">Storage used</p>
+                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">
                                     {usageStats.storageUsed < 1024 * 1024
                                         ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
                                         : usageStats.storageUsed < 1024 * 1024 * 1024
@@ -629,44 +628,46 @@ function UsageSection() {
                                     }
                                 </p>
                             </div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</p>
+                            <p className="text-xs text-ink-muted font-mono">Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}</p>
                         </div>
-                        <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className="wp-meter-track">
                             <div
-                                className="h-full bg-violet-500 rounded-full transition-all duration-500"
-                                style={{ width: `${getPercentage(usageStats.storageUsed, usageStats.storageLimit)}%` }}
+                                className="wp-meter-bar"
+                                style={{ width: `${Math.max(getPercentage(usageStats.storageUsed, usageStats.storageLimit), usageStats.storageUsed > 0 ? 2 : 0)}%` }}
                             />
                         </div>
                     </div>
 
-                    <div className="card card-pad">
-                        <div className="flex justify-between items-end mb-4">
+                    {/* Total Projects */}
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <div className="flex justify-between items-end mb-2">
                             <div>
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total projects</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">{usageStats.projectCount}</p>
+                                <p className="text-[11px] text-ink-muted">Total projects</p>
+                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">{usageStats.projectCount}</p>
                             </div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Limit: {usageStats.projectLimit}</p>
+                            <p className="text-xs text-ink-muted font-mono">Limit: {usageStats.projectLimit}</p>
                         </div>
-                        <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className="wp-meter-track">
                             <div
-                                className="h-full bg-violet-500 rounded-full transition-all duration-500"
-                                style={{ width: `${getPercentage(usageStats.projectCount, usageStats.projectLimit)}%` }}
+                                className="wp-meter-bar"
+                                style={{ width: `${Math.max(getPercentage(usageStats.projectCount, usageStats.projectLimit), usageStats.projectCount > 0 ? 2 : 0)}%` }}
                             />
                         </div>
                     </div>
 
-                    <div className="card card-pad">
-                        <div className="flex justify-between items-end mb-4">
+                    {/* Shared Reports */}
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <div className="flex justify-between items-end mb-2">
                             <div>
-                                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Shared reports</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight tabular-nums">{usageStats.share_report?.used || 0}</p>
+                                <p className="text-[11px] text-ink-muted">Shared reports</p>
+                                <p className="text-lg font-semibold text-ink font-mono tabular-nums">{usageStats.share_report?.used || 0}</p>
                             </div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}</p>
+                            <p className="text-xs text-ink-muted font-mono">Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}</p>
                         </div>
-                        <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div className="wp-meter-track">
                             <div
-                                className="h-full bg-violet-500 rounded-full transition-all duration-500"
-                                style={{ width: `${getPercentage(usageStats.share_report?.used || 0, usageStats.share_report?.limit || 1)}%` }}
+                                className="wp-meter-bar"
+                                style={{ width: `${Math.max(getPercentage(usageStats.share_report?.used || 0, usageStats.share_report?.limit || 1), (usageStats.share_report?.used || 0) > 0 ? 2 : 0)}%` }}
                             />
                         </div>
                     </div>
@@ -726,11 +727,11 @@ function ProjectsSection() {
 
     if (loading) {
         return (
-            <div className="card card-pad p-6 space-y-4 animate-pulse">
-                <div className="h-5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
-                <div className="space-y-3">
+            <div className="wp-panel p-5 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-subtle rounded" />
+                <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-14 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                        <div key={n} className="h-12 bg-subtle/50 rounded" />
                     ))}
                 </div>
             </div>
@@ -738,76 +739,76 @@ function ProjectsSection() {
     }
 
     return (
-        <div className="card card-pad">
+        <div className="wp-panel p-5">
             <div className="flex justify-between items-start mb-6">
                 <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-white">Projects & Teams</h3>
-                    <p className="page-sub">Manage your projects and team members.</p>
+                    <h3 className="text-sm font-medium text-ink">Projects & Teams</h3>
+                    <p className="text-xs text-ink-muted">Manage your registered domains and telemetry access scopes.</p>
                 </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
                 {projects.length === 0 ? (
-                    <div className="card card-pad py-12 text-center text-slate-500 font-medium text-sm">
+                    <div className="py-12 text-center text-ink-muted font-mono text-xs">
                         No projects found. Create one to get started.
                     </div>
                 ) : (
                     projects.map((project) => (
-                        <div key={project.id} className="flex items-center justify-between p-5 border border-slate-100 dark:border-slate-800 rounded-2xl">
-                            <div className="flex items-center gap-4 flex-1">
-                                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10 text-violet-500 text-base font-bold">
+                        <div key={project.id} className="flex items-center justify-between p-3 border border-line rounded bg-surface">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-line bg-subtle text-ink text-xs font-mono font-bold">
                                     {project.name[0].toUpperCase()}
                                 </div>
                                 {editingId === project.id ? (
-                                    <div className="flex-1 grid gap-2">
+                                    <div className="flex-1 grid gap-2 mr-3">
                                         <input
                                             type="text"
                                             value={editForm.name}
                                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                            className="input"
+                                            className="input font-mono text-xs h-7"
                                             placeholder="Project Name"
                                         />
                                         <input
                                             type="text"
                                             value={editForm.allowedOrigins}
                                             onChange={(e) => setEditForm({ ...editForm, allowedOrigins: e.target.value })}
-                                            className="input"
+                                            className="input font-mono text-xs h-7"
                                             placeholder="Allowed Origins (comma separated)"
                                         />
                                     </div>
                                 ) : (
-                                    <div>
-                                        <p className="text-base font-medium text-slate-900 dark:text-white tracking-tight">{project.name}</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">{project.allowed_origins || 'All origins allowed'}</p>
+                                    <div className="truncate">
+                                        <p className="text-xs font-medium text-ink truncate">{project.name}</p>
+                                        <p className="text-[11px] text-ink-muted font-mono truncate">{project.allowed_origins || 'All origins allowed'}</p>
                                     </div>
                                 )}
                             </div>
-                            <div className="flex items-center gap-4 ml-4">
+                            <div className="flex items-center gap-2 ml-3 shrink-0">
                                 {editingId === project.id ? (
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-1.5">
                                         <button
                                             onClick={() => handleSave(project.id)}
-                                            className="p-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 rounded-xl transition-all"
+                                            className="p-1 rounded bg-ink text-canvas hover:opacity-90 transition-opacity"
                                         >
-                                            <Check className="h-5 w-5" />
+                                            <Check className="h-3.5 w-3.5" />
                                         </button>
                                         <button
                                             onClick={cancelEditing}
-                                            className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-xl transition-all"
+                                            className="p-1 rounded border border-line text-ink-muted hover:text-ink hover:bg-hover transition-colors"
                                         >
-                                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                            <X className="h-3.5 w-3.5" />
                                         </button>
                                     </div>
                                 ) : (
                                     <>
-                                        <span className="badge-slate">
+                                        <span className="px-1.5 py-0.5 rounded border border-line bg-subtle text-[10px] font-mono text-ink-muted">
                                             Owner
                                         </span>
                                         <button
                                             onClick={() => startEditing(project)}
-                                            className="btn-ghost btn-sm"
+                                            className="p-1 rounded text-ink-muted hover:text-ink hover:bg-hover transition-colors"
                                         >
-                                            <Edit2 className="h-4 w-4" />
+                                            <Edit2 className="h-3.5 w-3.5" />
                                         </button>
                                     </>
                                 )}
@@ -844,12 +845,10 @@ function BillingSection({ user }) {
 
     const handleDownloadReceipt = async (paymentId) => {
         try {
-            // Ensure we target the v1 endpoint correctly
             const baseUrl = import.meta.env.VITE_API_URL;
             const apiUrl = baseUrl.endsWith('/v1') ? baseUrl : `${baseUrl}/v1`;
 
             const response = await fetch(`${apiUrl}/payment/receipt/${paymentId}`, {
-                // The session is carried by the HttpOnly cookie.
                 credentials: 'include',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
@@ -885,11 +884,11 @@ function BillingSection({ user }) {
 
     if (loading) {
         return (
-            <div className="card card-pad p-6 space-y-4 animate-pulse">
-                <div className="h-5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
-                <div className="space-y-3">
+            <div className="wp-panel p-5 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-subtle rounded" />
+                <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-14 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                        <div key={n} className="h-12 bg-subtle/50 rounded" />
                     ))}
                 </div>
             </div>
@@ -897,104 +896,92 @@ function BillingSection({ user }) {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="card card-pad">
-                <div className="flex justify-between items-start mb-8">
-                    <div>
-                        <h3 className="font-semibold text-slate-900 dark:text-white">Subscription Summary</h3>
-                        <p className="page-sub">Manage your plan and billing details.</p>
-                    </div>
+        <div className="space-y-4">
+            <div className="wp-panel p-5">
+                <div className="mb-6">
+                    <h3 className="text-sm font-medium text-ink">Subscription Summary</h3>
+                    <p className="text-xs text-ink-muted">Manage your active billing tier and invoice records.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-                    <div className="card card-pad card-hover">
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Current plan</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <p className="text-[11px] text-ink-muted mb-1 font-mono">Current tier</p>
                         <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{currentPlan.name}</span>
-                            <span className="badge-green">Active</span>
+                            <span className="text-lg font-semibold text-ink font-mono">{currentPlan.name}</span>
+                            <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-500">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                Active
+                            </span>
                         </div>
-                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                        <p className="mt-1 text-xs text-ink-secondary font-mono">
                             {formatINR(currentPlan.amount)} / month
                         </p>
                     </div>
-                    <div className="card card-pad card-hover">
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Billing terms</p>
-                        <p className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">
-                            One-time monthly order
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                            No automatic renewal
-                        </p>
+
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <p className="text-[11px] text-ink-muted mb-1 font-mono">Billing terms</p>
+                        <p className="text-xs font-medium text-ink">One-time monthly order</p>
+                        <p className="text-[11px] text-ink-muted mt-0.5">No automatic renewal</p>
                     </div>
-                    <div className="card card-pad card-hover">
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Payment gateway</p>
-                        <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-slate-500 dark:text-slate-300" />
-                            <span className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Razorpay</span>
+
+                    <div className="p-3.5 rounded border border-line bg-surface">
+                        <p className="text-[11px] text-ink-muted mb-1 font-mono">Payment gateway</p>
+                        <div className="flex items-center gap-1.5">
+                            <CreditCard className="h-3.5 w-3.5 text-ink-muted" />
+                            <span className="text-xs font-medium text-ink">Razorpay</span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                            INR · amounts exclude taxes
-                        </p>
+                        <p className="text-[11px] text-ink-muted mt-0.5 font-mono">INR · tax excluded</p>
                     </div>
                 </div>
 
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-5">Payment history</h3>
+                <h4 className="text-xs font-semibold text-ink mb-3 font-mono uppercase tracking-wider">Payment History</h4>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto rounded border border-line">
+                    <table className="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr className="table-head">
-                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Invoice ID</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Date</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Description</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Amount</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Status</th>
-                                <th className="px-5 py-3 text-xs font-semibold text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                            <tr className="bg-subtle border-b border-line text-[10px] font-mono uppercase tracking-wider text-ink-muted">
+                                <th className="px-3.5 py-2 font-medium">Invoice ID</th>
+                                <th className="px-3.5 py-2 font-medium">Date</th>
+                                <th className="px-3.5 py-2 font-medium">Description</th>
+                                <th className="px-3.5 py-2 font-medium">Amount</th>
+                                <th className="px-3.5 py-2 font-medium">Status</th>
+                                <th className="px-3.5 py-2 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                            {loading ? (
+                        <tbody className="divide-y divide-line">
+                            {paymentHistory.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
-                                        <Loader className="h-6 w-6 animate-spin mx-auto mb-2" />
-                                        Loading history...
-                                    </td>
-                                </tr>
-                            ) : paymentHistory.length === 0 ? (
-                                <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan="6" className="px-4 py-8 text-center text-ink-muted font-mono text-xs">
                                         No payment history found
                                     </td>
                                 </tr>
                             ) : (
                                 paymentHistory.map((payment) => (
-                                    <tr key={payment.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all">
-                                        <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-400 font-medium font-mono tracking-tighter">{payment.id && (payment.id.substring(0, 8) + '...')}</td>
-                                        <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-400 font-medium">
+                                    <tr key={payment.id} className="hover:bg-hover transition-colors font-mono">
+                                        <td className="px-3.5 py-2.5 text-ink-secondary">{payment.id && (payment.id.substring(0, 10) + '...')}</td>
+                                        <td className="px-3.5 py-2.5 text-ink-muted">
                                             {new Date(payment.date).toLocaleDateString()}
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium tracking-tight">{payment.description || 'Subscription'}</td>
-                                        <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium tracking-tight">{payment.amount != null ? formatINR(payment.amount) : '—'}</td>
-                                        <td className="px-6 py-4">
-                                            <span className="badge-green capitalize">
-                                                {payment.status}
-                                            </span>
+                                        <td className="px-3.5 py-2.5 text-ink font-sans font-medium">{payment.description || 'Subscription'}</td>
+                                        <td className="px-3.5 py-2.5 text-ink tabular-nums">{payment.amount != null ? formatINR(payment.amount) : '—'}</td>
+                                        <td className="px-3.5 py-2.5">
+                                            <span className="text-emerald-500 capitalize font-medium">{payment.status}</span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-3.5 py-2.5 text-right">
+                                            <div className="flex items-center justify-end gap-1.5">
                                                 <button
                                                     onClick={() => handleDownloadReceipt(payment.id)}
-                                                    className="btn-ghost btn-sm"
+                                                    className="p-1 rounded text-ink-muted hover:text-ink hover:bg-hover transition-colors"
                                                     title="Download Receipt"
                                                 >
-                                                    <Download className="h-4 w-4" />
+                                                    <Download className="h-3.5 w-3.5" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleEmailReceipt(payment.id)}
-                                                    className="btn-ghost btn-sm"
+                                                    className="p-1 rounded text-ink-muted hover:text-ink hover:bg-hover transition-colors"
                                                     title="Email Receipt"
                                                 >
-                                                    <Bell className="h-4 w-4" />
+                                                    <Bell className="h-3.5 w-3.5" />
                                                 </button>
                                             </div>
                                         </td>
@@ -1004,8 +991,8 @@ function BillingSection({ user }) {
                         </tbody>
                     </table>
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
 
@@ -1017,7 +1004,6 @@ function LinkedAccountsSection({ showToast }) {
     const [botToken, setBotToken] = useState('');
     const [isPro, setIsPro] = useState(false);
 
-    // Get usage stats from context
     const context = useOutletContext();
     const usageStats = context?.usageStats;
 
@@ -1036,7 +1022,6 @@ function LinkedAccountsSection({ showToast }) {
             if (data.telegram) {
                 setTelegramChatId(data.telegram.chat_id);
                 setTelegramUsername(data.telegram.username);
-                // We don't load the token back for security reasons, or we could if needed
             }
         } catch (err) {
             console.error(err);
@@ -1086,11 +1071,11 @@ function LinkedAccountsSection({ showToast }) {
 
     if (loading) {
         return (
-            <div className="card card-pad p-6 space-y-4 animate-pulse">
-                <div className="h-5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
-                <div className="space-y-3">
+            <div className="wp-panel p-5 space-y-3 animate-pulse">
+                <div className="h-4 w-36 bg-subtle rounded" />
+                <div className="space-y-2">
                     {[1, 2, 3].map((n) => (
-                        <div key={n} className="h-14 bg-slate-100 dark:bg-slate-800/50 rounded-xl" />
+                        <div key={n} className="h-12 bg-subtle/50 rounded" />
                     ))}
                 </div>
             </div>
@@ -1098,93 +1083,93 @@ function LinkedAccountsSection({ showToast }) {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Telegram Card */}
-            <div className="card card-pad relative overflow-hidden">
+        <div className="space-y-4">
+            <div className="wp-panel p-5 relative overflow-hidden">
                 {!isPro && (
-                    <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
-                        <div className="text-center p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-sm">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-500/10 mx-auto mb-6">
-                                <Lock className="h-8 w-8 text-violet-500" />
+                    <div className="absolute inset-0 bg-canvas/80 backdrop-blur-sm flex items-center justify-center z-10 p-4">
+                        <div className="text-center p-6 bg-surface border border-line rounded-lg shadow-2xl max-w-sm">
+                            <div className="flex h-10 w-10 items-center justify-center rounded border border-line bg-subtle mx-auto mb-3">
+                                <Lock className="h-5 w-5 text-ink" />
                             </div>
-                            <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Pro Feature</h4>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-6 leading-relaxed">Telegram integration is available on Pro plan and above.</p>
-                            <button className="w-full btn-primary btn-md">Upgrade to Pro</button>
+                            <h4 className="text-sm font-semibold text-ink mb-1">Pro Feature</h4>
+                            <p className="text-ink-muted text-xs mb-4">Telegram telemetry alerts are available on Pro and Business tiers.</p>
+                            <button className="w-full btn-primary h-7 text-xs">Upgrade Plan</button>
                         </div>
                     </div>
                 )}
 
-                <div className="flex justify-between items-start mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/10">
-                            <Send className="h-5 w-5 text-violet-500" />
+                <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded border border-line bg-subtle text-ink">
+                            <Send className="h-4 w-4" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-900 dark:text-white">Telegram Integration</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Receive notifications via Telegram Bot.</p>
+                            <h3 className="text-sm font-medium text-ink">Telegram Integration</h3>
+                            <p className="text-xs text-ink-muted">Receive live notifications directly through Telegram Bot.</p>
                         </div>
                     </div>
                     {accounts.telegram && (
-                        <span className="badge-green">
+                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-line bg-subtle text-xs font-mono text-emerald-500">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             Linked
                         </span>
                     )}
                 </div>
 
                 {accounts.telegram ? (
-                    <div className="flex items-center justify-between p-6 border border-slate-100 dark:border-slate-800 rounded-2xl">
+                    <div className="flex items-center justify-between p-3 border border-line rounded bg-surface">
                         <div>
-                            <div className="font-semibold text-slate-900 dark:text-white text-lg tracking-tight">{accounts.telegram.username}</div>
-                            <div className="text-xs text-slate-400 dark:text-slate-500 font-mono uppercase tracking-widest mt-1">ID: {accounts.telegram.chat_id}</div>
+                            <div className="text-xs font-medium text-ink font-mono">{accounts.telegram.username}</div>
+                            <div className="text-[11px] text-ink-muted font-mono mt-0.5">Chat ID: {accounts.telegram.chat_id}</div>
                             {accounts.telegram.bot_token && (
-                                <div className="badge-green mt-2">
+                                <div className="text-[10px] text-emerald-500 font-mono mt-1 flex items-center gap-1">
                                     <Check className="h-3 w-3" /> Custom Bot Token Active
                                 </div>
                             )}
                         </div>
-                        <button onClick={() => unlink('telegram')} className="btn-secondary btn-md text-red-600 dark:text-red-400">Unlink</button>
+                        <button onClick={() => unlink('telegram')} className="btn-secondary h-6 px-2 text-xs text-red-500">Unlink</button>
                     </div>
                 ) : (
-                    <form onSubmit={linkTelegram} className="space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2">
-                                <label className="label">Chat ID</label>
+                    <form onSubmit={linkTelegram} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label className="block text-xs font-mono text-ink-secondary mb-1">Chat ID</label>
                                 <input
                                     type="text"
                                     placeholder="Enter Chat ID"
                                     value={telegramChatId}
                                     onChange={e => setTelegramChatId(e.target.value)}
-                                    className="input"
+                                    className="input font-mono text-xs h-8"
                                     required
                                 />
-                                <p className="text-xs text-slate-400 dark:text-slate-500">
-                                    Don't know your ID? Open <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-violet-600 dark:text-violet-400 hover:underline">@userinfobot</a>
+                                <p className="text-[11px] text-ink-muted mt-1 font-mono">
+                                    Need your ID? Message <a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" className="text-ink underline">@userinfobot</a>
                                 </p>
                             </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="label">Username (Optional)</label>
+                            <div>
+                                <label className="block text-xs font-mono text-ink-secondary mb-1">Username (Optional)</label>
                                 <input
                                     type="text"
                                     placeholder="Username"
                                     value={telegramUsername}
                                     onChange={e => setTelegramUsername(e.target.value)}
-                                    className="input"
+                                    className="input font-mono text-xs h-8"
                                 />
                             </div>
-                            <div className="md:col-span-2 flex flex-col gap-2">
-                                <label className="label">Custom Bot Token (Optional)</label>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-mono text-ink-secondary mb-1">Custom Bot Token (Optional)</label>
                                 <input
                                     type="password"
                                     placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
                                     value={botToken}
                                     onChange={e => setBotToken(e.target.value)}
-                                    className="input"
+                                    className="input font-mono text-xs h-8"
                                 />
-                                <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">Leave blank to use the default system bot. Provide your own if you want notifications to come from your specific bot.</p>
+                                <p className="text-[11px] text-ink-muted mt-1 font-mono">Leave blank to use default WebPulse alerts, or enter custom bot token.</p>
                             </div>
                         </div>
-                        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
-                            <button type="submit" className="btn-primary btn-md">
+                        <div className="flex justify-end pt-3 border-t border-line">
+                            <button type="submit" className="btn-primary h-7 px-3 text-xs">
                                 Link Telegram
                             </button>
                         </div>
