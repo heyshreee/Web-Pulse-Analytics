@@ -25,7 +25,7 @@ than a large, unclear one.
 - **Request a feature** — use the [feature request form](https://github.com/heyshreee/Web-Pulse-Analytics/issues/new?template=feature_request.yml).
 - **Report a vulnerability** — **privately**, per [SECURITY.md](./SECURITY.md). Never in a public issue.
 - **Improve docs** — docs live in [`docs/`](docs/) and alongside code in each package.
-- **Write code** — look for [`good first issue`](https://github.com/heyshreee/Web-Pulse-Analytics/labels/good%20first%20issue) or `help wanted` labels.
+- **Write code** — look for [`good first issue`](https://github.com/heyshreee/Web-Pulse-Analytics/labels/good%20first%20issue) or `help wanted` labels. See [docs/labels.md](docs/labels.md) for our full issue and label taxonomy.
 
 ## Code of Conduct
 

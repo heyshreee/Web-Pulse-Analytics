@@ -1,69 +1,96 @@
 <!--
   Thanks for contributing to Web Pulse Analytics!
-  Please fill in every section. Incomplete PRs may be asked for more detail.
+  All pull requests must meet these requirements before merging into development or main.
+  Please fill out all required sections. Incomplete PRs will be requested for more information.
 -->
 
 ## Summary
 
-<!-- What does this change and why? Link the related issue with "Closes #123". -->
+<!-- What does this change and why? Explain the problem and the solution. -->
+
+## Linked Issue / Reference
+
+<!--
+  Every PR must link an issue or audit tracking item.
+  Examples:
+    Closes #123
+    Fixes #456
+    Ref: Audit task #9 (issue hygiene)
+-->
 
 ## Area
 
-<!-- Tick everything that applies. -->
+<!-- Check all that apply: -->
 
 - [ ] Marketing site (`apps/marketing`)
-- [ ] V1 dashboard (`apps/v1`)
-- [ ] V2 dashboard (`apps/v2`)
-- [ ] Backend (API, Socket.IO, services)
-- [ ] Tracking (ingest endpoint, tracker script)
-- [ ] Analytics (aggregation, filters, metrics)
-- [ ] Database (Supabase schema / migrations / RLS)
-- [ ] CI, tooling, or documentation
+- [ ] Stable V1 dashboard (`apps/v1`)
+- [ ] Beta V2 dashboard (`apps/v2`)
+- [ ] Backend API (`backend/src`)
+- [ ] Tracking ingestion (`backend/src/controllers/visitor.controller.js`, `routes/v1/track.routes.js`)
+- [ ] Real-time (`Socket.IO`)
+- [ ] Database / Supabase (`supabase/migrations`)
+- [ ] Tooling, CI, or Documentation (`.github`, `docs/`, `scripts/`)
 
-## Release line
+## Release Line / Target
 
-<!-- Keep V1 and V2 source separate. -->
+<!--
+  Target branch rules:
+  - All feature and bugfix PRs must target `development`.
+  - Only production promotions and hotfix PRs target `main`.
+  - Planned staging for V2 beta: `beta`.
+  Note: apps/v1 (stable) and apps/v2 (beta) are directories within the monorepo, not separate git branches.
+-->
 
-- [ ] V1 (`v1` / `v1-dev`) — stabilizing the current release
-- [ ] V2 (`v2` / `v2-dev`) — new interface work
-- [ ] Shared / integration (`development`) — tooling, docs, backend
-- [ ] Both / neither
+- [ ] `development` (Standard integration branch)
+- [ ] `main` (Production release branch — requires owner review)
+- [ ] `beta` (Planned V2 preview track)
 
-## What changed
+## What Changed
 
-<!-- Bullet list of the concrete changes. -->
+<!-- Bullet list of concrete, technical changes made in this PR. -->
 
--
+- 
 
-## How this was tested
+## Test Evidence (Required)
 
-<!-- Commands you ran and/or scenarios you verified. Do not write "not tested". -->
+<!--
+  Mandatory: All PRs must provide evidence of testing before merge.
+  Do not submit without running tests or write "not tested".
+-->
 
-- [ ] `npm run lint:all`
-- [ ] `npm run build:all`
-- [ ] `npm run check:backend`
-- [ ] `npm run test:backend`
-- [ ] `npm start --prefix backend` (or `npm run dev:backend`)
-- [ ] Manual check of the affected flow (describe below)
+### Automated Test Runs
 
-<!-- Describe the manual verification and any edge cases. -->
+- [ ] `npm run check:backend` (Syntax check across backend/src)
+- [ ] `npm run test:backend` (Backend Node.js test suite)
+- [ ] `npm run test:v1` (Vitest smoke tests for V1)
+- [ ] `npm run test:v2` (Vitest smoke tests for V2)
+- [ ] `npm run test:all` (Full test runner across all packages)
+- [ ] `npm run lint:all` (ESLint across all frontends)
+- [ ] `npm run build:all` (Production build verification for all frontends)
 
-## Migrations / database
+### Test Output / Verification Evidence
 
-<!-- Migrations are security-sensitive and must be reviewed. -->
+```text
+<!-- Paste terminal test output, test summary counts, or manual verification steps here -->
+```
+
+## Migrations / Database
+
+<!-- Database migrations are security-sensitive and require code owner review. -->
 
 - [ ] This PR does **not** include database migrations
-- [ ] This PR includes migrations (list them and link to `docs/database-schema.md`)
+- [ ] This PR includes migrations in `supabase/migrations/`
+  - [ ] Migration is additive (no destructive drops without migration path)
+  - [ ] Row Level Security (RLS) is enabled and policies are defined
 
-<!-- If migrations are included: are they additive? Do they need a rollback plan? -->
+## Security & Privacy Checklist
 
-## Security & privacy checklist
+- [ ] No secrets, `.env` files, API keys, tokens, or credentials are committed
+- [ ] No real visitor data, raw IP addresses, or production PII are included
+- [ ] Authentication, authorization, and rate limits are preserved or tightened
+- [ ] Input validation is enforced on public endpoints
+- [ ] No required CI checks are disabled or bypassed with `continue-on-error`
 
-- [ ] No secrets, `.env` files, tokens, or credentials are included
-- [ ] No real visitor data, PII, or production dumps are included
-- [ ] Authorization / RLS changes (if any) are described above
-- [ ] Tracking changes (if any) validate and restrict input
+## Screenshots / Visual Evidence
 
-## Screenshots / recordings
-
-<!-- Optional, but strongly recommended for UI changes. -->
+<!-- Strongly recommended for UI changes in apps/marketing, apps/v1, or apps/v2. -->
