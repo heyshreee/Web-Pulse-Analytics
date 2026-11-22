@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 import authController from '../../controllers/auth.controller.js';
-import auth from '../../middleware/auth.js';
-import { authLimiter, credentialLimiter, verificationLimiter } from '../../middleware/rateLimiter.js';
+import auth from '../../middlewares/auth.js';
+import { authLimiter, credentialLimiter, verificationLimiter } from '../../middlewares/rateLimiter.js';
 
 /**
  * Every credential-handling endpoint is rate limited. `credentialLimiter` is

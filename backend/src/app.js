@@ -7,7 +7,7 @@ import { env } from './config/env.js';
 import { isAllowedOrigin } from './config/origins.js';
 import v1Routes from './routes/v1/index.js';
 import trackRoutes from './routes/v1/track.routes.js';
-import csrf from './middleware/csrf.js';
+import csrf from './middlewares/csrf.js';
 import { notFound, errorHandler } from './middlewares/errorHandler.js';
 
 const createApp = () => {

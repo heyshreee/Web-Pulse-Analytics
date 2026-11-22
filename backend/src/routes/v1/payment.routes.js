@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import paymentController from '../../controllers/payment.controller.js';
-import authenticate from '../../middleware/auth.js';
+import authenticate from '../../middlewares/auth.js';
 
 router.get('/plans', paymentController.getPlans);
 router.post('/order', authenticate, paymentController.createOrder);

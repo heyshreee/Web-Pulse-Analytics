@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import env from '../../config/env.js';
 import EmailService from '../../services/email.service.js';
-import limiter from '../../middleware/rateLimiter.js';
+import limiter from '../../middlewares/rateLimiter.js';
 import asyncHandler from '../../utils/asyncHandler.js';
 import AppError from '../../errors/AppError.js';
 

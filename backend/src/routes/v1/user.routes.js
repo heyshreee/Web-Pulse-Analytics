@@ -2,8 +2,8 @@ import express from 'express';
 const router = express.Router();
 import userController from '../../controllers/user.controller.js';
 import linkedAccountsController from '../../controllers/linked-accounts.controller.js';
-import authenticate from '../../middleware/auth.js';
-import upload from '../../middleware/upload.js';
+import authenticate from '../../middlewares/auth.js';
+import upload from '../../middlewares/upload.js';
 
 router.use(authenticate);
 

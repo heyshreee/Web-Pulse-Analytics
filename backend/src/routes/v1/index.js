@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import csrf from '../../middleware/csrf.js';
+import csrf from '../../middlewares/csrf.js';
 
 // Import sub-routers
 import authRoutes from './auth.routes.js';

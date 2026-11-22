@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 import visitorController from '../../controllers/visitor.controller.js';
-import rateLimiter from '../../middleware/rateLimiter.js';
-import trackingCors from '../../middleware/trackingCors.js';
+import rateLimiter from '../../middlewares/rateLimiter.js';
+import trackingCors from '../../middlewares/trackingCors.js';
 
 // Public tracking endpoints. trackingCors owns CORS (including preflight) for
 // every route here so customer-site origins are never mixed with API CORS.

@@ -315,7 +315,7 @@ test('Socket.IO join_project denies access if user does not own the project', as
 });
 
 test('Credential rate limiter normalizes email across casing and whitespace', async () => {
-  const { credentialLimiter } = await import('../src/middleware/rateLimiter.js');
+  const { credentialLimiter } = await import('../src/middlewares/rateLimiter.js');
   assert.ok(credentialLimiter, 'credentialLimiter must be exported');
 
   // Verify key generator function behavior
