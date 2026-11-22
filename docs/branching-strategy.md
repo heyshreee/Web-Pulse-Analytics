@@ -24,7 +24,13 @@ flowchart TD
 |---|---|---|---|---|
 | **`main`** | `production` | Protected + Required Review | **Yes** | Repository default branch, source of truth for stable production (`https://app.webpulseanalytics.tech`, `https://webpulseanalytics.tech`, `https://api.webpulseanalytics.tech`). |
 | **`development`** | `development` | Protected | No | Integration branch for ongoing work; automatically deploys preview builds to the `development` environment. |
-| **`beta`** | `beta` | Protected | No | Dedicated release track for `apps/v2` Beta Dashboard; deploys to `https://beta.webpulseanalytics.tech`. |
+| **`beta`** | `beta` | Protected | No | Dedicated release track for `apps/v2` Beta Dashboard; deploys to `https://beta.webpulseanalytics.tech` (planned / pre-configured in CI). |
+
+> [!NOTE]
+> **Branch Topology vs Monorepo Directories:**
+> - Active branches on remote are `main` and `development`.
+> - `beta` is the dedicated staging and release track for the V2 Beta dashboard (`apps/v2`), planned for deployment to `https://beta.webpulseanalytics.tech`. Workflows in `.github/workflows/` (`ci.yml`, `deploy.yml`, `deploy-v2.yml`) are pre-configured to trigger on `beta`.
+> - There are **no separate `v1` or `v2` git branches**. V1 and V2 are independent applications coexisting in the monorepo under `apps/v1` and `apps/v2`.
 
 > [!IMPORTANT]
 > **No Separate Production Branch**: `main` serves directly as the production deployment branch. Do not create a separate `production` branch and do not rename `main`.
@@ -128,7 +134,9 @@ In the event of an urgent production issue:
 
 ## 6. Branch Protection Governance
 
-Configure branch protection rules under **Settings** → **Branches** for `main`, `beta`, and `development`:
+For the ready-to-import ruleset JSON and exact administrative setup steps for `main`, see [docs/branch-protection.md](branch-protection.md).
+
+Configure branch protection rules under **Settings** → **Branches** or **Settings** → **Rules** for `main`, `beta`, and `development`:
 
 - **Require a pull request before merging**: Enabled (minimum 1 approval for `main`).
 - **Require status checks to pass before merging**: Enabled.

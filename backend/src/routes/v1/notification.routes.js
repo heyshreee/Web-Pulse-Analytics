@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import notificationController from '../../controllers/notification.controller.js';
-import auth from '../../middleware/auth.js';
+import auth from '../../middlewares/auth.js';
 
 router.use(auth);
 

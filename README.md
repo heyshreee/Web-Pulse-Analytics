@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/releases"><img src="https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat-square" alt="Version 2.0.0" /></a>
+  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/releases"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square" alt="Version 1.0.0" /></a>
   <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status" /></a>
   <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/security.yml?branch=main&style=flat-square&label=Security" alt="Security Status" /></a>
   <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/codeql.yml?branch=main&style=flat-square&label=CodeQL" alt="CodeQL" /></a>
@@ -23,21 +23,25 @@
 ---
 
 > [!NOTE]
-> **Monorepo Architecture:** The repository is organized into distinct applications under `apps/` (`marketing`, `v1`, `v2`) and the shared `backend/` API. Existing branches (`main`, `development`, `v1`, `v1-dev`, `v2`, `v2-dev`) are preserved intact. Each app installs and builds independently; there are no root npm workspaces. The backend requires a long-lived Node.js host with WebSocket support and is **not** deployed to Vercel. See the [Monorepo Migration Guide](docs/migration-monorepo.md) and [Deployment Guide](docs/deployment.md).
+> **Monorepo Architecture & Release Tracks:**  
+> The repository is structured as an independent multi-package monorepo containing the public marketing site (`apps/marketing`), the **default stable production dashboard** (`apps/v1`), the **beta preview dashboard** (`apps/v2`), and the centralized API server (`backend/`).  
+> Each application installs and builds with its own `package.json` (no root npm workspaces). The backend is a persistent Node.js service (Express 5, WebSockets, `geoip-lite`) and must not be hosted on serverless functions. See the [Monorepo Migration Guide](docs/migration-monorepo.md) and [Deployment Guide](docs/deployment.md).
 
 ---
 
 ## Table of Contents
 
-- [What's New in Version 2.0](#whats-new-in-version-20)
+- [Dashboard Release Lines (V1 vs. V2)](#dashboard-release-lines-v1-vs-v2)
+- [Screenshots](#screenshots)
 - [Key Features](#key-features)
+- [What's New in Version 2.0 (Beta Track)](#whats-new-in-version-20-beta-track)
 - [Architecture & Data Strategy](#architecture--data-strategy)
 - [Technology Stack](#technology-stack)
 - [Quick Start](#quick-start)
   - [Prerequisites](#prerequisites)
   - [Environment Setup](#environment-setup)
   - [Database Migrations](#database-migrations)
-  - [Running the Services](#running-the-services)
+  - [Running Applications](#running-applications)
 - [Tracking Script & Integration](#tracking-script--integration)
   - [HTML Snippet](#1-standard-html-embed)
   - [Custom Event Telemetry](#2-custom-event-telemetry)
@@ -52,20 +56,28 @@
 
 ---
 
-## What's New in Version 2.0
+## Dashboard Release Lines (V1 vs. V2)
 
-WebPulse Analytics v2 is an end-to-end upgrade of both client and server architectures:
+WebPulse Analytics maintains two distinct dashboard implementations to preserve production stability while advancing a next-generation UI:
 
-| Module | Version 2.0 Upgrade |
-| :--- | :--- |
-| **Design System** | **Dark Data Observatory**: Semantic CSS tokens (`theme.css`), smooth dark/light mode switching using the native browser **View Transitions API** (circular click reveal), and refined SaaS typography. |
-| **Interactive Globe** | **3D Visitor Network**: WebGL/Three.js interactive globe powered by `react-globe.gl` with centroid country mapping, drag-to-rotate, and live telemetry arcs. |
-| **UI Component Kit** | Accessible primitives under `src/components/ui/` (`Icon`, `Button`, `Card`, `DataTable`, `Field`, `Display`, `Overlay`, `Blocks`, `Charts`, `State`, `Nav`, `Page`). |
-| **Dashboard Suite** | **15+ Dedicated Views**: Visitors, Sessions, Pages, Custom Events & Drilldowns, Traffic Sources, Geography, Real-Time Activity, Threshold Alerts, Audit Logs, and Shareable Reports. |
-| **Supabase Analytics Engine** | Additive PostgreSQL schema with **11 high-performance RPC aggregation functions**, composite B-tree indexes, partition-ready timestamp keys, and strict Row Level Security (RLS). |
-| **Resilient Data Strategy** | Dual-source pipeline in `src/lib/dataService.js`: Direct Supabase PostgREST/RPC queries with automated Express 5 API fallback. Honest zero-data states without synthetic mocks. |
-| **Zero-Flash Preloader** | Inlined SVG pulsing emblem in `index.html` with shimmer progress track eliminates white/blank flashes during asset loading. |
-| **Security Hardening** | Dynamic Content Security Policy (CSP) for Supabase REST & WebSockets, Leaflet dark tile providers, rate limiting, and hashed API keys. |
+| Application | Track | Production URL | Local Port | Status & Scope |
+| :--- | :--- | :--- | :--- | :--- |
+| **Stable V1 Dashboard** (`apps/v1`) | `main` | `https://app.webpulseanalytics.tech` | `5173` | **Default Stable Production**. Hardened analytics interface with core metric cards, live counters, projects switcher, settings, and billing. |
+| **Beta V2 Dashboard** (`apps/v2`) | `beta` | `https://beta.webpulseanalytics.tech` | `5175` | **Active Beta Preview**. Redesigned Dark Data Observatory UI featuring 3D Three.js visitor globe, modular primitives, and 15+ specialized views. |
+| **Marketing Site** (`apps/marketing`) | `main` | `https://webpulseanalytics.tech` | `5174` | Canonical public landing page, pricing, documentation, and blog. |
+| **Backend API** (`backend`) | `main` | `https://api.webpulseanalytics.tech` | `3000` | Express 5 persistent service with Socket.IO streaming, rate limiting, and Supabase integration. |
+
+---
+
+## Screenshots
+
+> [!NOTE]
+> **TODO(owner)**: Supply updated production screenshots for the stable V1 dashboard and beta V2 dashboard to `docs/images/`.
+
+| Stable V1 Dashboard (Production Default) | Beta V2 Observatory (Beta Preview) |
+| :---: | :---: |
+| ![Stable V1 Dashboard](docs/images/dashboard-v1.png) | ![Beta V2 Dashboard](docs/images/dashboard-v2.png) |
+| *Stable production dashboard (`apps/v1`)* | *Next-generation 3D observatory (`apps/v2`)* |
 
 ---
 
@@ -84,9 +96,26 @@ WebPulse Analytics v2 is an end-to-end upgrade of both client and server archite
 
 ---
 
+## What's New in Version 2.0 (Beta Track)
+
+The v2 track introduces modern visual and computational capabilities being tested for future promotion to default production:
+
+| Module | Version 2.0 Capabilities |
+| :--- | :--- |
+| **Design System** | **Dark Data Observatory**: Semantic CSS tokens (`theme.css`), smooth dark/light mode switching using the native browser **View Transitions API**, and refined typography. |
+| **Interactive Globe** | **3D Visitor Network**: WebGL/Three.js interactive globe powered by `react-globe.gl` with centroid country mapping, drag-to-rotate, and live telemetry arcs. |
+| **UI Component Kit** | Accessible primitives under `src/components/ui/` (`Icon`, `Button`, `Card`, `DataTable`, `Field`, `Display`, `Overlay`, `Blocks`, `Charts`, `State`, `Nav`, `Page`). |
+| **Dashboard Suite** | **15+ Dedicated Views**: Visitors, Sessions, Pages, Custom Events & Drilldowns, Traffic Sources, Geography, Real-Time Activity, Threshold Alerts, Audit Logs, and Shareable Reports. |
+| **Supabase Analytics Engine** | PostgreSQL schema with **11 high-performance RPC aggregation functions**, composite B-tree indexes, partition-ready timestamp keys, and strict Row Level Security (RLS). |
+| **Resilient Data Strategy** | Dual-source pipeline in `src/lib/dataService.js`: Direct Supabase PostgREST/RPC queries with automated Express 5 API fallback. |
+| **Zero-Flash Preloader** | Inlined SVG pulsing emblem in `index.html` with shimmer progress track eliminates blank flashes during asset loading. |
+| **Security Hardening** | Content Security Policy (CSP) for Supabase REST & WebSockets, Leaflet tile providers, rate limiting, and hashed API keys. |
+
+---
+
 ## Architecture & Data Strategy
 
-WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for sub-second dashboards and zero downtime:
+WebPulse Analytics utilizes an optimized dual-path data flow engineered for sub-second dashboards and high resilience:
 
 ```
 [ Tracked Websites ]
@@ -101,7 +130,7 @@ WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for s
         │                                │ (Live WebSocket Events)
         ▼                                ▼
  ┌──────────────────────┐      ┌──────────────────────┐
- │   Supabase Postgres   │◄────┤  React 19 Dashboard  │
+ │   Supabase Postgres   │◄────┤  React Dashboard     │
  │  - Core Tables       │      │  (Dual Data Service) │
  │  - 11 Analytics RPCs │      │  - Supabase Primary  │
  │  - RLS Security      │      │  - Express Fallback  │
@@ -110,13 +139,13 @@ WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for s
 
 1. **Ingestion Layer:** Public endpoints (`/api/track/:trackingId` and `/api/track/events`) parse incoming pings, extract geo/device telemetry, and persist records to Supabase.
 2. **Real-Time Stream:** Live events are broadcast via `Socket.IO` rooms scoped by project ID, triggering instantaneous dashboard metric increments.
-3. **Analytics Layer:** The frontend queries high-speed SQL RPC functions directly via Supabase PostgREST. If permissions or connectivity require, `dataService.js` transparently falls back to the backend API.
+3. **Analytics Layer:** The frontend queries high-speed SQL RPC functions directly via Supabase PostgREST. If permissions or network constraints require, `dataService.js` transparently falls back to the backend API.
 
 ---
 
 ## Technology Stack
 
-### Frontend Application
+### Frontend Applications
 - **Framework:** [React 19](https://react.dev/) + [Vite 7](https://vitejs.dev/)
 - **Routing:** [React Router 7](https://reactrouter.com/)
 - **Styling:** [Tailwind CSS 3](https://tailwindcss.com/) + Custom CSS Design System (`theme.css`, `app.css`)
@@ -162,12 +191,13 @@ WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for s
    cd backend
    cp .env.example .env
    ```
-   Edit `backend/.env` with your credentials:
+   Edit `backend/.env` with your credentials (see `backend/.env.example` for all options):
    ```env
-   PORT=5000
+   PORT=3000
    NODE_ENV=development
    FRONTEND_URL=http://localhost:5173
-   BACKEND_URL=http://localhost:5000
+   FRONTEND_URLS=http://localhost:5173,http://localhost:5174,http://localhost:5175
+   BACKEND_URL=http://localhost:3000
    JWT_SECRET=your_jwt_secret_key
    CSRF_SECRET=your_csrf_secret_key
    SUPABASE_URL=https://your-project.supabase.co
@@ -176,26 +206,27 @@ WebPulse Analytics v2 utilizes an optimized dual-path data flow engineered for s
    ```
 
 3. **Configure Frontend Environments:**
-   Configure environment files for whichever applications you are developing:
+   Configure environment files for the applications you want to run:
    ```bash
+   # From the repository root:
+
    # Marketing site
    cp apps/marketing/.env.example apps/marketing/.env
 
-   # V1 Dashboard
+   # Stable V1 Dashboard (Default Production)
    cp apps/v1/.env.example apps/v1/.env
 
-   # V2 Dashboard
+   # Beta V2 Dashboard (Beta Track)
    cp apps/v2/.env.example apps/v2/.env
    ```
-   Each application `.env` exposes only variables starting with `VITE_`:
+
+   Each frontend application `.env` exposes variables starting with `VITE_`:
    ```env
-   VITE_API_URL=http://localhost:5000/api
+   VITE_API_URL=http://localhost:3000/api
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
-   `VITE_API_URL` accepts a bare backend origin (`http://localhost:5000`), an `/api`
-   base, or a full `/api/v1` base. The examples use `/api` because the dev proxy and
-   production configs are easiest to reason about that way.
+   `VITE_API_URL` defaults to `http://localhost:3000/api`. Vite's development proxy will forward `/api` and `/api/track` requests to the local backend running on port `3000`.
 
 ### Database Migrations
 
@@ -205,7 +236,7 @@ Apply the versioned SQL migrations in `supabase/migrations/` to your Supabase pr
 # Using Supabase CLI:
 supabase db push
 
-# Alternatively: Execute the SQL files in Supabase SQL Editor:
+# Alternatively, execute the SQL files in the Supabase SQL Editor:
 # 1. 20261001000001_core_schema.sql
 # 2. 20261001000002_analytics_tables.sql
 # 3. 20261001000003_indexes.sql
@@ -215,55 +246,56 @@ supabase db push
 # 7. 20261020000001_user_sessions.sql
 ```
 
-> **Note:** Database migrations are never executed automatically by CI/CD workflows to prevent accidental production downtime.
+> **Note:** Database migrations are never executed automatically by CI/CD workflows to prevent accidental production schema drift.
 
 ### Running Applications
 
-The repository root includes convenient scripts to run each application independently:
+The root `package.json` includes convenience scripts to run each application on its designated port:
 
 ```bash
-# Run the Backend API server (http://localhost:5000)
+# 1. Start the Backend API server (http://localhost:3000)
 npm run dev:backend
 
-# Run the Marketing Website (http://localhost:5174)
-npm run dev:marketing
-
-# Run the Stable V1 Dashboard (http://localhost:5173)
+# 2. Start the Stable V1 Dashboard (http://localhost:5173 - Default Production)
 npm run dev:v1
 
-# Run the V2 Dashboard (http://localhost:5173)
+# 3. Start the Beta V2 Dashboard (http://localhost:5175 - Beta Track)
 npm run dev:v2
 
-# Build all applications for production
-npm run build:all
+# 4. Start the Marketing Website (http://localhost:5174)
+npm run dev:marketing
+```
 
-# Build specific applications
+To build all frontend applications for production:
+```bash
+npm run build:all
+```
+Or build individually:
+```bash
 npm run build:marketing
 npm run build:v1
 npm run build:v2
 ```
 
-> V1 and V2 both default to port `5173`, so run one dashboard at a time unless you
-> override the port (`npm --prefix apps/v1 run dev -- --port 5175`). The marketing site
-> is on `5174` and can run alongside either dashboard.
-
 ---
 
 ## Tracking Script & Integration
 
-WebPulse Analytics v2 provides a lightweight client tracker that can be embedded into any web property.
+WebPulse Analytics provides a lightweight client tracker that can be embedded into any web property.
 
 ### 1. Standard HTML Embed
 Add the following snippet before the closing `</head>` tag on your website:
 
 ```html
-<!-- WebPulse Analytics v2 Tracker -->
+<!-- WebPulse Analytics Tracker -->
 <script
   defer
-  src="http://localhost:5000/api/track/script.js"
+  src="https://YOUR_API_HOST/api/track/script.js"
   data-site="YOUR_PROJECT_TRACKING_ID">
 </script>
 ```
+
+*(For local testing, replace `https://YOUR_API_HOST` with `http://localhost:3000`)*.
 
 ### 2. Custom Event Telemetry
 Send custom interaction events from your application code:
@@ -284,7 +316,7 @@ You can also record events server-side using standard HTTP requests:
 
 ```http
 POST /api/track/events HTTP/1.1
-Host: localhost:5000
+Host: YOUR_API_HOST
 Content-Type: application/json
 
 {
@@ -301,8 +333,6 @@ Content-Type: application/json
 ---
 
 ## Application Route Map
-
-The v2 frontend offers a complete suite of marketing, authentication, and telemetry views:
 
 ### Dashboard & Analytics Views
 | Route | View Description |
@@ -374,7 +404,7 @@ Web-Pulse-Analytics/
 │   │   ├── package.json      # webpulse-marketing
 │   │   └── vite.config.js
 │   │
-│   ├── v1/                   # Stable V1 Dashboard Application
+│   ├── v1/                   # Stable V1 Dashboard Application (Default Production)
 │   │   ├── src/
 │   │   │   ├── components/   # V1 project tabs, WorldMap, and modals
 │   │   │   ├── pages/        # V1 dashboard, projects, billing, settings
@@ -382,7 +412,7 @@ Web-Pulse-Analytics/
 │   │   ├── package.json      # webpulse-v1
 │   │   └── vite.config.js
 │   │
-│   └── v2/                   # Modern V2 Dashboard Application
+│   └── v2/                   # Beta V2 Dashboard Application (Beta Preview)
 │       ├── src/
 │       │   ├── components/   # V2 App Shell, modular UI kit, and settings
 │       │   ├── pages/        # V2 metrics views (Visitors, Sessions, Events, Geo)
@@ -403,6 +433,7 @@ Web-Pulse-Analytics/
 │   └── package.json
 ├── supabase/                 # Supabase PostgreSQL Migrations (applied manually)
 │   └── migrations/           # 7 Versioned SQL migration scripts
+├── scripts/                  # Repository maintenance & verification scripts
 ├── docs/                     # Detailed architectural and user guides
 ├── .github/                  # CI/CD Workflows, security scans, and templates
 ├── package.json              # Convenience scripts (no root npm workspaces)
@@ -419,6 +450,8 @@ Deep dive into the architecture, deployment, and security of WebPulse Analytics:
 - 📋 [Monorepo Migration Guide](docs/migration-monorepo.md) — Architecture mapping, verification results, and Vercel checklist.
 - 📖 [Getting Started Guide](docs/getting-started.md) — Comprehensive local setup and configuration.
 - 🏗️ [Architecture Deep Dive](docs/architecture.md) — System design, monorepo layout, and data pipelines.
+- 🛡️ [Branch Protection Guide](docs/branch-protection.md) — Setup and ruleset configuration for `main`.
+- 🔀 [Branching Strategy](docs/branching-strategy.md) — Branch topology, promotion lifecycle, and PR rules.
 - 📡 [API Reference](docs/api-reference.md) — Full REST endpoint documentation and parameters.
 - 🔍 [Tracking Guide](docs/tracking-guide.md) — Client integration, bot protection, and custom events.
 - 💾 [Database Schema](docs/database-schema.md) — Supabase PostgreSQL schema, tables, and RPC functions.
@@ -431,7 +464,7 @@ Deep dive into the architecture, deployment, and security of WebPulse Analytics:
 
 ## Security & Compliance
 
-Security is a foundational pillar of WebPulse Analytics v2:
+Security is a foundational pillar of WebPulse Analytics:
 - **Strict Content Security Policy:** Dynamic CSP headers guarding against unauthorized scripts and connections.
 - **Row Level Security (RLS):** Strict Supabase database policies preventing cross-tenant data leaks.
 - **Automated Security Pipelines:** CodeQL static analysis, Gitleaks secret detection, and Dependabot automated vulnerability updates.
@@ -450,5 +483,5 @@ We warmly welcome contributions from the community!
 
 ## License
 
-This project is licensed under the **MIT License** (Repository created on January 17, 2026).  
+This project is licensed under the **MIT License**.  
 See the [LICENSE](LICENSE) file for the full license text.

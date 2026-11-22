@@ -32,12 +32,12 @@ body:
   - type: dropdown
     id: release-line
     attributes:
-      label: Release line
-      description: Keep V1 and V2 isolated; shared tooling goes to development.
+      label: Target component
+      description: Keep V1 and V2 isolated; shared backend/tooling goes to development.
       options:
-        - V1 (v1 / v1-dev)
-        - V2 (v2 / v2-dev)
-        - Shared / tooling (development)
+        - V1 dashboard (apps/v1)
+        - V2 dashboard (apps/v2)
+        - Shared backend / tooling (development)
         - Unsure
     validations:
       required: true

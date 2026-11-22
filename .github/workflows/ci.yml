@@ -96,6 +96,11 @@ jobs:
         working-directory: apps/v1
         run: npm run lint
 
+      - name: Test
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v1
+        run: npm test
+
       - name: Build (production)
         if: steps.check_workspace.outputs.present == 'true'
         working-directory: apps/v1
@@ -143,6 +148,11 @@ jobs:
         if: steps.check_workspace.outputs.present == 'true'
         working-directory: apps/v2
         run: npm run lint
+
+      - name: Test
+        if: steps.check_workspace.outputs.present == 'true'
+        working-directory: apps/v2
+        run: npm test
 
       - name: Build (production)
         if: steps.check_workspace.outputs.present == 'true'

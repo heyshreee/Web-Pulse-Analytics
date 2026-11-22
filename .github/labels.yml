@@ -1,0 +1,42 @@
+# Standard repository labels for Web Pulse Analytics
+# Compatible with GitHub label management tools (e.g. github-label-sync)
+
+- name: 'bug'
+  color: 'd73a4a'
+  description: "Something isn't working as intended"
+
+- name: 'enhancement'
+  color: 'a2eeef'
+  description: 'New feature or request'
+
+- name: 'security'
+  color: 'b60205'
+  description: 'Security hardening or vulnerability fix'
+
+- name: 'good first issue'
+  color: '7057ff'
+  description: 'Good for newcomers'
+
+- name: 'help wanted'
+  color: '008672'
+  description: 'Extra attention or community help is needed'
+
+- name: 'dependencies'
+  color: '0366d6'
+  description: 'Pull requests that update a dependency file'
+
+- name: 'documentation'
+  color: '0075ca'
+  description: 'Improvements or additions to documentation'
+
+- name: 'ci'
+  color: 'e99695'
+  description: 'CI/CD workflows and automated checks'
+
+- name: 'refactor'
+  color: 'cfd3d7'
+  description: 'Code refactoring without feature or bug changes'
+
+- name: 'needs-triage'
+  color: 'ededed'
+  description: 'Awaiting maintainer review'

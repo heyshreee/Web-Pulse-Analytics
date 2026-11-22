@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 import authController from '../controllers/auth.controller.js';
-import auth from '../middleware/auth.js';
-import { authLimiter } from '../middleware/rateLimiter.js';
+import auth from '../middlewares/auth.js';
+import { authLimiter } from '../middlewares/rateLimiter.js';
 
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);

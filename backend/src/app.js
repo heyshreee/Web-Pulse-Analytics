@@ -7,12 +7,87 @@ import { env } from './config/env.js';
 import { isAllowedOrigin } from './config/origins.js';
 import v1Routes from './routes/v1/index.js';
 import trackRoutes from './routes/v1/track.routes.js';
-import csrf from './middleware/csrf.js';
+import csrf from './middlewares/csrf.js';
 import { notFound, errorHandler } from './middlewares/errorHandler.js';
 
 const createApp = () => {
   const app = express();
   app.set('trust proxy', 1);
+
+  // Derive dynamic Supabase host from configured environment URL
+  let supabaseHost = '';
+  try {
+    if (env.supabaseUrl) {
+      supabaseHost = new URL(env.supabaseUrl).hostname;
+    }
+  } catch {}
+
+  const dynamicSupabaseHttps = supabaseHost ? `https://${supabaseHost}` : null;
+  const dynamicSupabaseWss = supabaseHost ? `wss://${supabaseHost}` : null;
+  const isProd = process.env.NODE_ENV === 'production';
+
+  // Configured frontend origins from env (avoiding wildcard *.vercel.app)
+  const configuredFrontendOrigins = (env.frontendUrls || [])
+    .map((origin) => {
+      try {
+        return new URL(origin).origin;
+      } catch {
+        return null;
+      }
+    })
+    .filter((origin) => {
+      if (!origin) return false;
+      if (isProd && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+        return false;
+      }
+      return true;
+    });
+
+  const cspImgSrc = [
+    "'self'",
+    'data:',
+    'blob:',
+    'https://*.basemaps.cartocdn.com',
+    'https://*.tile.openstreetmap.org',
+    'https://grainy-gradients.vercel.app',
+    'https://*.supabase.co',
+    dynamicSupabaseHttps,
+  ].filter(Boolean);
+
+  const cspConnectSrc = [
+    "'self'",
+    // Specific Supabase hosts
+    dynamicSupabaseHttps,
+    dynamicSupabaseWss,
+    'https://*.supabase.co',
+    'wss://*.supabase.co',
+    'https://*.supabase.in',
+    'wss://*.supabase.in',
+    // Map tiles & authentication
+    'https://*.basemaps.cartocdn.com',
+    'https://*.tile.openstreetmap.org',
+    'https://accounts.google.com',
+    'https://*.googleapis.com',
+    // Platform domains
+    'https://*.webpulseanalytics.tech',
+    'https://webpulseanalytics.tech',
+    'wss://*.webpulseanalytics.tech',
+    // Exact deployment origins from config
+    ...configuredFrontendOrigins,
+    // Development/test-only local addresses
+    ...(!isProd
+      ? [
+          'http://localhost:*',
+          'https://localhost:*',
+          'ws://localhost:*',
+          'wss://localhost:*',
+          'http://127.0.0.1:*',
+          'https://127.0.0.1:*',
+          'ws://127.0.0.1:*',
+          'wss://127.0.0.1:*',
+        ]
+      : []),
+  ].filter(Boolean);
 
   // Security headers
   app.use(
@@ -21,39 +96,8 @@ const createApp = () => {
       contentSecurityPolicy: {
         directives: {
           ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-          'img-src': [
-            "'self'",
-            'data:',
-            'blob:',
-            'https://*.basemaps.cartocdn.com',
-            'https://*.tile.openstreetmap.org',
-            'https://grainy-gradients.vercel.app',
-            'https://*.supabase.co',
-            'https://brjltpxgthgjiaufycvc.supabase.co',
-          ],
-          'connect-src': [
-            "'self'",
-            'ws:',
-            'wss:',
-            'http://localhost:*',
-            'https://localhost:*',
-            'https://brjltpxgthgjiaufycvc.supabase.co',
-            'wss://brjltpxgthgjiaufycvc.supabase.co',
-            'https://*.supabase.co',
-            'wss://*.supabase.co',
-            'https://*.supabase.in',
-            'wss://*.supabase.in',
-            'https://*.basemaps.cartocdn.com',
-            'https://*.tile.openstreetmap.org',
-            'https://*.vercel.app',
-            'https://*.webpulseanalytics.tech',
-            'https://webpulseanalytics.tech',
-            'https://accounts.google.com',
-            'https://*.googleapis.com',
-            'https://api.ipify.org',
-            'https://ipwho.is',
-            'https://ipapi.co',
-          ],
+          'img-src': Array.from(new Set(cspImgSrc)),
+          'connect-src': Array.from(new Set(cspConnectSrc)),
         },
       },
     })
@@ -121,7 +165,7 @@ const createApp = () => {
   app.use('/api/track', trackRoutes);
 
   app.get('/', (req, res) => {
-    res.send('Web Pluse Analytics API is running...');
+    res.send('WebPulse Analytics API is running...');
   });
 
   // 404 + centralized error handler
