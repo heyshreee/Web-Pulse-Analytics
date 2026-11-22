@@ -118,13 +118,13 @@ export default function ProjectActivity() {
 
     const getStatusBadge = (status) => {
         const styles = {
-            success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-            warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-            failure: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+            success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+            failure: 'bg-red-500/10 text-red-400 border-red-500/20',
         };
 
         return (
-            <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize border ${styles[status] || styles.success}`}>
+            <span className={`px-1.5 py-0.5 rounded text-[10.5px] font-mono capitalize border ${styles[status] || styles.success}`}>
                 {status}
             </span>
         );
@@ -154,73 +154,34 @@ export default function ProjectActivity() {
 
     if (loading && logs.length === 0) {
         return (
-            <div className="space-y-8 animate-pulse">
+            <div className="space-y-3 font-sans animate-pulse">
                 {/* Header Skeleton */}
-                <div className="page-header">
-                    <div className="page-header-title">
-                        <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800" />
-                        <div className="space-y-2">
-                            <div className="h-6 w-36 bg-slate-200 dark:bg-slate-800 rounded" />
-                            <div className="h-3.5 w-80 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                        </div>
+                <div className="flex justify-between items-center h-8">
+                    <div className="space-y-1">
+                        <div className="h-4 w-36 bg-[var(--wp-border-default)] rounded" />
+                        <div className="h-3 w-64 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
                     </div>
-                    <div className="h-9 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="h-7 w-24 bg-[var(--wp-border-default)] rounded" />
                 </div>
 
                 {/* Controls Skeleton */}
-                <div className="card card-pad flex flex-col lg:flex-row gap-4 items-center justify-between p-4">
-                    <div className="h-10 w-full lg:max-w-md bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                    <div className="flex flex-wrap gap-2.5 w-full lg:w-auto">
-                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                        <div className="h-10 w-28 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                    </div>
+                <div className="flex justify-between items-center h-8">
+                    <div className="h-7 w-64 bg-[var(--wp-border-subtle)] rounded" />
+                    <div className="h-7 w-48 bg-[var(--wp-border-subtle)] rounded" />
                 </div>
 
                 {/* Table Skeleton */}
-                <div className="card overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="table-head">
-                                    <th className="px-4 py-3">Timestamp</th>
-                                    {!idOrName && <th className="px-4 py-3">Project</th>}
-                                    <th className="px-4 py-3">Event type</th>
-                                    <th className="px-4 py-3">User</th>
-                                    <th className="px-4 py-3">Details</th>
-                                    <th className="px-4 py-3 text-right">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                                {[1, 2, 3, 4, 5, 6].map((n) => (
-                                    <tr key={n} className="text-xs">
-                                        <td className="px-4 py-4">
-                                            <div className="space-y-1.5">
-                                                <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                                                <div className="h-3 w-14 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                                            </div>
-                                        </td>
-                                        {!idOrName && (
-                                            <td className="px-4 py-4">
-                                                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
-                                            </td>
-                                        )}
-                                        <td className="px-4 py-4">
-                                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <div className="h-3.5 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
-                                        </td>
-                                        <td className="px-4 py-4 text-right">
-                                            <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full ml-auto" />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                <div className="wp-panel overflow-hidden bg-[var(--wp-bg-surface)]">
+                    <div className="h-8 bg-[var(--wp-bg-subtle)] border-b border-[var(--wp-border-subtle)]" />
+                    <div className="divide-y divide-[var(--wp-border-subtle)]">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                            <div key={n} className="h-10 px-3 flex items-center justify-between">
+                                <div className="h-3 w-28 bg-[var(--wp-border-subtle)] rounded" />
+                                <div className="h-3 w-24 bg-[var(--wp-border-subtle)] rounded" />
+                                <div className="h-3 w-48 bg-[var(--wp-border-subtle)] rounded" />
+                                <div className="h-4 w-14 bg-[var(--wp-border-subtle)] rounded" />
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -228,196 +189,192 @@ export default function ProjectActivity() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-3 font-sans">
             {/* Header */}
-            <div className="page-header">
-                <div className="page-header-title">
-                    <div className="page-header-icon">
-                        <Activity className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col">
-                        <h2 className="page-title">Activity Log</h2>
-                        <p className="page-sub">
-                            {idOrName ? `Monitor important events and security logs for ${project?.name || 'your project'}` : 'Monitor all management events across all your connected projects'}
-                        </p>
-                    </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div>
+                    <h1 className="wp-title-page">Activity Log</h1>
+                    <p className="text-[11.5px] text-[var(--wp-text-muted)] mt-0.5">
+                        {idOrName
+                            ? `Monitor events and audit telemetry for ${project?.name || 'this project'}.`
+                            : 'Monitor management events and security audit trails across all projects.'}
+                    </p>
                 </div>
                 <button
                     onClick={() => {
                         if (user?.plan === 'pro') {
                             setIsLive(!isLive);
-                            if (!isLive) showToast('Live mode enabled', 'success');
+                            if (!isLive) showToast('Live stream enabled', 'success');
                         } else {
-                            showToast('Live logs are available on Pro plan', 'info');
+                            showToast('Live stream requires a Pro plan', 'info');
                         }
                     }}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all border ${isLive
-                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
-                        : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
-                        }`}
+                    className={`wp-btn h-7 text-xs px-2.5 gap-1.5 transition-colors ${
+                        isLive
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : 'wp-btn-secondary'
+                    }`}
                     title={user?.plan === 'pro' ? 'Toggle Live Mode' : 'Upgrade to Pro for Live Mode'}
                 >
-                    <Zap className={`h-4 w-4 ${isLive ? 'fill-current' : ''}`} />
-                    <span>{isLive ? 'Live Tracking' : 'Go Live'}</span>
-                    {user?.plan !== 'pro' && <span className="text-[10px] bg-violet-500 text-white px-2 py-0.5 rounded-md ml-1 font-bold">PRO</span>}
+                    {isLive ? <span className="wp-live-dot" /> : <Zap className="h-3.5 w-3.5" />}
+                    <span>{isLive ? 'Live Streaming' : 'Go Live'}</span>
+                    {user?.plan !== 'pro' && (
+                        <span className="text-[9.5px] font-mono px-1 py-0.2 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] ml-0.5">
+                            PRO
+                        </span>
+                    )}
                 </button>
             </div>
 
             {/* Controls */}
-            <div className="card card-pad flex flex-col lg:flex-row gap-4 items-center justify-between p-4">
-                <div className="relative flex-1 w-full lg:max-w-md">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+                <div className="relative flex-1 w-full max-w-sm">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
                     <input
                         type="text"
-                        placeholder="Search by action, details, user..."
+                        placeholder="Search action, details, user..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="input pl-10"
+                        className="input pl-8 h-7 text-xs"
                     />
                 </div>
 
-                <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-                    <div className="relative flex-1 sm:flex-none">
+                <div className="flex flex-wrap items-center gap-2">
+                    {/* Event Type Filter */}
+                    <div className="relative">
                         <select
                             value={eventType}
                             onChange={(e) => setEventType(e.target.value)}
-                            className="input w-full sm:w-auto appearance-none pr-8 cursor-pointer"
+                            className="h-7 text-xs rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors font-mono"
                         >
                             <option value="all">All Events</option>
                             <option value="success">Success</option>
                             <option value="warning">Warning</option>
                             <option value="failure">Failure</option>
                         </select>
-                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--wp-text-muted)]" />
                     </div>
 
-                    <div className="relative flex-1 sm:flex-none">
+                    {/* Time Range Filter */}
+                    <div className="relative">
                         <select
                             value={timeRange}
                             onChange={(e) => setTimeRange(e.target.value)}
-                            className="input w-full sm:w-auto appearance-none pr-8 cursor-pointer"
+                            className="h-7 text-xs rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors font-mono"
                         >
                             <option value="24h">Last 24h</option>
-                            <option value="7d">Last 7 Days</option>
-                            <option value="30d">Last 30 Days</option>
+                            <option value="7d">Last 7d</option>
+                            <option value="30d">Last 30d</option>
                             <option value="all">All Time</option>
                         </select>
-                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--wp-text-muted)]" />
                     </div>
 
-                    <div className="flex gap-2 w-full sm:w-auto items-center">
-                        <button
-                            onClick={handleExport}
-                            className="btn-secondary btn-sm flex-1 sm:flex-none"
-                        >
-                            <Download className="h-4 w-4" />
-                            <span>Export CSV</span>
-                        </button>
+                    <button
+                        onClick={handleExport}
+                        className="wp-btn wp-btn-secondary h-7 text-xs px-2 gap-1.5"
+                        title="Export as CSV"
+                    >
+                        <Download className="h-3 w-3" />
+                        <span>Export</span>
+                    </button>
 
-                        <button
-                            onClick={() => loadData()}
-                            className="btn-secondary btn-sm"
-                            title="Refresh Logs"
-                        >
-                            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => loadData()}
+                        className="wp-btn wp-btn-secondary h-7 w-7 p-0 flex items-center justify-center"
+                        title="Refresh Logs"
+                    >
+                        <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
                 </div>
             </div>
 
             {/* Table */}
-            <div className="card overflow-hidden">
+            <div className="wp-panel overflow-hidden bg-[var(--wp-bg-surface)]">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className="table">
                         <thead>
-                            <tr className="bg-slate-50 dark:bg-slate-800/40 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                <th className="px-4 py-3">Timestamp</th>
-                                {!idOrName && <th className="px-4 py-3">Project</th>}
-                                <th className="px-4 py-3">Event Type</th>
-                                <th className="px-4 py-3">User</th>
-                                <th className="px-4 py-3">Details</th>
-                                <th className="px-4 py-3 text-right">Status</th>
+                            <tr className="table-head">
+                                <th className="table-th font-mono">Timestamp</th>
+                                {!idOrName && <th className="table-th">Project</th>}
+                                <th className="table-th">Action</th>
+                                <th className="table-th">User</th>
+                                <th className="table-th">Details</th>
+                                <th className="table-th text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 [1, 2, 3, 4, 5].map((n) => (
-                                    <tr key={n} className="border-b border-slate-100 dark:border-slate-800/60 animate-pulse text-xs">
-                                        <td className="px-4 py-3.5">
-                                            <div className="h-3.5 w-20 bg-slate-200 dark:bg-slate-800 rounded mb-1" />
-                                            <div className="h-3 w-14 bg-slate-200 dark:bg-slate-800/60 rounded" />
+                                    <tr key={n} className="border-b border-[var(--wp-border-subtle)] animate-pulse">
+                                        <td className="table-td">
+                                            <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
                                         </td>
                                         {!idOrName && (
-                                            <td className="px-4 py-3.5">
-                                                <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                                            <td className="table-td">
+                                                <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
                                             </td>
                                         )}
-                                        <td className="px-4 py-3.5">
-                                            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                                        <td className="table-td">
+                                            <div className="h-3 w-24 bg-[var(--wp-border-subtle)] rounded" />
                                         </td>
-                                        <td className="px-4 py-3.5">
-                                            <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        <td className="table-td">
+                                            <div className="h-3 w-28 bg-[var(--wp-border-subtle)] rounded" />
                                         </td>
-                                        <td className="px-4 py-3.5">
-                                            <div className="h-3.5 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
+                                        <td className="table-td">
+                                            <div className="h-3 w-40 bg-[var(--wp-border-subtle)] rounded" />
                                         </td>
-                                        <td className="px-4 py-3.5 text-right">
-                                            <div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full ml-auto" />
+                                        <td className="table-td text-right">
+                                            <div className="h-3 w-12 bg-[var(--wp-border-subtle)] rounded ml-auto" />
                                         </td>
                                     </tr>
                                 ))
                             ) : logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={idOrName ? 5 : 6} className="px-4 py-12 text-center">
-                                        <div className="py-14 text-center">
-                                            <Activity className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                                            <p className="text-slate-500 dark:text-slate-400">No activity logs found matching your criteria.</p>
+                                    <td colSpan={idOrName ? 5 : 6} className="py-12 text-center">
+                                        <div className="space-y-2">
+                                            <Activity className="h-6 w-6 text-[var(--wp-text-muted)] mx-auto" />
+                                            <p className="text-xs text-[var(--wp-text-secondary)]">No activity logs recorded matching criteria.</p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : (
                                 logs.map((log) => (
-                                    <tr key={log.id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                        <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="text-sm text-slate-900 dark:text-white font-semibold">
-                                                {new Date(log.created_at).toLocaleDateString()}
-                                            </div>
-                                            <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                                                {new Date(log.created_at).toLocaleTimeString()}
-                                            </div>
+                                    <tr
+                                        key={log.id}
+                                        className="hover:bg-[var(--wp-bg-hover)] transition-colors border-b border-[var(--wp-border-subtle)] last:border-0"
+                                    >
+                                        <td className="table-td whitespace-nowrap font-mono text-[11px] text-[var(--wp-text-muted)] tabular-nums">
+                                            <div>{new Date(log.created_at).toLocaleDateString()}</div>
+                                            <div className="text-[10px] text-[var(--wp-text-muted)]/70">{new Date(log.created_at).toLocaleTimeString()}</div>
                                         </td>
                                         {!idOrName && (
-                                            <td className="px-4 py-3">
-                                                <span className="text-sm text-slate-900 dark:text-slate-300 font-medium">
-                                                    {log.project?.name || 'Unknown'}
-                                                </span>
+                                            <td className="table-td whitespace-nowrap text-xs font-medium text-[var(--wp-text-primary)]">
+                                                {log.project?.name || 'System'}
                                             </td>
                                         )}
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                        <td className="table-td whitespace-nowrap">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] text-[var(--wp-text-muted)]">
                                                     {getIcon(log.action)}
                                                 </div>
-                                                <span className="text-sm text-slate-900 dark:text-white font-medium">{log.action}</span>
+                                                <span className="text-xs font-mono text-[var(--wp-text-primary)]">{log.action}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center text-xs font-bold text-violet-600 dark:text-violet-400">
-                                                    {(log.user?.email || 'S').charAt(0).toUpperCase()}
-                                                </div>
-                                                <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">{log.user?.email || 'System'}</span>
-                                            </div>
+                                        <td className="table-td whitespace-nowrap text-xs font-mono text-[var(--wp-text-secondary)]">
+                                            {log.user?.email || 'system'}
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate" title={log.details}>
+                                        <td className="table-td">
+                                            <div className="text-xs text-[var(--wp-text-secondary)] max-w-xs truncate" title={log.details}>
                                                 {log.details}
                                             </div>
                                             {log.ip_address && (
-                                                <div className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-1.5 font-mono badge-slate">IP: {log.ip_address}</div>
+                                                <span className="text-[10px] font-mono text-[var(--wp-text-muted)] block mt-0.5">
+                                                    IP: {log.ip_address}
+                                                </span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-right">
+                                        <td className="table-td whitespace-nowrap text-right">
                                             {getStatusBadge(log.status)}
                                         </td>
                                     </tr>
@@ -428,42 +385,47 @@ export default function ProjectActivity() {
                 </div>
 
                 {/* Pagination */}
-                <div className="px-4 py-5 border-t border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-800/20 flex items-center justify-between">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Showing <span className="text-slate-900 dark:text-white font-semibold">{logs.length > 0 ? (page - 1) * 10 + 1 : 0}</span> to <span className="text-slate-900 dark:text-white font-semibold">{Math.min(page * 10, totalLogs)}</span> of <span className="text-slate-900 dark:text-white font-semibold">{totalLogs}</span> entries
+                <div className="px-3 py-2 border-t border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)]/40 flex items-center justify-between text-xs">
+                    <p className="font-mono text-[11px] text-[var(--wp-text-muted)]">
+                        Showing <span className="text-[var(--wp-text-primary)] font-medium">{logs.length > 0 ? (page - 1) * 10 + 1 : 0}</span>-
+                        <span className="text-[var(--wp-text-primary)] font-medium">{Math.min(page * 10, totalLogs)}</span> of{' '}
+                        <span className="text-[var(--wp-text-primary)] font-medium">{totalLogs}</span> entries
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-1">
                         <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="p-2 rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
+                            className="wp-btn wp-btn-secondary h-6 w-6 p-0 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Previous Page"
                         >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-3 w-3" />
                         </button>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1 font-mono text-[11px]">
                             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                 const p = i + 1;
                                 return (
                                     <button
                                         key={p}
                                         onClick={() => setPage(p)}
-                                        className={`w-9 h-9 rounded-lg text-sm font-semibold transition-all ${page === p
-                                            ? 'bg-slate-900 dark:bg-violet-500 text-white shadow-sm'
-                                            : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700'
-                                            }`}
+                                        className={`h-6 w-6 rounded flex items-center justify-center transition-colors ${
+                                            page === p
+                                                ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium'
+                                                : 'text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)]'
+                                        }`}
                                     >
                                         {p}
                                     </button>
                                 );
                             })}
-                            {totalPages > 5 && <span className="text-slate-400 dark:text-slate-600 px-2 font-semibold">...</span>}
+                            {totalPages > 5 && <span className="text-[var(--wp-text-muted)] px-1">...</span>}
                         </div>
                         <button
-                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
-                            className="p-2 rounded-xl bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
+                            className="wp-btn wp-btn-secondary h-6 w-6 p-0 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Next Page"
                         >
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-3 w-3" />
                         </button>
                     </div>
                 </div>

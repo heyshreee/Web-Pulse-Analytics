@@ -214,52 +214,52 @@ export default function ActivityLog() {
             </div>
 
             {/* Controls */}
-            <div className="card card-pad flex flex-col md:flex-row gap-4 items-center justify-between p-4">
-                <div className="relative flex-1 w-full md:w-auto">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+                <div className="relative flex-1 w-full max-w-sm">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--wp-text-muted)]" />
                     <input
                         type="text"
                         placeholder="Search logs..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="input pl-10"
+                        className="input pl-8 h-7 text-xs"
                     />
                 </div>
 
-                <div className="flex gap-3 w-full md:w-auto">
-                    <div className="relative flex-1 md:flex-none">
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative">
                         <select
                             value={eventType}
                             onChange={(e) => setEventType(e.target.value)}
-                            className="input w-full md:w-auto appearance-none pr-8 cursor-pointer"
+                            className="h-7 text-xs rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors font-mono"
                         >
                             <option value="all">All Events</option>
                             <option value="success">Success</option>
                             <option value="warning">Warning</option>
                             <option value="failure">Failure</option>
                         </select>
-                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--wp-text-muted)]" />
                     </div>
 
-                    <div className="relative flex-1 md:flex-none">
+                    <div className="relative">
                         <select
                             value={timeRange}
                             onChange={(e) => setTimeRange(e.target.value)}
-                            className="input w-full md:w-auto appearance-none pr-8 cursor-pointer"
+                            className="h-7 text-xs rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-primary)] pl-2.5 pr-7 appearance-none cursor-pointer focus:outline-none focus:border-[var(--wp-border-strong)] transition-colors font-mono"
                         >
                             <option value="24h">Last 24h</option>
-                            <option value="7d">Last 7 Days</option>
-                            <option value="30d">Last 30 Days</option>
+                            <option value="7d">Last 7d</option>
+                            <option value="30d">Last 30d</option>
                         </select>
-                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[var(--wp-text-muted)]" />
                     </div>
 
                     <button
                         onClick={handleExport}
-                        className="btn-secondary btn-sm"
+                        className="wp-btn wp-btn-secondary h-7 text-xs px-2 gap-1.5"
                     >
-                        <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">Export CSV</span>
+                        <Download className="h-3 w-3" />
+                        <span>Export CSV</span>
                     </button>
                 </div>
             </div>
