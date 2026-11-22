@@ -16,6 +16,7 @@ than a large, unclear one.
 - [Testing and quality checks](#testing-and-quality-checks)
 - [Dependencies and Dependabot Policy](#dependencies-and-dependabot-policy)
 - [Commit and PR conventions](#commit-and-pr-conventions)
+- [Commit privacy and signing](#commit-privacy-and-signing)
 - [Security-sensitive areas](#security-sensitive-areas)
 - [Database changes](#database-changes)
 - [Getting help](#getting-help)
@@ -258,6 +259,61 @@ In your PR description, always include:
 - **How** you tested it (commands and/or scenarios)
 - Whether **database migrations** are involved
 - Whether it targets **V1**, **V2**, the marketing site, or shared tooling
+
+## Commit privacy and signing
+
+### Keeping your commit email private
+
+To avoid exposing personal or corporate email addresses in public commit logs and git history, use GitHub's provided `noreply` email address:
+
+1. In GitHub, go to **Settings → Emails**.
+2. Check **Keep my email addresses private** and **Block command line pushes that expose my email**.
+3. Copy your GitHub-provided email (e.g., `12345678+username@users.noreply.github.com`).
+4. Set it in your local repository or global git configuration:
+
+```bash
+# Repository-specific (recommended)
+git config user.email "12345678+username@users.noreply.github.com"
+
+# Or globally across all repositories
+git config --global user.email "12345678+username@users.noreply.github.com"
+```
+
+### Commit signing (SSH / GPG)
+
+We strongly encourage contributors to cryptographically sign commits so GitHub displays the **Verified** badge, preventing author impersonation.
+
+#### Option A: SSH signing (recommended)
+
+Modern git (2.34+) supports SSH key signing natively:
+
+```bash
+# 1. Configure git to use SSH for signing
+git config gpg.format ssh
+
+# 2. Point to your public SSH key (or create one with ssh-keygen -t ed25519)
+git config user.signingkey ~/.ssh/id_ed25519.pub
+
+# 3. Automatically sign every commit
+git config commit.gpgsign true
+```
+
+Add your public SSH key to GitHub under **Settings → SSH and GPG keys → New SSH key** with key type set to **Signing Key**.
+
+#### Option B: GPG signing
+
+```bash
+# 1. Tell git which GPG key ID to use
+git config user.signingkey <YOUR_GPG_KEY_ID>
+
+# 2. Automatically sign every commit
+git config commit.gpgsign true
+```
+
+Export your public GPG key (`gpg --armor --export <KEY_ID>`) and paste it into GitHub under **Settings → SSH and GPG keys → New GPG key**.
+
+> [!IMPORTANT]
+> **Do not rewrite existing history**: Never rewrite, rebase, or force-push historical commits to sign past contributions. Signing and email privacy configurations should be applied to future commits starting from your next feature branch.
 
 ## Security-sensitive areas
 
