@@ -1,174 +1,172 @@
 import { Eye, Users, Database, Activity, Smartphone, Tablet, Monitor, ChevronRight, Search } from 'lucide-react';
-import Reveal from '../../Reveal';
 import AnimatedNumber from '../../AnimatedNumber';
 
 export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
   return (
-    <div className="space-y-8">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 stagger-children">
-        <div className="card card-pad">
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Total views</span>
-            <div className="p-2.5 rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400">
-              <Eye className="h-4 w-4" />
+    <div className="space-y-4">
+      {/* Unified 4-Column KPI Bar */}
+      <div className="wp-panel grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-line">
+        {/* Total Views */}
+        <div className="p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-ink-secondary">Total views</span>
+            <Eye className="h-3.5 w-3.5 text-ink-muted" />
+          </div>
+          <div>
+            <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+              <AnimatedNumber end={stats?.total_views || 0} duration={1.2} />
+            </div>
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-ink-muted">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>Live feed</span>
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <AnimatedNumber
-              end={stats?.total_views || 0}
-              duration={1.4}
-              className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
-            />
+        </div>
+
+        {/* Unique Visitors */}
+        <div className="p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-ink-secondary">Unique visitors</span>
+            <Users className="h-3.5 w-3.5 text-ink-muted" />
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <span className="badge-green">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live feed
+          <div>
+            <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+              <AnimatedNumber end={overviewStats.uniqueVisitors || 0} duration={1.2} />
+            </div>
+            <p className="mt-1 text-[11px] text-ink-muted font-mono">Last 30-day window</p>
+          </div>
+        </div>
+
+        {/* Active Now */}
+        <div className="p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-ink-secondary">Active now</span>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
           </div>
+          <div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
+                <AnimatedNumber end={overviewStats.realTimeVisitors || 0} duration={1.0} />
+              </div>
+              <span className="text-xs text-emerald-500 font-mono">active</span>
+            </div>
+            <p className="mt-1 text-[11px] text-ink-muted font-mono">Real-time synchronized</p>
+          </div>
         </div>
 
-        <div className="card card-pad">
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">Unique visitors</span>
-            <div className="p-2.5 rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400">
-              <Users className="h-4 w-4" />
-            </div>
+        {/* Storage Used */}
+        <div className="p-4 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-ink-secondary">Storage used</span>
+            <Database className="h-3.5 w-3.5 text-ink-muted" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <AnimatedNumber
-              end={overviewStats.uniqueVisitors || 0}
-              duration={1.4}
-              className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
-            />
-          </div>
-          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">Last 30-day window</p>
-        </div>
-
-        <div className="card card-pad">
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Active now</span>
-            <div className="flex h-2 w-2 relative">
-                <div className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></div>
-                <div className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></div>
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <AnimatedNumber
-              end={overviewStats.realTimeVisitors || 0}
-              duration={1.2}
-              className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums"
-            />
-            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">active</span>
-          </div>
-          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">Real-time synchronized</p>
-        </div>
-
-        <div className="card card-pad">
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage used</span>
-            <div className="p-2.5 rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400">
-              <Database className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight tabular-nums whitespace-nowrap">
+          <div>
+            <div className="text-2xl font-semibold tracking-tight text-ink tabular-nums font-mono">
               {stats?.storageUsed < 1024 * 1024
-                ? `${(stats?.storageUsed / 1024).toFixed(1)} KB`
+                ? `${(stats?.storageUsed / 1024 || 0).toFixed(1)} KB`
                 : stats?.storageUsed < 1024 * 1024 * 1024
-                  ? `${(stats?.storageUsed / (1024 * 1024)).toFixed(1)} MB`
-                  : `${(stats?.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
+                  ? `${((stats?.storageUsed || 0) / (1024 * 1024)).toFixed(1)} MB`
+                  : `${((stats?.storageUsed || 0) / (1024 * 1024 * 1024)).toFixed(2)} GB`
               }
-            </span>
+            </div>
+            <p className="mt-1 text-[11px] text-ink-muted font-mono">Used of allocated quota</p>
           </div>
-          <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">Used of allocated quota</p>
         </div>
       </div>
 
-
-      <Reveal delay={60} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* 2-Column Split Workspace */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Activity */}
-        <div className="card card-pad flex flex-col min-h-[420px] min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="section-title">Live Activity Feed</h3>
+        <div className="wp-panel flex flex-col min-h-[380px]">
+          <div className="wp-panel-header">
+            <span className="wp-title-card">Live Activity Feed</span>
             <button
               onClick={onShowActivity}
-              className="btn-ghost btn-sm"
+              className="inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink transition-colors font-mono"
             >
-              Examine All <ChevronRight className="h-4 w-4" />
+              Examine All <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="space-y-5 flex-1 overflow-y-auto pr-2">
+          <div className="p-4 space-y-3 flex-1 overflow-y-auto">
             {overviewStats.recentActivity?.slice(0, 7).map((activity, i) => {
               const getDeviceIcon = (device) => {
                 const type = (device || 'desktop').toLowerCase();
-                if (type === 'mobile') return <Smartphone className="h-3.5 w-3.5" />;
-                if (type === 'tablet') return <Tablet className="h-3.5 w-3.5" />;
-                return <Monitor className="h-3.5 w-3.5" />;
+                if (type === 'mobile') return <Smartphone className="h-3 w-3" />;
+                if (type === 'tablet') return <Tablet className="h-3 w-3" />;
+                return <Monitor className="h-3 w-3" />;
               };
 
               return (
-                <div key={i} className="flex gap-4 relative group">
-                  <div className={`w-3 h-3 rounded-full mt-1.5 border-2 border-white dark:border-slate-900 z-10 flex-shrink-0 transition-transform group-hover:scale-125 duration-300 bg-violet-500`}></div>
-
+                <div key={i} className="flex items-start gap-3 py-2 border-b border-line last:border-b-0">
+                  <div className="w-1.5 h-1.5 rounded-full mt-1.5 bg-ink shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <p className="text-sm text-slate-900 dark:text-white truncate font-medium tracking-tight" title={activity.title || 'Unknown Page'}>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-xs font-medium text-ink truncate" title={activity.title || 'Untitled'}>
                         {activity.title || 'Untitled Interaction'}
                       </p>
-                      <span className="text-xs text-slate-400 dark:text-slate-500 font-medium tabular-nums">
-                         {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <span className="text-[10px] text-ink-muted font-mono tabular-nums shrink-0">
+                        {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 mt-1">
-                       <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                          {getDeviceIcon(activity.device)} {activity.device || 'Desktop'}
-                       </span>
-                       <span className="text-xs text-violet-600 dark:text-violet-400 truncate max-w-[200px]">{activity.path}</span>
+                    <div className="flex items-center gap-2 mt-0.5 text-[11px] text-ink-muted font-mono">
+                      <span className="flex items-center gap-1">
+                        {getDeviceIcon(activity.device)} {activity.device || 'Desktop'}
+                      </span>
+                      <span>•</span>
+                      <span className="truncate text-ink-secondary">{activity.path}</span>
                     </div>
                   </div>
                 </div>
               );
             })}
             {(!overviewStats.recentActivity || overviewStats.recentActivity.length === 0) && (
-              <div className="flex flex-col items-center justify-center h-40 text-slate-400 dark:text-slate-600">
-                <Activity className="h-10 w-10 mb-3" />
-                <p className="text-xs font-medium">Waiting for pulses...</p>
+              <div className="flex flex-col items-center justify-center h-48 text-ink-muted">
+                <Activity className="h-6 w-6 mb-2 opacity-40" />
+                <p className="text-xs font-mono">Waiting for pulses...</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Top Referrers */}
-        <div className="card card-pad min-h-[420px] flex flex-col min-w-0">
-          <h3 className="section-title mb-6">Ingress Sources</h3>
-          <div className="space-y-6 flex-1">
-            {overviewStats.topReferrers?.map((referrer, i) => (
-              <div key={i} className="group">
-                <div className="flex justify-between text-sm mb-2 items-baseline gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: referrer.color }}></div>
-                    <span className="text-slate-900 dark:text-white font-medium truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors" title={referrer.name}>{referrer.name}</span>
+        <div className="wp-panel flex flex-col min-h-[380px]">
+          <div className="wp-panel-header">
+            <span className="wp-title-card">Ingress Sources</span>
+            <span className="text-[10px] text-ink-muted font-mono">Sorted by pulse volume</span>
+          </div>
+          <div className="p-4 space-y-4 flex-1">
+            {overviewStats.topReferrers?.map((referrer, i) => {
+              const maxVal = overviewStats.topReferrers[0]?.value || 1;
+              const pct = Math.min((referrer.value / maxVal) * 100, 100);
+              return (
+                <div key={i} className="space-y-1.5">
+                  <div className="flex justify-between text-xs items-baseline gap-2">
+                    <span className="text-ink font-medium truncate" title={referrer.name}>{referrer.name}</span>
+                    <span className="text-ink-secondary font-mono text-[11.5px] tabular-nums shrink-0">
+                      {referrer.value.toLocaleString()} <span className="text-ink-muted">pulses</span>
+                    </span>
                   </div>
-                  <span className="text-slate-500 dark:text-slate-400 font-semibold tabular-nums shrink-0 whitespace-nowrap">{referrer.value.toLocaleString()} <span className="opacity-40 font-normal">Pulses</span></span>
+                  <div className="wp-meter-track">
+                    <div
+                      className="wp-meter-bar"
+                      style={{ width: `${Math.max(pct, 2)}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-1.5 bg-slate-100 dark:bg-slate-800/60 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${Math.min((referrer.value / (overviewStats.topReferrers[0]?.value || 1)) * 100, 100)}%`, backgroundColor: referrer.color }}
-                  ></div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
             {(!overviewStats.topReferrers || overviewStats.topReferrers.length === 0) && (
-              <div className="flex flex-col items-center justify-center h-40 text-slate-400 dark:text-slate-600">
-                <Search className="h-10 w-10 mb-3" />
-                <p className="text-xs font-medium">No ingress data</p>
+              <div className="flex flex-col items-center justify-center h-48 text-ink-muted">
+                <Search className="h-6 w-6 mb-2 opacity-40" />
+                <p className="text-xs font-mono">No ingress data</p>
               </div>
             )}
           </div>
         </div>
-      </Reveal>
+      </div>
     </div>
   );
 }

@@ -187,64 +187,45 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="space-y-8 animate-pulse">
+      <div className="space-y-6 animate-pulse">
         {/* Header Skeleton */}
-        <div className="page-header">
+        <div className="flex justify-between items-center pb-4 border-b border-line">
           <div>
-            <div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2" />
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-44 bg-slate-200 dark:bg-slate-800 rounded" />
-              <div className="h-5 w-20 bg-slate-200 dark:bg-slate-800 rounded-full" />
-            </div>
+            <div className="h-3 w-28 bg-subtle rounded mb-2" />
+            <div className="h-6 w-48 bg-subtle rounded" />
           </div>
-          <div className="h-9 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+          <div className="h-7 w-20 bg-subtle rounded" />
         </div>
 
         {/* Tabs Bar Skeleton */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div className="flex gap-4 border-b border-line pb-2.5">
           {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+            <div key={n} className="h-4 w-16 bg-subtle rounded" />
           ))}
         </div>
 
-        {/* KPI Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {/* Unified 4-Column KPI Bar Skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="card card-pad p-6 space-y-4">
-              <div className="flex justify-between items-start">
-                <div className="h-3.5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
-                <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800" />
-              </div>
-              <div className="h-8 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
-              <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800/60 rounded" />
+            <div key={n} className="p-3.5 rounded-lg border border-line bg-surface space-y-2">
+              <div className="h-3 w-20 bg-subtle rounded" />
+              <div className="h-6 w-24 bg-subtle rounded" />
             </div>
           ))}
         </div>
 
         {/* Detail Grid Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="card card-pad p-6 h-[420px] space-y-4">
-            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded mb-6" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="rounded-lg border border-line bg-surface p-4 h-[380px] space-y-3">
+            <div className="h-4 w-32 bg-subtle rounded mb-4" />
             {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="flex justify-between items-center py-2">
-                <div className="space-y-1">
-                  <div className="h-3.5 w-40 bg-slate-200 dark:bg-slate-800 rounded" />
-                  <div className="h-2.5 w-24 bg-slate-200 dark:bg-slate-800/60 rounded" />
-                </div>
-                <div className="h-3.5 w-12 bg-slate-200 dark:bg-slate-800 rounded" />
-              </div>
+              <div key={n} className="h-8 bg-subtle/50 rounded" />
             ))}
           </div>
-          <div className="card card-pad p-6 h-[420px] space-y-4">
-            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-800 rounded mb-6" />
+          <div className="rounded-lg border border-line bg-surface p-4 h-[380px] space-y-3">
+            <div className="h-4 w-32 bg-subtle rounded mb-4" />
             {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="space-y-2 py-1">
-                <div className="flex justify-between">
-                  <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
-                  <div className="h-3.5 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
-                </div>
-                <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
-              </div>
+              <div key={n} className="h-8 bg-subtle/50 rounded" />
             ))}
           </div>
         </div>
@@ -252,7 +233,7 @@ export default function ProjectDetail() {
     );
   }
   if (!project) return (
-    <div className="flex h-screen items-center justify-center px-6 text-center text-red-600 dark:text-red-400 font-bold">
+    <div className="flex h-96 items-center justify-center text-center text-ink-muted text-sm font-mono">
       Project not found or access denied.
     </div>
   );

@@ -12,43 +12,43 @@ export default function DeleteModal({ isOpen, onClose, onDelete, projectName, de
       }}
       title="Delete Project"
     >
-      <div className="space-y-6">
-        <div className="p-5 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl flex gap-4">
-          <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm font-medium text-red-800/80 dark:text-red-400 leading-relaxed">
-            Warning: This action will permanently delete all data and analytics associated with <span className="text-slate-900 dark:text-white font-semibold">{projectName}</span>. This cannot be undone.
+      <div className="space-y-4">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded flex gap-3">
+          <AlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-xs text-red-400 leading-relaxed font-mono">
+            Warning: This action will permanently erase all data and analytics associated with <span className="text-ink font-semibold">{projectName}</span>.
           </p>
         </div>
 
-        <div className="space-y-2">
-          <label className="label">
-            Please type <span className="text-red-600 dark:text-white font-mono bg-red-50 dark:bg-slate-800 px-1.5 py-0.5 rounded-md border border-red-200 dark:border-slate-700">{projectName}</span> to confirm
+        <div className="space-y-1.5">
+          <label className="block text-xs font-mono text-ink-secondary">
+            Please type <span className="text-red-400 font-mono bg-subtle px-1.5 py-0.5 rounded border border-line">{projectName}</span> to confirm
           </label>
           <input
             type="text"
             value={deleteConfirmation}
             onChange={(e) => setDeleteConfirmation(e.target.value)}
-            className="input"
+            className="input font-mono text-xs h-8"
             placeholder={projectName}
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-8 border-t border-slate-100 dark:border-slate-800/50">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t border-line">
           <button
             onClick={() => {
               onClose();
               setDeleteConfirmation('');
             }}
-            className="btn-secondary btn-md"
+            className="btn-secondary h-7 px-3 text-xs"
           >
             Cancel
           </button>
           <button
             onClick={() => onDelete(deleteConfirmation)}
             disabled={deleteConfirmation !== projectName || deleting}
-            className="btn-danger btn-md"
+            className="btn-danger h-7 px-3 text-xs inline-flex items-center gap-1.5"
           >
-            {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
             Delete Project
           </button>
         </div>
