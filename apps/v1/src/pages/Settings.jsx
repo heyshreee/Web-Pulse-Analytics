@@ -491,19 +491,46 @@ function SecuritySection({ showToast }) {
     );
 }
 
+const defaultNotificationPreferences = {
+    email: true,
+    email_reports: true,
+    browser: true,
+    security: true,
+    marketing: false
+};
+
+function parseSafePreferences(raw) {
+    if (!raw) return defaultNotificationPreferences;
+    if (typeof raw === 'string') {
+        try {
+            const parsed = JSON.parse(raw);
+            return typeof parsed === 'object' && parsed !== null
+                ? { ...defaultNotificationPreferences, ...parsed }
+                : defaultNotificationPreferences;
+        } catch {
+            return defaultNotificationPreferences;
+        }
+    }
+    if (typeof raw === 'object' && raw !== null) {
+        return { ...defaultNotificationPreferences, ...raw };
+    }
+    return defaultNotificationPreferences;
+}
+
 function NotificationsSection({ user, showToast }) {
     const [isEditing, setIsEditing] = useState(false);
-    const [preferences, setPreferences] = useState(user?.notification_preferences || {
-        email: true,
-        email_reports: true,
-        browser: true,
-        security: true,
-        marketing: false
-    });
+    const [preferences, setPreferences] = useState(() => parseSafePreferences(user?.notification_preferences));
+
+    useEffect(() => {
+        if (user?.notification_preferences) {
+            setPreferences(parseSafePreferences(user.notification_preferences));
+        }
+    }, [user?.notification_preferences]);
 
     const handleToggle = async (key) => {
         if (!isEditing) return;
-        const newPrefs = { ...preferences, [key]: !preferences[key] };
+        const currentPrefs = preferences || defaultNotificationPreferences;
+        const newPrefs = { ...currentPrefs, [key]: !currentPrefs[key] };
         setPreferences(newPrefs);
         try {
             await apiRequest('/user/notifications', {
@@ -512,9 +539,11 @@ function NotificationsSection({ user, showToast }) {
             });
         } catch (error) {
             showToast('Failed to update preferences', 'error');
-            setPreferences(preferences); // Revert
+            setPreferences(currentPrefs); // Revert
         }
     };
+
+    const currentPreferences = preferences || defaultNotificationPreferences;
 
     return (
         <div className="wp-panel bg-[var(--wp-bg-surface)]">
@@ -556,12 +585,12 @@ function NotificationsSection({ user, showToast }) {
                             onClick={() => handleToggle(item.id)}
                             disabled={!isEditing}
                             className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
-                                preferences[item.id] ? 'bg-[var(--wp-accent-solid)]' : 'bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)]'
+                                currentPreferences[item.id] ? 'bg-[var(--wp-accent-solid)]' : 'bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-default)]'
                             }`}
                         >
                             <span
                                 className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform ${
-                                    preferences[item.id] ? 'bg-[var(--wp-text-inverted)] translate-x-4' : 'bg-[var(--wp-text-muted)] translate-x-1'
+                                    currentPreferences[item.id] ? 'bg-[var(--wp-text-inverted)] translate-x-4' : 'bg-[var(--wp-text-muted)] translate-x-1'
                                 }`}
                             />
                         </button>

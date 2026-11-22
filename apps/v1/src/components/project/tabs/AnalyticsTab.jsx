@@ -169,8 +169,8 @@ export default function AnalyticsTab({
           </div>
 
           <div className="p-3.5 flex-1 flex flex-col justify-center">
-            <div className="h-[150px] w-full mb-3 relative">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-[150px] w-full mb-3 relative min-w-0">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={150}>
                 <PieChart>
                   <Pie
                     data={deviceData}

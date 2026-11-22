@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, X, Check, Trash2, Info, AlertTriangle, CheckCircle, AlertCircle, Shield, Activity, Settings, ChevronRight } from 'lucide-react';
+import { Bell, X, Check, Trash2, Info, AlertTriangle, CheckCircle, AlertCircle, Shield, Activity, Settings } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 
@@ -9,7 +9,7 @@ export default function Notifications() {
     const [unreadCount, setUnreadCount] = useState(0);
     const [activeTab, setActiveTab] = useState('all');
     const dropdownRef = useRef(null);
-    const { showToast, notificationSpotlight, triggerNotificationSpotlight } = useToast();
+    const { showToast, triggerNotificationSpotlight } = useToast();
 
     const loadNotifications = async () => {
         try {
@@ -26,12 +26,9 @@ export default function Notifications() {
 
         const handleNewNotification = (e) => {
             loadNotifications();
-            // Trigger spotlight effect
             if (e.detail) {
-                // We could show a toast here too if desired
                 showToast(e.detail.title || 'New Notification', 'info');
             }
-            // Trigger visual spotlight
             triggerNotificationSpotlight();
         };
 
@@ -95,19 +92,16 @@ export default function Notifications() {
     const clearAll = async () => {
         if (notifications.length === 0) return;
 
-        // Optimistic update
         const previousNotifications = [...notifications];
         setNotifications([]);
         setUnreadCount(0);
         showToast('All notifications cleared', 'success');
 
         try {
-            // Delete all notifications one by one since we don't have a bulk delete endpoint yet
             await Promise.all(previousNotifications.map(n =>
                 apiRequest(`/notifications/${n.id}`, { method: 'DELETE' })
             ));
         } catch (err) {
-            // Revert on error
             setNotifications(previousNotifications);
             setUnreadCount(previousNotifications.filter(n => !n.is_read).length);
             showToast('Failed to clear notifications', 'error');
@@ -116,13 +110,13 @@ export default function Notifications() {
 
     const getIcon = (type) => {
         switch (type) {
-            case 'success': return <CheckCircle className="h-5 w-5 text-emerald-500" />;
-            case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-500" />;
-            case 'error': return <AlertCircle className="h-5 w-5 text-red-500" />;
-            case 'security': return <Shield className="h-5 w-5 text-amber-500" />;
-            case 'activity': return <Activity className="h-5 w-5 text-sky-500" />;
-            case 'system': return <Settings className="h-5 w-5 text-violet-500" />;
-            default: return <Info className="h-5 w-5 text-slate-500" />;
+            case 'success': return <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />;
+            case 'warning': return <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />;
+            case 'error': return <AlertCircle className="h-3.5 w-3.5 text-rose-400" />;
+            case 'security': return <Shield className="h-3.5 w-3.5 text-amber-400" />;
+            case 'activity': return <Activity className="h-3.5 w-3.5 text-[var(--wp-text-secondary)]" />;
+            case 'system': return <Settings className="h-3.5 w-3.5 text-[var(--wp-text-secondary)]" />;
+            default: return <Info className="h-3.5 w-3.5 text-[var(--wp-text-muted)]" />;
         }
     };
 
@@ -135,59 +129,57 @@ export default function Notifications() {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            {/* Backdrop Blur - Active when open or spotlighted */}
-            {(isOpen || notificationSpotlight) && (
-                <div
-                    className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-sm z-40 transition-all duration-500"
-                    onClick={() => setIsOpen(false)}
-                />
-            )}
-
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`relative p-2.5 rounded-xl transition-all duration-300 z-50 group
-                    ${isOpen ? 'bg-slate-900 dark:bg-violet-500 text-white shadow-lg shadow-slate-900/20 dark:shadow-violet-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm'}
-                    ${notificationSpotlight ? 'bg-slate-900 dark:bg-violet-500 text-white ring-4 ring-violet-500/30 animate-pulse' : ''}
-                `}
+                className={`relative h-7 w-7 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] flex items-center justify-center transition-colors ${
+                    isOpen
+                        ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] border-[var(--wp-border-strong)]'
+                        : 'text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)]'
+                }`}
+                aria-label="Open notifications"
             >
-                <Bell className={`h-5 w-5 ${notificationSpotlight ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform'}`} />
+                <Bell className="h-3.5 w-3.5" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-violet-600 border-2 border-white dark:border-slate-950 shadow-sm"></span>
+                    <span className="absolute top-1 right-1 flex h-1.5 w-1.5">
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--wp-status-live)]"></span>
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-4 w-[400px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden ring-1 ring-black/5 dark:ring-white/5 animate-fade-in">
+                <div className="absolute right-0 top-full mt-2 w-[360px] sm:w-[400px] wp-panel bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-lg shadow-2xl z-50 overflow-hidden">
                     {/* Header */}
-                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                                <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Notifications</h3>
+                    <div className="p-3 sm:p-3.5 border-b border-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
+                        <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                                <span className="wp-title-card">Notifications</span>
                                 {unreadCount > 0 && (
-                                    <span className="badge-violet text-xs font-medium">
+                                    <span className="wp-metric-mono text-[10px] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase text-[var(--wp-text-primary)]">
                                         {unreadCount} new
                                     </span>
                                 )}
                             </div>
-                            <button onClick={() => setIsOpen(false)} aria-label="Close notifications" className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-                                <X className="h-4 w-4" />
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                aria-label="Close notifications"
+                                className="p-1 text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)] hover:bg-[var(--wp-bg-hover)] rounded transition-colors"
+                            >
+                                <X className="h-3.5 w-3.5" />
                             </button>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Manage your system alerts and activity signals</p>
+                        <p className="text-[11px] text-[var(--wp-text-muted)]">Manage your system alerts and activity signals.</p>
 
-                        {/* Tabs */}
-                        <div className="flex items-center gap-1 p-1 mt-5 bg-slate-100 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 overflow-x-auto no-scrollbar">
+                        {/* Segmented Control Filter Tabs */}
+                        <div className="inline-flex items-center p-0.5 rounded-md border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-xs mt-2.5 w-full justify-between">
                             {['all', 'system', 'security', 'activity'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize whitespace-nowrap ${activeTab === tab
-                                        ? 'bg-slate-900 dark:bg-violet-500 text-white shadow-sm'
-                                        : 'text-slate-500 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-slate-700/60 hover:text-slate-900 dark:hover:text-white'
-                                        }`}
+                                    className={`h-5 flex-1 rounded text-[10.5px] font-mono transition-colors capitalize ${
+                                        activeTab === tab
+                                            ? 'bg-[var(--wp-bg-active)] text-[var(--wp-text-primary)] font-medium'
+                                            : 'text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)]'
+                                    }`}
                                 >
                                     {tab}
                                 </button>
@@ -196,95 +188,83 @@ export default function Notifications() {
                     </div>
 
                     {/* Actions Bar */}
-                    <div className="px-4 py-2.5 bg-slate-50/50 dark:bg-slate-950/30 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div className="px-3 py-1.5 bg-[var(--wp-bg-subtle)]/30 border-b border-[var(--wp-border-subtle)] flex items-center justify-between text-[11px] font-mono">
                         <button
                             onClick={markAllAsRead}
-                            className="btn-ghost btn-sm text-violet-600 dark:text-violet-400"
+                            className="text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] inline-flex items-center gap-1 transition-colors"
                         >
-                            <Check className="h-3.5 w-3.5" /> Mark all read
+                            <Check className="h-3 w-3" />
+                            <span>Mark all read</span>
                         </button>
                         <button
                             onClick={clearAll}
-                            className="btn-ghost btn-sm text-slate-500 hover:text-red-500"
+                            className="text-[var(--wp-text-muted)] hover:text-rose-400 inline-flex items-center gap-1 transition-colors"
                         >
-                            <Trash2 className="h-3.5 w-3.5" /> Clear all
+                            <Trash2 className="h-3 w-3" />
+                            <span>Clear all</span>
                         </button>
                     </div>
 
                     {/* Notification List */}
-                    <div className="max-h-[420px] overflow-y-auto custom-scrollbar bg-white dark:bg-slate-900">
+                    <div className="max-h-[360px] overflow-y-auto divide-y divide-[var(--wp-border-subtle)]">
                         {filteredNotifications.length > 0 ? (
-                            <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                                {filteredNotifications.map((notification) => (
-                                    <div
-                                        key={notification.id}
-                                        onClick={() => !notification.is_read && markAsRead(notification.id)}
-                                        className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group relative ${!notification.is_read ? 'bg-violet-50/40 dark:bg-violet-500/5' : ''}`}
-                                    >
-                                        <div className="flex gap-3.5">
-                                            <div className={`mt-0.5 flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-105 duration-300 ${!notification.is_read ? 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800/60 opacity-60'}`}>
-                                                {getIcon(notification.type)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex justify-between items-start gap-2 mb-1">
-                                                    <div className="flex items-center gap-2 min-w-0">
-                                                        <span className={`text-[10px] font-semibold uppercase tracking-widest ${notification.type === 'security' ? 'text-amber-600 dark:text-amber-400' :
-                                                            notification.type === 'system' ? 'text-violet-600 dark:text-violet-400' :
-                                                                notification.type === 'error' ? 'text-red-600 dark:text-red-400' :
-                                                                    notification.type === 'activity' ? 'text-sky-600 dark:text-sky-400' :
-                                                                        'text-emerald-600 dark:text-emerald-400'
-                                                            }`}>
-                                                            {notification.type}
-                                                        </span>
-                                                        {!notification.is_read && (
-                                                            <span className="h-2 w-2 rounded-full bg-violet-500 flex-shrink-0"></span>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold tabular-nums flex-shrink-0">
-                                                        {getTimeAgo(new Date(notification.created_at))}
-                                                    </span>
-                                                </div>
-                                                <h4 className={`text-sm font-semibold mb-0.5 tracking-tight leading-tight transition-colors ${!notification.is_read ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
-                                                    {notification.title}
-                                                </h4>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                    {notification.message}
-                                                </p>
-
-                                                {/* Action Link (Example) */}
-                                                {notification.type === 'usage' && (
-                                                    <button className="mt-2 text-[10px] font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 flex items-center gap-1 uppercase tracking-widest transition-colors">
-                                                        Upgrade Analytics Hub <ChevronRight className="h-3 w-3" />
-                                                    </button>
-                                                )}
-                                            </div>
+                            filteredNotifications.map((notification) => (
+                                <div
+                                    key={notification.id}
+                                    onClick={() => !notification.is_read && markAsRead(notification.id)}
+                                    className={`p-3 hover:bg-[var(--wp-bg-hover)] transition-colors cursor-pointer group relative ${
+                                        !notification.is_read ? 'bg-[var(--wp-bg-subtle)]/30' : ''
+                                    }`}
+                                >
+                                    <div className="flex gap-2.5">
+                                        <div className="h-6 w-6 rounded border border-[var(--wp-border-subtle)] bg-[var(--wp-bg-subtle)] flex items-center justify-center shrink-0 mt-0.5">
+                                            {getIcon(notification.type)}
                                         </div>
-
-                                        {/* Delete button (visible on hover) */}
-                                        <button
-                                            onClick={(e) => deleteNotification(notification.id, e)}
-                                            className="absolute top-3 right-3 p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
-                                            title="Remove signal"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </button>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-baseline gap-2 mb-0.5">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className={`text-[10px] font-mono uppercase tracking-wider font-medium ${
+                                                        notification.type === 'security' ? 'text-amber-400' :
+                                                        notification.type === 'error' ? 'text-rose-400' :
+                                                        notification.type === 'activity' ? 'text-[var(--wp-text-secondary)]' :
+                                                        'text-emerald-400'
+                                                    }`}>
+                                                        {notification.type}
+                                                    </span>
+                                                    {!notification.is_read && (
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-[var(--wp-status-live)] shrink-0" />
+                                                    )}
+                                                </div>
+                                                <span className="text-[10px] text-[var(--wp-text-muted)] font-mono tabular-nums">
+                                                    {getTimeAgo(new Date(notification.created_at))}
+                                                </span>
+                                            </div>
+                                            <h4 className={`text-xs font-medium mb-0.5 ${!notification.is_read ? 'text-[var(--wp-text-primary)]' : 'text-[var(--wp-text-secondary)]'}`}>
+                                                {notification.title}
+                                            </h4>
+                                            <p className="text-[11px] text-[var(--wp-text-muted)] leading-relaxed">
+                                                {notification.message}
+                                            </p>
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
+
+                                    {/* Delete button (visible on hover) */}
+                                    <button
+                                        onClick={(e) => deleteNotification(notification.id, e)}
+                                        className="absolute top-2.5 right-2.5 p-1 text-[var(--wp-text-muted)] hover:text-rose-400 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                        title="Remove notification"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ))
                         ) : (
-                            <div className="py-12 px-8 text-center">
-                                <Bell className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                                <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Zero Signals</h4>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[220px] mx-auto leading-relaxed">System status is nominal. No urgent signals to report.</p>
+                            <div className="py-8 text-center text-[var(--wp-text-muted)]">
+                                <Bell className="h-5 w-5 mx-auto mb-1.5 opacity-30" />
+                                <p className="wp-title-card mb-0.5">Zero Signals</p>
+                                <p className="text-[11px] font-mono">System status is nominal. No alerts to report.</p>
                             </div>
                         )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
-                        <button className="btn-secondary btn-sm w-full">
-                            Telemetric Pipeline History <ChevronRight className="h-3.5 w-3.5" />
-                        </button>
                     </div>
                 </div>
             )}

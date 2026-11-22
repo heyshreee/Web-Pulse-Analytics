@@ -20,13 +20,13 @@ export default function TrafficTrendsChart({
     const tooltipBorder = isDark ? '#222222' : '#e5e5e5';
 
     return (
-        <div className="h-full w-full relative min-h-[300px]">
+        <div className="h-full w-full relative min-h-[300px] min-w-0">
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-canvas/60 backdrop-blur-sm z-10 rounded-lg">
                     <Loader2 className="h-6 w-6 text-ink-muted animate-spin" />
                 </div>
             )}
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={280}>
                 <AreaChart data={data || []} margin={{ top: 10, right: 10, left: -20, bottom: 24 }}>
                     <defs>
                         <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
