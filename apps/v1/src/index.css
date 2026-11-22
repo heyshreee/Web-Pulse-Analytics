@@ -5,9 +5,37 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* WebPulse Studio Tokens - Light Mode */
+    --wp-bg-canvas: #ffffff;
+    --wp-bg-surface: #ffffff;
+    --wp-bg-subtle: #fafafa;
+    --wp-bg-hover: #f5f5f5;
+    --wp-bg-active: #efefef;
+    --wp-border-subtle: #efefef;
+    --wp-border-default: #e5e5e5;
+    --wp-border-strong: #d4d4d4;
+    --wp-dot-color: rgba(0, 0, 0, 0.08);
+
+    --wp-text-primary: #0a0a0a;
+    --wp-text-secondary: #525252;
+    --wp-text-muted: #737373;
+    --wp-text-inverted: #ffffff;
+
+    --wp-accent-solid: #0a0a0a;
+    --wp-accent-hover: #262626;
+    --wp-status-live: #10b981;
+    --wp-chart-1: #0a0a0a;
+    --wp-chart-grid: #e5e5e5;
+    --wp-meter-bar: #0a0a0a;
+
+    --wp-nav-item-h: 30px;
+    --wp-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --wp-dur-fast: 120ms;
+    --wp-dur-base: 160ms;
+
     /* ---- Layout grid ---- */
-    --sidebar-width: 16rem;            /* 256px */
-    --topbar-height: 4rem;             /* 64px */
+    --sidebar-width: 224px;
+    --topbar-height: 46px;
     --page-padding: 1.5rem;            /* 24px horizontal */
     --page-gap: 2rem;                  /* 32px vertical between sections */
     /* ---- Spacing ---- */
@@ -28,26 +56,223 @@
     --control-radius: 0.625rem;        /* 10px */
   }
 
-  .dark {
+  .dark, [data-theme="dark"] {
     color-scheme: dark;
+    /* WebPulse Studio Tokens - Dark Mode (Default) */
+    --wp-bg-canvas: #000000;
+    --wp-bg-surface: #0a0a0a;
+    --wp-bg-subtle: #111111;
+    --wp-bg-hover: #171717;
+    --wp-bg-active: #1f1f1f;
+    --wp-border-subtle: #171717;
+    --wp-border-default: #222222;
+    --wp-border-strong: #333333;
+    --wp-dot-color: rgba(255, 255, 255, 0.075);
+
+    --wp-text-primary: #ededed;
+    --wp-text-secondary: #a1a1a1;
+    --wp-text-muted: #666666;
+    --wp-text-inverted: #000000;
+
+    --wp-accent-solid: #ffffff;
+    --wp-accent-hover: #e5e5e5;
+    --wp-status-live: #10b981;
+    --wp-chart-1: #ededed;
+    --wp-chart-grid: #1f1f1f;
+    --wp-meter-bar: #ededed;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased font-sans transition-colors duration-300;
+    background-color: var(--wp-bg-canvas);
+    color: var(--wp-text-primary);
+    font-family: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    transition: background-color var(--wp-dur-fast) var(--wp-ease-standard), color var(--wp-dur-fast) var(--wp-ease-standard);
   }
 
   .dark body {
-    @apply bg-slate-950 text-slate-100;
+    background-color: var(--wp-bg-canvas);
+    color: var(--wp-text-primary);
   }
 
   ::selection {
-    @apply bg-violet-500/20 text-violet-900 dark:text-violet-100;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--wp-text-primary);
   }
 }
 
 @layer components {
+  /* ========================================================
+     WebPulse Studio Design System (DESIGN.md) Primitives
+     ======================================================== */
+
+  /* ---- Typography Scale ---- */
+  .wp-title-page {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    color: var(--wp-text-primary);
+  }
+
+  .wp-title-card {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.30;
+    color: var(--wp-text-primary);
+  }
+
+  .wp-label-section {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.20;
+    color: var(--wp-text-muted);
+  }
+
+  .wp-kpi-value {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.10;
+    font-variant-numeric: tabular-nums;
+    color: var(--wp-text-primary);
+  }
+
+  .wp-metric-mono {
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.40;
+    font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- Shell & Structural Surfaces ---- */
+  .wp-shell {
+    display: grid;
+    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-rows: 46px minmax(0, 1fr);
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--wp-bg-canvas);
+  }
+
+  @media (max-width: 768px) {
+    .wp-shell {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: 46px minmax(0, 1fr);
+    }
+  }
+
+  .wp-panel {
+    border: 1px solid var(--wp-border-default);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--wp-bg-surface);
+  }
+
+  .wp-panel-header {
+    height: 38px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--wp-border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--wp-bg-surface);
+  }
+
+  .wp-studio-canvas {
+    background-color: var(--wp-bg-canvas);
+    background-image: radial-gradient(var(--wp-dot-color) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
   /* ---- Buttons ---- */
+  .wp-btn {
+    height: 30px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    transition: all var(--wp-dur-fast) var(--wp-ease-standard);
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    user-select: none;
+  }
+
+  .wp-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--wp-bg-canvas), 0 0 0 3.5px var(--wp-accent-solid);
+  }
+
+  .wp-btn-primary {
+    background-color: var(--wp-accent-solid);
+    color: var(--wp-text-inverted);
+    font-weight: 500;
+  }
+
+  .wp-btn-primary:hover {
+    background-color: var(--wp-accent-hover);
+  }
+
+  .wp-btn-secondary {
+    background-color: transparent;
+    border-color: var(--wp-border-default);
+    color: var(--wp-text-primary);
+  }
+
+  .wp-btn-secondary:hover {
+    background-color: var(--wp-bg-hover);
+    border-color: var(--wp-border-strong);
+  }
+
+  /* ---- Live Status & Quota Meters ---- */
+  .wp-live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: var(--wp-status-live);
+    flex-shrink: 0;
+  }
+
+  .wp-meter-track {
+    height: 3px;
+    background-color: var(--wp-border-default);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .wp-meter-bar {
+    height: 100%;
+    background-color: var(--wp-meter-bar);
+    border-radius: 9999px;
+    transition: width var(--wp-dur-base) var(--wp-ease-standard);
+  }
+
+  .wp-brand-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background-color: var(--wp-text-primary);
+    color: var(--wp-text-inverted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 11.5px;
+    flex-shrink: 0;
+  }
+
+  /* ---- Legacy Buttons ---- */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none;
   }
