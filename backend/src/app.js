@@ -121,7 +121,7 @@ const createApp = () => {
   app.use('/api/track', trackRoutes);
 
   app.get('/', (req, res) => {
-    res.send('Web Pluse Analytics API is running...');
+    res.send('WebPulse Analytics API is running...');
   });
 
   // 404 + centralized error handler
