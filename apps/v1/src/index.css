@@ -161,6 +161,11 @@
     background-color: var(--wp-bg-canvas);
   }
 
+  .wp-shell.wp-shell-full,
+  .wp-shell-full {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   @media (max-width: 768px) {
     .wp-shell {
       grid-template-columns: minmax(0, 1fr);
