@@ -840,44 +840,51 @@ export default function Dashboard() {
         isOpen={showModal}
         onClose={cleanUp}
         title={registerDomain ? 'Register Domain' : 'Create New Project'}
-        align={registerDomain ? 'bottom' : 'top'}
       >
         <form
           onSubmit={registerDomain ? handleRegisterDomain : handleCreateProject}
-          className="space-y-5"
+          className="space-y-4 font-sans"
         >
           <div>
-            <label className="label">Project Name</label>
+            <label className="wp-label-section uppercase block mb-1">Project Name</label>
             <input
               type="text"
               required
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              className="input"
+              className="wp-input w-full text-xs h-8 px-2.5 rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] focus:outline-none focus:border-[var(--wp-text-primary)]"
               placeholder={registerDomain ? "e.g. my-website" : "e.g. My SaaS Platform"}
             />
           </div>
           {registerDomain && (
             <div>
-              <label className="label">Domain / Allowed Origin</label>
+              <label className="wp-label-section uppercase block mb-1">Domain / Allowed Origin</label>
               <input
                 type="text"
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
-                className="input font-mono"
+                className="wp-input w-full text-xs h-8 px-2.5 rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] text-[var(--wp-text-primary)] font-mono focus:outline-none focus:border-[var(--wp-text-primary)]"
                 placeholder="https://example.com"
               />
-              <p className="field-hint">
+              <p className="text-[10.5px] text-[var(--wp-text-muted)] mt-1 font-mono">
                 Comma-separated list of domains allowed to track this project.
               </p>
             </div>
           )}
-          <div className="flex justify-end gap-3">
-            <button type="button" onClick={cleanUp} className="btn-ghost btn-md">
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={cleanUp}
+              className="wp-btn wp-btn-secondary h-7 px-3 text-xs"
+            >
               Cancel
             </button>
-            <button type="submit" disabled={creating} className="btn-primary btn-md">
-              {creating && <Loader2 className="h-4 w-4 animate-spin" />}
+            <button
+              type="submit"
+              disabled={creating}
+              className="wp-btn wp-btn-primary h-7 px-3 text-xs gap-1.5"
+            >
+              {creating && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {creating
                 ? (registerDomain ? 'Registering...' : 'Processing...')
                 : (registerDomain ? 'Register Domain' : 'Deploy Project')}
@@ -888,8 +895,8 @@ export default function Dashboard() {
 
       {/* Loading overlay for creation */}
       {creating && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
-          <Loader2 className="h-8 w-8 text-slate-500 animate-spin" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Loader2 className="h-7 w-7 text-[var(--wp-text-primary)] animate-spin" />
         </div>
       )}
     </div>
