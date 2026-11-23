@@ -21,8 +21,17 @@ const io = new Server(server, {
   allowRequest: (req, callback) => {
     const origin = req.headers.origin;
     if (!origin || isAllowedOrigin(origin)) return callback(null, true);
-    return callback('Origin not allowed', false);
+    return callback(null, false);
   },
+  transports: ['websocket', 'polling'],
+  pingTimeout: 30000,
+  pingInterval: 25000,
+});
+
+io.engine.on('connection_error', (err) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug('[Socket] Engine connection notice:', err.message, err.code);
+  }
 });
 
 // Expose io globally so controllers/services can push real-time updates
