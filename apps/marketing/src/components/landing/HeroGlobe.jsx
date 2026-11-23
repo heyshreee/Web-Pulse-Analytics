@@ -51,11 +51,13 @@ function generateLandDots(features, stepDeg = 2) {
 
   const dots = [];
   for (let lat = -88; lat <= 88; lat += stepDeg) {
-    for (let lng = -180; lng <= 180; lng += stepDeg) {
+    const cosLat = Math.cos(toRad(lat));
+    const lngStep = cosLat > 0.001 ? Math.max(stepDeg, stepDeg / cosLat) : 360;
+    for (let lng = -180; lng <= 180; lng += lngStep) {
       const point = [lng, lat];
       for (let i = 0; i < polygons.length; i++) {
         if (pointInPolygon(point, polygons[i])) {
-          dots.push(geoToVec3(lat + stepDeg * 0.3, lng + stepDeg * 0.3, 1.001));
+          dots.push(geoToVec3(lat, lng, 1.002));
           break;
         }
       }
@@ -259,11 +261,13 @@ const HeroGlobe = forwardRef(function HeroGlobe(
     scene.add(stars);
 
     // --- Dot-matrix continents ---
+    const MAX_LAND_DOTS = 8192;
     const dotGeo = new THREE.SphereGeometry(0.007, 5, 5);
     const dotMat = new THREE.MeshBasicMaterial({ color: BLUE_DOT, transparent: true, opacity: 0.5, depthWrite: false });
-    const landDots = new THREE.InstancedMesh(dotGeo, dotMat, 4096);
+    const landDots = new THREE.InstancedMesh(dotGeo, dotMat, MAX_LAND_DOTS);
     landDots.frustumCulled = false;
     landDots.visible = false;
+    landDots.renderOrder = 3;
     sceneGroup.add(landDots);
     const dotDummy = new THREE.Object3D();
 
@@ -356,7 +360,7 @@ const HeroGlobe = forwardRef(function HeroGlobe(
         const gj = await res.json();
         if (cancelled) return;
         const dots = generateLandDots(gj?.features, isLowPower ? 2.5 : 2);
-        const count = Math.min(dots.length, 4096);
+        const count = Math.min(dots.length, MAX_LAND_DOTS);
         stateRef.current.landDots.count = count;
         stateRef.current.landDots.visible = count > 0;
         for (let i = 0; i < count; i++) {

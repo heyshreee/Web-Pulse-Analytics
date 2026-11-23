@@ -18,8 +18,8 @@ export default function CountUp({
 
   useEffect(() => {
     if (!run) return;
-    const from = fromRef.current;
-    const to = end;
+    const from = typeof fromRef.current === 'number' && !isNaN(fromRef.current) ? fromRef.current : 0;
+    const to = typeof end === 'number' && !isNaN(end) ? end : Number(end) || 0;
     if (from === to) {
       setValue(to);
       return;
@@ -31,7 +31,7 @@ export default function CountUp({
       const t = Math.min(1, elapsed / (duration * 1000));
       const eased = 1 - Math.pow(1 - t, 3);
       const val = from + (to - from) * eased;
-      setValue(val);
+      setValue(isNaN(val) ? to : val);
       if (t < 1) {
         rafRef.current = requestAnimationFrame(step);
       } else {
@@ -47,7 +47,8 @@ export default function CountUp({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [end, duration, run]);
 
-  const fixed = value.toFixed(decimals);
+  const safeVal = typeof value === 'number' && !isNaN(value) ? value : (Number(end) || 0);
+  const fixed = safeVal.toFixed(decimals);
   const [intPart, decPart] = fixed.split('.');
   const formattedInt = separator
     ? intPart.replace(/\B(?=(\d{3})+(?!\d))/g, separator)

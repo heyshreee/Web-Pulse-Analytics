@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, Link } from 'react-router-dom';
 import { Plus, ArrowUpRight, Loader2, Copy, X } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
@@ -12,10 +12,66 @@ import {
   AreaChart,
   Area,
   XAxis,
+  YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+
+function formatRelativeTime(dateInput) {
+  if (!dateInput) return 'just now';
+  const time = new Date(dateInput).getTime();
+  if (isNaN(time)) return 'recently';
+  const diffSec = Math.floor((Date.now() - time) / 1000);
+  if (diffSec < 45) return 'just now';
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+  return `${Math.floor(diffSec / 86400)}d ago`;
+}
+
+const CustomTrafficTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+  const data = payload[0]?.payload || {};
+  const dateStr = data.fullDate
+    ? new Date(data.fullDate).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        ...(data.fullDate.includes(':')
+          ? { hour: '2-digit', minute: '2-digit' }
+          : { year: 'numeric' })
+      })
+    : label;
+
+  return (
+    <div className="bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-md p-2.5 shadow-2xl text-[11px] font-mono space-y-1.5 z-50 min-w-[130px]">
+      <div className="text-[var(--wp-text-muted)] font-medium text-[10px] uppercase border-b border-[var(--wp-border-subtle)] pb-1">
+        {dateStr}
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[var(--wp-text-secondary)]">Events:</span>
+        <span className="font-bold text-[var(--wp-text-primary)] tabular-nums">
+          {(data.views ?? 0).toLocaleString()}
+        </span>
+      </div>
+      {data.visitors !== undefined && (
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[var(--wp-text-secondary)]">Visitors:</span>
+          <span className="font-medium text-[var(--wp-text-secondary)] tabular-nums">
+            {(data.visitors ?? 0).toLocaleString()}
+          </span>
+        </div>
+      )}
+      {data.sessions !== undefined && (
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[var(--wp-text-secondary)]">Sessions:</span>
+          <span className="font-medium text-[var(--wp-text-secondary)] tabular-nums">
+            {(data.sessions ?? 0).toLocaleString()}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function Dashboard() {
   const { user, loadUser, usageStats, socket, setIsPageLoading } = useOutletContext();
@@ -171,17 +227,20 @@ export default function Dashboard() {
   };
 
   const formatUsagePercent = (used, limit) => {
-    if (!limit || limit === 0) return '0%';
-    const pct = (used / limit) * 100;
+    const numUsed = Number(used);
+    const numLimit = Number(limit);
+    if (!numLimit || isNaN(numLimit) || numLimit <= 0 || isNaN(numUsed)) return '0%';
+    const pct = (numUsed / numLimit) * 100;
     if (pct > 0 && pct < 0.1) return '<0.1%';
-    return `${Math.round(pct)}%`;
+    return `${Math.min(100, Math.max(0, Math.round(pct)))}%`;
   };
 
   const formatCompactLimit = (limit) => {
-    if (!limit) return '0';
-    if (limit >= 1000000) return `${(limit / 1000000).toFixed(0)}M`;
-    if (limit >= 1000) return `${(limit / 1000).toFixed(0)}k`;
-    return limit.toLocaleString();
+    const num = Number(limit);
+    if (!num || isNaN(num) || num <= 0) return '0';
+    if (num >= 1000000) return `${(num / 1000000).toFixed(0)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(0)}k`;
+    return num.toLocaleString();
   };
 
   if (loading) {
@@ -235,9 +294,10 @@ export default function Dashboard() {
     );
   }
 
-  const totalViewsUsed = stats?.reduce((acc, curr) => acc + curr.views, 0) || 0;
-  const viewLimit = usageStats?.monthlyLimit || 1000;
-  const viewPercentage = Math.min((totalViewsUsed / viewLimit) * 100, 100);
+  const totalViewsUsed = stats?.reduce((acc, curr) => acc + (Number(curr.views) || 0), 0) || 0;
+  const viewLimit = Number(usageStats?.monthlyLimit) || 1000;
+  const quotaUsed = usageStats?.totalViews !== undefined ? Number(usageStats.totalViews) || 0 : totalViewsUsed;
+  const viewPercentage = Math.min(Math.max((quotaUsed / viewLimit) * 100, 0), 100);
 
   const projectsUsed = usageStats?.projectCount ?? projects.length;
   const projectLimit = usageStats?.projectLimit ?? 5;
@@ -279,8 +339,11 @@ export default function Dashboard() {
     }
   };
 
-  const { realTimeVisitors, trafficData, liveActivity } = dashboardStats;
-  const totalSessionsCount = stats?.reduce((acc, curr) => acc + (curr.sessions || 0), 0) || totalViewsUsed || 0;
+  const { realTimeVisitors = 0, trafficData = [], liveActivity = [] } = dashboardStats || {};
+  const totalSessionsCount = stats?.reduce((acc, curr) => acc + (Number(curr.sessions) || 0), 0) || Number(dashboardStats?.sessions) || totalViewsUsed || 0;
+  const rangeLabel = timeRange === 'realtime' ? 'Live' : timeRange;
+  const eventsCount = dashboardStats?.viewsTotal !== undefined ? Number(dashboardStats.viewsTotal) || 0 : totalViewsUsed;
+  const sessionsCount = dashboardStats?.sessions !== undefined ? Number(dashboardStats.sessions) || 0 : totalSessionsCount;
 
   return (
     <div className="space-y-3 font-sans">
@@ -334,6 +397,76 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Disrupted Telemetry Notice */}
+      {globeError && (
+        <div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-amber-400 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <span>Telemetry endpoint temporarily unreachable. Showing cached metrics.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => loadData(true)}
+            className="text-[11px] font-mono underline hover:text-amber-300"
+          >
+            Retry sync
+          </button>
+        </div>
+      )}
+
+      {/* 0-Projects Onboarding Studio State */}
+      {projects.length === 0 && (
+        <div className="wp-panel p-5 bg-[var(--wp-bg-surface)] border border-dashed border-[var(--wp-border-strong)] rounded-lg space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="wp-live-dot" />
+                <h2 className="text-sm font-semibold text-[var(--wp-text-primary)]">
+                  Your analytics workspace is ready
+                </h2>
+              </div>
+              <p className="text-xs text-[var(--wp-text-muted)] mt-1 max-w-xl">
+                Connect your first website to start streaming visitor telemetry, traffic channels, and real-time geographic maps.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={openRegisterDomain}
+                className="wp-btn wp-btn-secondary text-xs h-7 px-3"
+              >
+                Register Domain
+              </button>
+              <button
+                type="button"
+                onClick={openCreateProject}
+                className="wp-btn wp-btn-primary text-xs h-7 px-3"
+              >
+                Deploy Project
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-[var(--wp-border-subtle)] text-xs">
+            <div className="p-2.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] space-y-1">
+              <span className="font-mono text-[10px] text-[var(--wp-text-muted)]">01 / DOMAIN</span>
+              <p className="font-medium text-[var(--wp-text-primary)]">Register your site</p>
+              <p className="text-[11px] text-[var(--wp-text-muted)]">Whitelist your domain origin to authorize incoming hits.</p>
+            </div>
+            <div className="p-2.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] space-y-1">
+              <span className="font-mono text-[10px] text-[var(--wp-text-muted)]">02 / SNIPPET</span>
+              <p className="font-medium text-[var(--wp-text-primary)]">Embed lightweight tag</p>
+              <p className="text-[11px] text-[var(--wp-text-muted)]">Privacy-first &lt;1KB tracking script tag.</p>
+            </div>
+            <div className="p-2.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] space-y-1">
+              <span className="font-mono text-[10px] text-[var(--wp-text-muted)]">03 / TELEMETRY</span>
+              <p className="font-medium text-[var(--wp-text-primary)]">Inspect live stream</p>
+              <p className="text-[11px] text-[var(--wp-text-muted)]">Watch real-time visitors, geography, and momentum live.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 2. Unified 4-Column KPI Bar */}
       <div className="wp-panel grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
         {/* Col 1: Live Visitors */}
@@ -347,11 +480,11 @@ export default function Dashboard() {
           </div>
           <div className="mt-1">
             <span className="wp-kpi-value text-2xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
-              <AnimatedNumber value={realTimeVisitors} />
+              <AnimatedNumber value={realTimeVisitors || 0} />
             </span>
           </div>
           <div className="text-[11px] font-mono text-[var(--wp-text-muted)] mt-1 truncate">
-            {realTimeVisitors > 0 ? 'Concurrent active streams' : 'No active streams'}
+            {realTimeVisitors > 0 ? 'Concurrent active streams' : 'No active streams (last 5m)'}
           </div>
         </div>
 
@@ -359,15 +492,15 @@ export default function Dashboard() {
         <div className="p-3 sm:p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-[11px]">
             <span className="wp-label-section uppercase">Events tracked</span>
-            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">30d</span>
+            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] uppercase">{rangeLabel}</span>
           </div>
           <div className="mt-1">
             <span className="wp-kpi-value text-2xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
-              {totalViewsUsed.toLocaleString()}
+              {eventsCount.toLocaleString()}
             </span>
           </div>
           <div className="text-[11px] font-mono text-[var(--wp-text-muted)] mt-1 truncate">
-            30-day recorded hits
+            Recorded telemetry hits ({rangeLabel})
           </div>
         </div>
 
@@ -375,15 +508,15 @@ export default function Dashboard() {
         <div className="p-3 sm:p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-[11px]">
             <span className="wp-label-section uppercase">Unique sessions</span>
-            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">Total</span>
+            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] uppercase">{rangeLabel}</span>
           </div>
           <div className="mt-1">
             <span className="wp-kpi-value text-2xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
-              {totalSessionsCount.toLocaleString()}
+              {sessionsCount.toLocaleString()}
             </span>
           </div>
           <div className="text-[11px] font-mono text-[var(--wp-text-muted)] mt-1 truncate">
-            Across connected domains
+            Distinct browsing visits across domains
           </div>
         </div>
 
@@ -392,12 +525,12 @@ export default function Dashboard() {
           <div className="flex items-center justify-between text-[11px]">
             <span className="wp-label-section uppercase">Capacity</span>
             <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
-              {formatUsagePercent(totalViewsUsed, viewLimit)}
+              {formatUsagePercent(quotaUsed, viewLimit)}
             </span>
           </div>
           <div className="mt-1 flex items-baseline gap-1">
             <span className="wp-kpi-value text-xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums">
-              {totalViewsUsed.toLocaleString()}
+              {quotaUsed.toLocaleString()}
             </span>
             <span className="text-xs font-mono text-[var(--wp-text-muted)]">
               / {formatCompactLimit(viewLimit)}
@@ -407,8 +540,11 @@ export default function Dashboard() {
             <div className="wp-meter-track">
               <div
                 className="wp-meter-bar"
-                style={{ width: `${Math.max(viewPercentage, totalViewsUsed > 0 ? 2 : 0)}%` }}
+                style={{ width: `${Math.max(viewPercentage, quotaUsed > 0 ? 2 : 0)}%` }}
               />
+            </div>
+            <div className="text-[10px] font-mono text-[var(--wp-text-muted)] truncate">
+              Monthly events allowance ({usageStats?.plan ? usageStats.plan.toUpperCase() : 'FREE'})
             </div>
           </div>
         </div>
@@ -432,9 +568,9 @@ export default function Dashboard() {
 
           <div className="wp-studio-canvas flex-1 min-h-[380px] p-2.5 sm:p-3 flex flex-col justify-between min-w-0">
             {trafficData && trafficData.length > 0 ? (
-              <div className="w-full h-full min-h-[360px] min-w-0 flex-1 relative">
-                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={340}>
-                  <AreaChart data={trafficData} margin={{ top: 12, right: 12, left: -20, bottom: 4 }}>
+              <div className="w-full h-full min-h-[360px] min-w-0 flex-1 relative" style={{ minHeight: 360 }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={340} debounce={50}>
+                  <AreaChart data={trafficData} margin={{ top: 12, right: 12, left: -10, bottom: 4 }}>
                     <defs>
                       <linearGradient id="studioTrafficGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="var(--wp-chart-1)" stopOpacity={0.25} />
@@ -448,19 +584,15 @@ export default function Dashboard() {
                       axisLine={{ stroke: 'var(--wp-border-subtle)' }}
                       tickLine={false}
                     />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'var(--wp-bg-surface)',
-                        borderColor: 'var(--wp-border-default)',
-                        borderRadius: '6px',
-                        color: 'var(--wp-text-primary)',
-                        fontSize: '11px',
-                        fontFamily: 'monospace',
-                        boxShadow: 'none',
-                      }}
-                      itemStyle={{ color: 'var(--wp-text-primary)' }}
-                      labelStyle={{ color: 'var(--wp-text-muted)', marginBottom: '4px' }}
+                    <YAxis
+                      tick={{ fill: 'var(--wp-text-muted)', fontSize: 10, fontFamily: 'monospace' }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={34}
+                      allowDecimals={false}
+                      domain={[0, (dataMax) => Math.max(dataMax, 5)]}
                     />
+                    <Tooltip content={<CustomTrafficTooltip />} />
                     <Area
                       type="monotone"
                       dataKey="views"
@@ -580,6 +712,123 @@ export default function Dashboard() {
                 )
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Secondary Studio Workspace: Live Activity Feed (7 cols) + Ingress Sources (5 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        {/* Left 7 Cols: Recent Live Activity Feed */}
+        <div className="lg:col-span-7 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
+          <div className="wp-panel-header">
+            <div className="flex items-center gap-2">
+              <span className="wp-title-card">Recent activity</span>
+              <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] flex items-center gap-1">
+                <span className="wp-live-dot" />
+                Live stream
+              </span>
+            </div>
+            <Link
+              to="/dashboard/activity"
+              className="text-[11px] font-mono text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] transition-colors flex items-center gap-1"
+            >
+              <span>View full log</span>
+              <ArrowUpRight className="h-3 w-3" />
+            </Link>
+          </div>
+
+          <div className="p-3 divide-y divide-[var(--wp-border-subtle)] min-h-[200px] flex flex-col justify-center">
+            {liveActivity && liveActivity.length > 0 ? (
+              <div className="space-y-0.5">
+                {liveActivity.slice(0, 5).map((act, idx) => (
+                  <div
+                    key={act.id || idx}
+                    className="py-2 px-2.5 rounded-md hover:bg-[var(--wp-bg-hover)] transition-colors flex items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="wp-live-dot shrink-0" />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-[var(--wp-text-primary)] truncate">
+                            {act.location && act.location !== 'Unknown Location' ? act.location : (act.site || 'Direct Visitor')}
+                          </span>
+                          <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] bg-[var(--wp-bg-subtle)] px-1.5 py-0.2 rounded border border-[var(--wp-border-subtle)] truncate max-w-[200px]">
+                            {act.path || '/'}
+                          </span>
+                        </div>
+                        <div className="text-[10.5px] font-mono text-[var(--wp-text-muted)] flex items-center gap-2 mt-0.5">
+                          <span>{act.device || 'Desktop'}</span>
+                          <span>•</span>
+                          <span>{act.browser || 'Browser'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] whitespace-nowrap shrink-0">
+                      {formatRelativeTime(act.timestamp)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 space-y-1.5">
+                <p className="text-xs font-mono text-[var(--wp-text-secondary)]">No incoming activity yet</p>
+                <p className="text-[11px] text-[var(--wp-text-muted)]">
+                  Live pageviews and custom telemetry events will populate here as visitors browse your domains.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right 5 Cols: Top Ingress Sources */}
+        <div className="lg:col-span-5 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
+          <div className="wp-panel-header">
+            <div className="flex items-center gap-2">
+              <span className="wp-title-card">Top ingress sources</span>
+            </div>
+            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">
+              {dashboardStats?.sourceData?.length || 0} sources
+            </span>
+          </div>
+
+          <div className="p-3 min-h-[200px] flex flex-col justify-center">
+            {dashboardStats?.sourceData && dashboardStats.sourceData.length > 0 ? (
+              <div className="space-y-2.5">
+                {(() => {
+                  const sources = dashboardStats.sourceData.slice(0, 5);
+                  const maxVal = Math.max(...sources.map(s => Number(s.value) || 0), 1);
+                  return sources.map((s, idx) => {
+                    const val = Number(s.value) || 0;
+                    const pct = Math.round((val / maxVal) * 100);
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-mono text-[var(--wp-text-primary)] truncate max-w-[180px]">
+                            {s.name || 'Direct'}
+                          </span>
+                          <span className="font-mono text-[11px] text-[var(--wp-text-secondary)] tabular-nums">
+                            {val.toLocaleString()} hits
+                          </span>
+                        </div>
+                        <div className="wp-meter-track">
+                          <div
+                            className="wp-meter-bar"
+                            style={{ width: `${Math.max(pct, 3)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            ) : (
+              <div className="text-center py-8 space-y-1.5">
+                <p className="text-xs font-mono text-[var(--wp-text-secondary)]">No referral sources detected</p>
+                <p className="text-[11px] text-[var(--wp-text-muted)]">
+                  Traffic channels (Direct, Organic, Social, Referrals) will display here once recorded.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

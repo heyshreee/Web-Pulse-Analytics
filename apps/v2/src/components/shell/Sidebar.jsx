@@ -49,7 +49,7 @@ const NAV_GROUPS = [
   }
 ];
 
-export default function Sidebar({ user, onLogout }) {
+export default function Sidebar({ user, plan = 'free', onLogout }) {
   const { projects, selectedProjectId, setSelectedProjectId, currentProject, openAddProject } = useProject();
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
@@ -241,7 +241,16 @@ export default function Sidebar({ user, onLogout }) {
             {initials}
           </span>
           <span className="user-meta">
-            <span className="user-name">{user?.name || 'Account'}</span>
+            <span className="user-name flex items-center justify-between gap-1.5">
+              <span className="truncate">{user?.name || 'Account'}</span>
+              <span className={`badge ${
+                ['pro', 'business', 'enterprise'].includes((plan || user?.plan || '').toLowerCase())
+                  ? 'badge--success'
+                  : 'badge--outline'
+              } text-[9px] px-1.5 py-0 leading-tight uppercase font-mono shrink-0`}>
+                {(plan || user?.plan || 'free').toUpperCase()}
+              </span>
+            </span>
             <span className="user-mail">{user?.email || 'admin@webpulse.io'}</span>
           </span>
           <span aria-hidden="true" style={{ color: 'var(--muted-foreground)' }} className="nav-trailing">
@@ -256,7 +265,21 @@ export default function Sidebar({ user, onLogout }) {
           align="left"
           className="w-60"
         >
-          <MenuLabel>{user?.email || 'User Account'}</MenuLabel>
+          <div className="px-3 py-2 border-b border-[var(--border)]">
+            <p className="text-xs font-semibold text-foreground truncate">{user?.name || 'Account'}</p>
+            <p className="text-[11px] text-muted-foreground truncate">{user?.email || ''}</p>
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <span
+                className={`badge ${
+                  ['pro', 'business', 'enterprise'].includes((plan || user?.plan || '').toLowerCase())
+                    ? 'badge--success'
+                    : 'badge--outline'
+                } text-[10px] px-1.5 uppercase font-mono font-semibold`}
+              >
+                {(plan || user?.plan || 'free').toUpperCase()} PLAN
+              </span>
+            </div>
+          </div>
           <MenuItem
             icon="user"
             onClick={() => {

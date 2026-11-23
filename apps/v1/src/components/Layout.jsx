@@ -63,8 +63,10 @@ export default function Layout() {
         if (isSocketEnabled()) {
             const newSocket = io(getSocketUrl(), {
                 withCredentials: true,
-                transports: ['polling', 'websocket'],
-                reconnectionAttempts: 5
+                transports: ['websocket', 'polling'],
+                reconnectionAttempts: 5,
+                reconnectionDelay: 2000,
+                timeout: 10000,
             });
 
             socketRef.current = newSocket;
@@ -78,7 +80,9 @@ export default function Layout() {
             });
 
             newSocket.on('connect_error', (err) => {
-                console.error('❌ Socket.IO connection error:', err.message);
+                if (import.meta.env.DEV) {
+                    console.debug('Socket.IO connection notice:', err.message);
+                }
             });
 
             newSocket.on('usage_update', (data) => {
@@ -177,9 +181,11 @@ export default function Layout() {
         return limit.toLocaleString();
     };
 
+    const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
+
     if (loading) {
         return (
-            <div className="wp-shell font-sans text-[var(--wp-text-primary)]">
+            <div className={`wp-shell font-sans text-[var(--wp-text-primary)] ${isSettingsPage ? 'wp-shell-full' : ''}`}>
                 {/* Top Studio Bar Skeleton */}
                 <header className="col-span-full h-[46px] border-b border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] px-3 sm:px-4 flex items-center justify-between z-30 animate-pulse">
                     <div className="flex items-center gap-2">
@@ -191,40 +197,43 @@ export default function Layout() {
                     <div className="flex items-center gap-2">
                         <div className="h-7 w-16 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
                         <div className="h-7 w-7 bg-[var(--wp-border-subtle)] rounded" />
+                        <div className="h-5 w-14 bg-[var(--wp-border-subtle)] rounded hidden sm:block" />
                         <div className="h-7 w-7 bg-[var(--wp-border-subtle)] rounded-full" />
                     </div>
                 </header>
 
                 {/* Left Control Rail Skeleton */}
-                <aside className="w-[224px] min-w-[224px] max-w-[224px] border-r border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] flex flex-col justify-between p-2.5 hidden lg:flex animate-pulse">
-                    <div className="space-y-4">
-                        <div>
-                            <div className="h-3 w-14 bg-[var(--wp-border-subtle)] rounded mb-2 px-1" />
-                            <div className="space-y-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <div key={i} className="h-[30px] rounded-md px-2 flex items-center gap-2 bg-[var(--wp-bg-subtle)]/60">
-                                        <div className="h-3.5 w-3.5 rounded bg-[var(--wp-border-default)]" />
-                                        <div className={`h-3 rounded bg-[var(--wp-border-default)] ${i === 1 ? 'w-20' : i === 2 ? 'w-16' : i === 3 ? 'w-24' : 'w-14'}`} />
-                                    </div>
-                                ))}
+                {!isSettingsPage && (
+                    <aside className="w-[224px] min-w-[224px] max-w-[224px] border-r border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] flex flex-col justify-between p-2.5 hidden lg:flex animate-pulse">
+                        <div className="space-y-4">
+                            <div>
+                                <div className="h-3 w-14 bg-[var(--wp-border-subtle)] rounded mb-2 px-1" />
+                                <div className="space-y-1">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="h-[30px] rounded-md px-2 flex items-center gap-2 bg-[var(--wp-bg-subtle)]/60">
+                                            <div className="h-3.5 w-3.5 rounded bg-[var(--wp-border-default)]" />
+                                            <div className={`h-3 rounded bg-[var(--wp-border-default)] ${i === 1 ? 'w-20' : i === 2 ? 'w-16' : i === 3 ? 'w-24' : 'w-14'}`} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded mb-2 px-1" />
+                                <div className="h-[28px] rounded-md bg-[var(--wp-bg-subtle)]/40" />
                             </div>
                         </div>
 
-                        <div>
-                            <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded mb-2 px-1" />
-                            <div className="h-[28px] rounded-md bg-[var(--wp-bg-subtle)]/40" />
+                        <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)]">
+                            <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
+                            <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
+                            <div className="h-6 w-full bg-[var(--wp-border-subtle)] rounded" />
                         </div>
-                    </div>
-
-                    <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)]">
-                        <div className="h-3 w-20 bg-[var(--wp-border-subtle)] rounded" />
-                        <div className="h-1 w-full bg-[var(--wp-border-default)] rounded-full" />
-                        <div className="h-6 w-full bg-[var(--wp-border-subtle)] rounded" />
-                    </div>
-                </aside>
+                    </aside>
+                )}
 
                 {/* Main Viewport Skeleton */}
-                <div className="flex flex-col min-w-0 h-full overflow-hidden bg-[var(--wp-bg-canvas)]">
+                <div className={`flex flex-col min-w-0 h-full overflow-hidden bg-[var(--wp-bg-canvas)] ${isSettingsPage ? 'col-span-full' : ''}`}>
                     <main className="flex-1 p-3 sm:p-4 space-y-3 animate-pulse">
                         <div className="flex justify-between items-center h-8">
                             <div className="h-4 w-32 bg-[var(--wp-border-default)] rounded" />
@@ -255,7 +264,6 @@ export default function Layout() {
         return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
     };
 
-    const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
     const isSidebarBusy = sidebarLoading || isPageLoading;
 
     const isProdDomain = typeof window !== 'undefined' &&
@@ -264,7 +272,7 @@ export default function Layout() {
     const v2AppUrl = import.meta.env.VITE_V2_APP_URL || defaultV2Url;
 
     return (
-        <div className="wp-shell font-sans text-[var(--wp-text-primary)]">
+        <div className={`wp-shell font-sans text-[var(--wp-text-primary)] ${isSettingsPage ? 'wp-shell-full' : ''}`}>
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && !isSettingsPage && (
                 <div
@@ -318,6 +326,19 @@ export default function Layout() {
 
                     {user && (
                         <div className="flex items-center gap-2 pl-1 border-l border-[var(--wp-border-subtle)] ml-1">
+                            <Link
+                                to="/dashboard/billing"
+                                className="wp-metric-mono text-[10px] uppercase font-semibold px-2 py-0.5 rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-surface)] text-[var(--wp-text-secondary)] hover:text-[var(--wp-text-primary)] hover:border-[var(--wp-border-strong)] transition-all inline-flex items-center gap-1.5 select-none"
+                                title="Subscription plan — click to manage in Billing"
+                            >
+                                <span className={`h-1.5 w-1.5 rounded-full ${
+                                    ['pro', 'business', 'enterprise'].includes((user.plan || usageStats?.plan || '').toLowerCase())
+                                        ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]'
+                                        : 'bg-[var(--wp-text-muted)]'
+                                }`} />
+                                <span>{(user.plan || usageStats?.plan || 'Free').toUpperCase()}</span>
+                            </Link>
+
                             <div className="relative group">
                                 <button className="h-7 w-7 rounded-full border border-[var(--wp-border-default)] bg-[var(--wp-bg-subtle)] flex items-center justify-center text-[var(--wp-text-primary)] overflow-hidden hover:border-[var(--wp-border-strong)] transition-all">
                                     {user.avatar_url ? (
@@ -356,10 +377,10 @@ export default function Layout() {
             {/* Left Control Rail (224px) */}
             {!isSettingsPage && (
                 <aside className={`
-                    fixed lg:static inset-y-[46px] left-0 z-40 w-[224px] min-w-[224px] max-w-[224px] bg-[var(--wp-bg-canvas)] border-r border-[var(--wp-border-default)] transform transition-transform duration-200 ease-in-out flex flex-col justify-between p-2.5
+                    fixed lg:static inset-y-[46px] left-0 z-40 w-[224px] min-w-[224px] max-w-[224px] bg-[var(--wp-bg-canvas)] border-r border-[var(--wp-border-default)] transform transition-transform duration-200 ease-in-out flex flex-col justify-between p-2.5 h-full min-h-0 overflow-hidden
                     ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 `}>
-                    <div className="space-y-4 overflow-y-auto">
+                    <div className="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1">
                         <div>
                             <div className="wp-label-section px-2 mb-1.5 uppercase">Workspace</div>
                             {isSidebarBusy ? (
@@ -441,7 +462,7 @@ export default function Layout() {
                     </div>
 
                     {/* Recessed Capacity Card */}
-                    <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)] shrink-0">
+                    <div className="border border-[var(--wp-border-default)] rounded-md p-2.5 space-y-2 bg-[var(--wp-bg-surface)] shrink-0 mt-2">
                         {isSidebarBusy ? (
                             <div className="space-y-2.5 animate-pulse" aria-label="Loading capacity">
                                 <div>
@@ -467,17 +488,17 @@ export default function Layout() {
                                     <div className="flex items-center justify-between text-[11px] mb-1">
                                         <span className="text-[var(--wp-text-secondary)]">Events</span>
                                         <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
-                                            {formatUsagePercent(usageStats.totalViews, usageStats.monthlyLimit)}
+                                            {formatUsagePercent(usageStats?.totalViews, usageStats?.monthlyLimit)}
                                         </span>
                                     </div>
                                     <div className="wp-meter-track">
                                         <div
                                             className="wp-meter-bar"
-                                            style={{ width: `${Math.max(usagePercentage, usageStats.totalViews > 0 ? 2 : 0)}%` }}
+                                            style={{ width: `${Math.max(usagePercentage, (usageStats?.totalViews || 0) > 0 ? 2 : 0)}%` }}
                                         />
                                     </div>
                                     <p className="wp-metric-mono text-[10.5px] text-[var(--wp-text-muted)] mt-1">
-                                        {usageStats.totalViews.toLocaleString()} / {formatCompactLimit(usageStats.monthlyLimit)} views
+                                        {(usageStats?.totalViews || 0).toLocaleString()} / {formatCompactLimit(usageStats?.monthlyLimit)} views
                                     </p>
                                 </div>
 
@@ -485,13 +506,13 @@ export default function Layout() {
                                     <div className="flex items-center justify-between text-[11px] mb-1">
                                         <span className="text-[var(--wp-text-secondary)]">Storage</span>
                                         <span className="wp-metric-mono font-medium text-[var(--wp-text-primary)]">
-                                            {formatBytes(usageStats.storageUsed)}
+                                            {formatBytes(usageStats?.storageUsed || 0)}
                                         </span>
                                     </div>
                                     <div className="wp-meter-track">
                                         <div
                                             className="wp-meter-bar"
-                                            style={{ width: `${Math.max(storagePct, usageStats.storageUsed > 0 ? 2 : 0)}%` }}
+                                            style={{ width: `${Math.max(storagePct, (usageStats?.storageUsed || 0) > 0 ? 2 : 0)}%` }}
                                         />
                                     </div>
                                 </div>
@@ -506,7 +527,7 @@ export default function Layout() {
             )}
 
             {/* Main Studio Viewport */}
-            <div className="flex flex-col min-w-0 h-full overflow-hidden bg-[var(--wp-bg-canvas)]">
+            <div className={`flex flex-col min-w-0 h-full overflow-hidden bg-[var(--wp-bg-canvas)] ${isSettingsPage ? 'col-span-full' : ''}`}>
                 <main className="flex-1 overflow-auto layout-scroll-content p-3 sm:p-4 min-h-0">
                     <PageTransition>
                         <Outlet context={{ user, loadUser, loadSidebarData, usageStats, socket, isPageLoading, setIsPageLoading }} />

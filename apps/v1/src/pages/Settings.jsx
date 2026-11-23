@@ -6,12 +6,13 @@ import {
     Check, Edit2, CreditCard, Download,
     MessageSquare, Send, Lock, X
 } from 'lucide-react';
-import { apiRequest } from '../utils/api';
+import { apiRequest, getApiUrl } from '../utils/api';
 import { useToast } from '../context/ToastContext';
 import { formatINR, getPlanById } from '../data/plans';
 
 export default function Settings() {
-    const { user, loadUser } = useOutletContext();
+    const context = useOutletContext() || {};
+    const { user, loadUser } = context;
     const { tab } = useParams();
     const navigate = useNavigate();
     const activeTab = tab || 'profile';
@@ -125,7 +126,7 @@ function ProfileSection({ user, loadUser, showToast }) {
 
         setUploading(true);
         try {
-            const response = await fetch('/api/v1/user/avatar', {
+            const response = await fetch(`${getApiUrl()}/user/avatar`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: {
@@ -602,7 +603,8 @@ function NotificationsSection({ user, showToast }) {
 }
 
 function UsageSection() {
-    const { usageStats } = useOutletContext();
+    const context = useOutletContext() || {};
+    const usageStats = context.usageStats;
 
     if (!usageStats) {
         return (
@@ -616,8 +618,15 @@ function UsageSection() {
         );
     }
 
+    const totalViews = Number(usageStats.totalViews) || 0;
+    const monthlyLimit = Number(usageStats.monthlyLimit) || 0;
+    const storageUsed = Number(usageStats.storageUsed) || 0;
+    const storageLimit = Number(usageStats.storageLimit) || 0;
+    const projectCount = Number(usageStats.projectCount) || 0;
+    const projectLimit = usageStats.projectLimit ?? 0;
+
     const getPercentage = (used, limit) => {
-        if (!limit || limit === Infinity) return 0;
+        if (!limit || limit === Infinity || limit <= 0) return 0;
         return Math.min((used / limit) * 100, 100);
     };
 
@@ -626,7 +635,7 @@ function UsageSection() {
             <div className="wp-panel-header">
                 <span className="wp-title-card">Usage & Quota</span>
                 <span className="wp-metric-mono text-[10.5px] uppercase px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] text-[var(--wp-text-primary)]">
-                    {usageStats.plan} Plan
+                    {usageStats.plan || 'Free'} Plan
                 </span>
             </div>
 
@@ -637,17 +646,17 @@ function UsageSection() {
                         <div>
                             <span className="wp-label-section uppercase">Monthly views</span>
                             <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
-                                {usageStats.totalViews.toLocaleString()}
+                                {totalViews.toLocaleString()}
                             </div>
                         </div>
                         <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)] tabular-nums">
-                            Limit: {usageStats.monthlyLimit.toLocaleString()}
+                            Limit: {monthlyLimit > 0 ? monthlyLimit.toLocaleString() : 'Unlimited'}
                         </p>
                     </div>
                     <div className="wp-meter-track">
                         <div
                             className="wp-meter-bar"
-                            style={{ width: `${Math.max(getPercentage(usageStats.totalViews, usageStats.monthlyLimit), usageStats.totalViews > 0 ? 2 : 0)}%` }}
+                            style={{ width: `${Math.max(getPercentage(totalViews, monthlyLimit), totalViews > 0 ? 2 : 0)}%` }}
                         />
                     </div>
                 </div>
@@ -658,22 +667,22 @@ function UsageSection() {
                         <div>
                             <span className="wp-label-section uppercase">Storage used</span>
                             <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
-                                {usageStats.storageUsed < 1024 * 1024
-                                    ? `${(usageStats.storageUsed / 1024).toFixed(2)} KB`
-                                    : usageStats.storageUsed < 1024 * 1024 * 1024
-                                        ? `${(usageStats.storageUsed / (1024 * 1024)).toFixed(2)} MB`
-                                        : `${(usageStats.storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
+                                {storageUsed < 1024 * 1024
+                                    ? `${(storageUsed / 1024).toFixed(2)} KB`
+                                    : storageUsed < 1024 * 1024 * 1024
+                                        ? `${(storageUsed / (1024 * 1024)).toFixed(2)} MB`
+                                        : `${(storageUsed / (1024 * 1024 * 1024)).toFixed(2)} GB`
                                 }
                             </div>
                         </div>
                         <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
-                            Limit: {usageStats.storageLimit < 1024 * 1024 * 1024 ? `${(usageStats.storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(usageStats.storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}
+                            Limit: {storageLimit < 1024 * 1024 * 1024 ? `${(storageLimit / (1024 * 1024)).toFixed(0)} MB` : `${(storageLimit / (1024 * 1024 * 1024)).toFixed(0)} GB`}
                         </p>
                     </div>
                     <div className="wp-meter-track">
                         <div
                             className="wp-meter-bar"
-                            style={{ width: `${Math.max(getPercentage(usageStats.storageUsed, usageStats.storageLimit), usageStats.storageUsed > 0 ? 2 : 0)}%` }}
+                            style={{ width: `${Math.max(getPercentage(storageUsed, storageLimit), storageUsed > 0 ? 2 : 0)}%` }}
                         />
                     </div>
                 </div>
@@ -684,17 +693,17 @@ function UsageSection() {
                         <div>
                             <span className="wp-label-section uppercase">Total projects</span>
                             <div className="wp-kpi-value text-base font-medium text-[var(--wp-text-primary)] mt-0.5 tabular-nums">
-                                {usageStats.projectCount}
+                                {projectCount}
                             </div>
                         </div>
                         <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
-                            Limit: {usageStats.projectLimit}
+                            Limit: {projectLimit === Infinity ? 'Unlimited' : projectLimit}
                         </p>
                     </div>
                     <div className="wp-meter-track">
                         <div
                             className="wp-meter-bar"
-                            style={{ width: `${Math.max(getPercentage(usageStats.projectCount, usageStats.projectLimit), usageStats.projectCount > 0 ? 2 : 0)}%` }}
+                            style={{ width: `${Math.max(getPercentage(projectCount, projectLimit), projectCount > 0 ? 2 : 0)}%` }}
                         />
                     </div>
                 </div>
@@ -709,7 +718,7 @@ function UsageSection() {
                             </div>
                         </div>
                         <p className="wp-metric-mono text-[11px] text-[var(--wp-text-muted)]">
-                            Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : usageStats.share_report?.limit}
+                            Limit: {usageStats.share_report?.limit === Infinity ? 'Unlimited' : (usageStats.share_report?.limit ?? 'Unlimited')}
                         </p>
                     </div>
                     <div className="wp-meter-track">
@@ -898,8 +907,7 @@ function BillingSection({ user }) {
 
     const handleDownloadReceipt = async (paymentId) => {
         try {
-            const baseUrl = import.meta.env.VITE_API_URL;
-            const apiUrl = baseUrl.endsWith('/v1') ? baseUrl : `${baseUrl}/v1`;
+            const apiUrl = getApiUrl();
 
             const response = await fetch(`${apiUrl}/payment/receipt/${paymentId}`, {
                 credentials: 'include',
