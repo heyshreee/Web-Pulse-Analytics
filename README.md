@@ -1,7 +1,7 @@
 # WebPulse Analytics
 
 <p align="center">
-  <img src="apps/marketing/public/logo.png" alt="WebPulse Analytics Logo" width="80" height="80" />
+  <img src="apps/marketing/public/logo.png" alt="WebPulse Analytics Logo" width="180" />
 </p>
 
 <h3 align="center">Privacy-Friendly Real-Time Web Telemetry & Analytics Platform</h3>
