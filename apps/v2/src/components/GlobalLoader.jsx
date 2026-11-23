@@ -76,15 +76,13 @@ export default function GlobalLoader({
           {/* Central Logo Badge */}
           <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center ring-4 ring-card">
             <svg
-              className="w-7 h-7"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              className="w-8 h-8"
+              viewBox="0 0 706 204"
+              fill="currentColor"
             >
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              <path d="M 43 102 L 43 147 L 89 147 L 90 145 L 89 102 Z" />
+              <path d="M 1 61 L 1 98 L 39 98 L 39 61 Z" />
+              <path d="M 705 121 L 705 93 L 609 92 L 581 127 L 526 2 L 496 2 L 415 128 L 347 52 L 298 52 L 214 138 L 114 21 L 46 21 L 200 203 L 231 202 L 325 111 L 406 203 L 426 203 L 510 66 L 564 191 L 582 191 L 621 122 Z" />
             </svg>
           </div>
         </div>
