@@ -43,6 +43,7 @@ export default function Header({
   onOpenNotifications,
   unreadNotificationsCount = 3,
   user,
+  plan = 'free',
   onLogout
 }) {
   const { theme, toggleTheme } = useTheme();
@@ -167,6 +168,28 @@ export default function Header({
           <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17} />
         </button>
 
+        <Link
+          to="/dashboard/billing"
+          className={`badge ${
+            ['pro', 'business', 'enterprise'].includes((plan || user?.plan || '').toLowerCase())
+              ? 'badge--success'
+              : 'badge--outline'
+          } uppercase font-mono tracking-wider cursor-pointer hover:opacity-80 transition-opacity select-none hidden xs:inline-flex`}
+          title="Subscription plan — click to manage in Billing"
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: ['pro', 'business', 'enterprise'].includes((plan || user?.plan || '').toLowerCase())
+                ? 'var(--success)'
+                : 'var(--muted-foreground)'
+            }}
+          />
+          <span>{((plan || user?.plan || 'free')).toUpperCase()}</span>
+        </Link>
+
         <button
           ref={avatarRef}
           type="button"
@@ -186,7 +209,21 @@ export default function Header({
           align="right"
           className="w-56"
         >
-          <MenuLabel>{user?.email || 'Account'}</MenuLabel>
+          <div className="px-3 py-2 border-b border-[var(--border)]">
+            <p className="text-xs font-semibold text-foreground truncate">{user?.name || 'Account'}</p>
+            <p className="text-[11px] text-muted-foreground truncate">{user?.email || ''}</p>
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <span
+                className={`badge ${
+                  ['pro', 'business', 'enterprise'].includes((plan || user?.plan || '').toLowerCase())
+                    ? 'badge--success'
+                    : 'badge--outline'
+                } text-[10px] px-1.5 uppercase font-mono font-semibold`}
+              >
+                {(plan || user?.plan || 'free').toUpperCase()} PLAN
+              </span>
+            </div>
+          </div>
           <MenuItem
             icon="user"
             onClick={() => {

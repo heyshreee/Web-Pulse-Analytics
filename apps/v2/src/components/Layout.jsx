@@ -108,8 +108,10 @@ export default function Layout() {
     if (isSocketEnabled()) {
       const socket = io(getSocketUrl(), {
         withCredentials: true,
-        transports: ['polling', 'websocket'],
-        reconnectionAttempts: 5
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
+        timeout: 10000
       });
       socketRef.current = socket;
       window.socket = socket;
@@ -183,7 +185,7 @@ export default function Layout() {
         Skip to main content
       </a>
 
-      <Sidebar user={user} onLogout={handleLogout} />
+      <Sidebar user={user} plan={user?.plan || usageStats?.plan || 'free'} onLogout={handleLogout} />
 
       <div
         className="sidebar-scrim"
@@ -199,6 +201,7 @@ export default function Layout() {
           onOpenNotifications={() => setNotificationsSheetOpen(true)}
           unreadNotificationsCount={unreadNotifications}
           user={user}
+          plan={user?.plan || usageStats?.plan || 'free'}
           onLogout={handleLogout}
         />
 
