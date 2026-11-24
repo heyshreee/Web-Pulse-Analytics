@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Clock } from 'lucide-react';
 import SectionHead from '../marketing/SectionHead';
 import Reveal from '../marketing/Reveal';
-import { plans, formatINR } from '../../data/plans';
+import { individualPlans, formatINR } from '../../data/plans';
 
 /**
  * Compact pricing summary on the landing page. Full comparison lives at
@@ -18,8 +18,8 @@ export default function PricingTeaser() {
           description="Start with 10,000 tracked events per month on Nano. Higher tiers scale your event, project, and retention limits; Pro and Max include live activity logs, Full API access, and V2 Beta access."
         />
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {plans.map((plan) => {
+        <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {individualPlans.map((plan) => {
             const highlighted = plan.kind === 'primary';
             return (
               <Reveal
