@@ -10,55 +10,81 @@ import { fmtInt, downloadFile } from '../lib/format';
 
 const PLANS = [
   {
-    name: 'Free',
+    id: 'nano',
+    name: 'Nano',
     amount: '₹0',
     period: 'forever',
     desc: 'For personal projects and testing.',
-    feats: ['1,000 monthly events', '1 website project', '24h data retention', 'Community support'],
+    feats: ['10,000 monthly events', '1 website project', '1 allowed origin', '7-day data retention', '60 sec refresh interval', 'Basic API access'],
     cta: 'Current plan',
     current: true
   },
   {
-    name: 'Basic',
-    amount: '₹299',
+    id: 'lite',
+    name: 'Lite',
+    amount: '₹199',
     period: 'per month',
-    desc: 'For developers and small websites.',
+    desc: 'For individual developers and small websites.',
     feats: [
-      '50,000 monthly events',
-      'Multiple projects',
-      'Extended analytics usage',
-      'Advanced dashboard views',
-      'Report export'
+      '100,000 monthly events',
+      '3 website projects',
+      '3 allowed origins',
+      '30-day data retention',
+      '15 sec refresh interval',
+      'CSV activity export'
     ],
-    cta: 'Upgrade to Basic',
+    cta: 'Upgrade to Lite',
     current: false
   },
   {
+    id: 'pro',
     name: 'Pro',
-    amount: '₹999',
+    amount: '₹699',
     period: 'per month',
     desc: 'For growing products and high-traffic websites.',
     feats: [
-      '500,000 monthly events',
-      'Unlimited projects',
-      'Detailed visitor analytics',
-      'Webhooks & API access',
-      'Priority support'
+      '1,000,000 monthly events',
+      '10 website projects',
+      '10 allowed origins',
+      '90-day data retention',
+      '5 sec refresh interval',
+      'Live event logs',
+      'Full API & V2 Beta access'
     ],
     cta: 'Upgrade to Pro',
     current: false
   },
   {
-    name: 'Business',
-    amount: '₹2,999',
+    id: 'max',
+    name: 'Max',
+    amount: '₹1,999',
     period: 'per month',
-    desc: 'For teams that need more control and scale.',
+    desc: 'For power users needing high capacity and alpha access.',
     feats: [
       '5,000,000 monthly events',
-      'Team collaboration & RBAC',
-      'Custom retention windows',
-      'Dedicated support',
-      '99.9% uptime SLA'
+      '50 website projects',
+      '25 allowed origins',
+      '12-month data retention',
+      '1 sec refresh interval',
+      'Live logs & unlimited reports',
+      'Alpha invitation eligible'
+    ],
+    cta: 'Upgrade to Max',
+    current: false
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    amount: 'Custom',
+    period: 'commercial',
+    desc: 'For companies requiring custom capacity, security and SLA.',
+    feats: [
+      'Negotiated event volume',
+      'Custom projects & domains',
+      'Custom data retention',
+      'Dedicated dashboard refresh',
+      'Role-based access & SSO',
+      'Priority support & SLA'
     ],
     cta: 'Contact Sales',
     current: false
@@ -70,15 +96,17 @@ export default function Billing() {
   const { showToast } = useToast();
   const plans = PLANS;
   const [invoices] = useState([
-    { id: 'inv_3', month: 'Sep 2026', desc: 'Free plan · no charge', amount: '$0.00' },
-    { id: 'inv_2', month: 'Aug 2026', desc: 'Free plan · no charge', amount: '$0.00' },
-    { id: 'inv_1', month: 'Jul 2026', desc: 'Free plan · no charge', amount: '$0.00' }
+    { id: 'inv_3', month: 'Sep 2026', desc: 'Nano plan · no charge', amount: '$0.00' },
+    { id: 'inv_2', month: 'Aug 2026', desc: 'Nano plan · no charge', amount: '$0.00' },
+    { id: 'inv_1', month: 'Jul 2026', desc: 'Nano plan · no charge', amount: '$0.00' }
   ]);
 
-  const activePlanName = user?.plan || usageStats?.plan || 'Free';
+  const rawPlan = user?.plan || usageStats?.plan || 'Nano';
+  const planAliasMap = { free: 'Nano', basic: 'Lite', business: 'Max' };
+  const activePlanName = planAliasMap[rawPlan.toLowerCase()] || (rawPlan.charAt(0).toUpperCase() + rawPlan.slice(1));
 
   const eventsUsed = usageStats?.totalViews || 4;
-  const eventsLimit = usageStats?.monthlyLimit || 1000;
+  const eventsLimit = usageStats?.monthlyLimit || 10000;
   const eventsPct = Math.min(100, Math.round((eventsUsed / eventsLimit) * 1000) / 10);
 
   const storageUsedMB = Math.round((usageStats?.storageUsed || 116 * 1024 * 1024) / (1024 * 1024));
