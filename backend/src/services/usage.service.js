@@ -2,54 +2,91 @@ import supabase from '../config/supabase.js';
 import NotificationService from './notification.service.js';
 import ActivityLogService from './activity.service.js';
 
+const PLAN_ALIASES = {
+    free: 'nano',
+    basic: 'lite',
+    business: 'max'
+};
+
 const PLAN_LIMITS = {
-    free: {
-        monthlyViews: 1000,
+    nano: {
+        monthlyViews: 10000,
         storageLimit: 1 * 1024 * 1024 * 1024, // 1GB
         projectLimit: 1,
         liveLogs: false,
         emailIntegrity: false,
         allowedOriginsLimit: 1,
         share_report: 0,
-        amount: 0
+        retentionDays: 7,
+        refreshRate: 60,
+        amount: 0,
+        price_inr: 0,
+        price_usd: 0
     },
-    basic: {
-        monthlyViews: 50000,
+    lite: {
+        monthlyViews: 100000,
         storageLimit: 5 * 1024 * 1024 * 1024, // 5GB
-        projectLimit: 5,
+        projectLimit: 3,
         liveLogs: false,
         emailIntegrity: false,
         allowedOriginsLimit: 3,
-        share_report: 0,
-        amount: 299
+        share_report: 1,
+        retentionDays: 30,
+        refreshRate: 15,
+        amount: 199,
+        price_inr: 199,
+        price_usd: 2.49
     },
     pro: {
-        monthlyViews: 500000,
-        storageLimit: 15 * 1024 * 1024 * 1024, // 15GB
-        projectLimit: 15,
+        monthlyViews: 1000000,
+        storageLimit: 20 * 1024 * 1024 * 1024, // 20GB
+        projectLimit: 10,
         liveLogs: true,
         emailIntegrity: true,
         allowedOriginsLimit: 10,
         share_report: 5,
-        amount: 999
+        retentionDays: 90,
+        refreshRate: 5,
+        amount: 699,
+        price_inr: 699,
+        price_usd: 8.99
     },
-    business: {
+    max: {
         monthlyViews: 5000000,
         storageLimit: 100 * 1024 * 1024 * 1024, // 100GB
-        projectLimit: 100,
+        projectLimit: 50,
+        liveLogs: true,
+        emailIntegrity: true,
+        allowedOriginsLimit: 25,
+        share_report: 100,
+        retentionDays: 365,
+        refreshRate: 1,
+        amount: 1999,
+        price_inr: 1999,
+        price_usd: 24.99
+    },
+    enterprise: {
+        monthlyViews: 50000000,
+        storageLimit: 500 * 1024 * 1024 * 1024, // 500GB
+        projectLimit: 500,
         liveLogs: true,
         emailIntegrity: true,
         allowedOriginsLimit: 100,
-        share_report: 100,
-        amount: 2999
+        share_report: 500,
+        retentionDays: 730,
+        refreshRate: 1,
+        amount: 'custom',
+        price_inr: null,
+        price_usd: null
     }
 };
 
 /**
  * Get limits for a specific plan
  */
-export const getPlanLimits = (plan = 'free') => {
-    return PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+export const getPlanLimits = (plan = 'nano') => {
+    const normalized = PLAN_ALIASES[plan] || plan;
+    return PLAN_LIMITS[normalized] || PLAN_LIMITS.nano;
 };
 
 /**
