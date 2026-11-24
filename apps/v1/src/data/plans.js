@@ -15,8 +15,13 @@ export const plans = [
     name: 'Nano',
     amount: 0,
     amountUSD: 0,
-    description: 'Entry-level analytics for personal websites and testing.',
+    description: 'For personal websites and testing.',
     leadIn: 'Included features',
+    benefits: [
+      'Core visitor analytics & page views',
+      'Basic REST API access',
+      'V1 Stable production dashboard',
+    ],
     limits: [
       { label: 'Tracked events / month', value: '10,000' },
       { label: 'Projects', value: '1' },
@@ -38,8 +43,13 @@ export const plans = [
     name: 'Lite',
     amount: 199,
     amountUSD: 2.49,
-    description: 'Affordable analytics for individual developers and small websites.',
+    description: 'For individual developers.',
     leadIn: 'Everything in Nano, plus',
+    benefits: [
+      'Everything in Nano',
+      '30-day extended data retention',
+      'CSV analytics activity export',
+    ],
     limits: [
       { label: 'Tracked events / month', value: '100,000' },
       { label: 'Projects', value: '3' },
@@ -62,8 +72,13 @@ export const plans = [
     name: 'Pro',
     amount: 699,
     amountUSD: 8.99,
-    description: 'Advanced analytics, API access, and V2 beta access.',
+    description: 'For growing projects.',
     leadIn: 'Everything in Lite, plus',
+    benefits: [
+      'Everything in Lite',
+      'Live event logs & real-time refresh',
+      'Full API access & V2 Beta dashboard',
+    ],
     limits: [
       { label: 'Tracked events / month', value: '1,000,000' },
       { label: 'Projects', value: '10' },
@@ -88,8 +103,13 @@ export const plans = [
     name: 'Max',
     amount: 1999,
     amountUSD: 24.99,
-    description: 'Full analytics capabilities, beta and invitation-only alpha access.',
+    description: 'For advanced users and teams.',
     leadIn: 'Everything in Pro, plus',
+    benefits: [
+      'Everything in Pro',
+      '1-second high-frequency dashboard refresh',
+      'Alpha experimental access eligibility',
+    ],
     limits: [
       { label: 'Tracked events / month', value: '5,000,000' },
       { label: 'Projects', value: '50' },
@@ -116,6 +136,11 @@ export const plans = [
     amountUSD: 'custom',
     description: 'For companies requiring custom capacity, security and support.',
     leadIn: 'Everything in Max, plus',
+    benefits: [
+      'Negotiated event capacity & custom limits',
+      'Advanced RBAC & dedicated SLA',
+      'Configurable Beta & Alpha access',
+    ],
     limits: [
       { label: 'Tracked events / month', value: 'Negotiated' },
       { label: 'Projects', value: 'Custom' },
@@ -134,6 +159,9 @@ export const plans = [
     kind: 'secondary',
   },
 ];
+
+export const individualPlans = plans.filter((plan) => plan.id !== 'enterprise');
+export const enterprisePlan = plans.find((plan) => plan.id === 'enterprise');
 
 const inrFormatter = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
 
