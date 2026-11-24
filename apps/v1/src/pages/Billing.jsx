@@ -9,6 +9,7 @@ const LIMIT_SHORT_LABELS = {
     'Tracked events / month': 'Events / mo',
     'Projects': 'Projects',
     'Allowed domains / project': 'Domains / proj',
+    'Data retention': 'Retention',
     'Dashboard refresh interval': 'Refresh rate',
 };
 
@@ -20,10 +21,10 @@ export default function Billing() {
     const [pageLoading, setPageLoading] = useState(true);
     const [usageStats, setUsageStats] = useState({
         totalViews: 0,
-        monthlyLimit: 1000,
+        monthlyLimit: 10000,
         storageUsed: 0,
         storageLimit: 1024 * 1024 * 1024,
-        plan: 'free',
+        plan: 'nano',
         projectLimit: 1
     });
     const [, setPaymentHistory] = useState([]);
@@ -82,13 +83,14 @@ export default function Billing() {
         }
     };
 
-    const viewLimit = usageStats?.monthlyLimit || 1000;
+    const viewLimit = usageStats?.monthlyLimit || 10000;
     const totalViewsUsed = usageStats?.totalViews || 0;
     const viewPercentage = Math.min((totalViewsUsed / viewLimit) * 100, 100);
     const projectsCount = stats?.projectsCount || 0;
-    const projectLimit = usageStats?.projectLimit || 5;
+    const projectLimit = usageStats?.projectLimit || 1;
     const projectPercentage = Math.min((projectsCount / projectLimit) * 100, 100);
-    const currentPlan = getPlanById(usageStats?.plan) || getPlanById('free') || { id: 'free', name: 'Free', amount: 0, description: 'Free Tier', limits: [], features: [] };
+    const activePlanId = usageStats?.plan === 'free' ? 'nano' : usageStats?.plan === 'basic' ? 'lite' : usageStats?.plan === 'business' ? 'max' : (usageStats?.plan || 'nano');
+    const currentPlan = getPlanById(activePlanId) || getPlanById('nano') || { id: 'nano', name: 'Nano', amount: 0, description: 'Nano Tier', limits: [], features: [] };
 
     const getNextResetDate = () => {
         const now = new Date();
@@ -180,7 +182,7 @@ export default function Billing() {
     };
 
     const handleDowngrade = async () => {
-        if (!window.confirm('Are you sure you want to downgrade to the Free plan? You will lose access to paid plan features and limits.')) {
+        if (!window.confirm('Are you sure you want to downgrade to the Nano plan? You will lose access to paid plan features and limits.')) {
             return;
         }
 
@@ -188,7 +190,7 @@ export default function Billing() {
         try {
             await apiRequest('/payment/downgrade', {
                 method: 'POST',
-                body: JSON.stringify({ planId: 'free' })
+                body: JSON.stringify({ planId: 'nano' })
             });
 
             showToast('Plan downgraded successfully', 'success');
@@ -228,8 +230,8 @@ export default function Billing() {
                 </div>
 
                 {/* Plans Skeleton */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {[1, 2, 3, 4].map((n) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                    {[1, 2, 3, 4, 5].map((n) => (
                         <div key={n} className="wp-panel h-[280px] p-3 space-y-3 bg-[var(--wp-bg-surface)]">
                             <div className="h-4 w-20 bg-[var(--wp-border-subtle)] rounded" />
                             <div className="h-6 w-24 bg-[var(--wp-border-default)] rounded" />
@@ -359,17 +361,20 @@ export default function Billing() {
                         <div className="animate-spin rounded-full h-6 w-6 border-2 border-[var(--wp-border-default)] border-t-[var(--wp-accent-solid)]" />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                         {plans.map((plan) => {
-                            const isCurrentPlan = usageStats.plan === plan.id;
-                            const isFree = plan.id === 'free';
+                            const isCurrentPlan = activePlanId === plan.id;
+                            const isNano = plan.id === 'nano';
+                            const isEnterprise = plan.id === 'enterprise';
                             const isPro = plan.kind === 'primary';
-                            const isDowngrade = plan.amount < currentPlan.amount;
+                            const isDowngrade = typeof plan.amount === 'number' && typeof currentPlan.amount === 'number' && plan.amount < currentPlan.amount;
                             const ctaLabel = isCurrentPlan
                                 ? 'Current plan'
-                                : isFree
-                                    ? 'Downgrade to Free'
-                                    : `${isDowngrade ? 'Switch' : 'Upgrade'} to ${plan.name}`;
+                                : isEnterprise
+                                    ? 'Contact Sales'
+                                    : isNano
+                                        ? 'Downgrade to Nano'
+                                        : `${isDowngrade ? 'Switch' : 'Upgrade'} to ${plan.name}`;
 
                             return (
                                 <div
@@ -403,7 +408,9 @@ export default function Billing() {
                                                 <span className="wp-kpi-value text-xl font-medium text-[var(--wp-text-primary)] tracking-tight tabular-nums">
                                                     {formatINR(plan.amount)}
                                                 </span>
-                                                <span className="text-[11px] font-mono text-[var(--wp-text-muted)]">/ mo</span>
+                                                <span className="text-[11px] font-mono text-[var(--wp-text-muted)]">
+                                                    {plan.amount === 'custom' ? 'pricing' : '/ mo'}
+                                                </span>
                                             </div>
                                         </div>
 
@@ -433,7 +440,11 @@ export default function Billing() {
                                     <button
                                         onClick={() => {
                                             if (isCurrentPlan) return;
-                                            if (isFree) handleDowngrade();
+                                            if (isEnterprise) {
+                                                window.location.href = 'mailto:sales@webpulseanalytics.tech?subject=WebPulse%20Enterprise%20Inquiry';
+                                                return;
+                                            }
+                                            if (isNano) handleDowngrade();
                                             else handleUpgrade(plan.id);
                                         }}
                                         disabled={isCurrentPlan}

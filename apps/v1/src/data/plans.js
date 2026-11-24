@@ -6,100 +6,145 @@
  * INR price per month and matches the value charged by the backend.
  *
  * `limits` is intentionally limited to the values a visitor needs to compare
- * plans: monthly tracked events, projects, allowed domains, and dashboard
- * refresh rate. Display features are deliberately short and only describe
- * verified capabilities.
+ * plans: monthly tracked events, projects, allowed domains, dashboard
+ * refresh rate, and data retention. Display features describe verified capabilities.
  */
 export const plans = [
   {
-    id: 'free',
-    name: 'Free',
+    id: 'nano',
+    name: 'Nano',
     amount: 0,
-    description: 'For learning, prototypes, and personal projects.',
+    amountUSD: 0,
+    description: 'Entry-level analytics for personal websites and testing.',
     leadIn: 'Included features',
     limits: [
-      { label: 'Tracked events / month', value: '1,000' },
+      { label: 'Tracked events / month', value: '10,000' },
       { label: 'Projects', value: '1' },
       { label: 'Allowed domains / project', value: '1' },
+      { label: 'Data retention', value: '7 days' },
       { label: 'Dashboard refresh interval', value: '60 seconds' },
     ],
     features: [
       'Website traffic analytics',
       'Pages, sources, devices, and geography',
-      'Custom events and REST API',
-      'Historical analytics and CSV activity export',
+      'Basic REST API access',
+      'Stable V1 production dashboard',
     ],
     cta: 'Start for free',
     kind: 'secondary',
   },
   {
-    id: 'basic',
-    name: 'Basic',
-    amount: 299,
-    description: 'For independent developers running a few small websites.',
-    leadIn: 'Everything in Free, plus',
+    id: 'lite',
+    name: 'Lite',
+    amount: 199,
+    amountUSD: 2.49,
+    description: 'Affordable analytics for individual developers and small websites.',
+    leadIn: 'Everything in Nano, plus',
     limits: [
-      { label: 'Tracked events / month', value: '50,000' },
-      { label: 'Projects', value: '5' },
+      { label: 'Tracked events / month', value: '100,000' },
+      { label: 'Projects', value: '3' },
       { label: 'Allowed domains / project', value: '3' },
-      { label: 'Dashboard refresh interval', value: '10 seconds' },
+      { label: 'Data retention', value: '30 days' },
+      { label: 'Dashboard refresh interval', value: '15 seconds' },
     ],
     features: [
-      '50× the Free monthly event allowance',
-      'Track up to 5 projects',
-      'Manage up to 3 allowed domains per project',
-      'Dashboard refresh interval of 10 seconds',
+      '10× the Nano monthly event allowance',
+      'Track up to 3 projects & domains',
+      '30-day extended data retention',
+      'Dashboard refresh interval of 15 seconds',
+      'CSV analytics activity export',
     ],
-    cta: 'Choose Basic',
+    cta: 'Choose Lite',
     kind: 'secondary',
   },
   {
     id: 'pro',
     name: 'Pro',
-    amount: 999,
-    description: 'For growing products that need live activity logs and public reports.',
-    leadIn: 'Everything in Basic, plus',
+    amount: 699,
+    amountUSD: 8.99,
+    description: 'Advanced analytics, API access, and V2 beta access.',
+    leadIn: 'Everything in Lite, plus',
     limits: [
-      { label: 'Tracked events / month', value: '500,000' },
-      { label: 'Projects', value: '15' },
+      { label: 'Tracked events / month', value: '1,000,000' },
+      { label: 'Projects', value: '10' },
       { label: 'Allowed domains / project', value: '10' },
-      { label: 'Dashboard refresh interval', value: '1 second' },
+      { label: 'Data retention', value: '90 days' },
+      { label: 'Dashboard refresh interval', value: '5 seconds' },
     ],
     features: [
-      '10× the Basic monthly event allowance',
-      'Live activity logs',
-      'Up to 5 public reports',
-      'Dashboard refresh interval of 1 second',
+      '1,000,000 monthly events',
+      'Up to 10 projects and 10 domains',
+      '90-day data retention',
+      'Live event logs & real-time monitoring',
+      'Full Analytics API & advanced reports',
+      'Team members (up to 3 seats)',
+      'V2 Beta dashboard access',
     ],
     cta: 'Choose Pro',
     kind: 'primary',
   },
   {
-    id: 'business',
-    name: 'Business',
-    amount: 2999,
-    description: 'For high-traffic sites tracking millions of events across many projects.',
+    id: 'max',
+    name: 'Max',
+    amount: 1999,
+    amountUSD: 24.99,
+    description: 'Full analytics capabilities, beta and invitation-only alpha access.',
     leadIn: 'Everything in Pro, plus',
     limits: [
       { label: 'Tracked events / month', value: '5,000,000' },
-      { label: 'Projects', value: '100' },
-      { label: 'Allowed domains / project', value: '100' },
+      { label: 'Projects', value: '50' },
+      { label: 'Allowed domains / project', value: '25' },
+      { label: 'Data retention', value: '12 months' },
       { label: 'Dashboard refresh interval', value: '1 second' },
     ],
     features: [
-      '10× the Pro monthly event allowance',
-      'Up to 100 public reports',
-      'Up to 100 projects and 100 allowed domains per project',
-      'Dashboard refresh interval of 1 second',
+      '5,000,000 monthly events',
+      'Up to 50 projects and 25 domains',
+      '12-month data retention',
+      '1-second high-frequency dashboard refresh',
+      'Team members (up to 10 seats)',
+      'Unlimited saved reports & custom dashboards',
+      'Alpha invitation eligible & priority support',
     ],
-    plannedNote: 'Team access is planned and is not included today.',
-    cta: 'Choose Business',
+    cta: 'Choose Max',
+    kind: 'secondary',
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    amount: 'custom',
+    amountUSD: 'custom',
+    description: 'For companies requiring custom capacity, security and support.',
+    leadIn: 'Everything in Max, plus',
+    limits: [
+      { label: 'Tracked events / month', value: 'Negotiated' },
+      { label: 'Projects', value: 'Custom' },
+      { label: 'Allowed domains / project', value: 'Custom' },
+      { label: 'Data retention', value: 'Custom' },
+      { label: 'Dashboard refresh interval', value: 'Dedicated (1s)' },
+    ],
+    features: [
+      'Custom volume contracts & dedicated capacity',
+      'Advanced role-based access control (RBAC)',
+      'Configurable beta & explicitly granted alpha',
+      'Custom integrations & custom domains',
+      'Contractual SLA and dedicated support engineer',
+    ],
+    cta: 'Contact Sales',
     kind: 'secondary',
   },
 ];
 
 const inrFormatter = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 });
 
-export const formatINR = (amount) => `₹${inrFormatter.format(amount)}`;
+export const formatINR = (amount) => {
+  if (amount === 'custom' || amount === undefined || amount === null || typeof amount !== 'number') {
+    return 'Custom';
+  }
+  return `₹${inrFormatter.format(amount)}`;
+};
 
-export const getPlanById = (id) => plans.find((plan) => plan.id === id);
+export const getPlanById = (id) => {
+  const normalizedId = id === 'free' ? 'nano' : id === 'basic' ? 'lite' : id === 'business' ? 'max' : id;
+  return plans.find((plan) => plan.id === normalizedId);
+};
