@@ -11,18 +11,20 @@ const planLimit = (planId, label) =>
 
 const usageRow = (feature, label = feature) => ({
   feature,
-  free: planLimit('free', label),
-  basic: planLimit('basic', label),
+  nano: planLimit('nano', label),
+  lite: planLimit('lite', label),
   pro: planLimit('pro', label),
-  business: planLimit('business', label),
+  max: planLimit('max', label),
+  enterprise: planLimit('enterprise', label),
 });
 
-const featureRow = (feature, free, basic = free, pro = free, business = free) => ({
+const featureRow = (feature, nano, lite = nano, pro = nano, max = nano, enterprise = max) => ({
   feature,
-  free,
-  basic,
+  nano,
+  lite,
   pro,
-  business,
+  max,
+  enterprise,
 });
 
 const comparisonGroups = [
@@ -32,29 +34,32 @@ const comparisonGroups = [
       usageRow('Tracked events / month'),
       usageRow('Projects'),
       usageRow('Allowed domains / project'),
+      usageRow('Data retention'),
       usageRow('Dashboard refresh interval'),
     ],
   },
   {
-    label: 'Analytics',
+    label: 'Analytics & Reporting',
     rows: [
       featureRow('Website traffic analytics', 'yes'),
       featureRow('Pages, sources, devices, and geography', 'yes'),
-      featureRow('Custom events and REST API', 'yes'),
+      featureRow('Custom events & REST API', 'yes'),
       featureRow('Historical analytics', 'yes'),
+      featureRow('CSV activity export', 'no', 'Limited', 'yes', 'yes', 'yes'),
+      featureRow('Live event logs', 'no', 'no', 'yes', 'yes', 'yes'),
+      featureRow('Saved reports', 'Basic', 'Basic', '5', 'Unlimited', 'Custom'),
     ],
   },
   {
-    label: 'Activity and reporting',
+    label: 'Platform & Access',
     rows: [
-      featureRow('CSV activity export', 'yes'),
-      featureRow('Live activity logs', 'no', 'no', 'yes', 'yes'),
-      featureRow('Public reports', 'no', 'no', '5', '100'),
+      featureRow('Team members', '1', '1', '3', '10', 'Custom'),
+      featureRow('V1 Stable dashboard', 'yes'),
+      featureRow('V2 Beta dashboard', 'no', 'no', 'yes', 'yes', 'Configurable'),
+      featureRow('Alpha access', 'no', 'no', 'no', 'Invite', 'yes'),
+      featureRow('Custom domains', 'no', 'no', 'no', 'yes', 'yes'),
+      featureRow('Priority support / SLA', 'no', 'no', 'no', 'yes', 'SLA Contract'),
     ],
-  },
-  {
-    label: 'Access',
-    rows: [featureRow('Team access', 'no', 'no', 'no', 'Planned')],
   },
 ];
 
@@ -159,16 +164,17 @@ export default function Pricing() {
           </Reveal>
 
           {/* Plan cards */}
-          <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {plans.map((plan, i) => {
               const isPrimary = plan.kind === 'primary';
+              const isNano = plan.id === 'nano' || plan.id === 'free';
               const ctaTo = authenticated
-                ? plan.id === 'free'
+                ? isNano
                   ? '/dashboard/billing'
                   : `/dashboard/billing?plan=${plan.id}`
                 : `/register?plan=${plan.id}`;
               const ctaLabel = authenticated
-                ? plan.id === 'free'
+                ? isNano
                   ? 'Manage plan'
                   : `Upgrade to ${plan.name}`
                 : plan.cta;
@@ -196,7 +202,9 @@ export default function Pricing() {
                       <span className="metric-num font-display text-3xl font-bold text-slate-100">
                         {formatINR(plan.amount)}
                       </span>
-                      <span className="text-sm text-slate-500">/ month</span>
+                      <span className="text-sm text-slate-500">
+                        {plan.amount === 'custom' ? 'pricing' : '/ month'}
+                      </span>
                     </div>
 
                     <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -310,7 +318,7 @@ export default function Pricing() {
                       >
                         <div className="font-semibold text-slate-100">{plan.name}</div>
                         <div className="mt-0.5 text-xs font-normal text-slate-500">
-                          {formatINR(plan.amount)} / month
+                          {formatINR(plan.amount)}{plan.amount === 'custom' ? '' : ' / month'}
                         </div>
                       </th>
                     ))}
@@ -320,7 +328,7 @@ export default function Pricing() {
                   <tbody key={group.label} className="divide-y divide-white/[0.05]">
                     <tr className="bg-white/[0.02]">
                       <th
-                        colSpan={5}
+                        colSpan={6}
                         scope="rowgroup"
                         className="px-6 pb-2.5 pt-5 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500"
                       >
