@@ -8,77 +8,99 @@ import { Badge } from '../components/ui/Display';
 import { useToast } from '../context/ToastContext';
 import { fmtInt, downloadFile } from '../lib/format';
 
-const PLANS = [
+const INDIVIDUAL_PLANS = [
   {
-    name: 'Free',
+    id: 'nano',
+    name: 'Nano',
     amount: '₹0',
-    period: 'forever',
-    desc: 'For personal projects and testing.',
-    feats: ['1,000 monthly events', '1 website project', '24h data retention', 'Community support'],
-    cta: 'Current plan',
-    current: true
-  },
-  {
-    name: 'Basic',
-    amount: '₹299',
-    period: 'per month',
-    desc: 'For developers and small websites.',
-    feats: [
-      '50,000 monthly events',
-      'Multiple projects',
-      'Extended analytics usage',
-      'Advanced dashboard views',
-      'Report export'
+    period: '/ month',
+    desc: 'For personal websites and testing.',
+    benefits: [
+      'Core visitor analytics & page views',
+      'Basic REST API access',
+      'V1 Stable production dashboard',
     ],
-    cta: 'Upgrade to Basic',
-    current: false
+    cta: 'Current plan',
+    kind: 'secondary'
   },
   {
+    id: 'lite',
+    name: 'Lite',
+    amount: '₹199',
+    period: '/ month',
+    desc: 'For individual developers.',
+    benefits: [
+      'Everything in Nano',
+      '30-day extended data retention',
+      'CSV analytics activity export',
+    ],
+    cta: 'Upgrade to Lite',
+    kind: 'secondary'
+  },
+  {
+    id: 'pro',
     name: 'Pro',
-    amount: '₹999',
-    period: 'per month',
-    desc: 'For growing products and high-traffic websites.',
-    feats: [
-      '500,000 monthly events',
-      'Unlimited projects',
-      'Detailed visitor analytics',
-      'Webhooks & API access',
-      'Priority support'
+    amount: '₹699',
+    period: '/ month',
+    desc: 'For growing projects.',
+    popular: true,
+    benefits: [
+      'Everything in Lite',
+      'Live event logs & real-time refresh',
+      'Full API access & V2 Beta dashboard',
     ],
     cta: 'Upgrade to Pro',
-    current: false
+    kind: 'primary'
   },
   {
-    name: 'Business',
-    amount: '₹2,999',
-    period: 'per month',
-    desc: 'For teams that need more control and scale.',
-    feats: [
-      '5,000,000 monthly events',
-      'Team collaboration & RBAC',
-      'Custom retention windows',
-      'Dedicated support',
-      '99.9% uptime SLA'
+    id: 'max',
+    name: 'Max',
+    amount: '₹1,999',
+    period: '/ month',
+    desc: 'For advanced users and teams.',
+    benefits: [
+      'Everything in Pro',
+      '1-second high-frequency dashboard refresh',
+      'Alpha experimental access eligibility',
     ],
-    cta: 'Contact Sales',
-    current: false
+    cta: 'Upgrade to Max',
+    kind: 'secondary'
   }
 ];
+
+const ENTERPRISE_PLAN = {
+  id: 'enterprise',
+  name: 'Business & Enterprise',
+  amount: 'Custom',
+  period: 'commercial',
+  desc: 'Custom commercial agreements for organizations requiring enterprise-grade capacity, security, compliance, and dedicated engineering support.',
+  capabilities: [
+    'Negotiated monthly event volume & retention',
+    'Custom projects & verified domain allowances',
+    'Advanced RBAC & enterprise SSO integration',
+    'Configurable V2 Beta and Alpha preview access',
+    'Custom webhooks, data pipelines & API limits',
+    'Contractual SLA & dedicated support engineer'
+  ],
+  cta: 'Contact Sales'
+};
 
 export default function Billing() {
   const { user, usageStats } = useOutletContext();
   const { showToast } = useToast();
-  const plans = PLANS;
+  const [category, setCategory] = useState('individual');
   const [invoices] = useState([
-    { id: 'inv_3', month: 'Sep 2026', desc: 'Free plan · no charge', amount: '$0.00' },
-    { id: 'inv_2', month: 'Aug 2026', desc: 'Free plan · no charge', amount: '$0.00' },
-    { id: 'inv_1', month: 'Jul 2026', desc: 'Free plan · no charge', amount: '$0.00' }
+    { id: 'inv_3', month: 'Sep 2026', desc: 'Nano plan · no charge', amount: '$0.00' },
+    { id: 'inv_2', month: 'Aug 2026', desc: 'Nano plan · no charge', amount: '$0.00' },
+    { id: 'inv_1', month: 'Jul 2026', desc: 'Nano plan · no charge', amount: '$0.00' }
   ]);
 
-  const activePlanName = user?.plan || usageStats?.plan || 'Free';
+  const rawPlan = user?.plan || usageStats?.plan || 'Nano';
+  const planAliasMap = { free: 'Nano', basic: 'Lite', business: 'Max' };
+  const activePlanName = planAliasMap[rawPlan.toLowerCase()] || (rawPlan.charAt(0).toUpperCase() + rawPlan.slice(1));
 
   const eventsUsed = usageStats?.totalViews || 4;
-  const eventsLimit = usageStats?.monthlyLimit || 1000;
+  const eventsLimit = usageStats?.monthlyLimit || 10000;
   const eventsPct = Math.min(100, Math.round((eventsUsed / eventsLimit) * 1000) / 10);
 
   const storageUsedMB = Math.round((usageStats?.storageUsed || 116 * 1024 * 1024) / (1024 * 1024));
@@ -168,51 +190,144 @@ export default function Billing() {
           </CardBody>
         </Card>
 
-        {/* Plans Grid */}
+        {/* Plans Section */}
         <div>
-          <h2 className="card-title mb-4">Subscription plans</h2>
-          <div className="plan-grid">
-            {plans.map((p) => {
-              const isCurrent = p.name.toLowerCase() === activePlanName.toLowerCase();
-              return (
-                <article key={p.name} className="card plan-card flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="plan-name font-semibold text-lg">{p.name}</h3>
-                      {isCurrent ? <Badge variant="info">Current plan</Badge> : null}
-                    </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div>
+              <h2 className="card-title">Subscription plans</h2>
+              <p className="hint text-xs mt-0.5">Prepaid allowances with fixed ceilings and zero surprise overages.</p>
+            </div>
 
-                    <div className="plan-price my-3">
-                      <span className="plan-amount text-3xl font-bold font-mono">{p.amount}</span>
-                      <span className="plan-period text-xs text-muted-foreground ml-1.5">{p.period}</span>
-                    </div>
-
-                    <p className="plan-desc text-xs text-muted-foreground mb-4">{p.desc}</p>
-
-                    <ul className="plan-feats space-y-2 mb-6 text-xs">
-                      {p.feats.map((f) => (
-                        <li key={f} className="plan-feat flex items-center gap-2">
-                          <span className="text-success-text shrink-0">
-                            <Icon name="check" size={14} />
-                          </span>
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <button
-                    type="button"
-                    className={`btn w-full ${isCurrent ? 'btn--secondary opacity-60 cursor-not-allowed' : ''}`}
-                    disabled={isCurrent}
-                    onClick={() => handleUpgrade(p.name)}
-                  >
-                    {isCurrent ? 'Active Plan' : p.cta}
-                  </button>
-                </article>
-              );
-            })}
+            {/* Segmented Category Switcher */}
+            <div className="inline-flex self-start sm:self-auto rounded-lg border border-border bg-card-bg p-0.5" role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={category === 'individual'}
+                onClick={() => setCategory('individual')}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  category === 'individual'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Individual
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={category === 'enterprise'}
+                onClick={() => setCategory('enterprise')}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  category === 'enterprise'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Business & Enterprise
+              </button>
+            </div>
           </div>
+
+          {category === 'individual' ? (
+            <div className="plan-grid">
+              {INDIVIDUAL_PLANS.map((p) => {
+                const isCurrent = p.name.toLowerCase() === activePlanName.toLowerCase();
+                const isPro = p.popular;
+                return (
+                  <article
+                    key={p.name}
+                    className={`card plan-card flex flex-col justify-between ${
+                      isPro ? 'border-primary/40' : ''
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="plan-name font-semibold text-lg">{p.name}</h3>
+                        {isCurrent ? (
+                          <Badge variant="info">Current plan</Badge>
+                        ) : isPro ? (
+                          <Badge variant="primary" className="text-[10px] uppercase font-semibold">
+                            Most popular
+                          </Badge>
+                        ) : null}
+                      </div>
+
+                      <div className="plan-price my-3">
+                        <span className="plan-amount text-3xl font-bold font-mono">{p.amount}</span>
+                        <span className="plan-period text-xs text-muted-foreground ml-1.5">{p.period}</span>
+                      </div>
+
+                      <p className="plan-desc text-xs text-muted-foreground mb-4 min-h-[32px]">{p.desc}</p>
+
+                      <ul className="plan-feats space-y-2 mb-6 text-xs border-t border-border pt-3">
+                        {p.benefits.map((b) => (
+                          <li key={b} className="plan-feat flex items-center gap-2">
+                            <span className="text-success-text shrink-0">
+                              <Icon name="check" size={14} />
+                            </span>
+                            <span>{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={`btn w-full ${isCurrent ? 'btn--secondary opacity-60 cursor-not-allowed' : isPro ? 'btn--primary' : ''}`}
+                      disabled={isCurrent}
+                      onClick={() => handleUpgrade(p.name)}
+                    >
+                      {isCurrent ? 'Active Plan' : p.cta}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="card p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div className="max-w-2xl">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg text-foreground">{ENTERPRISE_PLAN.name}</h3>
+                    <Badge variant="info">Custom agreement</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                    {ENTERPRISE_PLAN.desc}
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4 text-xs">
+                    {ENTERPRISE_PLAN.capabilities.map((c) => (
+                      <div key={c} className="flex items-start gap-2">
+                        <span className="text-success-text shrink-0 mt-0.5">
+                          <Icon name="check" size={14} />
+                        </span>
+                        <span>{c}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="lg:border-l lg:border-border lg:pl-8 flex flex-col justify-center sm:min-w-[240px]">
+                  <div className="text-[10.5px] font-mono text-muted-foreground uppercase tracking-wider">
+                    Commercial Tier
+                  </div>
+                  <div className="text-xl font-bold font-mono mt-1 text-foreground">
+                    Custom pricing
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Invoiced annually or quarterly with contractual SLA guarantees.
+                  </p>
+                  <a
+                    href="mailto:sales@webpulseanalytics.tech?subject=WebPulse%20Enterprise%20Inquiry"
+                    className="btn btn--primary mt-4 w-full text-center flex items-center justify-center"
+                  >
+                    {ENTERPRISE_PLAN.cta}
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Invoices List */}

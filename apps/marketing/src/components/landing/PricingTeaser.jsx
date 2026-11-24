@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Clock } from 'lucide-react';
 import SectionHead from '../marketing/SectionHead';
 import Reveal from '../marketing/Reveal';
-import { plans, formatINR } from '../../data/plans';
+import { individualPlans, formatINR } from '../../data/plans';
 
 /**
  * Compact pricing summary on the landing page. Full comparison lives at
@@ -15,11 +15,11 @@ export default function PricingTeaser() {
         <SectionHead
           eyebrow="Pricing"
           title="Start free. Upgrade when the traffic does."
-          description="Start with 1,000 tracked events per month. Higher tiers raise your event, project, and domain limits; Pro and Business add live activity logs and public reports."
+          description="Start with 10,000 tracked events per month on Nano. Higher tiers scale your event, project, and retention limits; Pro and Max include live activity logs, Full API access, and V2 Beta access."
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {plans.map((plan) => {
+          {individualPlans.map((plan) => {
             const highlighted = plan.kind === 'primary';
             return (
               <Reveal
@@ -45,7 +45,9 @@ export default function PricingTeaser() {
                   <span className="metric-num mkt-h3 !text-[2rem] !font-extrabold !text-white">
                     {formatINR(plan.amount)}
                   </span>
-                  <span className="text-sm text-slate-500">/ month</span>
+                  <span className="text-sm text-slate-500">
+                    {plan.amount === 'custom' ? 'pricing' : '/ month'}
+                  </span>
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-slate-400">{plan.description}</p>
 

@@ -294,8 +294,12 @@ export default function Layout() {
                         </button>
                     )}
                     <Link to="/dashboard" className="flex items-center gap-2 group">
-                        <span className="wp-brand-mark">
-                            <Activity className="h-3 w-3" strokeWidth={2.5} />
+                        <span className="wp-brand-mark flex items-center justify-center p-0.5">
+                            <svg viewBox="0 0 706 204" className="w-3.5 h-auto" fill="currentColor">
+                                <path d="M 43 102 L 43 147 L 89 147 L 90 145 L 89 102 Z" />
+                                <path d="M 1 61 L 1 98 L 39 98 L 39 61 Z" />
+                                <path d="M 705 121 L 705 93 L 609 92 L 581 127 L 526 2 L 496 2 L 415 128 L 347 52 L 298 52 L 214 138 L 114 21 L 46 21 L 200 203 L 231 202 L 325 111 L 406 203 L 426 203 L 510 66 L 564 191 L 582 191 L 621 122 Z" />
+                            </svg>
                         </span>
                         <span className="text-[13px] font-semibold tracking-tight text-[var(--wp-text-primary)]">
                             WebPulse

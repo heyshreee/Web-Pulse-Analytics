@@ -91,7 +91,7 @@ export default function Sidebar({ user, plan = 'free', onLogout }) {
       <div className="sidebar-head">
         <NavLink to="/dashboard" className="brand" aria-label="WebPulse Home">
           <span className="brand-mark" aria-hidden="true">
-            <Icon name="activity" size={17} />
+            <Icon name="brand" size={19} />
           </span>
           <span className="brand-text">
             <span className="brand-name flex items-center gap-1.5">
