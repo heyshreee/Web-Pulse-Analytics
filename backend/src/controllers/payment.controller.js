@@ -12,64 +12,94 @@ import AppError from '../errors/AppError.js';
 export const getPlans = asyncHandler(async (req, res) => {
     const plans = [
         {
-            id: 'free',
-            name: 'Free',
+            id: 'nano',
+            name: 'Nano',
             price: 0,
             price_usd: 0,
             price_inr: 0,
             interval: 'month',
-            description: 'Trying WebPulse',
-            features: ['1 Project', '1 Allowed Origin', '1,000 events/mo', '60 sec refresh'],
-            buttonText: 'Get Started',
+            description: 'Entry-level analytics for personal websites and testing.',
+            features: ['1 Project', '1 Allowed Origin', '10,000 events/mo', '7-day data retention', '60 sec refresh', 'Basic API access'],
+            buttonText: 'Start Free',
             limits: {
-                monthlyViews: 1000,
-                projectLimit: 1
+                monthlyViews: 10000,
+                projectLimit: 1,
+                allowedOriginsLimit: 1,
+                retentionDays: 7,
+                refreshRate: 60
             }
         },
         {
-            id: 'basic',
-            name: 'Basic',
-            price: 299,
-            price_usd: 4,
-            price_inr: 299,
+            id: 'lite',
+            name: 'Lite',
+            price: 199,
+            price_usd: 2.49,
+            price_inr: 199,
             interval: 'month',
-            description: 'Students & solo devs',
-            features: ['5 Projects', '3 Allowed Origins', 'Live Device Stats', '50,000 events/mo', '10 sec refresh'],
-            buttonText: 'Choose Basic',
+            description: 'Affordable analytics for individual developers and small websites.',
+            features: ['3 Projects', '3 Allowed Origins', '100,000 events/mo', '30-day data retention', '15 sec refresh', 'Basic API access', 'Limited CSV export'],
+            buttonText: 'Choose Lite',
             limits: {
-                monthlyViews: 50000,
-                projectLimit: 5
+                monthlyViews: 100000,
+                projectLimit: 3,
+                allowedOriginsLimit: 3,
+                retentionDays: 30,
+                refreshRate: 15
             }
         },
         {
             id: 'pro',
             name: 'Pro',
-            price: 999,
-            price_usd: 12,
-            price_inr: 999,
+            price: 699,
+            price_usd: 8.99,
+            price_inr: 699,
             interval: 'month',
-            description: 'Streamers & growing apps',
-            features: ['15 Projects', '10 Allowed Origins', 'Live Activity Logs', '500,000 events/mo', '1 sec refresh'],
+            description: 'Advanced analytics, API access and V2 beta access.',
+            features: ['10 Projects', '10 Allowed Origins', '1,000,000 events/mo', '90-day data retention', '5 sec refresh', '3 Team members', 'Live event logs', 'Full Analytics API', 'Advanced exports', 'V2 Beta access'],
             buttonText: 'Choose Pro',
             popular: true,
             limits: {
-                monthlyViews: 500000,
-                projectLimit: 15
+                monthlyViews: 1000000,
+                projectLimit: 10,
+                allowedOriginsLimit: 10,
+                retentionDays: 90,
+                refreshRate: 5
             }
         },
         {
-            id: 'business',
-            name: 'Business',
-            price: 2999,
-            price_usd: 39,
-            price_inr: 2999,
+            id: 'max',
+            name: 'Max',
+            price: 1999,
+            price_usd: 24.99,
+            price_inr: 1999,
             interval: 'month',
-            description: 'Teams & high traffic',
-            features: ['Unlimited Projects', '100 Allowed Origins', '5,000,000 events/mo', 'Real-time / SLA', 'Team access'],
-            buttonText: 'Contact Sales',
+            description: 'Full analytics capabilities, beta and invitation-only alpha access.',
+            features: ['50 Projects', '25 Allowed Origins', '5,000,000 events/mo', '12-month data retention', '1 sec refresh', '10 Team members', 'Unlimited saved reports', 'Live event logs', 'Full Analytics API', 'V2 Beta & Alpha access'],
+            buttonText: 'Choose Max',
             limits: {
                 monthlyViews: 5000000,
-                projectLimit: 100
+                projectLimit: 50,
+                allowedOriginsLimit: 25,
+                retentionDays: 365,
+                refreshRate: 1
+            }
+        },
+        {
+            id: 'enterprise',
+            name: 'Enterprise',
+            price: 'custom',
+            price_usd: 'custom',
+            price_inr: 'custom',
+            interval: 'month',
+            description: 'For companies requiring custom capacity, security and support.',
+            features: ['Negotiated event capacity', 'Custom projects & domains', 'Custom data retention', 'Dedicated dashboard refresh', 'Role-based access & SSO', 'Priority support & SLA'],
+            buttonText: 'Contact Sales',
+            limits: {
+                monthlyViews: 'custom',
+                projectLimit: 'custom',
+                allowedOriginsLimit: 'custom',
+                retentionDays: 'custom',
+                refreshRate: 1
             }
         }
     ];
@@ -89,7 +119,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     }
 
     if (amount === 0) {
-        throw AppError.badRequest('Free plan cannot be purchased');
+        throw AppError.badRequest('Nano plan cannot be purchased');
     }
 
     console.log('Creating order for:', { userId, planId, amount });

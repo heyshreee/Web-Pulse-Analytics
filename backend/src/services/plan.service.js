@@ -46,8 +46,8 @@ export const getPlanLimits = async (planId) => {
     const plan = plans.find(p => p.id === planId);
 
     if (!plan) {
-        // Fallback to free plan if not found
-        return plans.find(p => p.id === 'free') || {};
+        // Fallback to nano (or legacy free) plan if not found
+        return plans.find(p => p.id === 'nano') || plans.find(p => p.id === 'free') || {};
     }
 
     // Map DB columns to internal limit names if necessary, 
