@@ -74,38 +74,43 @@ WebPulse isolates public marketing, stable production analytics, and beta consol
 Screenshot placeholders and capture naming conventions (`dashboard-v1.png`, `dashboard-v2.png`, `visitor-globe.png`) are documented in [docs/images/README.md](docs/images/README.md).
 
 ---
-## Key Features
+## Core Capabilities & Privacy Model
 
-- ⚡ **Real-Time Visitor Streaming**: Live telemetry and active visitor counts streamed via Socket.IO directly to your dashboard.
-- 🌐 **3D Geospatial Visualizations**: Interactive WebGL visitor globe and high-definition Leaflet maps for granular geographic distribution.
-- 🎯 **Custom Event Telemetry**: Track interactions, conversions, button clicks, and custom metadata with flexible JSONB payloads.
-- 📊 **Content & Page Performance**: Monitor real-time pageviews, bounce rates, visit durations, entrance/exit paths, and scroll depth.
-- 🧭 **Attribution & Source Breakdown**: Automatic tracking of search engines, social referrals, direct traffic, and campaign channels.
-- 🛡️ **Privacy & Compliance**: Cookieless tracking options, hashed IP addresses, and respect for Do Not Track (DNT) headers.
-- 🏢 **Multi-Project Management**: Manage multiple websites and apps under a single workspace with per-project tracking IDs and settings.
-- 🔔 **Multi-Channel Alerting**: Instant threshold triggers and notifications dispatched via Transactional Email (Resend) and Telegram bots.
-- 🔗 **Shareable Public Reports**: Generate secured, read-only dashboard tokens to share real-time metrics with clients and stakeholders.
-- 💳 **Billing & Quota Management**: Built-in subscription tiers, usage limits, and Razorpay payment integration.
+- **Real-Time Telemetry Streams:** WebSocket broadcasts via Socket.IO (`setupVisitorSocket`, `global.io`) push live visitor activity and KPI updates to active workspace rooms without polling.
+- **Cookie-Free Client Collector:** The browser script (`~1.1 KB` uncompressed / `~540 B` gzipped) sets zero cookies, writes zero keys to `localStorage`, and injects zero third-party ad-network scripts.
+- **Project-Scoped Origin Security:** Per-project `trackingCors` enforcement validates origin/referrer headers alongside `express-rate-limit` throttling and automated bot filtering (`isBot`).
+- **3D & Regional Geography Views:** Server-side IP geolocation (`ipwho.is` with offline `geoip-lite` fallback) feeds an interactive Three.js 3D visitor globe and country-level breakdowns.
+- **Custom Events & Unified Ingest:** Supports standard pageviews via `window.tracker` as well as custom event payloads and server-side REST ingestion (`/api/track/events` and `/api/track/:trackingId`).
+- **Tokenized Public Share Links:** Generate, regenerate, or revoke read-only `/share/:shareToken` dashboards (`POST` / `DELETE /api/v1/projects/:id/share-token`) without exposing workspace credentials.
+- **Workspace Governance & Security:** Revocable Postgres session tracking (`public.user_sessions`), `HttpOnly` JWT authentication, cross-subdomain SSO, CSRF validation, dynamic Helmet 8 CSP headers, and Supabase Row Level Security (`RLS`).
+- **Billing & Alert Channels:** Razorpay order processing, payment verification, PDF invoice receipts (`pdfkit`) with Resend email dispatch, plus Telegram and Twilio alert integrations.
 
----
+### Privacy & Telemetry Pipeline Boundaries
 
-## What's New in Version 2.0 (Beta Track)
+- **Visitor browser:** Zero cookies, zero `localStorage` persistence, and zero third-party tracking scripts on tracked customer sites.
+- **Ingestion server:** Applies SHA-256 deduplication hit hashing (`IP + UserAgent + ProjectId`), bot heuristics, `ua-parser-js` browser/OS/device parsing, and IP geolocation (`ipwho.is` / `geoip-lite`) prior to persisting records in Supabase PostgreSQL. Configure project privacy settings (`anonymize_ip`, `respect_dnt`, `retention_days` in `public.project_settings`) according to your regional compliance requirements.
 
-The v2 track introduces modern visual and computational capabilities being tested for future promotion to default production:
+### Version 2.0 Observatory Highlights
 
-| Module | Version 2.0 Capabilities |
-| :--- | :--- |
-| **Design System** | **Dark Data Observatory**: Semantic CSS tokens (`theme.css`), smooth dark/light mode switching using the native browser **View Transitions API**, and refined typography. |
-| **Interactive Globe** | **3D Visitor Network**: WebGL/Three.js interactive globe powered by `react-globe.gl` with centroid country mapping, drag-to-rotate, and live telemetry arcs. |
-| **UI Component Kit** | Accessible primitives under `src/components/ui/` (`Icon`, `Button`, `Card`, `DataTable`, `Field`, `Display`, `Overlay`, `Blocks`, `Charts`, `State`, `Nav`, `Page`). |
-| **Dashboard Suite** | **15+ Dedicated Views**: Visitors, Sessions, Pages, Custom Events & Drilldowns, Traffic Sources, Geography, Real-Time Activity, Threshold Alerts, Audit Logs, and Shareable Reports. |
-| **Supabase Analytics Engine** | PostgreSQL schema with **11 high-performance RPC aggregation functions**, composite B-tree indexes, partition-ready timestamp keys, and strict Row Level Security (RLS). |
-| **Resilient Data Strategy** | Dual-source pipeline in `src/lib/dataService.js`: Direct Supabase PostgREST/RPC queries with automated Express 5 API fallback. |
-| **Zero-Flash Preloader** | Inlined SVG pulsing emblem in `index.html` with shimmer progress track eliminates blank flashes during asset loading. |
-| **Security Hardening** | Content Security Policy (CSP) for Supabase REST & WebSockets, Leaflet tile providers, rate limiting, and hashed API keys. |
+- **v0 Playground Studio UI (`apps/v2`):** Rebuilt using the monochrome tokens defined in [DESIGN.md](DESIGN.md) (`#000000` canvas, `#0A0A0A` panels, `1px` borders, `tabular-nums` Geist Mono telemetry).
+- **Backend-Only Data Normalization:** `apps/v2/src/lib/dataService.js` fetches metrics exclusively from `/api/v1/analytics/*` backed by Express + Supabase service-role queries, returning honest zeroes (`—` / `<0.1%`) with no synthetic fallback data.
+- **Expanded Telemetry Views:** Adds dedicated views for Visitors, Sessions, Pages, Events, Event Drilldowns, Sources, 3D Geography, Live Activity, Alerts, Integrations, and Workspace Activity.
 
 ---
 
+## Subscription Plans
+
+Tier quotas enforced by `backend/src/services/usage.service.js`, `backend/src/controllers/payment.controller.js`, and `public.plans`:
+
+| Tier | Pricing (INR / USD) | Monthly Events | Projects | Allowed Domains / Project | Retention | Refresh Interval | Access Highlights |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Nano** | `₹0` / `$0` | `10,000` | `1` | `1` | `7 days` | `60s` | Core analytics, basic REST API, V1 Stable console |
+| **Lite** | `₹199` / `$2.49` | `100,000` | `3` | `3` | `30 days` | `15s` | Everything in Nano, CSV exports |
+| **Pro** | `₹699` / `$8.99` | `1,000,000` | `10` | `10` | `90 days` | `5s` | Full API, live event logs, 3 team seats, **V2 Beta** access |
+| **Max** | `₹1,999` / `$24.99` | `5,000,000` | `50` | `25` | `12 months` | `1s` | 10 seats, unlimited saved reports, **V2 Beta & Alpha** eligibility |
+| **Enterprise** | `Custom` | `Negotiated` | `Custom` | `Custom` | `Custom` | `Dedicated (1s)` | RBAC, SSO integration, custom pipelines, contractual SLA |
+
+---
 ## Architecture & Data Strategy
 
 WebPulse Analytics utilizes an optimized dual-path data flow engineered for sub-second dashboards and high resilience:
