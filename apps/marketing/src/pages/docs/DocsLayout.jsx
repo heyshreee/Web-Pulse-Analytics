@@ -172,7 +172,7 @@ export default function DocsLayout() {
                             <div className="mkt-panel relative overflow-hidden px-6 py-10 text-center">
                                 <div
                                     aria-hidden="true"
-                                    className="mkt-glow left-1/2 top-[-140px] h-[280px] w-[480px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                                    className="mkt-glow left-1/2 top-[-140px] h-[280px] w-[480px] max-w-[110vw] -translate-x-1/2 bg-[#FFFFFF]/10"
                                 />
                                 <div className="relative">
                                     <h2 className="mkt-h3 !text-2xl">Still exploring?</h2>
@@ -208,7 +208,7 @@ export default function DocsLayout() {
                                 type="button"
                                 aria-label="Close documentation menu"
                                 onClick={() => setSidebarOpen(false)}
-                                className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
+                                className="fixed inset-0 z-[60] bg-black/70 "
                             />
                         )}
                         <DocsSidebar

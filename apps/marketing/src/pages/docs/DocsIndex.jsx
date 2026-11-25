@@ -7,13 +7,13 @@ import CodeBlock from './CodeBlock';
 import Reveal from '../../components/marketing/Reveal';
 
 const FlowStep = ({ label }) => (
-    <div className="whitespace-nowrap rounded-xl border border-violet-400/20 bg-violet-500/10 px-4 py-2.5 text-center text-xs font-semibold text-violet-300">
+    <div className="whitespace-nowrap rounded-[2px] border border-white/15 bg-[#FFFFFF]/10 px-4 py-2.5 text-center text-xs font-semibold text-[#FFFFFF]">
         {label}
     </div>
 );
 
-const FlowArrowRight = () => <ArrowRight className="hidden h-4 w-4 text-slate-600 md:block" aria-hidden="true" />;
-const FlowArrowDown = () => <ArrowDown className="h-4 w-4 text-slate-600 md:hidden" aria-hidden="true" />;
+const FlowArrowRight = () => <ArrowRight className="hidden h-4 w-4 text-[#8E8E88] md:block" aria-hidden="true" />;
+const FlowArrowDown = () => <ArrowDown className="h-4 w-4 text-[#8E8E88] md:hidden" aria-hidden="true" />;
 
 const primaryCards = [
     {
@@ -85,8 +85,8 @@ export default function DocsIndex() {
 
             <Reveal className="mb-16">
                 <div className="mkt-panel p-6">
-                    <h2 className="mb-6 flex items-center gap-2 text-lg font-bold tracking-tight text-slate-100">
-                        <Zap className="h-5 w-5 text-violet-300" aria-hidden="true" /> Start tracking in minutes
+                    <h2 className="mb-6 flex items-center gap-2 text-lg font-bold tracking-tight text-[#F5F5F4]">
+                        <Zap className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" /> Start tracking in minutes
                     </h2>
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2">
                         {flowSteps.map((step, i) => (
@@ -101,9 +101,9 @@ export default function DocsIndex() {
                             </div>
                         ))}
                     </div>
-                    <p className="mt-6 text-sm text-slate-400">
+                    <p className="mt-6 text-sm text-[#B3B3AF]">
                         From project creation to live analytics —{' '}
-                        <Link to="/docs/getting-started" className="font-semibold text-violet-300 transition-colors hover:text-violet-200">
+                        <Link to="/docs/getting-started" className="font-semibold text-[#FFFFFF] transition-colors hover:text-[#F5F5F4]">
                             follow the quick start →
                         </Link>
                     </p>
@@ -117,13 +117,13 @@ export default function DocsIndex() {
                         <Reveal key={card.to} delay={(i % 2) * 70}>
                             <Link to={card.to} className="mkt-card mkt-card-hover group block p-6">
                                 <div className="mb-4 flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10 transition-transform duration-300 group-hover:scale-105">
-                                        <Icon className="h-6 w-6 text-violet-300" aria-hidden="true" />
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10 transition-transform duration-300 group-hover:scale-105">
+                                        <Icon className="h-6 w-6 text-[#FFFFFF]" aria-hidden="true" />
                                     </div>
-                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{card.eyebrow}</p>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#969690]">{card.eyebrow}</p>
                                 </div>
-                                <h2 className="mb-5 text-lg font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-violet-300">{card.title}</h2>
-                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-300">
+                                <h2 className="mb-5 text-lg font-semibold tracking-tight text-[#F5F5F4] transition-colors group-hover:text-[#FFFFFF]">{card.title}</h2>
+                                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#FFFFFF]">
                                     {card.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                                 </span>
                             </Link>
@@ -133,12 +133,12 @@ export default function DocsIndex() {
             </div>
 
             <Reveal className="mb-20">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">JavaScript</p>
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#969690]">JavaScript</p>
                 <div className="mkt-panel p-6">
                     <div className="grid items-center gap-8 lg:grid-cols-2">
                         <div>
-                            <h2 className="mb-3 font-display text-2xl font-bold tracking-tight text-slate-100">JavaScript Tracker</h2>
-                            <p className="mb-6 text-slate-400">
+                            <h2 className="mb-3 font-display text-2xl font-bold tracking-tight text-[#F5F5F4]">JavaScript Tracker</h2>
+                            <p className="mb-6 text-[#B3B3AF]">
                                 Integrate WebPulse into your website using the lightweight JavaScript tracking module.
                             </p>
                             <Link to="/docs/javascript" className="mkt-link inline-flex items-center gap-1.5">
@@ -156,7 +156,7 @@ export default function DocsIndex() {
 
             <Reveal className="mb-20">
                 <div className="mb-4 flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Developer Guides</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#969690]">Developer Guides</p>
                     <Link to="/docs/guides" className="mkt-link inline-flex items-center gap-1">
                         Browse guides <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
@@ -164,12 +164,12 @@ export default function DocsIndex() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     {guideLinks.map((link) => (
                         <Link key={link.label} to={link.to} className="mkt-card mkt-card-hover group/li block p-5">
-                            <span className="flex items-center gap-2 font-semibold tracking-tight text-slate-100 transition-colors group-hover/li:text-violet-300">
-                                <Code2 className="h-4 w-4 shrink-0 text-violet-400" aria-hidden="true" />
+                            <span className="flex items-center gap-2 font-semibold tracking-tight text-[#F5F5F4] transition-colors group-hover/li:text-[#FFFFFF]">
+                                <Code2 className="h-4 w-4 shrink-0 text-[#FFFFFF]" aria-hidden="true" />
                                 {link.label}
-                                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-violet-400 transition-transform group-hover/li:translate-x-1" aria-hidden="true" />
+                                <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-[#FFFFFF] transition-transform group-hover/li:translate-x-1" aria-hidden="true" />
                             </span>
-                            <p className="mt-1.5 text-sm text-slate-400">{link.desc}</p>
+                            <p className="mt-1.5 text-sm text-[#B3B3AF]">{link.desc}</p>
                         </Link>
                     ))}
                 </div>
@@ -179,7 +179,7 @@ export default function DocsIndex() {
                 <div className="mkt-panel relative overflow-hidden px-6 py-12 text-center">
                     <div
                         aria-hidden="true"
-                        className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                        className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-[#FFFFFF]/10"
                     />
                     <div className="relative">
                         <h2 className="mkt-h3 !text-2xl">Ready to build?</h2>
