@@ -3,7 +3,7 @@
 
   <defs>
     <marker id="ammArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 10 5 0 10z" fill="#A78BFA" fill-opacity="0.75"/>
+      <path d="M0 0 10 5 0 10z" fill="#E5E5E5" fill-opacity="0.75"/>
     </marker>
   </defs>
 
@@ -44,14 +44,14 @@
   <g class="amm-fade amm-s1">
     <rect x="30" y="22" width="128" height="24" rx="12" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.2"/>
     <text x="42" y="38" font-size="11" font-weight="600" letter-spacing="2" fill="#64748B">01 · CAPTURE</text>
-    <rect x="168" y="22" width="170" height="24" rx="12" fill="#0C111C" stroke="#8B5CF6" stroke-opacity="0.34"/>
-    <text x="180" y="38" font-size="11" font-weight="600" letter-spacing="1.6" fill="#A78BFA">ALLOWED ORIGINS</text>
+    <rect x="168" y="22" width="170" height="24" rx="12" fill="#0C111C" stroke="#FFFFFF" stroke-opacity="0.34"/>
+    <text x="180" y="38" font-size="11" font-weight="600" letter-spacing="1.6" fill="#E5E5E5">ALLOWED ORIGINS</text>
 
-    <rect x="18" y="48" width="404" height="128" rx="20" stroke="#8B5CF6" stroke-opacity="0.34" stroke-dasharray="4 7"/>
+    <rect x="18" y="48" width="404" height="128" rx="20" stroke="#FFFFFF" stroke-opacity="0.34" stroke-dasharray="4 7"/>
     <rect x="30" y="52" width="380" height="118" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
 
-    <rect x="52" y="74" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(64,86) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="52" y="74" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(64,86) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <rect x="2" y="4" width="20" height="16" rx="3"/>
       <path d="M2 9h20"/>
       <path d="M6 6.5h.01M9.5 6.5h.01"/>
@@ -62,10 +62,10 @@
   </g>
 
   <!-- connector -->
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#ammArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#ammArrow)">
     <line x1="220" y1="176" x2="220" y2="226" class="amm-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="amm-travel amm-d1" cx="220" cy="182" r="3.2"/>
   </g>
 
@@ -75,9 +75,9 @@
     <text x="42" y="218" font-size="11" font-weight="600" letter-spacing="2" fill="#64748B">02 · VALIDATE</text>
 
     <rect x="30" y="232" width="380" height="118" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <circle cx="388" cy="246" r="4.5" fill="#48E6A1" class="amm-pulse"/>
-    <rect x="52" y="254" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(64,266) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="388" cy="246" r="4.5" fill="#FFFFFF" class="amm-pulse"/>
+    <rect x="52" y="254" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(64,266) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <rect x="2" y="4" width="20" height="7" rx="2"/>
       <rect x="2" y="13" width="20" height="7" rx="2"/>
       <path d="M6 7.5h.01M6 16.5h.01"/>
@@ -88,10 +88,10 @@
   </g>
 
   <!-- connector -->
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#ammArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#ammArrow)">
     <line x1="220" y1="356" x2="220" y2="406" class="amm-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="amm-travel amm-d2" cx="220" cy="362" r="3.2"/>
   </g>
 
@@ -101,8 +101,8 @@
     <text x="42" y="398" font-size="11" font-weight="600" letter-spacing="2" fill="#64748B">03 · STORE</text>
 
     <rect x="30" y="412" width="380" height="118" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <rect x="52" y="434" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(64,446) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="52" y="434" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(64,446) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <ellipse cx="12" cy="6" rx="8" ry="3"/>
       <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
       <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>
@@ -113,10 +113,10 @@
   </g>
 
   <!-- connector -->
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#ammArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#ammArrow)">
     <line x1="220" y1="536" x2="220" y2="586" class="amm-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="amm-travel amm-d3" cx="220" cy="542" r="3.2"/>
   </g>
 
@@ -126,8 +126,8 @@
     <text x="42" y="578" font-size="11" font-weight="600" letter-spacing="2" fill="#64748B">04 · READ</text>
 
     <rect x="30" y="592" width="380" height="118" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <rect x="52" y="614" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(64,626) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="52" y="614" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(64,626) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <path d="M3 20h18"/>
       <path d="M6 20V10M12 20V4M18 20v-7"/>
     </g>
