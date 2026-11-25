@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://obs-real-time-tracker.vercel.app/sitemap.xml
+Sitemap: https://www.webpulseanalytics.tech/sitemap.xml
