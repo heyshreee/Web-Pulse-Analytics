@@ -2240,13 +2240,13 @@
   .toast {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 10px 12px;
-    background: var(--popover);
-    color: var(--popover-foreground);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-md);
+    gap: 14px;
+    padding: 16px 44px 16px 16px;
+    background: #0a0a0a;
+    color: #f5f5f4;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 2px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.92);
     animation: wp-toast-in var(--duration-slow) var(--ease-out);
   }
 
@@ -3522,6 +3522,119 @@
     color: var(--muted-foreground);
   }
 
+  /* --- Editorial Noir auth primitives (isolated to /login, /register, recovery) --- */
+  .noir-auth {
+    color-scheme: dark;
+    min-height: 100dvh;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #050505;
+    color: #f5f5f4;
+  }
+
+  .noir-auth .font-mono {
+    font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .noir-grid-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 90% 65% at 35% 30%, #000 15%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 65% at 35% 30%, #000 15%, transparent 80%);
+  }
+
+  .noir-panel {
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    background: #0a0a0a;
+  }
+
+  .noir-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #c8c8c4;
+  }
+
+  .noir-field {
+    width: 100%;
+    height: 2.75rem;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #050505;
+    padding: 0 0.875rem;
+    font-size: 0.875rem;
+    color: #f5f5f4;
+    transition: border-color 0.14s ease, background-color 0.14s ease;
+  }
+
+  .noir-field::placeholder {
+    color: #737373;
+  }
+
+  .noir-field:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .noir-field:focus {
+    outline: none;
+    border-color: #ffffff;
+    background: #050505;
+  }
+
+  .noir-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: 2px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  }
+
+  .noir-btn:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+  }
+
+  .noir-btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .noir-btn-primary {
+    color: #050505;
+    background: #ffffff;
+  }
+
+  .noir-btn-primary:hover {
+    background: #e5e5e5;
+  }
+
+  .noir-btn-secondary {
+    color: #f5f5f4;
+    background: #0f0f0f;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-weight: 500;
+  }
+
+  .noir-btn-secondary:hover {
+    color: #ffffff;
+    background: #181818;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
   /* --- auth --- */
   .auth-layout {
     display: grid;
@@ -4141,5 +4254,60 @@
     .marketing-head {
       display: none;
     }
+  }
+}
+
+/* Unlayered short-viewport overrides ensure cascade wins cleanly over @layer utilities */
+@media (max-height: 820px) {
+  .noir-auth-header-inner {
+    height: 3.25rem;
+  }
+
+  #auth-main {
+    padding-top: 1rem;
+    padding-bottom: 1.25rem;
+  }
+
+  #auth-main .noir-auth-tabs {
+    margin-bottom: 0.625rem;
+  }
+
+  #auth-main .noir-panel {
+    padding: 1.25rem 1.375rem;
+  }
+
+  #auth-main .noir-panel h1 {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  #auth-main .noir-panel .mb-6 {
+    margin-bottom: 0.875rem;
+  }
+
+  #auth-main .noir-panel .mb-5 {
+    margin-bottom: 0.75rem;
+  }
+
+  #auth-main .noir-label {
+    margin-bottom: 0.3125rem;
+    font-size: 0.75rem;
+  }
+
+  #auth-main .noir-field,
+  #auth-main .noir-btn {
+    height: 2.375rem;
+  }
+
+  #auth-main form.space-y-5 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.875rem;
+  }
+
+  #auth-main .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.625rem;
+  }
+
+  .noir-globe-stage {
+    height: min(320px, 44dvh);
   }
 }
