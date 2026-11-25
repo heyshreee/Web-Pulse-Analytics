@@ -9,7 +9,6 @@ import {
   Plug,
 } from 'lucide-react';
 import MarketingShell from '../components/marketing/MarketingShell';
-import SectionHead from '../components/marketing/SectionHead';
 import Reveal from '../components/marketing/Reveal';
 import CodeSnippet from '../components/marketing/CodeSnippet';
 
@@ -18,11 +17,11 @@ function FlowDiagram({ steps }) {
     <div className="mt-6 flex flex-col items-center gap-1">
       {steps.map((s, i) => (
         <div key={s}>
-          <div className="rounded-lg border border-violet-400/20 bg-violet-500/10 px-4 py-2 text-center text-xs font-semibold text-violet-300">
+          <div className="rounded-[2px] border border-white/15 bg-[#FFFFFF]/10 px-4 py-2 text-center text-xs font-semibold text-[#FFFFFF]">
             {s}
           </div>
           {i < steps.length - 1 && (
-            <ArrowDown className="mx-auto my-1 h-4 w-4 text-slate-600" aria-hidden="true" />
+            <ArrowDown className="mx-auto my-1 h-4 w-4 text-[#8E8E88]" aria-hidden="true" />
           )}
         </div>
       ))}
@@ -90,28 +89,28 @@ export default function Integrations() {
     <MarketingShell>
       <section className="mkt-section">
         <div className="mkt-container">
-          <SectionHead
-            eyebrow="Integrations"
-            title={
-              <>
-                Connect your <span className="mkt-accent-text">stack</span> to WebPulse
-              </>
-            }
-            description="Track events from your applications, query analytics through the API, and build the integrations your workflow needs."
-          />
+          <Reveal className="max-w-3xl">
+            <p className="noir-meta mb-4 text-[#FFFFFF]">Integrations</p>
+            <h1 className="mkt-h1">
+              Connect your <span className="text-[#FFFFFF]">stack</span> to WebPulse.
+            </h1>
+            <p className="mkt-lead mt-5">
+              Track events from your applications, query analytics through the API, and build the integrations your workflow needs.
+            </p>
+          </Reveal>
 
           <div className="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-2">
             {integrations.map((item, i) => (
               <Reveal key={item.title} delay={(i % 2) * 70} className="h-full">
                 <article className="mkt-card mkt-card-hover flex h-full flex-col p-6 sm:p-7">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                    <item.icon className="h-6 w-6 text-violet-300" aria-hidden="true" />
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                    <item.icon className="h-6 w-6 text-[#FFFFFF]" aria-hidden="true" />
                   </div>
-                  <h2 className="text-lg font-semibold tracking-tight text-slate-100">
+                  <h2 className="text-lg font-semibold tracking-tight text-[#F5F5F4]">
                     {item.title}
                   </h2>
-                  <p className="mt-1.5 text-sm font-medium text-slate-200">{item.headline}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.description}</p>
+                  <p className="mt-1.5 text-sm font-medium text-[#F5F5F4]">{item.headline}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#B3B3AF]">{item.description}</p>
 
                   {item.flow && <FlowDiagram steps={item.flow} />}
 
@@ -136,12 +135,12 @@ export default function Integrations() {
           <Reveal className="mx-auto mt-8 max-w-5xl">
             <div className="mkt-panel p-6 sm:p-10">
               <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                  <Plug className="h-5 w-5 text-violet-300" aria-hidden="true" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                  <Plug className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
                 </div>
                 <h2 className="mkt-h3 !text-xl">Build your own integration</h2>
               </div>
-              <p className="text-lg font-semibold text-slate-100">WebPulse is API-first.</p>
+              <p className="text-lg font-semibold text-[#F5F5F4]">WebPulse is API-first.</p>
               <p className="mkt-body mt-1 max-w-2xl">
                 You don't need a pre-built connector for every service. If your application can
                 make an HTTP request, it can work with WebPulse.
@@ -150,29 +149,29 @@ export default function Integrations() {
               <div className="mb-8 mt-8 flex flex-col items-center gap-1">
                 {['Your App', 'WebPulse API', 'Analytics'].map((s, i, arr) => (
                   <div key={s}>
-                    <div className="rounded-lg border border-violet-400/30 bg-violet-500/15 px-5 py-2 text-center text-xs font-semibold text-violet-200">
+                    <div className="rounded-[2px] border border-[#FFFFFF]/35 bg-[#FFFFFF]/12 px-5 py-2 text-center text-xs font-semibold text-[#F5F5F4]">
                       {s}
                     </div>
                     {i < arr.length - 1 && (
                       <div className="my-1 flex items-center justify-center gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-slate-500">
+                        <span className="text-[10px] uppercase tracking-widest text-[#969690]">
                           {i === 0 ? 'Events' : 'Data'}
                         </span>
-                        <ArrowDown className="h-4 w-4 text-slate-600" aria-hidden="true" />
+                        <ArrowDown className="h-4 w-4 text-[#8E8E88]" aria-hidden="true" />
                       </div>
                     )}
                   </div>
                 ))}
               </div>
 
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#969690]">
                 Supported today
               </p>
               <div className="flex flex-wrap gap-2">
                 {supported.map((s) => (
                   <span
                     key={s}
-                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-xs font-medium text-slate-300"
+                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-xs font-medium text-[#C8C8C4]"
                   >
                     {s}
                   </span>
