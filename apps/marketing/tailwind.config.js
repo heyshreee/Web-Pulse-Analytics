@@ -8,36 +8,41 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        sans: ['"Geist"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        display: ['"Geist"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
-        space: {
-          950: '#070A10',
-          900: '#0B0F17',
-          800: '#101522',
-          700: '#151B29',
+        noir: {
+          950: '#050505',
+          900: '#0A0A0A',
+          850: '#101010',
+          800: '#141414',
+          700: '#1D1D1D',
+          600: '#272727',
+        },
+        mono: {
+          white: '#FFFFFF',
+          silver: '#D4D4D4',
+          muted: '#969690',
         },
         pulse: {
-          purple: '#8B5CF6',
-          violet: '#7C6CE0',
-          green: '#48E6A1',
-          live: '#48E6A1',
-          warning: '#F59E0B',
+          accent: '#FFFFFF',
+          live: '#FFFFFF',
+          green: '#FFFFFF',
+          warning: '#D4D4D4',
           error: '#EF4444',
         },
-      },
-      boxShadow: {
-        soft: '0 1px 2px 0 rgb(15 23 42 / 0.05)',
-        lift: '0 8px 30px rgb(0 0 0 / 0.06)',
-        crisp: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
       },
       maxWidth: {
         '8xl': '88rem',
       },
+      transitionTimingFunction: {
+        weighted: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      },
       animation: {
         'fade-up': 'fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
-        'fade-in': 'fadeIn 0.4s ease-out both',
+        'fade-in': 'fadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both',
         'loading-bar': 'loadingBar 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite',
       },
       keyframes: {
