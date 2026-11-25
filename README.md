@@ -111,64 +111,59 @@ Tier quotas enforced by `backend/src/services/usage.service.js`, `backend/src/co
 | **Enterprise** | `Custom` | `Negotiated` | `Custom` | `Custom` | `Custom` | `Dedicated (1s)` | RBAC, SSO integration, custom pipelines, contractual SLA |
 
 ---
-## Architecture & Data Strategy
+## Architecture & Data Pipeline
 
-WebPulse Analytics utilizes an optimized dual-path data flow engineered for sub-second dashboards and high resilience:
+WebPulse separates public marketing, console presentation, and telemetry ingestion into four independent runtime surfaces backed by Supabase PostgreSQL:
 
-```
-[ Tracked Websites ]
-         │ (HTTP POST /api/track)
-         ▼
- ┌──────────────────────────────────────────────┐
- │             Express 5 Backend                │
- │  - Rate Limiter & Helmet CSP                │
- │  - Geolocation (geoip-lite) & User-Agent    │
- │  - Socket.IO Gateway Server                 │
- └──────┬────────────────────────────────┬──────┘
-        │                                │ (Live WebSocket Events)
-        ▼                                ▼
- ┌──────────────────────┐      ┌──────────────────────┐
- │   Supabase Postgres   │◄────┤  React Dashboard     │
- │  - Core Tables       │      │  (Dual Data Service) │
- │  - 11 Analytics RPCs │      │  - Supabase Primary  │
- │  - RLS Security      │      │  - Express Fallback  │
- └──────────────────────┘      └──────────────────────┘
+```text
+Tracked Visitor Browsers
+  └─ GET  /api/track/:id/script.js   (~1.1 KB raw / ~540 B gzip, zero cookies)
+  └─ POST /api/track/:id             ──┐
+  └─ POST /api/track/events          ──┤
+                                       ▼
+                           Express 5 API + Ingestion
+  Marketing (apps/marketing) ──▶ Portals ──▶ /login, /register, /beta/*
+  Stable V1 (apps/v1)        ◀── REST /api/v1/* + Socket.IO WS ◀──┤
+  Beta V2   (apps/v2)        ◀── REST /api/v1/* + Socket.IO WS ◀──┤
+                                       │
+                        Bot Filter · Hit Hash · Geo (ipwho.is / geoip-lite) · UA Parse
+                                       │
+                                       ▼
+                           Supabase PostgreSQL + RLS
 ```
 
-1. **Ingestion Layer:** Public endpoints (`/api/track/:trackingId` and `/api/track/events`) parse incoming pings, extract geo/device telemetry, and persist records to Supabase.
-2. **Real-Time Stream:** Live events are broadcast via `Socket.IO` rooms scoped by project ID, triggering instantaneous dashboard metric increments.
-3. **Analytics Layer:** The frontend queries high-speed SQL RPC functions directly via Supabase PostgREST. If permissions or network constraints require, `dataService.js` transparently falls back to the backend API.
+1. **Collector & Ingest:** `GET /api/track/:trackingId/script.js` (or `/api/track/script.js`) delivers a lightweight script that collects page path, title, and referrer without touching cookies or `localStorage`. Events post to `POST /api/track/:trackingId` or `POST /api/track/events`.
+2. **Validation & Enrichment:** `trackingCors` verifies project origins while `express-rate-limit` and `isBot` filter abusive or automated hits. `visitor.controller.js` computes deduplication hit hashes, parses user agents via `ua-parser-js`, and resolves location via `ipwho.is` with offline `geoip-lite` fallback.
+3. **Persistence & Broadcast:** Ingestion writes normalized records across `visitors`, `sessions`, `page_views`, `events`, and `analytics_daily`, then emits live room updates over Socket.IO (`setupVisitorSocket`, validated by shared origin rules in `backend/src/config/origins.js`).
+4. **Console API & SSO:** Both V1 and V2 query Express (`/api/v1/analytics/*`) rather than embedding privileged service credentials in the browser, sharing `HttpOnly` JWT sessions via `COOKIE_DOMAIN`.
+
+> **Runtime Note:** Because the backend maintains persistent Socket.IO WebSocket connections, scheduled notification cleanup, and the local `geoip-lite` dataset, it runs as a long-lived Node.js service rather than a stateless serverless function. See [docs/deployment.md](docs/deployment.md).
 
 ---
 
 ## Technology Stack
 
-### Frontend Applications
-- **Framework:** [React 19](https://react.dev/) + [Vite 7](https://vitejs.dev/)
-- **Routing:** [React Router 7](https://reactrouter.com/)
-- **Styling:** [Tailwind CSS 3](https://tailwindcss.com/) + Custom CSS Design System (`theme.css`, `app.css`)
-- **Visualizations:** [Recharts 3](https://recharts.org/), [react-globe.gl](https://globe.gl/) (Three.js), [Leaflet](https://leafletjs.com/)
-- **Animations:** [Framer Motion 12](https://motion.dev/), [GSAP](https://gsap.com/)
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **Real-Time:** [Socket.IO Client 4](https://socket.io/)
-- **Database Client:** [@supabase/supabase-js 2](https://supabase.com/docs/reference/javascript)
+### Frontend Applications (`apps/marketing`, `apps/v1`, `apps/v2`)
 
-### Backend Service
-- **Runtime:** [Node.js 22 LTS](https://nodejs.org/)
-- **Web Framework:** [Express 5](https://expressjs.com/)
-- **Real-Time Server:** [Socket.IO 4](https://socket.io/)
-- **Authentication:** JWT, [Google Auth Library](https://github.com/googleapis/google-auth-library-nodejs), bcryptjs
-- **Telemetry Parsers:** [geoip-lite](https://github.com/bluesmoon/node-geoip), [ua-parser-js](https://github.com/faisalman/ua-parser-js)
-- **Security Middleware:** [Helmet 8](https://helmetjs.github.io/), [express-rate-limit](https://github.com/express-rate-limit/express-rate-limit), CORS, cookie-parser
-- **Notifications & Billing:** [Resend](https://resend.com/), [Razorpay](https://razorpay.com/), Cloudinary, PDFKit
+| Layer | Technologies |
+| :--- | :--- |
+| **Core Framework** | React `19.2`, Vite `7.2`, React Router `7.12` |
+| **Design & Motion** | Tailwind CSS `3.4`, Editorial Noir & Playground Studio tokens (`Geist` / `Geist Mono`), Framer Motion `12.26` / `motion 13.1`, GSAP `3.15`, Lucide React |
+| **Data & 3D Visualization** | Recharts `3.6`, Three.js `0.183` (`world-110m.json` wireframe globe), `react-globe.gl` `2.37`, Leaflet `1.9` + `react-leaflet` `5.0` |
+| **Realtime & Client Auth** | `socket.io-client` `4.8`, `@react-oauth/google` `0.13`, `react-syntax-highlighter` |
+| **Testing & Linting** | Vitest `5.1` (`apps/v1`, `apps/v2`), ESLint `9.39` |
 
-### Database & Storage
-- **Database:** [Supabase PostgreSQL 15+](https://supabase.com/)
-- **Analytics Functions:** 11 Custom PL/pgSQL RPC procedures (`supabase/migrations/`)
-- **Security:** Row Level Security (RLS) policies with multi-tenant isolation
+### Backend Service (`backend/`) & Infrastructure
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Server & Realtime** | Node.js `20+` (`22 LTS` in CI), Express `5.2`, Socket.IO `4.8` |
+| **Database & Schema** | `@supabase/supabase-js` `2.90`, PostgreSQL, versioned SQL RPCs & RLS policies (`supabase/migrations/`) |
+| **Auth & Hardening** | `jsonwebtoken` `9.0`, `google-auth-library` `10.5`, `bcryptjs` `3.0`, Helmet `8.1`, `express-rate-limit` `8.2`, CSRF header checks |
+| **Telemetry & Media** | `geoip-lite` `2.0`, `ipwho.is` lookup, `ua-parser-js` `2.0`, `pdfkit` `0.17`, Cloudinary `2.9` + `multer` `2.0` |
+| **Billing, Alerts & CI** | Razorpay `2.9`, Resend `6.7`, Telegram / Twilio, `node --test`, CodeQL & Gitleaks workflows (`.github/workflows/`) |
 
 ---
-
 ## Quick Start
 
 ### Prerequisites
