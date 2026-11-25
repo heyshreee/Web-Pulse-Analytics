@@ -167,164 +167,152 @@ Tracked Visitor Browsers
 ## Quick Start
 
 ### Prerequisites
-- **Node.js:** v20.0.0 or higher (v22 LTS recommended)
-- **npm:** v10 or higher
-- **Supabase Account:** A Supabase project for PostgreSQL data storage
+
+- **Node.js 20+** (Node `22 LTS` used in CI workflows) and **npm**
+- A **Supabase** project (PostgreSQL database)
+- Optional integrations (only needed for features that use them): Razorpay, Google OAuth, Resend, Cloudinary, Telegram, Twilio
+
+### Installation
+
+Each package maintains independent dependencies (no root npm workspaces):
+
+```bash
+git clone https://github.com/heyshreee/Web-Pulse-Analytics.git
+cd Web-Pulse-Analytics
+
+npm --prefix backend install
+npm --prefix apps/marketing install
+npm --prefix apps/v1 install
+npm --prefix apps/v2 install
+```
 
 ### Environment Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/heyshreee/Web-Pulse-Analytics.git
-   cd Web-Pulse-Analytics
-   ```
+Copy the template environment files and fill in your credentials before starting any service:
 
-2. **Configure Backend Environment:**
-   ```bash
-   cd backend
-   cp .env.example .env
-   ```
-   Edit `backend/.env` with your credentials (see `backend/.env.example` for all options):
-   ```env
-   PORT=3000
-   NODE_ENV=development
-   FRONTEND_URL=http://localhost:5173
-   FRONTEND_URLS=http://localhost:5173,http://localhost:5174,http://localhost:5175
-   BACKEND_URL=http://localhost:3000
-   JWT_SECRET=your_jwt_secret_key
-   CSRF_SECRET=your_csrf_secret_key
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_KEY=your_supabase_service_role_key
-   ```
+```bash
+cp backend/.env.example backend/.env
+cp apps/marketing/.env.example apps/marketing/.env
+cp apps/v1/.env.example apps/v1/.env
+cp apps/v2/.env.example apps/v2/.env
+```
 
-3. **Configure Frontend Environments:**
-   Configure environment files for the applications you want to run:
-   ```bash
-   # From the repository root:
-
-   # Marketing site
-   cp apps/marketing/.env.example apps/marketing/.env
-
-   # Stable V1 Dashboard (Default Production)
-   cp apps/v1/.env.example apps/v1/.env
-
-   # Beta V2 Dashboard (Beta Track)
-   cp apps/v2/.env.example apps/v2/.env
-   ```
-
-   Each frontend application `.env` exposes variables starting with `VITE_`:
-   ```env
-   VITE_API_URL=http://localhost:3000/api
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-   `VITE_API_URL` defaults to `http://localhost:3000/api`. Vite's development proxy will forward `/api` and `/api/track` requests to the local backend running on port `3000`.
+- **Backend (`backend/.env`):** Configure `PORT=3000` (if `PORT` is omitted, `backend/src/config/env.js` falls back to `5000`; `.env.example` and Vite dev proxies default to `http://localhost:3000`), `JWT_SECRET`, `CSRF_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `FRONTEND_URL`, and comma-separated `FRONTEND_URLS`. Add `COOKIE_DOMAIN` in multi-subdomain production deployments for V1/V2 SSO.
+- **Frontends (`apps/*/.env`):** Set `VITE_API_URL=http://localhost:3000/api`, `VITE_MARKETING_URL`, `VITE_V1_APP_URL` / `VITE_APP_URL`, `VITE_V2_APP_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, plus optional `VITE_SOCKET_URL`, `VITE_GOOGLE_CLIENT_ID`, and `VITE_RAZORPAY_KEY_ID`.
 
 ### Database Migrations
 
-Apply the versioned SQL migrations in `supabase/migrations/` to your Supabase project in sequential order:
+SQL migrations live in [`supabase/migrations/`](supabase/migrations/) and are never auto-applied by CI/CD. Apply all 8 files in order via the Supabase CLI (`supabase db push`) or the Supabase SQL Editor:
+
+1. `20261001000001_core_schema.sql` — Profiles, projects, members, and project settings
+2. `20261001000002_analytics_tables.sql` — Visitors, sessions, page views, events, and daily aggregates
+3. `20261001000003_indexes.sql` — Query performance indexes
+4. `20261001000004_analytics_functions.sql` — SQL analytics aggregation functions
+5. `20261001000005_rls_security.sql` — Row Level Security (`RLS`) policies
+6. `20261008000001_fix_security_and_performance_linter.sql` — Linter security and performance fixes
+7. `20261020000001_user_sessions.sql` — Revocable server-side sessions (`public.user_sessions`)
+8. `20261124000001_update_subscription_plans.sql` — Canonical `public.plans` seed (`nano` through `enterprise`)
+
+Validate migration filenames and basic SQL hygiene offline with `node scripts/check-migrations.mjs`.
+
+### Running Applications & Checks
+
+Launch each service in its own terminal from the repository root:
 
 ```bash
-# Using Supabase CLI:
-supabase db push
-
-# Alternatively, execute the SQL files in the Supabase SQL Editor:
-# 1. 20261001000001_core_schema.sql
-# 2. 20261001000002_analytics_tables.sql
-# 3. 20261001000003_indexes.sql
-# 4. 20261001000004_analytics_functions.sql
-# 5. 20261001000005_rls_security.sql
-# 6. 20261008000001_fix_security_and_performance_linter.sql
-# 7. 20261020000001_user_sessions.sql
-```
-
-> **Note:** Database migrations are never executed automatically by CI/CD workflows to prevent accidental production schema drift.
-
-### Running Applications
-
-The root `package.json` includes convenience scripts to run each application on its designated port:
-
-```bash
-# 1. Start the Backend API server (http://localhost:3000)
+# 1. Start the Backend API & Socket.IO server (http://localhost:3000)
 npm run dev:backend
 
-# 2. Start the Stable V1 Dashboard (http://localhost:5173 - Default Production)
+# 2. Start the Stable V1 Dashboard (http://localhost:5173 — Default Production)
 npm run dev:v1
 
-# 3. Start the Beta V2 Dashboard (http://localhost:5175 - Beta Track)
-npm run dev:v2
-
-# 4. Start the Marketing Website (http://localhost:5174)
+# 3. Start the Marketing Website (http://localhost:5174)
 npm run dev:marketing
+
+# 4. Start the Beta V2 Observatory Dashboard (http://localhost:5175)
+npm run dev:v2
 ```
 
-To build all frontend applications for production:
+Run tests, linting, syntax validation, and production builds using root convenience scripts:
+
 ```bash
-npm run build:all
-```
-Or build individually:
-```bash
-npm run build:marketing
-npm run build:v1
-npm run build:v2
+npm run check:backend   # Syntax check across backend/src
+npm run test:backend    # Backend unit tests (node --test)
+npm run test:v1         # Vitest suite for apps/v1
+npm run test:v2         # Vitest suite for apps/v2
+npm run test:all        # Run backend, V1, and V2 test suites
+npm run lint:all        # ESLint across all three frontend apps
+npm run build:all       # Production Vite builds for marketing, V1, and V2
 ```
 
 ---
 
 ## Tracking Script & Integration
 
-WebPulse Analytics provides a lightweight client tracker that can be embedded into any web property.
-
 ### 1. Standard HTML Embed
-Add the following snippet before the closing `</head>` tag on your website:
+
+Embed the cookie-free tracker SDK and initialize your project ID:
 
 ```html
-<!-- WebPulse Analytics Tracker -->
-<script
-  defer
-  src="https://YOUR_API_HOST/api/track/script.js"
-  data-site="YOUR_PROJECT_TRACKING_ID">
+<script src="https://api.webpulseanalytics.tech/api/track/script.js" defer></script>
+<script>
+  window.addEventListener('load', function () {
+    window.tracker('init', 'YOUR_PROJECT_TRACKING_ID');
+    window.tracker('track', 'page_view');
+  });
 </script>
 ```
 
-*(For local testing, replace `https://YOUR_API_HOST` with `http://localhost:3000`)*.
+You can also embed the project-scoped URL directly (`https://api.webpulseanalytics.tech/api/track/YOUR_PROJECT_TRACKING_ID/script.js`), which auto-initializes your tracking ID on load.
 
-### 2. Custom Event Telemetry
-Send custom interaction events from your application code:
+### 2. Custom Events & SPA Transitions
+
+Fire custom events or manual SPA route transitions using `window.tracker`:
 
 ```javascript
-// Track button clicks, conversions, or signups
-if (window.webpulse) {
-  window.webpulse('track', 'button_click', {
-    button_name: 'upgrade_cta',
-    plan_tier: 'pro_annual',
-    value: 120
+if (typeof window.tracker === 'function') {
+  window.tracker('track', 'checkout_completed', {
+    plan: 'pro',
+    value: 699
   });
 }
 ```
 
 ### 3. REST API Ingestion
-You can also record events server-side using standard HTTP requests:
+
+Record custom events or server-side pageviews over HTTP:
 
 ```http
 POST /api/track/events HTTP/1.1
 Host: YOUR_API_HOST
 Content-Type: application/json
+x-api-key: YOUR_PROJECT_TRACKING_ID
 
 {
-  "trackingId": "YOUR_PROJECT_TRACKING_ID",
-  "eventName": "checkout_completed",
+  "event": "checkout_completed",
   "url": "https://example.com/checkout/success",
+  "referrer": "https://example.com/pricing",
   "metadata": {
-    "currency": "USD",
-    "amount": 49.99
+    "currency": "INR",
+    "amount": 699
   }
 }
 ```
 
----
+To record a pageview and receive the updated live count in one call:
 
+```http
+POST /api/track/YOUR_PROJECT_TRACKING_ID HTTP/1.1
+Host: YOUR_API_HOST
+Content-Type: application/json
+
+{
+  "pageUrl": "https://example.com/pricing",
+  "title": "Pricing"
+}
+```
+
+---
 ## Application Route Map
 
 ### Dashboard & Analytics Views
