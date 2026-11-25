@@ -1,187 +1,162 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import PreviewFrame from './PreviewFrame';
-import Reveal from '../marketing/Reveal';
-import DashboardPreview from './DashboardPreview';
-import ChartPreview from './ChartPreview';
-import LiveEventStream from './LiveEventStream';
-import AnimatedNumber from './AnimatedNumber';
-import { SAMPLE_KPIS, SAMPLE_REFERRERS, makeTrafficSeries, TRAFFIC_RANGES } from './sampleData';
+import { Link } from 'react-router-dom';
 import { getCanonicalAppUrl } from '../../utils/urls';
-
-function KpiTile({ label, value, accent, decimals = 0, suffix = '' }) {
-  const isNumeric = typeof value === 'number';
-  return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
-      <p className="metric-num mt-1.5 text-xl font-bold sm:text-2xl" style={{ color: accent }}>
-        {isNumeric ? (
-          <AnimatedNumber end={value} decimals={decimals} suffix={suffix} duration={1.6} />
-        ) : (
-          value
-        )}
-      </p>
-    </div>
-  );
-}
+import { SAMPLE_PAYLOAD, SAMPLE_STREAMS } from './sampleData';
 
 export default function Hero() {
-  const [range, setRange] = useState('30d');
-  const series = useMemo(() => makeTrafficSeries(range), [range]);
+  const v1Url = getCanonicalAppUrl('v1');
+  const [probeTab, setProbeTab] = useState('stream');
 
   return (
-    <section className="relative overflow-hidden pb-16 pt-14 sm:pt-20 lg:pb-24">
-      {/* Brand glow — the only decorative gradient in the hero. */}
-      <div
-        aria-hidden="true"
-        className="mkt-glow left-1/2 top-[-140px] h-[420px] w-[720px] max-w-[110vw] -translate-x-1/2 bg-violet-600/25"
-      />
+    <section className="relative pt-12 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-24">
+      <div className="mkt-container">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
+          {/* Left editorial column */}
+          <div className="lg:col-span-7">
+            <h1 className="text-[1.6875rem] font-semibold leading-[1.05] tracking-[-0.036em] md:text-[2.35rem] lg:text-[3.25rem]">
+              <span className="block text-[#B3B3AF]">Understand your traffic,</span>
+              <span className="block text-[#FFFFFF]">not your users.</span>
+            </h1>
 
-      <div className="mkt-container relative">
-        <div className="mx-auto max-w-5xl text-center">
-          <p className="mkt-chip mx-auto">
-            <span className="mkt-live-dot" aria-hidden="true" />
-            Real-time web analytics
-          </p>
+            <p className="mkt-lead mt-6 max-w-[54ch] text-[#C8C8C4]">
+              Real-time web analytics in one lightweight script. No cookies, no bloated
+              dashboards, and full visibility into routes, sources, and custom events.
+            </p>
 
-          <h1 className="mkt-h1 mt-6">
-            Your website is always talking.
-            <br />
-            <span className="mkt-accent-text">WebPulse listens.</span>
-          </h1>
-
-          <p className="mkt-lead mx-auto mt-6 max-w-2xl">
-            Understand your traffic, follow visitor activity, and discover which pages bring
-            people in. All from one real-time analytics dashboard built for developers.
-          </p>
-
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href={`${getCanonicalAppUrl('v1')}/register`} className="mkt-btn mkt-btn-primary mkt-btn-lg w-full sm:w-auto">
-              Start tracking free
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-            <a
-              href="#product-preview"
-              className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full sm:w-auto"
-            >
-              Explore the preview
-            </a>
-          </div>
-
-          <p className="mt-5 text-xs text-slate-500">
-            Free plan available · No credit card required
-          </p>
-        </div>
-
-        {/* Product preview — presentation-only, clearly labelled as sample data. */}
-        <Reveal id="product-preview" className="mx-auto mt-14 max-w-5xl scroll-mt-24 lg:mt-16">
-          <PreviewFrame title="WebPulse · Dashboard" note="Illustrative sample data">
-            <DashboardPreview>
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {SAMPLE_KPIS.map((kpi) => (
-                  <KpiTile key={kpi.label} {...kpi} />
-                ))}
-              </div>
-
-              <div className="grid gap-3 lg:grid-cols-[1.6fr_1fr]">
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                      Traffic momentum
-                    </p>
-                    <div className="flex items-center gap-0.5 rounded-full border border-white/[0.08] bg-white/[0.03] p-0.5">
-                      {TRAFFIC_RANGES.map((r) => (
-                        <button
-                          key={r}
-                          type="button"
-                          onClick={() => setRange(r)}
-                          aria-pressed={range === r}
-                          className={`rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors ${
-                            range === r
-                              ? 'bg-violet-500/90 text-white'
-                              : 'text-slate-500 hover:text-slate-300'
-                          }`}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="h-40 sm:h-48">
-                    <ChartPreview data={series} dark />
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    Referral sources
-                  </p>
-                  <ul className="space-y-3">
-                    {SAMPLE_REFERRERS.map((r) => (
-                      <li key={r.label}>
-                        <div className="mb-1.5 flex items-center justify-between text-xs">
-                          <span className="text-slate-400">{r.label}</span>
-                          <span className="metric-num font-semibold" style={{ color: r.accent }}>
-                            {r.value}%
-                          </span>
-                        </div>
-                        <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${r.value * 2}%`, background: r.accent, opacity: 0.85 }}
-                          />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    Live activity
-                  </p>
-                  <span className="text-[11px] text-slate-600">Visitors arriving now</span>
-                </div>
-                <div className="h-[168px]">
-                  <LiveEventStream maxItems={4} seedCount={4} />
-                </div>
-              </div>
-            </DashboardPreview>
-          </PreviewFrame>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              {
-                label: 'Traffic',
-                text: 'Page views and sessions across 24 hours, 7 days, or 30 days.',
-              },
-              {
-                label: 'Visitor activity',
-                text: 'Events as visitors move through your site, labeled with page and time.',
-              },
-              {
-                label: 'Acquisition',
-                text: 'The channels and referrers that brought those visitors in.',
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-left"
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href={`${v1Url}/register`}
+                className="mkt-btn mkt-btn-primary mkt-btn-lg"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-300">
-                  {item.label}
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-400">{item.text}</p>
+                Start free
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <a
+                href="#preview"
+                className="mkt-btn mkt-btn-secondary mkt-btn-lg"
+              >
+                Live demo
+              </a>
+              <Link
+                to="/docs"
+                className="mkt-btn mkt-btn-ghost mkt-btn-md text-[#C8C8C4]"
+              >
+                Read the docs
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+
+            {/* Grounded micro-specs matching real collector code */}
+            <dl className="mt-12 grid grid-cols-1 gap-6 bg-[#0A0A0A] p-5 sm:grid-cols-3">
+              <div>
+                <dt className="text-sm font-semibold text-[#F5F5F4]">&lt; 1.5 KB</dt>
+                <dd className="mt-1 text-sm text-[#B3B3AF]">
+                  540-byte gzipped collector. Loads async, never blocks rendering.
+                </dd>
               </div>
-            ))}
+              <div>
+                <dt className="text-sm font-semibold text-[#F5F5F4]">Zero cookies</dt>
+                <dd className="mt-1 text-sm text-[#B3B3AF]">
+                  Writes no visitor cookies and zero browser localStorage keys.
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-semibold text-[#F5F5F4]">Socket.IO + REST</dt>
+                <dd className="mt-1 text-sm text-[#B3B3AF]">
+                  Events stream live over Socket.IO as requests hit your pages.
+                </dd>
+              </div>
+            </dl>
           </div>
 
-          <p className="mt-3 text-center text-xs text-slate-500">
-            The dashboard above uses illustrative sample data — not customer data or live traffic.
-          </p>
-        </Reveal>
+          {/* Right live telemetry probe */}
+          <div className="lg:col-span-5" data-ui="">
+            <div className="border border-white/15 bg-[#0A0A0A]">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.11] px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="mkt-live-dot" aria-hidden="true" />
+                  <span className="text-sm font-medium text-[#F5F5F4]">
+                    Ingestion probe
+                  </span>
+                </div>
+                <span className="text-[13px] text-[#969690]">
+                  Illustrative sample
+                </span>
+              </div>
+
+              <div
+                role="tablist"
+                aria-label="Telemetry probe mode"
+                className="grid grid-cols-2 border-b border-white/[0.11] bg-[#0F0F0F]"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={probeTab === 'stream'}
+                  onClick={() => setProbeTab('stream')}
+                  className={`px-4 py-2.5 text-left text-sm transition-colors ${
+                    probeTab === 'stream'
+                      ? 'bg-[#171717] font-medium text-[#FFFFFF] border-b-2 border-[#FFFFFF]'
+                      : 'text-[#B3B3AF] hover:text-[#F5F5F4]'
+                  }`}
+                >
+                  Live event feed
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={probeTab === 'payload'}
+                  onClick={() => setProbeTab('payload')}
+                  className={`border-l border-white/[0.08] px-4 py-2.5 text-left text-sm transition-colors ${
+                    probeTab === 'payload'
+                      ? 'bg-[#171717] font-medium text-[#FFFFFF] border-b-2 border-[#FFFFFF]'
+                      : 'text-[#B3B3AF] hover:text-[#F5F5F4]'
+                  }`}
+                >
+                  <code className="font-mono text-[13px]">POST /track/events</code>
+                </button>
+              </div>
+
+              {probeTab === 'stream' ? (
+                <div role="tabpanel" className="divide-y divide-white/[0.08]">
+                  {SAMPLE_STREAMS.slice(0, 5).map((row) => (
+                    <div
+                      key={row.id}
+                      className="flex items-center justify-between gap-4 px-4 py-3 mkt-feed-item"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-[#F5F5F4]">
+                          <code className="font-mono text-[13px]">{row.path}</code>
+                        </p>
+                        <p className="mt-0.5 truncate text-[13px] text-[#969690]">
+                          {row.referrer} · {row.country} · {row.device}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right text-[13px] metric-num">
+                        <span className="font-medium text-[#FFFFFF]">{row.status}</span>
+                        <span className="block text-[#969690]">{row.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between bg-[#0F0F0F] px-4 py-2.5 text-[13px] text-[#B3B3AF]">
+                    <span>Origin check: verified</span>
+                    <span className="text-[#FFFFFF]">Bot filter active</span>
+                  </div>
+                </div>
+              ) : (
+                <div role="tabpanel" className="p-4 sm:p-5">
+                  <pre className="overflow-x-auto font-mono text-[13px] leading-relaxed text-[#C8C8C4]">
+                    <code>{SAMPLE_PAYLOAD}</code>
+                  </pre>
+                  <div className="mt-4 border-t border-white/[0.08] pt-3 text-[13px] text-[#969690]">
+                    Headers: <code className="font-mono text-[#F5F5F4]">x-api-key</code> · Zero client cookies written
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
