@@ -64,7 +64,7 @@ function App() {
     return (
         <ErrorBoundary>
             <BrowserRouter>
-                <div className="min-h-screen">
+                <div className="min-h-dvh">
                     <ScrollToTop />
                     <ThemeSync />
                     <Suspense fallback={<Spinner />}>
