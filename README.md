@@ -1,51 +1,43 @@
-# WebPulse Analytics
+<div align="center">
+  <img src="apps/marketing/public/logo.png" alt="WebPulse Analytics Logo" width="160" />
+  <h1>WebPulse Analytics</h1>
+  <p>
+    <strong>Privacy-first, real-time web analytics &amp; telemetry platform.</strong><br />
+    Cookie-free edge ingestion, sub-second Socket.IO streams, monochrome dashboards, and Postgres storage.
+  </p>
 
-<p align="center">
-  <img src="apps/marketing/public/logo.png" alt="WebPulse Analytics Logo" width="180" />
-</p>
+  <p>
+    <a href="https://github.com/heyshreee/Web-Pulse-Analytics/releases"><img src="https://img.shields.io/badge/version-1.0.0-111111.svg?style=flat-square" alt="Version 1.0.0" /></a>
+    <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status" /></a>
+    <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/security.yml?branch=main&style=flat-square&label=Security" alt="Security Status" /></a>
+    <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/codeql.yml?branch=main&style=flat-square&label=CodeQL" alt="CodeQL" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111111.svg?style=flat-square" alt="License MIT" /></a>
+    <a href="https://github.com/heyshreee/Web-Pulse-Analytics/issues"><img src="https://img.shields.io/github/issues/heyshreee/Web-Pulse-Analytics?style=flat-square" alt="Open Issues" /></a>
+  </p>
 
-<h3 align="center">Privacy-Friendly Real-Time Web Telemetry & Analytics Platform</h3>
+  <p>
+    <a href="docs/getting-started.md">Documentation</a> ·
+    <a href="docs/architecture.md">Architecture</a> ·
+    <a href="docs/api-reference.md">API Reference</a> ·
+    <a href="DESIGN.md">Design System</a> ·
+    <a href="CONTRIBUTING.md">Contributing</a>
+  </p>
+</div>
 
-<p align="center">
-  A high-performance web analytics platform engineered for modern web applications.<br />
-  Track live visitors, page performance, and custom telemetry events with zero hassle.
-</p>
-
-<p align="center">
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/releases"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square" alt="Version 1.0.0" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/security.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/security.yml?branch=main&style=flat-square&label=Security" alt="Security Status" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/heyshreee/Web-Pulse-Analytics/codeql.yml?branch=main&style=flat-square&label=CodeQL" alt="CodeQL" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License MIT" /></a>
-  <a href="https://github.com/heyshreee/Web-Pulse-Analytics/issues"><img src="https://img.shields.io/github/issues/heyshreee/Web-Pulse-Analytics?style=flat-square" alt="Open Issues" /></a>
-</p>
-
----
-
-> [!NOTE]
-> **Monorepo Architecture & Release Tracks:**  
-> The repository is structured as an independent multi-package monorepo containing the public marketing site (`apps/marketing`), the **default stable production dashboard** (`apps/v1`), the **beta preview dashboard** (`apps/v2`), and the centralized API server (`backend/`).  
-> Each application installs and builds with its own `package.json` (no root npm workspaces). The backend is a persistent Node.js service (Express 5, WebSockets, `geoip-lite`) and must not be hosted on serverless functions. See the [Monorepo Migration Guide](docs/migration-monorepo.md) and [Deployment Guide](docs/deployment.md).
+> **Monorepo Architecture:** WebPulse Analytics organizes four independent Node.js packages under one repository (`apps/marketing`, `apps/v1`, `apps/v2`, and `backend/`). Each application maintains its own `package.json`, lockfile, and deployment target rather than root npm workspaces; root `package.json` provides convenience orchestration scripts across all packages.
 
 ---
 
 ## Table of Contents
 
-- [Dashboard Release Lines (V1 vs. V2)](#dashboard-release-lines-v1-vs-v2)
-- [Screenshots](#screenshots)
-- [Key Features](#key-features)
-- [What's New in Version 2.0 (Beta Track)](#whats-new-in-version-20-beta-track)
-- [Architecture & Data Strategy](#architecture--data-strategy)
+- [Release Lines & Applications](#release-lines--applications)
+- [Interfaces & Design Systems](#interfaces--design-systems)
+- [Core Capabilities & Privacy Model](#core-capabilities--privacy-model)
+- [Subscription Plans](#subscription-plans)
+- [Architecture & Data Pipeline](#architecture--data-pipeline)
 - [Technology Stack](#technology-stack)
 - [Quick Start](#quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Environment Setup](#environment-setup)
-  - [Database Migrations](#database-migrations)
-  - [Running Applications](#running-applications)
 - [Tracking Script & Integration](#tracking-script--integration)
-  - [HTML Snippet](#1-standard-html-embed)
-  - [Custom Event Telemetry](#2-custom-event-telemetry)
-  - [REST Ingestion](#3-rest-api-ingestion)
 - [Application Route Map](#application-route-map)
 - [API Overview](#api-overview)
 - [Project Structure](#project-structure)
@@ -56,31 +48,32 @@
 
 ---
 
-## Dashboard Release Lines (V1 vs. V2)
+## Release Lines & Applications
 
-WebPulse Analytics maintains two distinct dashboard implementations to preserve production stability while advancing a next-generation UI:
+WebPulse isolates public marketing, stable production analytics, and beta console development so new telemetry views can iterate without destabilizing active workspaces.
 
-| Application | Track | Production URL | Local Port | Status & Scope |
-| :--- | :--- | :--- | :--- | :--- |
-| **Stable V1 Dashboard** (`apps/v1`) | `main` | `https://app.webpulseanalytics.tech` | `5173` | **Default Stable Production**. Hardened analytics interface with core metric cards, live counters, projects switcher, settings, and billing. |
-| **Beta V2 Dashboard** (`apps/v2`) | `beta` | `https://beta.webpulseanalytics.tech` | `5175` | **Active Beta Preview**. Redesigned Dark Data Observatory UI featuring 3D Three.js visitor globe, modular primitives, and 15+ specialized views. |
-| **Marketing Site** (`apps/marketing`) | `main` | `https://webpulseanalytics.tech` | `5174` | Canonical public landing page, pricing, documentation, and blog. |
-| **Backend API** (`backend`) | `main` | `https://api.webpulseanalytics.tech` | `3000` | Express 5 persistent service with Socket.IO streaming, rate limiting, and Supabase integration. |
+| Surface | Directory | Production Host | Local Dev URL | Git Branch | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Marketing Site** | `apps/marketing` | `https://webpulseanalytics.tech` | `http://localhost:5174` | `development` / `main` | Public product site, interactive docs, pricing, and portal redirects |
+| **Stable V1 Console** | `apps/v1` | `https://app.webpulseanalytics.tech` | `http://localhost:5173` | `development` / `main` | Default production dashboard, projects, billing, and settings |
+| **Beta V2 Console** | `apps/v2` | `https://beta.webpulseanalytics.tech` | `http://localhost:5175` | `development` (`beta` planned) | Observatory V2 dashboard with 15+ views and 3D geography |
+| **API & Socket Server** | `backend` | `https://api.webpulseanalytics.tech` | `http://localhost:3000` (`5000` fallback) | `development` / `main` | Express 5 REST API, tracking ingestion, and Socket.IO broadcasts |
 
----
-
-## Screenshots
-
-> [!NOTE]
-> **TODO(owner)**: Supply updated production screenshots for the stable V1 dashboard and beta V2 dashboard to `docs/images/`.
-
-| Stable V1 Dashboard (Production Default) | Beta V2 Observatory (Beta Preview) |
-| :---: | :---: |
-| ![Stable V1 Dashboard](docs/images/dashboard-v1.png) | ![Beta V2 Dashboard](docs/images/dashboard-v2.png) |
-| *Stable production dashboard (`apps/v1`)* | *Next-generation 3D observatory (`apps/v2`)* |
+- **Default Console Routing:** Marketing `/login`, `/register`, and `/dashboard/*` paths route to Stable V1 by default, while `/beta/*` aliases target V2 (`apps/marketing/src/utils/urls.js`).
+- **Cross-Subdomain SSO:** Setting `COOKIE_DOMAIN=.webpulseanalytics.tech` shares `HttpOnly` JWT sessions across V1 and V2, restored seamlessly via `GET /api/v1/auth/me`.
+- **Branch Topology:** `main` (protected production) and `development` (integration base) are active branches; a dedicated `beta` branch is pre-configured in CI/CD workflows (`.github/workflows/ci.yml`, `deploy-v2.yml`) for future isolation.
 
 ---
 
+## Interfaces & Design Systems
+
+- **Marketing & Shared Auth (`Editorial Noir`):** Built for `apps/marketing` and shared across `apps/v1` and `apps/v2` authentication screens (`AuthShell`, `EditorialGlobe`, `Toast`). Uses monochrome obsidian canvases (`#050505` / `#0A0A0A`), `1px` architectural hairlines, `Geist` + `Geist Mono` typography, and an interactive Three.js TopoJSON wireframe globe (`world-110m.json`) inside a `min-h-dvh` responsive card shell.
+- **Stable V1 Console (`apps/v1`):** Production workspace console covering executive metrics, project onboarding, installation verification, share links, API keys, billing, and session management with synchronized View Transitions light/dark switching.
+- **Beta V2 Observatory (`apps/v2`):** Follows the **v0 Playground Studio** specification in [DESIGN.md](DESIGN.md) — `#000000` canvas, `#0A0A0A` panels, `#222222` structural borders, `tabular-nums` monospace metrics, and expanded modules for live visitor streams, sessions, events, sources, alerts, and 3D geography.
+
+Screenshot placeholders and capture naming conventions (`dashboard-v1.png`, `dashboard-v2.png`, `visitor-globe.png`) are documented in [docs/images/README.md](docs/images/README.md).
+
+---
 ## Key Features
 
 - ⚡ **Real-Time Visitor Streaming**: Live telemetry and active visitor counts streamed via Socket.IO directly to your dashboard.
