@@ -2,15 +2,15 @@ import Logo from './Logo';
 
 export default function GoogleLoading() {
     return (
-        <div className="fixed inset-0 bg-slate-50 dark:bg-[#070A10] z-50 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-            <div className="absolute top-8 left-8">
-                <Logo />
+        <div className="noir-auth fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] p-4 text-[#F5F5F4]">
+            <div className="absolute left-6 top-6">
+                <Logo tone="noir" />
             </div>
 
-            <div className="relative mb-8">
-                <div className="absolute inset-0 rounded-full border-2 border-violet-500/20 border-t-violet-500 animate-spin w-24 h-24 -m-2"></div>
-                <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center relative z-10 border border-slate-200 dark:border-slate-800 shadow-soft">
-                    <svg className="w-10 h-10" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className="relative mb-6">
+                <div className="absolute -m-1 h-20 w-20 animate-spin rounded-full border border-white/[0.11] border-t-[#FFFFFF]" />
+                <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full border border-white/[0.14] bg-[#0A0A0A]">
+                    <svg className="h-8 w-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -19,14 +19,14 @@ export default function GoogleLoading() {
                 </div>
             </div>
 
-            <h2 className="page-title !text-xl mb-2">Connecting your Google account...</h2>
-            <p className="page-sub max-w-xs text-center">
-                Securely authenticating with Google Workspace to sync your projects.
+            <h2 className="mb-1 text-base font-semibold tracking-tight text-[#FFFFFF]">Connecting Google account...</h2>
+            <p className="max-w-xs text-center font-mono text-xs text-[#969690]">
+                Authenticating your Google session with WebPulse.
             </p>
 
-            <div className="mt-12 flex items-center gap-2 text-[10px] font-semibold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                Secure encrypted connection
+            <div className="mt-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#969690]">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                Encrypted OAuth handoff
             </div>
         </div>
     );

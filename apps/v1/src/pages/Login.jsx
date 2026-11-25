@@ -107,15 +107,22 @@ export default function Login() {
         return <GoogleLoading />;
     }
 
+    const selectedPlan = searchParams.get('plan');
+
     return (
-        <AuthShell>
+        <AuthShell
+            showGlobe
+            eyebrow="01 // SIGN IN"
+            headline="Understand your traffic, not your users."
+            description="Real-time web analytics in one lightweight script. Sign in to inspect active visitors, referrers, and event logs."
+        >
             {!showVerification && <AuthTabs active="login" />}
 
             <motion.div
-                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={reduceMotion ? { duration: 0 } : { duration: 0.35, ease: 'easeOut' }}
-                className="mkt-panel p-7 sm:p-8"
+                transition={reduceMotion ? { duration: 0 } : { duration: 0.28, ease: 'easeOut' }}
+                className="mkt-panel p-6 sm:p-8"
             >
                 {showVerification ? (
                     <OTPVerification
@@ -125,13 +132,26 @@ export default function Login() {
                     />
                 ) : (
                     <>
-                        <div className="mb-8">
-                            <h1 className="mkt-h3 !text-2xl">Welcome back</h1>
-                            <p className="mkt-body mt-2">Enter your details to access your dashboard.</p>
+                        {selectedPlan && (
+                            <div className="mb-5 flex items-center justify-between rounded-[2px] border border-white/20 bg-[#141414] px-3 py-2 font-mono text-[11px]">
+                                <span className="uppercase tracking-[0.12em] text-[#969690]">Selected plan</span>
+                                <span className="font-semibold uppercase tracking-[0.12em] text-[#FFFFFF]">
+                                    {selectedPlan}
+                                </span>
+                            </div>
+                        )}
+
+                        <div className="mb-6">
+                            <h1 className="text-2xl font-semibold tracking-[-0.025em] text-[#FFFFFF]">
+                                Welcome back
+                            </h1>
+                            <p className="mt-1.5 text-sm text-[#969690]">
+                                Enter your credentials to open your dashboard.
+                            </p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-5">
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div className="space-y-4">
                                 <div>
                                     <label htmlFor="login-email" className="mkt-label">Email address</label>
                                     <div className="relative">
@@ -142,21 +162,21 @@ export default function Login() {
                                             autoComplete="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="mkt-field peer !pl-11"
+                                            className="mkt-field peer !pl-10"
                                             placeholder="name@company.com"
                                         />
                                         <Mail
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#969690] transition-colors peer-focus:text-[#FFFFFF]"
                                             aria-hidden="true"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="flex items-center justify-between">
-                                        <label htmlFor="login-password" className="mkt-label">Password</label>
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <label htmlFor="login-password" className="mkt-label !mb-0">Password</label>
                                         <Link
                                             to="/forgot-password"
-                                            className="mb-2 text-xs font-mono text-ink-muted transition-colors hover:text-ink"
+                                            className="font-mono text-xs text-[#C8C8C4] underline-offset-4 transition-colors hover:text-[#FFFFFF] hover:underline"
                                         >
                                             Forgot password?
                                         </Link>
@@ -169,18 +189,18 @@ export default function Login() {
                                             autoComplete="current-password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            className="mkt-field peer !pl-11 !pr-12"
+                                            className="mkt-field peer !pl-10 !pr-11"
                                             placeholder="••••••••"
                                         />
                                         <Lock
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-muted transition-colors peer-focus:text-ink"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#969690] transition-colors peer-focus:text-[#FFFFFF]"
                                             aria-hidden="true"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             aria-label={showPassword ? "Hide password" : "Show password"}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-ink-muted transition-colors hover:text-ink focus-visible:outline-none"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-[2px] p-1 text-[#969690] transition-colors hover:text-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]"
                                         >
                                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
@@ -200,12 +220,12 @@ export default function Login() {
                                 )}
                             </button>
 
-                            <div className="flex items-center gap-4">
-                                <span className="h-px flex-1 bg-white/[0.07]" aria-hidden="true" />
-                                <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                            <div className="flex items-center gap-3">
+                                <span className="h-px flex-1 bg-white/[0.11]" aria-hidden="true" />
+                                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#969690]">
                                     Or continue with
                                 </span>
-                                <span className="h-px flex-1 bg-white/[0.07]" aria-hidden="true" />
+                                <span className="h-px flex-1 bg-white/[0.11]" aria-hidden="true" />
                             </div>
 
                             <button
@@ -213,7 +233,7 @@ export default function Login() {
                                 onClick={handleGoogleLogin}
                                 className="mkt-btn mkt-btn-secondary mkt-btn-lg w-full"
                             >
-                                <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+                                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                                         fill="#4285F4"

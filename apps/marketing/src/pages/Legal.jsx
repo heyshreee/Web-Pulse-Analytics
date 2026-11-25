@@ -7,7 +7,7 @@ import { apiRequest } from '../utils/api';
 import { LEGAL_POLICIES, getPolicySections } from './legal/policies';
 import LegalContact from './legal/LegalContact';
 
-const SITE_URL = 'https://obs-real-time-tracker.vercel.app';
+const SITE_URL = 'https://www.webpulseanalytics.tech';
 
 /* ---------------------------------------------------------------------------
    SEO — the SPA has a single static <head>, so each legal route sets its own
@@ -97,7 +97,7 @@ function renderInline(text) {
 
         if (part.startsWith('`') && part.endsWith('`')) {
             return (
-                <code key={i} className="rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[0.85em] text-violet-300">
+                <code key={i} className="rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[0.85em] text-[#FFFFFF]">
                     {part.slice(1, -1)}
                 </code>
             );
@@ -105,7 +105,7 @@ function renderInline(text) {
 
         if (part.startsWith('**') && part.endsWith('**')) {
             return (
-                <strong key={i} className="font-semibold text-slate-100">
+                <strong key={i} className="font-semibold text-[#F5F5F4]">
                     {part.slice(2, -2)}
                 </strong>
             );
@@ -116,7 +116,7 @@ function renderInline(text) {
             const [, label, href] = link;
             const internal = href.startsWith('/');
             const anchor = href.startsWith('#');
-            const className = 'font-medium text-violet-300 underline decoration-violet-400/40 underline-offset-2 transition-colors hover:text-violet-200 hover:decoration-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60';
+            const className = 'font-medium text-[#FFFFFF] underline decoration-[#FFFFFF]/50 underline-offset-2 transition-colors hover:text-[#F5F5F4] hover:decoration-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60';
 
             // A link to a clause on this page: scroll to it instead of
             // navigating, so the reader keeps their place in the document.
@@ -163,9 +163,9 @@ function renderInline(text) {
 
 function TableBlock({ caption, head, rows }) {
     return (
-        <figure className="overflow-hidden rounded-xl border border-white/[0.07]">
+        <figure className="overflow-hidden rounded-[2px] border border-white/[0.07]">
             {caption && (
-                <figcaption className="border-b border-white/[0.07] bg-white/[0.02] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                <figcaption className="border-b border-white/[0.07] bg-white/[0.02] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#969690]">
                     {renderInline(caption)}
                 </figcaption>
             )}
@@ -177,7 +177,7 @@ function TableBlock({ caption, head, rows }) {
                                 <th
                                     key={cell}
                                     scope="col"
-                                    className="whitespace-nowrap border-b border-white/[0.07] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-slate-400"
+                                    className="whitespace-nowrap border-b border-white/[0.07] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-[#B3B3AF]"
                                 >
                                     {cell}
                                 </th>
@@ -192,8 +192,8 @@ function TableBlock({ caption, head, rows }) {
                                         key={cellIndex}
                                         className={`border-b border-white/[0.05] px-4 py-3 leading-relaxed ${
                                             cellIndex === 0
-                                                ? 'font-medium text-slate-200'
-                                                : 'text-slate-400'
+                                                ? 'font-medium text-[#F5F5F4]'
+                                                : 'text-[#B3B3AF]'
                                         }`}
                                     >
                                         {renderInline(cell)}
@@ -213,13 +213,13 @@ function LinksBlock({ items }) {
         <ul className="space-y-2.5">
             {items.map((item) => {
                 const internal = item.href.startsWith('/');
-                const className = 'group flex items-start gap-2 text-sm leading-relaxed text-slate-400 transition-colors hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60';
+                const className = 'group flex items-start gap-2 text-sm leading-relaxed text-[#B3B3AF] transition-colors hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60';
 
                 if (internal) {
                     return (
                         <li key={item.href + item.label}>
                             <Link to={item.href} className={className}>
-                                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-violet-400" aria-hidden="true" />
+                                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#FFFFFF]" aria-hidden="true" />
                                 <span className="font-medium">{item.label}</span>
                             </Link>
                         </li>
@@ -234,7 +234,7 @@ function LinksBlock({ items }) {
                             rel="noopener noreferrer"
                             className={className}
                         >
-                            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-violet-400" aria-hidden="true" />
+                            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#FFFFFF]" aria-hidden="true" />
                             <span className="font-medium">{item.label}</span>
                             <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             <span className="sr-only">(opens in a new tab)</span>
@@ -367,14 +367,14 @@ export default function Legal({ type }) {
                 return <p className="mkt-body">{renderInline(block.text)}</p>;
             case 'h':
                 return (
-                    <h3 className="mkt-h4 mt-6 mb-2 text-slate-200">{renderInline(block.text)}</h3>
+                    <h3 className="mkt-h4 mt-6 mb-2 text-[#F5F5F4]">{renderInline(block.text)}</h3>
                 );
             case 'list':
                 return (
                     <ul className="space-y-2.5">
                         {block.items.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed text-slate-400">
-                                <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-violet-400" />
+                            <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed text-[#B3B3AF]">
+                                <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#FFFFFF]" />
                                 <span>{renderInline(item)}</span>
                             </li>
                         ))}
@@ -382,7 +382,7 @@ export default function Legal({ type }) {
                 );
             case 'note':
                 return (
-                    <div className="rounded-xl border border-amber-400/20 bg-amber-500/[0.06] p-4 text-sm leading-relaxed text-slate-300">
+                    <div className="rounded-[2px] border border-amber-400/20 bg-amber-500/[0.06] p-4 text-sm leading-relaxed text-[#C8C8C4]">
                         {renderInline(block.text)}
                     </div>
                 );
@@ -417,12 +417,12 @@ export default function Legal({ type }) {
                                     <span className="mkt-chip">
                                         <Clock className="h-3.5 w-3.5" aria-hidden="true" />
                                         Last updated:{' '}
-                                        <span className="font-medium text-slate-200">{policy.lastUpdated}</span>
+                                        <span className="font-medium text-[#F5F5F4]">{policy.lastUpdated}</span>
                                     </span>
                                     {policy.effective && (
                                         <span className="mkt-chip">
                                             Effective:{' '}
-                                            <span className="font-medium text-slate-200">{policy.effective}</span>
+                                            <span className="font-medium text-[#F5F5F4]">{policy.effective}</span>
                                         </span>
                                     )}
                                 </div>
@@ -442,11 +442,11 @@ export default function Legal({ type }) {
                                             e.preventDefault();
                                             scrollTo(card.href.replace('#', ''));
                                         }}
-                                        className="mkt-card mkt-card-hover group flex flex-col p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                        className="mkt-card mkt-card-hover group flex flex-col p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                     >
-                                        <h2 className="mkt-h4 text-slate-100">{card.title}</h2>
-                                        <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-400">{card.text}</p>
-                                        <span className="mt-3 text-xs font-semibold text-violet-300">Read the clauses</span>
+                                        <h2 className="mkt-h4 text-[#F5F5F4]">{card.title}</h2>
+                                        <p className="mt-2 flex-1 text-sm leading-relaxed text-[#B3B3AF]">{card.text}</p>
+                                        <span className="mt-3 text-xs font-semibold text-[#FFFFFF]">Read the clauses</span>
                                     </a>
                                 ))}
                             </div>
@@ -456,22 +456,22 @@ export default function Legal({ type }) {
                     {/* Mobile contents menu --------------------------------- */}
                     <div className="mt-10">
                         <div className="lg:hidden">
-                            <div className="sticky top-16 z-30 -mx-5 border-y border-white/[0.07] bg-[#070A10]/92 px-5 py-2.5 backdrop-blur-xl sm:-mx-8 sm:px-8">
+                            <div className="sticky top-16 z-30 -mx-5 border-y border-white/[0.07] bg-[#050505]/95 px-5 py-2.5  sm:-mx-8 sm:px-8">
                                 <button
                                     type="button"
                                     onClick={() => setMobileNavOpen((open) => !open)}
                                     aria-expanded={mobileNavOpen}
                                     aria-controls="legal-mobile-nav"
-                                    className="flex w-full items-center justify-between gap-3 rounded-lg px-1 py-1 text-left text-sm font-medium text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                    className="flex w-full items-center justify-between gap-3 rounded-[2px] px-1 py-1 text-left text-sm font-medium text-[#C8C8C4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                 >
                                     <span className="flex min-w-0 items-center gap-2">
-                                        <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                        <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#969690]">
                                             Contents
                                         </span>
-                                        <span className="truncate text-slate-200">{activeLabel}</span>
+                                        <span className="truncate text-[#F5F5F4]">{activeLabel}</span>
                                     </span>
                                     <ChevronDown
-                                        className={`h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 ${
+                                        className={`h-4 w-4 shrink-0 text-[#969690] transition-transform duration-200 ${
                                             mobileNavOpen ? 'rotate-180' : ''
                                         }`}
                                         aria-hidden="true"
@@ -482,7 +482,7 @@ export default function Legal({ type }) {
                                     <nav id="legal-mobile-nav" aria-label="Table of contents" className="mt-3 pb-3">
                                         {groups.map((group) => (
                                             <div key={group.id} className="mb-4 last:mb-0">
-                                                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-violet-300">
+                                                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFFFFF]">
                                                     {group.label}
                                                 </p>
                                                 <ul className="space-y-1 border-l border-white/[0.08]">
@@ -495,10 +495,10 @@ export default function Legal({ type }) {
                                                                     scrollTo(section.id);
                                                                 }}
                                                                 aria-current={section.id === activeId ? 'true' : undefined}
-                                                                className={`block -ml-px border-l-2 py-1 pl-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                                                className={`block -ml-px border-l-2 py-1 pl-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                                                     section.id === activeId
-                                                                        ? 'border-violet-400 font-medium text-violet-300'
-                                                                        : 'border-transparent text-slate-400 hover:text-violet-300'
+                                                                        ? 'border-[#FFFFFF] font-medium text-[#FFFFFF]'
+                                                                        : 'border-transparent text-[#B3B3AF] hover:text-[#FFFFFF]'
                                                                 }`}
                                                             >
                                                                 {section.label}
@@ -518,13 +518,13 @@ export default function Legal({ type }) {
                             {/* Desktop navigator */}
                             <nav aria-label="Table of contents" className="hidden lg:block" ref={tocNavRef}>
                                 <div className="lg:sticky lg:top-28">
-                                    <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                                         Table of contents
                                     </p>
                                     <div className="space-y-6">
                                         {groups.map((group) => (
                                             <div key={group.id}>
-                                                <p className="mb-2 px-4 text-xs font-semibold text-slate-500">
+                                                <p className="mb-2 px-4 text-xs font-semibold text-[#969690]">
                                                     {group.label}
                                                 </p>
                                                 <ul
@@ -543,10 +543,10 @@ export default function Legal({ type }) {
                                                                         scrollTo(section.id);
                                                                     }}
                                                                     aria-current={isActive ? 'true' : undefined}
-                                                                    className={`block -ml-px border-l-2 py-1 pl-4 text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                                                    className={`block -ml-px border-l-2 py-1 pl-4 text-sm transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                                                         isActive
-                                                                            ? 'border-violet-400 font-medium text-violet-300'
-                                                                            : 'border-transparent text-slate-400 hover:border-slate-600 hover:text-violet-300'
+                                                                            ? 'border-[#FFFFFF] font-medium text-[#FFFFFF]'
+                                                                            : 'border-transparent text-[#B3B3AF] hover:border-slate-600 hover:text-[#FFFFFF]'
                                                                     }`}
                                                                 >
                                                                     {section.label}
@@ -554,7 +554,7 @@ export default function Legal({ type }) {
                                                                 {indicator.groupId === group.id && (
                                                                     <span
                                                                         aria-hidden="true"
-                                                                        className={`pointer-events-none absolute left-[-2px] top-0 block w-[2px] rounded-full bg-violet-400 transition-all duration-300 ease-out ${
+                                                                        className={`pointer-events-none absolute left-[-2px] top-0 block w-[2px] rounded-full bg-[#FFFFFF] transition-colors duration-300 ease-out ${
                                                                             indicator.height ? 'opacity-100' : 'opacity-0'
                                                                         }`}
                                                                         style={{
@@ -572,20 +572,20 @@ export default function Legal({ type }) {
                                     </div>
 
                                     <div className="mt-8 space-y-2 border-t border-white/[0.07] pt-6 text-sm">
-                                        <p className="flex items-center gap-2 text-slate-400">
-                                            <ShieldCheck className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                                        <p className="flex items-center gap-2 text-[#B3B3AF]">
+                                            <ShieldCheck className="h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                                             <Link
                                                 to="/security"
-                                                className="font-medium text-violet-300 underline decoration-violet-400/40 underline-offset-2 hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                                className="font-medium text-[#FFFFFF] underline decoration-[#FFFFFF]/50 underline-offset-2 hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                             >
                                                 Security page
                                             </Link>
                                         </p>
-                                        <p className="flex items-center gap-2 text-slate-400">
-                                            <ExternalLink className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                                        <p className="flex items-center gap-2 text-[#B3B3AF]">
+                                            <ExternalLink className="h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                                             <Link
                                                 to="/privacy"
-                                                className="font-medium text-violet-300 underline decoration-violet-400/40 underline-offset-2 hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                                className="font-medium text-[#FFFFFF] underline decoration-[#FFFFFF]/50 underline-offset-2 hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                             >
                                                 Privacy Policy
                                             </Link>
@@ -607,7 +607,7 @@ export default function Legal({ type }) {
                                     </section>
                                 ))}
 
-                                <p className="border-t border-white/[0.07] pt-6 text-xs leading-relaxed text-slate-500">
+                                <p className="border-t border-white/[0.07] pt-6 text-xs leading-relaxed text-[#969690]">
                                     This page is the {policy.title.toLowerCase()} for WebPulse Analytics. The last
                                     update is shown at the top of the page. If anything here does not match what the
                                     Service actually does, the Service and this page should both be corrected —

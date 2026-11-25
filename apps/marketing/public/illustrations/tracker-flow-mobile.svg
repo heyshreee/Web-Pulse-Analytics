@@ -3,7 +3,7 @@
 
   <defs>
     <marker id="tfmArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 10 5 0 10z" fill="#A78BFA" fill-opacity="0.75"/>
+      <path d="M0 0 10 5 0 10z" fill="#E5E5E5" fill-opacity="0.75"/>
     </marker>
   </defs>
 
@@ -62,28 +62,28 @@
     <rect x="106" y="59" width="182" height="22" rx="11" fill="#94A3B8" fill-opacity="0.1"/>
     <text x="118" y="74" font-size="12" fill="#94A3B8">your-site.com</text>
 
-    <rect x="50" y="104" width="340" height="128" rx="12" fill="#8B5CF6" fill-opacity="0.08" stroke="#8B5CF6" stroke-opacity="0.24"/>
-    <text x="66" y="132" font-size="12" class="tfm-mono" fill="#C4B5FD">&lt;script src="api.webpulse.app/track.js"&gt;</text>
-    <text x="66" y="158" font-size="12" class="tfm-mono" fill="#C4B5FD">tracker('init', 'YOUR_TRACKING_ID')</text>
-    <text x="66" y="184" font-size="12" class="tfm-mono" fill="#C4B5FD">tracker('track', 'page_view')</text>
+    <rect x="50" y="104" width="340" height="128" rx="12" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.24"/>
+    <text x="66" y="132" font-size="12" class="tfm-mono" fill="#F5F5F4">&lt;script src="api.webpulse.app/track.js"&gt;</text>
+    <text x="66" y="158" font-size="12" class="tfm-mono" fill="#F5F5F4">tracker('init', 'YOUR_TRACKING_ID')</text>
+    <text x="66" y="184" font-size="12" class="tfm-mono" fill="#F5F5F4">tracker('track', 'page_view')</text>
     <text x="66" y="212" font-size="12" class="tfm-mono" fill="#64748B">// no build step, no dependencies</text>
   </g>
 
   <!-- Connector 1 -->
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfmArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfmArrow)">
     <line x1="220" y1="248" x2="220" y2="306" class="tfm-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="tfm-travel tfm-d1" cx="220" cy="254" r="3.4"/>
     <circle class="tfm-travel tfm-d2" cx="220" cy="254" r="3.4"/>
   </g>
 
   <!-- Tracker -->
   <g>
-    <circle cx="74" cy="364" r="26" fill="none" stroke="#8B5CF6" stroke-opacity="0.45" class="tfm-pulse"/>
-    <rect x="30" y="312" width="380" height="104" rx="18" fill="#101522" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <rect x="52" y="342" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.4"/>
-    <g transform="translate(63,353) scale(0.83)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="74" cy="364" r="26" fill="none" stroke="#FFFFFF" stroke-opacity="0.45" class="tfm-pulse"/>
+    <rect x="30" y="312" width="380" height="104" rx="18" fill="#121212" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <rect x="52" y="342" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.18" stroke="#FFFFFF" stroke-opacity="0.4"/>
+    <g transform="translate(63,353) scale(0.83)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>
     </g>
     <text x="112" y="358" font-size="15" font-weight="600" fill="#E2E8F0">WebPulse tracker</text>
@@ -91,10 +91,10 @@
   </g>
 
   <!-- Connector 2 -->
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfmArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#tfmArrow)">
     <line x1="220" y1="416" x2="220" y2="474" class="tfm-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="tfm-travel tfm-d3" cx="220" cy="422" r="3.4"/>
     <circle class="tfm-travel tfm-d4" cx="220" cy="422" r="3.4"/>
   </g>
@@ -102,37 +102,37 @@
   <!-- Events -->
   <g>
     <rect x="30" y="480" width="380" height="280" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.18"/>
-    <circle cx="56" cy="512" r="4.5" fill="#48E6A1"/>
-    <text x="72" y="517" font-size="12" font-weight="600" letter-spacing="1.6" fill="#48E6A1">RECEIVING EVENTS</text>
+    <circle cx="56" cy="512" r="4.5" fill="#FFFFFF"/>
+    <text x="72" y="517" font-size="12" font-weight="600" letter-spacing="1.6" fill="#FFFFFF">RECEIVING EVENTS</text>
 
     <g class="tfm-row tfm-r1">
-      <circle cx="64" cy="556" r="9" fill="#48E6A1" fill-opacity="0.14"/>
-      <path d="M60 556.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="64" cy="556" r="9" fill="#FFFFFF" fill-opacity="0.14"/>
+      <path d="M60 556.5l2.9 2.9 4.9-5.6" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="86" y="561" font-size="14" fill="#CBD5E1">Page views</text>
     </g>
     <g class="tfm-row tfm-r2">
-      <circle cx="64" cy="590" r="9" fill="#48E6A1" fill-opacity="0.14"/>
-      <path d="M60 590.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="64" cy="590" r="9" fill="#FFFFFF" fill-opacity="0.14"/>
+      <path d="M60 590.5l2.9 2.9 4.9-5.6" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="86" y="595" font-size="14" fill="#CBD5E1">Sessions</text>
     </g>
     <g class="tfm-row tfm-r3">
-      <circle cx="64" cy="624" r="9" fill="#48E6A1" fill-opacity="0.14"/>
-      <path d="M60 624.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="64" cy="624" r="9" fill="#FFFFFF" fill-opacity="0.14"/>
+      <path d="M60 624.5l2.9 2.9 4.9-5.6" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="86" y="629" font-size="14" fill="#CBD5E1">Custom events</text>
     </g>
     <g class="tfm-row tfm-r4">
-      <circle cx="64" cy="658" r="9" fill="#48E6A1" fill-opacity="0.14"/>
-      <path d="M60 658.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="64" cy="658" r="9" fill="#FFFFFF" fill-opacity="0.14"/>
+      <path d="M60 658.5l2.9 2.9 4.9-5.6" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="86" y="663" font-size="14" fill="#CBD5E1">Referrers</text>
     </g>
     <g class="tfm-row tfm-r5">
-      <circle cx="64" cy="692" r="9" fill="#48E6A1" fill-opacity="0.14"/>
-      <path d="M60 692.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="64" cy="692" r="9" fill="#FFFFFF" fill-opacity="0.14"/>
+      <path d="M60 692.5l2.9 2.9 4.9-5.6" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="86" y="697" font-size="14" fill="#CBD5E1">Devices</text>
     </g>
     <g class="tfm-row tfm-r6">
-      <circle cx="64" cy="726" r="9" fill="#48E6A1" fill-opacity="0.14"/>
-      <path d="M60 726.5l2.9 2.9 4.9-5.6" stroke="#48E6A1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="64" cy="726" r="9" fill="#FFFFFF" fill-opacity="0.14"/>
+      <path d="M60 726.5l2.9 2.9 4.9-5.6" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="86" y="731" font-size="14" fill="#CBD5E1">Location</text>
     </g>
   </g>

@@ -66,13 +66,13 @@ export default function DocsSidebar({ activeTo, onNavigate, variant = 'rail', op
                 /* The drawer covers the marketing nav, so its own header (and
                    the close button in it) must stay put while the list
                    scrolls underneath. */
-                <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-white/[0.07] bg-[#0B0F17] px-5 py-4">
+                <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-white/[0.07] bg-[#0A0A0A] px-5 py-4">
                     <Logo to="/docs" label="Documentation" />
                     <button
                         type="button"
                         onClick={onNavigate}
                         aria-label="Close documentation menu"
-                        className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="rounded-[2px] p-2 text-[#B3B3AF] transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         <X className="h-5 w-5" aria-hidden="true" />
                     </button>
@@ -87,7 +87,7 @@ export default function DocsSidebar({ activeTo, onNavigate, variant = 'rail', op
                 <nav aria-label="Documentation" className="space-y-6">
                     {docsNav.map((group) => (
                         <div key={group.label}>
-                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">{group.label}</p>
+                            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#969690]">{group.label}</p>
                             <div className="space-y-0.5">
                                 {group.items.map((item) => {
                                     const active = item.to === activeTo;
@@ -98,14 +98,14 @@ export default function DocsSidebar({ activeTo, onNavigate, variant = 'rail', op
                                             data-nav-to={item.to}
                                             onClick={onNavigate}
                                             aria-current={active ? 'page' : undefined}
-                                            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                            className={`flex items-center gap-2 rounded-[2px] px-3 py-2 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                                 active
-                                                    ? 'bg-violet-500/15 text-violet-300'
-                                                    : 'text-slate-400 hover:bg-white/[0.05] hover:text-slate-100'
+                                                    ? 'bg-[#FFFFFF]/12 text-[#FFFFFF]'
+                                                    : 'text-[#B3B3AF] hover:bg-white/[0.05] hover:text-[#F5F5F4]'
                                             }`}
                                         >
                                             {item.label}
-                                            {active && <span className="ml-auto h-1 w-1 rounded-full bg-violet-400" aria-hidden="true" />}
+                                            {active && <span className="ml-auto h-1 w-1 rounded-full bg-[#FFFFFF]" aria-hidden="true" />}
                                         </Link>
                                     );
                                 })}

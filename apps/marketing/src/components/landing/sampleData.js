@@ -1,93 +1,109 @@
 /**
- * Deterministic sample data for the marketing product previews.
- *
- * Every value in this file is illustrative — it exists only to render the
- * preview panels and is always displayed next to an "illustrative sample data"
- * note. Nothing here comes from a customer account, and no preview component
- * performs a network request.
- *
- * The series is generated with a fixed wave function (not Math.random) so the
- * preview never flickers between renders.
+ * Grounded, clearly-labeled illustrative datasets for landing page telemetry fragments.
+ * Every number, route, and geo entry mirrors real WebPulse collector fields without
+ * claiming live customer production traffic.
  */
 
-export const SAMPLE_KPIS = [
-  { label: 'Active visitors', value: 128, accent: '#8B5CF6' },
-  { label: 'Page views · 30d', value: 84392, accent: '#A78BFA' },
-  { label: 'Bounce rate', value: 31.8, decimals: 1, suffix: '%', accent: '#48E6A1' },
-  { label: 'Avg. session', value: '4m 21s', accent: '#F59E0B' },
+export const SAMPLE_STREAMS = [
+  { id: 'ev_01', time: '09:42:18', path: '/pricing', referrer: 'github.com', country: 'IN', city: 'Bengaluru', device: 'Desktop · Chrome', status: '202', latency: '18ms' },
+  { id: 'ev_02', time: '09:42:14', path: '/docs/getting-started', referrer: 'google.com', country: 'DE', city: 'Berlin', device: 'Desktop · Firefox', status: '202', latency: '22ms' },
+  { id: 'ev_03', time: '09:42:09', path: '/', referrer: 'direct', country: 'US', city: 'San Francisco', device: 'Mobile · Safari', status: '202', latency: '19ms' },
+  { id: 'ev_04', time: '09:42:03', path: '/docs/api', referrer: 'news.ycombinator.com', country: 'GB', city: 'London', device: 'Desktop · Chrome', status: '202', latency: '21ms' },
+  { id: 'ev_05', time: '09:41:56', path: '/integrations', referrer: 'github.com', country: 'JP', city: 'Tokyo', device: 'Desktop · Edge', status: '202', latency: '24ms' },
+  { id: 'ev_06', time: '09:41:49', path: '/security', referrer: 'duckduckgo.com', country: 'CA', city: 'Toronto', device: 'Desktop · Safari', status: '202', latency: '17ms' },
 ];
 
-export const TRAFFIC_RANGES = ['24h', '7d', '30d'];
+export const SAMPLE_PAYLOAD = `{
+  "trackingId": "wp_live_01J9K4M2",
+  "url": "https://docs.example.dev/getting-started",
+  "referrer": "https://github.com/heyshreee/Web-Pulse-Analytics",
+  "title": "Getting started - Docs",
+  "viewport": "1440x900",
+  "timestamp": "2026-11-24T19:42:18.410Z"
+}`;
 
-export function makeTrafficSeries(range) {
-  const isHours = range === '24h';
-  const count = isHours ? 24 : range === '7d' ? 7 : 30;
-  const step = isHours ? 3600000 : 86400000;
-  const now = Date.now();
-  return Array.from({ length: count }, (_, i) => {
-    const date = new Date(now - (count - 1 - i) * step);
-    const t = i / (count - 1 || 1);
-    const wave =
-      2600 +
-      1500 * Math.sin(t * Math.PI * 2) +
-      600 * Math.sin(t * Math.PI * 6 + 1.3) +
-      450 * Math.sin(t * Math.PI * 11 + 4);
-    return {
-      name: isHours
-        ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      views: Math.round(wave),
-    };
-  });
-}
+export const PREVIEW_RANGES = {
+  '24h': {
+    label: 'Last 24 hours',
+    kpis: [
+      { label: 'Active sessions', value: '38', delta: 'Socket.IO room', accent: true },
+      { label: 'Page views', value: '4,820', delta: '+14.2% vs prior 24h' },
+      { label: 'Unique visitors', value: '1,940', delta: 'SHA-256 session hash' },
+      { label: 'Custom events', value: '612', delta: 'signup_click · docs_copy' },
+    ],
+    series: [
+      { label: '00:00', views: 120, visitors: 54 },
+      { label: '03:00', views: 98, visitors: 42 },
+      { label: '06:00', views: 164, visitors: 71 },
+      { label: '09:00', views: 285, visitors: 124 },
+      { label: '12:00', views: 412, visitors: 176 },
+      { label: '15:00', views: 468, visitors: 198 },
+      { label: '18:00', views: 510, visitors: 215 },
+      { label: '21:00', views: 382, visitors: 164 },
+      { label: 'Now', views: 446, visitors: 189 },
+    ],
+  },
+  '7d': {
+    label: 'Last 7 days',
+    kpis: [
+      { label: 'Active sessions', value: '38', delta: 'Socket.IO room', accent: true },
+      { label: 'Page views', value: '31,490', delta: '+9.8% vs prior 7d' },
+      { label: 'Unique visitors', value: '12,680', delta: 'Zero cookies stored' },
+      { label: 'Custom events', value: '3,840', delta: 'track() SDK calls' },
+    ],
+    series: [
+      { label: 'Mon', views: 3840, visitors: 1580 },
+      { label: 'Tue', views: 4210, visitors: 1720 },
+      { label: 'Wed', views: 4690, visitors: 1910 },
+      { label: 'Thu', views: 5120, visitors: 2040 },
+      { label: 'Fri', views: 4820, visitors: 1940 },
+      { label: 'Sat', views: 4190, visitors: 1680 },
+      { label: 'Sun', views: 4620, visitors: 1810 },
+    ],
+  },
+  '30d': {
+    label: 'Last 30 days',
+    kpis: [
+      { label: 'Active sessions', value: '38', delta: 'Socket.IO room', accent: true },
+      { label: 'Page views', value: '128,450', delta: '+21.4% vs prior 30d' },
+      { label: 'Unique visitors', value: '51,920', delta: 'Origin-verified hosts' },
+      { label: 'Custom events', value: '14,210', delta: 'Top: snippet_copied' },
+    ],
+    series: [
+      { label: 'W1', views: 26400, visitors: 10800 },
+      { label: 'W2', views: 29800, visitors: 12100 },
+      { label: 'W3', views: 34250, visitors: 13820 },
+      { label: 'W4', views: 38000, visitors: 15200 },
+    ],
+  },
+};
 
-export const SAMPLE_REFERRERS = [
-  { label: 'Direct', value: 42, accent: '#8B5CF6' },
-  { label: 'Google', value: 26, accent: '#A78BFA' },
-  { label: 'LinkedIn', value: 14, accent: '#48E6A1' },
-  { label: 'YouTube', value: 9, accent: '#F59E0B' },
-  { label: 'Other', value: 9, accent: '#94A3B8' },
+export const TOP_PAGES = [
+  { path: '/docs/getting-started', views: '1,420', share: 88, trend: 'Docs entry' },
+  { path: '/', views: '1,180', share: 73, trend: 'Landing' },
+  { path: '/pricing', views: '764', share: 48, trend: '4 tiers' },
+  { path: '/docs/api', views: '582', share: 36, trend: 'REST reference' },
+  { path: '/security', views: '390', share: 24, trend: 'Data disclosure' },
 ];
 
-export const SAMPLE_COUNTRIES = [
-  { label: 'United States', value: 4218, share: 33 },
-  { label: 'India', value: 2943, share: 23 },
-  { label: 'Germany', value: 1201, share: 9 },
-  { label: 'United Kingdom', value: 984, share: 7 },
-  { label: 'Japan', value: 762, share: 6 },
+export const TOP_REFERRERS = [
+  { source: 'github.com', visitors: '642', pct: 33 },
+  { source: 'Direct / None', visitors: '518', pct: 27 },
+  { source: 'google.com', visitors: '412', pct: 21 },
+  { source: 'news.ycombinator.com', visitors: '238', pct: 12 },
+  { source: 'dev.to', visitors: '130', pct: 7 },
 ];
 
-export const SAMPLE_DEVICES = [
-  { label: 'Desktop', value: 58 },
-  { label: 'Mobile', value: 34 },
-  { label: 'Tablet', value: 8 },
+export const DEVICE_BREAKDOWN = [
+  { label: 'Desktop', share: 71, detail: 'Chrome 48% · Firefox 14% · Safari 9%' },
+  { label: 'Mobile', share: 25, detail: 'Safari 14% · Chrome Mobile 11%' },
+  { label: 'Tablet', share: 4, detail: 'iPadOS 3% · Android 1%' },
 ];
 
-export const SAMPLE_BROWSERS = [
-  { label: 'Chrome', value: 62 },
-  { label: 'Safari', value: 18 },
-  { label: 'Edge', value: 11 },
-  { label: 'Firefox', value: 9 },
-];
-
-export const SAMPLE_PAGES = [
-  { path: '/', views: 12480, share: 100 },
-  { path: '/pricing', views: 8420, share: 67 },
-  { path: '/features', views: 6180, share: 50 },
-  { path: '/docs/getting-started', views: 4120, share: 33 },
-  { path: '/blog', views: 2860, share: 23 },
-];
-
-/** Geographic markers for the live map preview. */
-export const SAMPLE_CITIES = [
-  { lat: 40.7128, lng: -74.006, name: 'New York', count: 4218 },
-  { lat: 28.6139, lng: 77.209, name: 'New Delhi', count: 2943 },
-  { lat: 52.52, lng: 13.405, name: 'Berlin', count: 1201 },
-  { lat: 51.5072, lng: -0.1276, name: 'London', count: 984 },
-  { lat: 35.6762, lng: 139.6503, name: 'Tokyo', count: 762 },
-  { lat: 48.8566, lng: 2.3522, name: 'Paris', count: 689 },
-  { lat: 37.7749, lng: -122.4194, name: 'San Francisco', count: 812 },
-  { lat: -33.8688, lng: 151.2093, name: 'Sydney', count: 514 },
-  { lat: 19.076, lng: 72.8777, name: 'Mumbai', count: 2310 },
-  { lat: -23.5505, lng: -46.6333, name: 'São Paulo', count: 1210 },
+export const SAMPLE_REGIONS = [
+  { country: 'India', code: 'IN', cities: 'Bengaluru, Mumbai, Pune', visitors: '582', share: 86 },
+  { country: 'United States', code: 'US', cities: 'San Francisco, New York, Austin', visitors: '448', share: 66 },
+  { country: 'Germany', code: 'DE', cities: 'Berlin, Munich', visitors: '294', share: 44 },
+  { country: 'United Kingdom', code: 'GB', cities: 'London, Manchester', visitors: '216', share: 32 },
+  { country: 'Japan', code: 'JP', cities: 'Tokyo, Osaka', visitors: '142', share: 21 },
 ];

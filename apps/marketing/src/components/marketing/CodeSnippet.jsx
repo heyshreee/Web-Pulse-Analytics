@@ -1,18 +1,10 @@
-// Lightweight VS Code "Dark+"-style syntax highlighting for the small static
-// code blocks shown across the marketing pages (landing setup, integrations,
-// API examples). Hand-rolled instead of pulling in the ~640KB
-// react-syntax-highlighter/Prism bundle so the marketing pages stay fast.
-// HTML attribute pairs are highlighted; other lines render as plain text.
-// Colors match the atomDark Prism theme used across the docs/API pages.
 const COLORS = {
-  tag: '#e06c75',
-  attr: '#d19a66',
-  value: '#98c379',
-  text: '#abb2bf',
+  tag: '#F5F5F4',
+  attr: '#C8C8C4',
+  value: '#FFFFFF',
+  text: '#B3B3AF',
 };
 
-// Matches html-attribute="value" pairs; the snippet is a single <script> tag
-// with no nested content, so a focused regex is sufficient and safe here.
 const ATTR_RE = /([\w-]+)="([^"]*)"/g;
 const HAS_ATTR_RE = /[\w-]+="/;
 
@@ -23,7 +15,6 @@ function renderLine(line, key) {
     trimmed.startsWith('</') ||
     trimmed.startsWith('>') ||
     trimmed.startsWith('/>') ||
-    // Continuation lines of a wrapped tag, e.g. `  src="…"`.
     HAS_ATTR_RE.test(trimmed);
 
   const parts = [];
@@ -42,7 +33,7 @@ function renderLine(line, key) {
   while ((m = ATTR_RE.exec(line)) !== null) {
     if (m.index > lastIndex) {
       parts.push(
-        <span key={`p${lastIndex}`} style={{ color: isTag ? COLORS.tag : COLORS.text }}>
+        <span key={`p${lastIndex}`} style={{ color: COLORS.tag }}>
           {line.slice(lastIndex, m.index)}
         </span>
       );
@@ -78,7 +69,7 @@ function renderLine(line, key) {
 export default function CodeSnippet({ code }) {
   const lines = code.trim().split('\n');
   return (
-    <pre className="p-5 sm:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto bg-transparent m-0">
+    <pre className="m-0 overflow-x-auto bg-transparent p-5 font-mono text-[13px] leading-relaxed sm:p-6">
       <code>
         {lines.map((line, i) => (
           <div key={i} style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>

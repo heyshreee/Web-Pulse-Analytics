@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -6,7 +7,7 @@ class ErrorBoundary extends React.Component {
         this.state = { hasError: false };
     }
 
-    static getDerivedStateFromError(_error) {
+    static getDerivedStateFromError() {
         return { hasError: true };
     }
 
@@ -17,20 +18,23 @@ class ErrorBoundary extends React.Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#070A10] transition-colors duration-500">
-                    <div className="text-center p-12 bg-slate-50 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-md mx-4">
-                        <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                            <span className="text-3xl">⚠️</span>
+                <div className="min-h-screen flex items-center justify-center bg-[#050505] text-[#F5F5F4] px-5">
+                    <div className="text-center p-8 sm:p-10 bg-[#0B0B0B] border border-[#262626] rounded-[4px] max-w-md w-full">
+                        <div className="w-12 h-12 border border-[#EF4444]/40 bg-[#EF4444]/10 rounded-[4px] flex items-center justify-center mx-auto mb-6">
+                            <AlertTriangle className="w-5 h-5 text-[#EF4444]" aria-hidden="true" />
                         </div>
-                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">Something went wrong</h2>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">
-                            An unexpected error occurred. We've been notified and are looking into it. Please try refreshing.
+                        <h2 className="text-2xl font-semibold text-[#F5F5F4] mb-3 tracking-tight">
+                            Something went wrong
+                        </h2>
+                        <p className="text-[#B3B3AF] text-base mb-8 leading-relaxed">
+                            An unexpected client error occurred while rendering this page. Reload to restore the view.
                         </p>
                         <button
+                            type="button"
                             onClick={() => window.location.reload()}
-                            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-8 rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/20 active:scale-95"
+                            className="mkt-btn mkt-btn-primary mkt-btn-md w-full"
                         >
-                            Refresh Page
+                            Reload page
                         </button>
                     </div>
                 </div>

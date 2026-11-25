@@ -4,324 +4,271 @@
 
 @layer base {
   :root {
-    color-scheme: light;
-    /* ---- Layout grid ---- */
-    --sidebar-width: 16rem;            /* 256px */
-    --topbar-height: 4rem;             /* 64px */
-    --page-padding: 1.5rem;            /* 24px horizontal */
-    --page-gap: 2rem;                  /* 32px vertical between sections */
-    /* ---- Spacing ---- */
-    --space-1: 0.25rem;                /* 4px  */
-    --space-2: 0.5rem;                 /* 8px  */
-    --space-3: 0.75rem;                /* 12px */
-    --space-4: 1rem;                   /* 16px */
-    --space-5: 1.25rem;                /* 20px */
-    --space-6: 1.5rem;                 /* 24px */
-    --space-8: 2rem;                   /* 32px */
-    --space-10: 2.5rem;                /* 40px */
-    --space-12: 3rem;                  /* 48px */
-    /* ---- Cards ---- */
-    --card-padding: 1.5rem;            /* 24px */
-    --card-radius: 0.75rem;            /* 12px */
-    /* ---- Controls ---- */
-    --control-height: 2.5rem;          /* 40px buttons/inputs */
-    --control-radius: 0.625rem;        /* 10px */
+    color-scheme: dark;
+    /* ---- Noir surface tokens ---- */
+    --noir-bg: #050505;
+    --noir-bg-soft: #0A0A0A;
+    --noir-surface: #0F0F0F;
+    --noir-surface-2: #161616;
+    --noir-line: rgba(255, 255, 255, 0.11);
+    --noir-line-strong: rgba(255, 255, 255, 0.22);
+
+    /* ---- High-contrast typography ---- */
+    --noir-ink: #F5F5F4;
+    --noir-ink-2: #C8C8C4;
+    --noir-ink-3: #969690;
+
+    /* ---- Monochrome Noir high-contrast accent ---- */
+    --noir-accent: #FFFFFF;
+    --noir-accent-dim: #A3A3A3;
+    --noir-accent-ink: #050505;
+    --noir-danger: #EF4444;
+    --noir-warn: #F59E0B;
+
+    /* ---- Layout container ---- */
+    --noir-container: 82.5rem; /* 1320px */
+
+    /* ---- Legacy spacing / surface aliases preserved for subpage compatibility ---- */
+    --sidebar-width: 16rem;
+    --topbar-height: 4rem;
+    --page-padding: 1.5rem;
+    --page-gap: 2rem;
+    --card-padding: 1.5rem;
+    --card-radius: 2px;
+    --control-height: 2.5rem;
+    --control-radius: 2px;
+
+    --mkt-bg: #050505;
+    --mkt-bg-soft: #0A0A0A;
+    --mkt-surface: #0F0F0F;
+    --mkt-surface-2: #161616;
+    --mkt-line: rgba(255, 255, 255, 0.11);
+    --mkt-line-strong: rgba(255, 255, 255, 0.22);
+    --mkt-text: #F5F5F4;
+    --mkt-text-2: #C8C8C4;
+    --mkt-text-3: #969690;
+    --mkt-text-4: #8E8E88;
+    --mkt-brand: #FFFFFF;
+    --mkt-brand-2: #A3A3A3;
+    --mkt-brand-3: #E5E5E5;
+    --mkt-live: #FFFFFF;
+    --mkt-warn: #F59E0B;
+    --mkt-container: 82.5rem;
+    --mkt-radius: 2px;
+    --mkt-radius-lg: 4px;
   }
 
-  .dark {
-    color-scheme: dark;
+  html {
+    background-color: var(--noir-bg);
+    color: var(--noir-ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #272727 #050505;
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased font-sans transition-colors duration-300;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  }
-
-  .dark body {
-    @apply bg-slate-950 text-slate-100;
+    background-color: var(--noir-bg);
+    color: var(--noir-ink);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
   }
 
   ::selection {
-    @apply bg-violet-500/20 text-violet-900 dark:text-violet-100;
+    background-color: var(--noir-accent);
+    color: var(--noir-accent-ink);
   }
 }
 
 @layer components {
-  /* ---- Buttons ---- */
+  /* ---- Base action controls (kept aligned for shared UI components) ---- */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] text-sm font-medium transition-[background-color,border-color,color,transform] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-900 text-white hover:bg-slate-800 shadow-sm dark:bg-violet-500 dark:hover:bg-violet-400 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] text-sm font-semibold bg-[#FFFFFF] text-[#050505] hover:bg-[#E5E5E5] transition-[background-color,color,transform] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] text-sm font-medium bg-[#0F0F0F] text-[#F5F5F4] border border-white/15 hover:bg-[#191919] hover:border-white/30 transition-[background-color,border-color,color] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/70 hover:text-slate-900 dark:hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] text-sm font-medium text-[#C8C8C4] hover:text-[#F5F5F4] hover:bg-white/[0.06] transition-[background-color,color] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF] disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-red-600 text-white hover:bg-red-500 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] text-sm font-semibold bg-[#EF4444] text-white hover:bg-[#DC2626] transition-[background-color] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#EF4444] disabled:opacity-50 disabled:pointer-events-none;
   }
-  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .btn-sm { @apply px-3 py-1.5 text-[13px]; }
   .btn-md { @apply px-4 py-2 text-sm; }
   .btn-lg { @apply px-5 py-3 text-sm; }
 
-  /* ---- Cards ---- */
   .card {
-    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl;
+    @apply bg-[#0B0B0B] border border-white/[0.11] rounded-[2px];
   }
   .card-pad { @apply p-5 sm:p-6; }
   .card-hover {
-    @apply transition-all duration-200 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-200/60 dark:hover:shadow-slate-950/80;
-  }
-  .card-hover:hover {
-    transform: translate3d(0, -2px, 0);
+    @apply transition-[border-color,background-color] duration-200 hover:border-white/25 hover:bg-[#101010];
   }
 
-  /* ---- Inputs ---- */
   .input {
-    @apply w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500/40 transition-all disabled:opacity-60;
+    @apply w-full rounded-[2px] border border-white/15 bg-[#0B0B0B] px-3.5 py-2.5 text-sm text-[#F5F5F4] placeholder:text-[#8E8E88] focus:outline-none focus:border-[#FFFFFF] transition-colors disabled:opacity-60;
   }
   .label {
-    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
+    @apply block text-sm font-medium text-[#C8C8C4] mb-1.5;
   }
   .field-hint {
-    @apply mt-1.5 text-xs text-slate-500 dark:text-slate-500;
+    @apply mt-1.5 text-[13px] text-[#969690];
   }
 
-  /* ---- Badges ---- */
-  .badge-violet { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300; }
-  .badge-green { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300; }
-  .badge-amber { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300; }
-  .badge-red { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300; }
-  .badge-slate { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300; }
+  .badge-violet { @apply inline-flex items-center gap-1.5 rounded-[2px] border border-[#FFFFFF]/40 bg-[#FFFFFF]/10 px-2.5 py-1 text-[13px] font-medium text-[#FFFFFF]; }
+  .badge-green  { @apply inline-flex items-center gap-1.5 rounded-[2px] border border-[#FFFFFF]/40 bg-[#FFFFFF]/10 px-2.5 py-1 text-[13px] font-medium text-[#FFFFFF]; }
+  .badge-amber  { @apply inline-flex items-center gap-1.5 rounded-[2px] border border-[#F59E0B]/40 bg-[#F59E0B]/10 px-2.5 py-1 text-[13px] font-medium text-[#F59E0B]; }
+  .badge-red    { @apply inline-flex items-center gap-1.5 rounded-[2px] border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-[13px] font-medium text-[#EF4444]; }
+  .badge-slate  { @apply inline-flex items-center gap-1.5 rounded-[2px] border border-white/15 bg-white/[0.04] px-2.5 py-1 text-[13px] font-medium text-[#C8C8C4]; }
 
-  /* ---- Section headings ---- */
-  .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500;
-  }
-  .page-title {
-    @apply text-2xl sm:text-[1.75rem] font-bold tracking-tight text-slate-900 dark:text-white;
-  }
-  .page-sub {
-    @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
-  }
-
-  /* ---- Auth page heading (28–36px, larger than dashboard title) ---- */
-  .auth-title {
-    @apply text-[1.75rem] sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white;
-  }
-
-  /* ---- Section / card heading (18–20px) ---- */
-  .section-title {
-    @apply text-lg font-semibold tracking-tight text-slate-900 dark:text-white;
-  }
-
-  /* ---- Page header (standardized across app) ---- */
-  .page-header {
-    @apply flex flex-col md:flex-row md:items-end justify-between gap-4;
-  }
-  .page-header-title {
-    @apply flex items-center gap-4;
-  }
-  .page-header-icon {
-    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400;
-  }
-
-  /* ---- Segmented control (time range / view toggle) ---- */
-  .segmented {
-    @apply inline-flex items-center gap-0.5 rounded-lg border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800/60;
-  }
-  .segmented-btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all;
-  }
-
-  /* ---- Tables ---- */
-  .table {
-    @apply w-full text-left;
-  }
-  .table-head {
-    @apply bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/40 dark:text-slate-400;
-  }
-  .table-th {
-    @apply px-6 py-3.5 font-semibold;
-  }
-  .table-td {
-    @apply px-6 py-4 text-sm text-slate-600 dark:text-slate-300;
-  }
-
-  /* ---- Icon action button ---- */
-  .icon-btn {
-    @apply inline-flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white;
-  }
-
-  /* ---- Wrappers ---- */
   .container-app {
-    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-12;
   }
   .container-page {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-12;
   }
   .prose-quiet {
-    @apply text-sm leading-relaxed text-slate-600 dark:text-slate-300;
+    @apply text-base leading-relaxed text-[#C8C8C4];
   }
 }
 
 /* ===========================================================================
-   MARKETING DESIGN SYSTEM
-   ---------------------------------------------------------------------------
-   Scoped to the marketing / authentication surface only. Every class in this
-   section is prefixed `mkt-` and is referenced exclusively by non-dashboard
-   pages, so the dashboard styling is never affected.
-
-   The marketing surface is intentionally dark-only (see ThemeContext, which
-   pins every non-dashboard route to dark mode). Light-mode rules are therefore
-   not required here; the dashboard keeps its own light/dark tokens above.
+   EDITORIAL NOIR DESIGN SYSTEM (.noir-* & .mkt-*)
    =========================================================================== */
-:root {
-  /* Surfaces — same values as the space-* scale in tailwind.config.js */
-  --mkt-bg: #070A10;
-  --mkt-bg-soft: #0B0F17;
-  --mkt-surface: #101522;
-  --mkt-surface-2: #151B29;
 
-  /* Structure */
-  --mkt-line: rgba(148, 163, 184, 0.13);
-  --mkt-line-strong: rgba(148, 163, 184, 0.22);
-
-  /* Text — slate scale already used across the product */
-  --mkt-text: #F1F5F9;
-  --mkt-text-2: #CBD5E1;
-  --mkt-text-3: #94A3B8;
-  --mkt-text-4: #64748B;
-
-  /* Brand — exact WebPulse palette */
-  --mkt-brand: #8B5CF6;
-  --mkt-brand-2: #7C6CE0;
-  --mkt-brand-3: #A78BFA;
-  --mkt-live: #48E6A1;
-  --mkt-warn: #F59E0B;
-
-  --mkt-container: 75rem;      /* 1200px content width */
-  --mkt-radius: 1rem;
-  --mkt-radius-lg: 1.25rem;
-}
-
-/* ---- Page shell ---------------------------------------------------------- */
 .mkt-shell {
   position: relative;
   min-height: 100vh;
-  background-color: var(--mkt-bg);
-  color: var(--mkt-text);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
+  background-color: var(--noir-bg);
+  color: var(--noir-ink);
+  font-feature-settings: 'ss01', 'cv02', 'cv03';
   overflow-x: clip;
 }
 
-.mkt-shell a {
-  text-decoration: none;
+.mkt-shell a:focus-visible,
+.mkt-shell button:focus-visible {
+  outline: 2px solid var(--noir-accent);
+  outline-offset: 2px;
 }
 
-/* Faint blueprint grid, drawn purely with gradients (no image request). */
+/* Subtle architectural grid overlay kept hairline-thin and low opacity */
 .mkt-grid-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
   background-image:
-    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 20%, transparent 78%);
-  -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 20%, transparent 78%);
 }
 
-/* Soft brand glow used behind hero / CTA sections. */
+/* Disabled legacy ambient glow blobs */
 .mkt-glow {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.5;
+  display: none;
 }
 
-/* ---- Layout -------------------------------------------------------------- */
+/* ---- Containers & section cadence ---------------------------------------- */
+.noir-container,
 .mkt-container {
   width: 100%;
-  max-width: var(--mkt-container);
+  max-width: var(--noir-container);
   margin-inline: auto;
-  padding-inline: 1.25rem;
-}
-@media (min-width: 640px) {
-  .mkt-container { padding-inline: 2rem; }
-}
-@media (min-width: 1024px) {
-  .mkt-container { padding-inline: 2.5rem; }
+  padding-inline: clamp(1.25rem, 3.5vw, 3rem);
 }
 
+.noir-section,
 .mkt-section {
   position: relative;
-  padding-block: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+  padding-block: clamp(4.5rem, 7.5vw, 6.75rem);
+  border-top: 1px solid var(--noir-line);
 }
+
+.noir-section-flush {
+  position: relative;
+  border-top: 1px solid var(--noir-line);
+}
+
 .mkt-section-tight {
   position: relative;
-  padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+  padding-block: clamp(3rem, 5vw, 4.5rem);
 }
 
-/* ---- Typography ---------------------------------------------------------- */
-.mkt-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--mkt-brand-3);
-}
-
-.mkt-h1, .mkt-h2, .mkt-h3, .mkt-h4 {
-  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
-  color: var(--mkt-text);
-  letter-spacing: -0.025em;
-  text-wrap: balance;
-}
+/* ---- Editorial typography scale (strict discipline: 6 stops) ------------- */
 .mkt-h1 {
-  font-size: clamp(2.5rem, 1.75rem + 3.2vw, 4rem);
-  line-height: 1.04;
-  font-weight: 800;
-}
-.mkt-h2 {
-  font-size: clamp(1.875rem, 1.35rem + 2.1vw, 2.75rem);
-  line-height: 1.12;
-  font-weight: 700;
-}
-.mkt-h3 {
-  font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
-  line-height: 1.25;
-  font-weight: 700;
-}
-.mkt-h4 {
-  font-size: 1.0625rem;
-  line-height: 1.35;
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(1.9rem, 4.35vw, 3.65rem);
   font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.036em;
+  color: var(--noir-ink);
 }
+
+.mkt-h2 {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(1.65rem, 2.8vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--noir-ink);
+}
+
+.mkt-h3 {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--noir-ink);
+}
+
+.mkt-h4 {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.012em;
+  color: var(--noir-ink);
+}
+
 .mkt-lead {
-  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
-  line-height: 1.65;
-  color: var(--mkt-text-3);
-  text-wrap: pretty;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--noir-ink-2);
+  max-width: 56ch;
 }
+
 .mkt-body {
   font-size: 1rem;
-  line-height: 1.7;
-  color: var(--mkt-text-3);
+  line-height: 1.6;
+  color: var(--noir-ink-2);
 }
+
+.noir-meta {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem; /* 13px minimum for crisp readability */
+  line-height: 1.5;
+  color: var(--noir-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Swiss section index replaces uppercase eyebrow pill chrome */
+.mkt-eyebrow {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--noir-accent);
+  letter-spacing: -0.01em;
+}
+
+/* Crisp monochrome highlight without gradient clipping */
 .mkt-accent-text {
-  background: linear-gradient(100deg, #A78BFA 0%, #8B5CF6 55%, #C4B5FD 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--noir-accent);
 }
 
 /* ---- Buttons ------------------------------------------------------------- */
@@ -330,352 +277,312 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.75rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
-  white-space: nowrap;
+  border-radius: 2px;
   cursor: pointer;
-  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+  transition:
+    background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .mkt-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--mkt-bg), 0 0 0 4px rgba(139, 92, 246, 0.55);
+  outline: 2px solid var(--noir-accent);
+  outline-offset: 2px;
 }
+
 .mkt-btn:disabled {
-  opacity: 0.55;
+  opacity: 0.48;
   pointer-events: none;
 }
-.mkt-btn-sm { padding: 0.5rem 0.875rem; font-size: 0.8125rem; }
-.mkt-btn-md { padding: 0.625rem 1.125rem; }
-.mkt-btn-lg { padding: 0.8125rem 1.375rem; font-size: 0.9375rem; }
+
+.mkt-btn-sm { padding: 0.5625rem 0.875rem; font-size: 0.8125rem; }
+.mkt-btn-md { padding: 0.75rem 1.25rem; }
+.mkt-btn-lg { padding: 0.9375rem 1.5rem; font-size: 0.9375rem; }
 
 .mkt-btn-primary {
-  color: #fff;
-  background: linear-gradient(180deg, #8B5CF6 0%, #7C3AED 100%);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 8px 24px -12px rgba(139, 92, 246, 0.9);
+  background-color: var(--noir-accent);
+  color: var(--noir-accent-ink);
+  font-weight: 600;
+  border: 1px solid var(--noir-accent);
 }
 .mkt-btn-primary:hover {
-  background: linear-gradient(180deg, #9D74F7 0%, #8B5CF6 100%);
-  transform: translateY(-1px);
+  background-color: #E5E5E5;
+  border-color: #E5E5E5;
 }
 
 .mkt-btn-secondary {
-  color: var(--mkt-text-2);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--mkt-line-strong);
+  background-color: var(--noir-surface);
+  color: var(--noir-ink);
+  border: 1px solid var(--noir-line-strong);
 }
 .mkt-btn-secondary:hover {
-  color: var(--mkt-text);
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(167, 139, 250, 0.45);
+  background-color: var(--noir-surface-2);
+  border-color: rgba(255, 255, 255, 0.38);
 }
 
 .mkt-btn-ghost {
-  color: var(--mkt-text-3);
-  background: transparent;
+  background-color: transparent;
+  color: var(--noir-ink-2);
+  border: 1px solid transparent;
 }
 .mkt-btn-ghost:hover {
-  color: var(--mkt-text);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--noir-ink);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Inline text link with an optional arrow. */
+.mkt-btn:active {
+  transform: translateY(1px);
+}
+
 .mkt-link {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--mkt-brand-3);
-  transition: color 0.18s ease, gap 0.18s ease;
+  width: fit-content;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--noir-ink);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 2px;
+  transition: color 180ms ease, border-color 180ms ease;
 }
 .mkt-link:hover {
-  color: #C4B5FD;
+  color: var(--noir-accent);
+  border-color: var(--noir-accent);
 }
 .mkt-link svg {
-  transition: transform 0.18s ease;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .mkt-link:hover svg {
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
-/* ---- Surfaces ------------------------------------------------------------ */
+/* ---- Architectural surfaces (no blurry glass, sharp hairlines) ----------- */
 .mkt-card {
-  position: relative;
-  border-radius: var(--mkt-radius);
-  border: 1px solid var(--mkt-line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, rgba(255, 255, 255, 0.012) 100%);
+  background-color: var(--noir-bg-soft);
+  border: 1px solid var(--noir-line);
+  border-radius: 2px;
 }
+
 .mkt-card-hover {
-  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 200ms ease, background-color 200ms ease;
 }
 .mkt-card-hover:hover {
-  border-color: rgba(167, 139, 250, 0.32);
-  transform: translateY(-2px);
+  border-color: var(--noir-line-strong);
+  background-color: var(--noir-surface);
 }
 
 .mkt-glass {
-  background: rgba(11, 15, 23, 0.62);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--mkt-line);
+  background-color: var(--noir-bg-soft);
+  border: 1px solid var(--noir-line);
+  border-radius: 2px;
 }
 
 .mkt-panel {
-  border-radius: var(--mkt-radius-lg);
-  border: 1px solid var(--mkt-line);
-  background: var(--mkt-bg-soft);
-  box-shadow: 0 32px 64px -32px rgba(0, 0, 0, 0.85);
-  overflow: hidden;
+  background-color: var(--noir-bg-soft);
+  border: 1px solid var(--noir-line-strong);
+  border-radius: 2px;
 }
 
 .mkt-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 9999px;
-  border: 1px solid var(--mkt-line);
-  background: rgba(255, 255, 255, 0.03);
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--mkt-text-3);
+  padding: 0.3125rem 0.625rem;
+  border-radius: 2px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--noir-ink-2);
+  background-color: var(--noir-surface);
+  border: 1px solid var(--noir-line);
 }
 
 .mkt-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--mkt-line-strong), transparent);
+  background-color: var(--noir-line);
 }
 
-/* Small live indicator dot (decorative, purely CSS). */
+/* ---- Quiet telemetry dot (static crisp square or subtle opacity pulse) ---- */
 .mkt-live-dot {
   position: relative;
-  display: inline-flex;
-  height: 0.5rem;
-  width: 0.5rem;
+  display: inline-block;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  background-color: var(--noir-accent);
   flex-shrink: 0;
 }
-.mkt-live-dot::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: var(--mkt-live);
-  opacity: 0.55;
-  animation: mktPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-.mkt-live-dot::after {
-  content: '';
-  position: relative;
-  border-radius: 9999px;
-  background: var(--mkt-live);
-  height: 100%;
-  width: 100%;
-}
-@keyframes mktPing {
-  0% { transform: scale(1); opacity: 0.5; }
-  70%, 100% { transform: scale(2.4); opacity: 0; }
-}
 
-/* Live activity feed used inside marketing product previews. */
+/* ---- Scroll & feed panels ------------------------------------------------ */
 .mkt-feed-scroll {
+  overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(139, 92, 246, 0.35) transparent;
-  /* Older rows scroll away under a soft fade so the clipped top row reads as
-     an intentional live-feed edge rather than a layout glitch. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30px);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 30px);
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
 }
-.mkt-feed-scroll::-webkit-scrollbar {
-  width: 4px;
-}
+.mkt-feed-scroll::-webkit-scrollbar { width: 5px; }
 .mkt-feed-scroll::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.35);
-  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.16);
 }
-.mkt-feed-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
+.mkt-feed-scroll::-webkit-scrollbar-track { background: transparent; }
+
 .mkt-feed-item {
-  animation: mktFeedIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: background-color 160ms ease;
 }
-@keyframes mktFeedIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: none; }
+.mkt-feed-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
-/* Tabular figures for every metric shown in marketing previews. */
 .metric-num {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum';
 }
 
-/* ---- Auth surface --------------------------------------------------------
-   Shared by /login, /register, /verify-email, /forgot-password, /reset-password. */
+/* ---- Form controls ------------------------------------------------------- */
 .mkt-field {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid var(--mkt-line-strong);
-  background: rgba(7, 10, 16, 0.6);
-  padding: 0.8125rem 1rem;
+  border-radius: 2px;
+  border: 1px solid var(--noir-line-strong);
+  background-color: var(--noir-bg-soft);
+  padding: 0.6875rem 0.875rem;
   font-size: 0.9375rem;
-  color: var(--mkt-text);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  color: var(--noir-ink);
+  transition: border-color 180ms ease;
 }
-.mkt-field::placeholder {
-  color: #4B5A75;
-}
-.mkt-field:hover {
-  border-color: rgba(148, 163, 184, 0.32);
-}
+.mkt-field::placeholder { color: var(--noir-ink-3); }
+.mkt-field:hover { border-color: rgba(255, 255, 255, 0.35); }
 .mkt-field:focus {
   outline: none;
-  border-color: rgba(139, 92, 246, 0.65);
-  background: rgba(7, 10, 16, 0.85);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  border-color: var(--noir-accent);
 }
 .mkt-field[aria-invalid='true'] {
-  border-color: rgba(239, 68, 68, 0.55);
+  border-color: var(--noir-danger);
 }
+
 .mkt-label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--mkt-text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--noir-ink-2);
 }
+
 .mkt-hint {
   margin-top: 0.375rem;
-  font-size: 0.75rem;
-  color: var(--mkt-text-4);
+  font-size: 0.8125rem;
+  color: var(--noir-ink-3);
 }
 
-/* ===========================================================================
-   SITE-WIDE MOTION
-   ---------------------------------------------------------------------------
-   Motion primitives shared by every surface — marketing, auth, docs and the
-   dashboard. Everything animates transform/opacity only, so it stays on the
-   compositor, and the prefers-reduced-motion rule at the bottom of this file
-   collapses the lot for visitors who ask for less motion.
-   =========================================================================== */
-
-/* ---- Route transitions (see components/PageTransition.jsx) --------------- */
-@keyframes pageEnter {
-  from { opacity: 0; transform: translate3d(0, 12px, 0); }
-  to   { opacity: 1; transform: none; }
+/* ---- SVG Illustration Frame helpers -------------------------------------- */
+.mkt-ill {
+  margin: 0;
 }
-@keyframes pageFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.mkt-ill-panel {
+  border: 1px solid var(--noir-line);
+  background-color: var(--noir-bg-soft);
+  padding: 1rem;
 }
-@keyframes pageEnterSoft {
-  from { opacity: 0; transform: translate3d(0, 6px, 0); }
-  to   { opacity: 1; transform: none; }
+.mkt-ill-img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
-.page-enter {
-  animation: pageEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.page-enter[data-page-transition='fade'] {
-  animation-name: pageFade;
-}
-.page-enter[data-page-transition='soft'] {
-  animation-name: pageEnterSoft;
-  animation-duration: 0.36s;
+.mkt-ill-caption {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--noir-ink-3);
 }
 
-/* ---- Scroll reveals (see components/Reveal.jsx) -------------------------- */
-/* Armed by JavaScript only when motion is allowed; visible by default.
-   Uses the independent `translate`/`scale` properties so a reveal never
-   clobbers a hover transform supplied by utilities on the same element. */
-.reveal[data-reveal-armed] {
-  opacity: 0;
-  transition:
-    opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    translate 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    scale 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+/* ---- Editorial word-reveal manifesto ------------------------------------- */
+.editorial-word {
+  color: rgba(245, 245, 244, 0.24);
+  transition: color 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* Promote to its own layer only while waiting to reveal. */
-.reveal[data-reveal-armed]:not(.is-revealed) {
-  will-change: opacity, translate, scale;
+.editorial-word.is-lit {
+  color: #B3B3AF;
 }
-.reveal[data-reveal-armed][data-reveal='up']    { translate: 0 20px; }
-.reveal[data-reveal-armed][data-reveal='down']  { translate: 0 -20px; }
-.reveal[data-reveal-armed][data-reveal='left']  { translate: -24px 0; }
-.reveal[data-reveal-armed][data-reveal='right'] { translate: 24px 0; }
-.reveal[data-reveal-armed][data-reveal='scale'] { scale: 0.96; }
-.reveal[data-reveal-armed].is-revealed {
-  opacity: 1;
-  translate: none;
-  scale: none;
+.editorial-word-accent.is-lit {
+  color: #FFFFFF;
 }
 
-/* ---- Staggered entrances -------------------------------------------------- */
-/* Add .stagger-children to a container to cascade its direct children in. */
-@keyframes riseIn {
-  from { opacity: 0; transform: translate3d(0, 14px, 0); }
-  to   { opacity: 1; transform: none; }
-}
-.stagger-children > * {
-  animation: riseIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.stagger-children > *:nth-child(1)  { animation-delay: 0.04s; }
-.stagger-children > *:nth-child(2)  { animation-delay: 0.09s; }
-.stagger-children > *:nth-child(3)  { animation-delay: 0.14s; }
-.stagger-children > *:nth-child(4)  { animation-delay: 0.19s; }
-.stagger-children > *:nth-child(5)  { animation-delay: 0.24s; }
-.stagger-children > *:nth-child(6)  { animation-delay: 0.29s; }
-.stagger-children > *:nth-child(7)  { animation-delay: 0.34s; }
-.stagger-children > *:nth-child(8)  { animation-delay: 0.39s; }
-.stagger-children > *:nth-child(9)  { animation-delay: 0.44s; }
-.stagger-children > *:nth-child(10) { animation-delay: 0.49s; }
-.stagger-children > *:nth-child(11) { animation-delay: 0.54s; }
-.stagger-children > *:nth-child(n + 12) { animation-delay: 0.59s; }
-
-/* ---- Micro-interactions --------------------------------------------------- */
-/* Tactile press feedback shared by every button variant. */
-.btn:active,
-.btn-primary:active,
-.btn-secondary:active,
-.btn-ghost:active,
-.btn-danger:active {
-  transform: scale(0.97);
-}
-.mkt-btn:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* Marketing nav underline that slides in on hover / active. */
+/* ---- Navigation underline indicator -------------------------------------- */
 .mkt-navlink {
   position: relative;
 }
 .mkt-navlink::after {
   content: '';
   position: absolute;
-  left: 0.75rem;
-  right: 0.75rem;
-  bottom: 0.3rem;
-  height: 2px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #A78BFA 0%, #8B5CF6 100%);
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  background-color: var(--noir-accent);
   transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
+  transform-origin: left;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .mkt-navlink:hover::after,
 .mkt-navlink[aria-current='page']::after {
   transform: scaleX(1);
 }
 
-/* ---- Documentation rail --------------------------------------------------- */
-/* The rail is sticky under the marketing nav and scrolls on its own. The
-   offset is published by the docs layout as `--docs-rail-top` /
-   `--docs-rail-h` so the rail follows the nav even while the preview notice
-   above it is still on screen. */
+/* ---- Route transition & progressive scroll reveals ----------------------- */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pageFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.page-enter {
+  animation: pageEnter 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.page-enter[data-page-transition='fade'] {
+  animation-name: pageFade;
+}
+
+.reveal[data-reveal-armed] {
+  opacity: 0;
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    translate 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal[data-reveal-armed]:not(.is-revealed) {
+  will-change: opacity, translate, scale;
+}
+.reveal[data-reveal-armed][data-reveal='up']    { translate: 0 16px; }
+.reveal[data-reveal-armed][data-reveal='down']  { translate: 0 -16px; }
+.reveal[data-reveal-armed][data-reveal='left']  { translate: -20px 0; }
+.reveal[data-reveal-armed][data-reveal='right'] { translate: 20px 0; }
+.reveal[data-reveal-armed][data-reveal='scale'] { scale: 0.98; }
+.reveal[data-reveal-armed].is-revealed {
+  opacity: 1;
+  translate: none;
+  scale: none;
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.stagger-children > * {
+  animation: riseIn 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger-children > *:nth-child(1)  { animation-delay: 0.03s; }
+.stagger-children > *:nth-child(2)  { animation-delay: 0.07s; }
+.stagger-children > *:nth-child(3)  { animation-delay: 0.11s; }
+.stagger-children > *:nth-child(4)  { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(5)  { animation-delay: 0.19s; }
+.stagger-children > *:nth-child(6)  { animation-delay: 0.23s; }
+.stagger-children > *:nth-child(n + 7) { animation-delay: 0.27s; }
+
+/* ---- Docs rail & drawer -------------------------------------------------- */
 .docs-rail {
   align-self: flex-start;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid var(--noir-line);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -687,8 +594,6 @@
   }
 }
 
-/* The mobile drawer lives in a portal on <body> so it can sit above the
-   marketing nav instead of being trapped under it. */
 .docs-drawer {
   position: fixed;
   top: 0;
@@ -699,43 +604,33 @@
   height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background-color: #0B0F17;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  background-color: var(--noir-bg);
+  border-right: 1px solid var(--noir-line-strong);
   transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .docs-drawer.is-open {
   transform: translateX(0);
 }
 
-/* A slim, always visible scrollbar so it is obvious the list continues. */
 .docs-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(167, 139, 250, 0.38) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
-.docs-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.docs-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
+.docs-scroll::-webkit-scrollbar { width: 5px; }
+.docs-scroll::-webkit-scrollbar-track { background: transparent; }
 .docs-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(167, 139, 250, 0.3);
-  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 .docs-scroll:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(167, 139, 250, 0.5);
+  background-color: rgba(255, 255, 255, 0.45);
 }
-
-/* Fade the cut edge while there is more of the list below it. */
 .docs-scroll.has-more {
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent 100%);
 }
 
-/* ---- Skeleton shimmer ----------------------------------------------------- */
-/* Background comes from the element itself so it can be tinted per surface. */
+/* ---- Skeleton shimmer ---------------------------------------------------- */
 @keyframes skeletonSweep {
   from { transform: translateX(-100%); }
   to   { transform: translateX(100%); }
@@ -748,26 +643,25 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
   animation: skeletonSweep 1.6s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: var(--noir-bg);
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-slate-50 dark:border-slate-950 hover:bg-slate-400 dark:hover:bg-slate-600;
+  background: #272727;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #404040;
 }
 
-/* Respect users who prefer reduced motion: collapse CSS animations,
-   transitions, and custom scrolling so decorative motion never causes
-   unnecessary rendering/CPU work. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -778,5 +672,11 @@
     transition-duration: 0.01ms !important;
     transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+  .editorial-word {
+    color: #B3B3AF !important;
+  }
+  .editorial-word-accent {
+    color: #FFFFFF !important;
   }
 }

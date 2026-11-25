@@ -3,7 +3,7 @@
 
   <defs>
     <marker id="pmArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-      <path d="M0 0 10 5 0 10z" fill="#A78BFA" fill-opacity="0.7"/>
+      <path d="M0 0 10 5 0 10z" fill="#E5E5E5" fill-opacity="0.7"/>
     </marker>
   </defs>
 
@@ -30,13 +30,13 @@
     }
   </style>
 
-  <g stroke="#8B5CF6" stroke-opacity="0.32" fill="#101522">
+  <g stroke="#FFFFFF" stroke-opacity="0.32" fill="#121212">
     <rect x="40" y="28" width="64" height="64" rx="18"/>
     <rect x="178" y="28" width="64" height="64" rx="18"/>
     <rect x="316" y="28" width="64" height="64" rx="18"/>
   </g>
 
-  <g stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <g stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <g transform="translate(60,48) scale(0.8)">
       <rect x="2" y="4" width="20" height="16" rx="3"/>
       <path d="M2 9h20"/>
@@ -52,13 +52,13 @@
     </g>
   </g>
 
-  <circle cx="362" cy="34" r="4" fill="#48E6A1" class="pm-pulse"/>
+  <circle cx="362" cy="34" r="4" fill="#FFFFFF" class="pm-pulse"/>
 
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.4" marker-end="url(#pmArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.4" marker-end="url(#pmArrow)">
     <line x1="104" y1="60" x2="174" y2="60" class="pm-march"/>
     <line x1="242" y1="60" x2="312" y2="60" class="pm-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="pm-travel pm-d1" cx="108" cy="60" r="3"/>
     <circle class="pm-travel pm-d2" cx="246" cy="60" r="3"/>
   </g>

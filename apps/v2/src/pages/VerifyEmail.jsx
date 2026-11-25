@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, ArrowLeft, Loader2, Sparkles, ShieldCheck } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { useToast } from '../context/ToastContext';
-import Logo from '../components/Logo';
-import { Button } from '../components/ui/Button';
-import { LiveChip } from '../components/ui/Display';
+import AuthShell from '../components/auth/AuthShell';
 
 export default function VerifyEmail() {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -105,99 +103,78 @@ export default function VerifyEmail() {
     };
 
     return (
-        <div className="auth-layout">
-            <div className="auth-panel">
-                <div className="auth-inner">
-                    <div className="mb-6 flex items-center justify-between">
-                        <Logo />
-                        <Link
-                            to="/login"
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
-                            style={{ color: 'var(--muted-foreground)' }}
-                        >
-                            <ArrowLeft className="h-3.5 w-3.5" />
-                            Back to login
-                        </Link>
+        <AuthShell
+            legal={false}
+            eyebrow="01 // VERIFY EMAIL"
+            headline="Confirm your account address."
+            description="One-time email verification ensures alert emails and billing notices reach the right inbox."
+        >
+            <div className="noir-panel p-6 sm:p-8">
+                <div className="mb-6 text-center">
+                    <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/[0.14] bg-[#050505]">
+                        <Mail className="h-5 w-5 text-[#F5F5F4]" aria-hidden="true" />
                     </div>
-
-                    <div className="text-center mb-6">
-                        <div
-                            className="flex h-12 w-12 items-center justify-center rounded-2xl mx-auto mb-4"
-                            style={{ background: 'var(--accent)', color: 'var(--primary)' }}
-                        >
-                            <Mail className="h-6 w-6" />
-                        </div>
-                        <h1 className="auth-title !text-2xl mb-2">Verify your email</h1>
-                        <p className="auth-desc">
-                            We sent a 6-digit code to <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{email}</span>.<br />
-                            Please enter it below to activate your account.
-                        </p>
-                    </div>
-
-                    <form onSubmit={handleVerify} className="space-y-6">
-                        <div className="flex justify-center gap-2">
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    ref={el => inputRefs.current[index] = el}
-                                    type="text"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleChange(index, e.target.value)}
-                                    onKeyDown={(e) => handleKeyDown(index, e)}
-                                    onPaste={handlePaste}
-                                    className="w-12 h-14 text-center text-xl font-semibold rounded-xl transition-all"
-                                    style={{
-                                        background: 'var(--background)',
-                                        border: '1px solid var(--border)',
-                                        color: 'var(--foreground)'
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        <Button
-                            type="submit"
-                            size="lg"
-                            block
-                            loading={loading}
-                            disabled={otp.join('').length !== 6}
-                        >
-                            Verify Account
-                        </Button>
-                    </form>
-
-                    <div className="mt-6 text-center space-y-3">
-                        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                            Didn't receive the code?{' '}
-                            <button
-                                type="button"
-                                onClick={handleResend}
-                                className="font-semibold hover:underline underline-offset-4 transition-colors"
-                                style={{ color: 'var(--primary)' }}
-                            >
-                                Resend code
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="auth-aside">
-                <div style={{ maxWidth: 440 }}>
-                    <div className="mb-4">
-                        <LiveChip label="Account Activation" />
-                    </div>
-                    <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.2, color: 'var(--foreground)' }}>
-                        One step away from your live pulse dashboard.
-                    </h2>
-                    <p className="mt-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-base)', lineHeight: 'var(--leading-relaxed)' }}>
-                        Verifying your email ensures that your real-time alerts, weekly digests, and usage threshold warnings arrive promptly.
+                    <h1 className="text-xl font-semibold tracking-tight text-[#FFFFFF]">Verify your email</h1>
+                    <p className="mt-2 text-xs leading-relaxed text-[#969690]">
+                        We sent a 6-digit code to <span className="font-mono text-[#F5F5F4]">{email}</span>.
+                        <br />
+                        Enter it below to activate your account.
                     </p>
                 </div>
+
+                <form onSubmit={handleVerify} className="space-y-5">
+                    <div className="flex justify-center gap-2">
+                        {otp.map((digit, index) => (
+                            <input
+                                key={index}
+                                ref={el => inputRefs.current[index] = el}
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                aria-label={`Verification code digit ${index + 1}`}
+                                maxLength={1}
+                                value={digit}
+                                onChange={(e) => handleChange(index, e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(index, e)}
+                                onPaste={handlePaste}
+                                className="h-12 w-11 rounded-[2px] border border-white/[0.14] bg-[#050505] text-center font-mono text-lg font-semibold text-[#FFFFFF] transition-colors focus:border-[#FFFFFF] focus:outline-none"
+                            />
+                        ))}
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading || otp.join('').length !== 6}
+                        className="noir-btn noir-btn-primary w-full disabled:opacity-50"
+                    >
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+                        {loading ? 'Verifying...' : 'Verify account'}
+                    </button>
+                </form>
+
+                <div className="mt-5 space-y-3 text-center">
+                    <p className="text-xs text-[#969690]">
+                        Didn&apos;t receive the code?{' '}
+                        <button
+                            type="button"
+                            onClick={handleResend}
+                            className="font-medium text-[#F5F5F4] underline underline-offset-4 transition-colors hover:text-[#FFFFFF]"
+                        >
+                            Resend code
+                        </button>
+                    </p>
+
+                    <div>
+                        <Link
+                            to="/login"
+                            className="inline-flex items-center gap-1.5 font-mono text-xs text-[#969690] transition-colors hover:text-[#FFFFFF]"
+                        >
+                            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                            Back to sign in
+                        </Link>
+                    </div>
+                </div>
             </div>
-        </div>
+        </AuthShell>
     );
 }

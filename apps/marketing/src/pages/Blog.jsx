@@ -123,19 +123,19 @@ const filterCounts = filters.reduce((counts, filter) => {
 }, {});
 
 const categoryText = {
-    Product: 'text-violet-300/90',
-    Engineering: 'text-sky-300/90',
-    Analytics: 'text-teal-300/90',
-    Security: 'text-rose-300/90',
-    Guides: 'text-amber-300/90',
+    Product: 'text-[#FFFFFF]',
+    Engineering: 'text-[#F5F5F4]',
+    Analytics: 'text-[#C8C8C4]',
+    Security: 'text-[#F5F5F4]',
+    Guides: 'text-[#B3B3AF]',
 };
 
 const categoryAccents = {
-    Product: 'from-violet-400/80 via-violet-400/25',
-    Engineering: 'from-sky-400/80 via-sky-400/25',
-    Analytics: 'from-teal-400/80 via-teal-400/25',
-    Security: 'from-rose-400/80 via-rose-400/25',
-    Guides: 'from-amber-400/80 via-amber-400/25',
+    Product: 'bg-[#FFFFFF]',
+    Engineering: 'bg-white/50',
+    Analytics: 'bg-white/30',
+    Security: 'bg-[#FFFFFF]/60',
+    Guides: 'bg-white/25',
 };
 
 const featuredPath = ['Visitor', 'Signal', 'Event', 'Session', 'Insight', 'Decision'];
@@ -200,40 +200,40 @@ function ArticleCard({ post }) {
             href={post.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mkt-card mkt-card-hover group relative flex h-full flex-col overflow-hidden p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+            className="mkt-card mkt-card-hover group relative flex h-full flex-col overflow-hidden p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
         >
             <span
                 aria-hidden="true"
-                className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r to-transparent ${
-                    categoryAccents[post.category] || 'from-slate-400/80 via-slate-400/25'
+                className={`absolute inset-x-0 top-0 h-[2px] ${
+                    categoryAccents[post.category] || 'bg-white/25'
                 }`}
             />
             <div className="flex items-start justify-between gap-3">
                 <span
                     className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                        categoryText[post.category] || 'text-slate-300/90'
+                        categoryText[post.category] || 'text-[#C8C8C4]'
                     }`}
                 >
                     {post.number} — {post.category}
                 </span>
-                <span className="shrink-0 text-[11px] font-medium text-slate-500">
+                <span className="shrink-0 text-[11px] font-medium text-[#969690]">
                     {post.readingTime}
                 </span>
             </div>
 
-            <h3 className="mt-5 text-lg font-semibold leading-snug tracking-tight text-slate-100 transition-colors group-hover:text-violet-200">
+            <h3 className="mt-5 text-lg font-semibold leading-snug tracking-tight text-[#F5F5F4] transition-colors group-hover:text-[#F5F5F4]">
                 {post.title}
             </h3>
-            <p className="mt-3 text-sm leading-relaxed text-slate-400">
+            <p className="mt-3 text-sm leading-relaxed text-[#B3B3AF]">
                 {post.cardDescription || post.description}
             </p>
 
             <div className="mt-auto pt-6">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-[#969690]">
                         WebPulse Team · {post.published}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-300 transition-colors group-hover:text-violet-200">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#FFFFFF] transition-colors group-hover:text-[#F5F5F4]">
                         Read on DEV
                         <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </span>
@@ -251,7 +251,7 @@ function FeaturedCard({ post }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-labelledby="featured-article-title"
-                className="mkt-card mkt-card-hover group block overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                className="mkt-card mkt-card-hover group block overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
             >
                 <div className="lg:grid lg:grid-cols-[0.92fr_1.35fr]">
                     <div className="relative flex min-h-[19rem] flex-col justify-between overflow-hidden border-b border-white/[0.06] bg-[radial-gradient(circle_at_18%_12%,rgba(139,92,246,0.32),transparent_52%),linear-gradient(155deg,#151226_0%,#0B0F17_72%)] p-7 sm:p-9 lg:border-b-0 lg:border-r">
@@ -261,16 +261,16 @@ function FeaturedCard({ post }) {
                         />
 
                         <div className="relative flex items-center justify-between gap-3">
-                            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-300/90">
+                            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#FFFFFF]">
                                 From the article
                             </span>
-                            <span className="mkt-chip !border-white/10 !bg-white/[0.04] !text-slate-300">
+                            <span className="mkt-chip !border-white/10 !bg-white/[0.04] !text-[#C8C8C4]">
                                 Open source
                             </span>
                         </div>
 
                         <div className="relative my-9">
-                            <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+                            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#969690]">
                                 The path from activity to understanding
                             </p>
                             <ol className="mt-5">
@@ -282,11 +282,11 @@ function FeaturedCard({ post }) {
                                         {index < featuredPath.length - 1 && (
                                             <span
                                                 aria-hidden="true"
-                                                className="absolute left-[3px] top-2.5 h-full w-px bg-gradient-to-b from-violet-400/50 to-violet-400/5"
+                                                className="absolute left-[3px] top-2.5 h-full w-px bg-gradient-to-b from-[#FFFFFF]/50 to-[#FFFFFF]/10"
                                             />
                                         )}
-                                        <span className="relative h-1.5 w-1.5 shrink-0 rounded-full bg-violet-300 shadow-[0_0_12px_rgba(167,139,250,0.7)]" />
-                                        <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 transition-colors group-hover:text-slate-300">
+                                        <span className="relative h-1.5 w-1.5 shrink-0 rounded-full bg-[#FFFFFF] " />
+                                        <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#B3B3AF] transition-colors group-hover:text-[#C8C8C4]">
                                             {step}
                                         </span>
                                     </li>
@@ -295,7 +295,7 @@ function FeaturedCard({ post }) {
                         </div>
 
                         <div className="relative flex items-end justify-between gap-4">
-                            <p className="max-w-[13rem] font-['Plus_Jakarta_Sans'] text-2xl font-bold leading-tight tracking-tight text-slate-100">
+                            <p className="max-w-[13rem] font-['Plus_Jakarta_Sans'] text-2xl font-bold leading-tight tracking-tight text-[#F5F5F4]">
                                 Closer to what&apos;s happening.
                             </p>
                             <span
@@ -308,25 +308,25 @@ function FeaturedCard({ post }) {
                     </div>
 
                     <div className="p-6 sm:p-8 lg:p-10">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-violet-300/90">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFFFFF]">
                             Featured · {post.category}
                         </p>
                         <h2
                             id="featured-article-title"
-                            className="mkt-h3 mt-3 text-[1.45rem] transition-colors group-hover:text-violet-200 sm:text-[1.65rem]"
+                            className="mkt-h3 mt-3 text-[1.45rem] transition-colors group-hover:text-[#F5F5F4] sm:text-[1.65rem]"
                         >
                             {post.title}
                         </h2>
-                        <p className="mt-4 text-base font-medium leading-relaxed text-slate-200">
+                        <p className="mt-4 text-base font-medium leading-relaxed text-[#F5F5F4]">
                             {post.headline}
                         </p>
                         <p className="mkt-body mt-3">{post.description}</p>
 
                         <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.06] pt-5">
-                            <span className="text-xs text-slate-500">
+                            <span className="text-xs text-[#969690]">
                                 WebPulse Team · {post.published} · {post.readingTime}
                             </span>
-                            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-300 transition-colors group-hover:text-violet-200">
+                            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#FFFFFF] transition-colors group-hover:text-[#F5F5F4]">
                                 Read the article
                                 <ArrowRight
                                     className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
@@ -344,7 +344,7 @@ function FeaturedCard({ post }) {
 function FilterBar({ activeFilter, onChange }) {
     return (
         <div className="mt-10 flex flex-col gap-4 border-y border-white/[0.06] py-4 lg:flex-row lg:items-center lg:justify-between">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#969690]">
                 Filter by topic
             </p>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Filter articles by topic">
@@ -358,10 +358,10 @@ function FilterBar({ activeFilter, onChange }) {
                             type="button"
                             onClick={() => onChange(filter)}
                             aria-pressed={isActive}
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                 isActive
-                                    ? 'border-violet-400/40 bg-violet-600 text-white'
-                                    : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-violet-400/30 hover:text-slate-100'
+                                    ? 'border-[#FFFFFF] bg-[#FFFFFF] text-[#050505]'
+                                    : 'border-white/[0.08] bg-white/[0.03] text-[#B3B3AF] hover:border-[#FFFFFF]/35 hover:text-[#F5F5F4]'
                             }`}
                         >
                             {filter}
@@ -370,8 +370,8 @@ function FilterBar({ activeFilter, onChange }) {
                                     isActive
                                         ? 'bg-white/15 text-white'
                                         : count === 0
-                                          ? 'bg-white/[0.03] text-slate-600'
-                                          : 'bg-white/[0.05] text-slate-500'
+                                          ? 'bg-white/[0.03] text-[#8E8E88]'
+                                          : 'bg-white/[0.05] text-[#969690]'
                                 }`}
                             >
                                 {count}
@@ -435,17 +435,17 @@ export default function Blog() {
                             </a>
                         </div>
 
-                        <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-slate-500">
+                        <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium text-[#969690]">
                             <span>Product development</span>
-                            <span aria-hidden="true" className="text-slate-700">
+                            <span aria-hidden="true" className="text-[#8E8E88]">
                                 ·
                             </span>
                             <span>Engineering</span>
-                            <span aria-hidden="true" className="text-slate-700">
+                            <span aria-hidden="true" className="text-[#8E8E88]">
                                 ·
                             </span>
                             <span>Analytics</span>
-                            <span aria-hidden="true" className="text-slate-700">
+                            <span aria-hidden="true" className="text-[#8E8E88]">
                                 ·
                             </span>
                             <span>Security</span>
@@ -491,7 +491,7 @@ export default function Blog() {
                     </p>
 
                     {!isAllArticles && (
-                        <p className="mt-5 text-xs font-medium text-slate-500">
+                        <p className="mt-5 text-xs font-medium text-[#969690]">
                             Showing {filteredPosts.length} of {posts.length} articles
                             {activeFilter !== 'Changelog' ? ` in ${activeFilter}` : ''}.
                         </p>
@@ -505,10 +505,10 @@ export default function Blog() {
 
                     {isAllArticles && filteredPosts.length > 0 && (
                         <div className="mt-12 flex flex-wrap items-end justify-between gap-3">
-                            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#969690]">
                                 Latest articles
                             </h3>
-                            <span className="text-xs font-medium text-slate-600">
+                            <span className="text-xs font-medium text-[#8E8E88]">
                                 {latestPosts[0]?.number} — {latestPosts[latestPosts.length - 1]?.number}
                             </span>
                         </div>
@@ -536,14 +536,14 @@ export default function Blog() {
                         <Reveal className="mt-8">
                             <div className="mkt-card flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-8">
                                 <div className="flex items-start gap-4">
-                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
+                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
                                         <GitCommit
-                                            className="h-5 w-5 text-violet-300"
+                                            className="h-5 w-5 text-[#FFFFFF]"
                                             aria-hidden="true"
                                         />
                                     </span>
                                     <div>
-                                        <h3 className="text-base font-semibold tracking-tight text-slate-100">
+                                        <h3 className="text-base font-semibold tracking-tight text-[#F5F5F4]">
                                             No changelog posts published yet.
                                         </h3>
                                         <p className="mkt-body mt-2 text-sm">
@@ -614,21 +614,21 @@ export default function Blog() {
                                     href={update.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="mkt-card mkt-card-hover group flex h-full flex-col p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                    className="mkt-card mkt-card-hover group flex h-full flex-col p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                 >
                                     <div className="flex items-center justify-between gap-3">
-                                        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-violet-300/90">
+                                        <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFFFFF]">
                                             {update.label}
                                         </span>
-                                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-600">
+                                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8E8E88]">
                                             In development
                                         </span>
                                     </div>
-                                    <h3 className="mt-4 text-base font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-violet-200">
+                                    <h3 className="mt-4 text-base font-semibold tracking-tight text-[#F5F5F4] transition-colors group-hover:text-[#F5F5F4]">
                                         {update.title}
                                     </h3>
                                     <p className="mkt-body mt-2 text-sm">{update.description}</p>
-                                    <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-semibold text-violet-300 transition-colors group-hover:text-violet-200">
+                                    <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-semibold text-[#FFFFFF] transition-colors group-hover:text-[#F5F5F4]">
                                         {update.linkLabel}
                                         <ArrowUpRight
                                             className="h-3.5 w-3.5"
@@ -677,18 +677,18 @@ export default function Blog() {
                                             <Link
                                                 key={doc.title}
                                                 to={doc.to}
-                                                className="group flex flex-col rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 transition-colors hover:border-violet-400/30 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                                className="group flex flex-col rounded-[2px] border border-white/[0.07] bg-white/[0.02] p-4 transition-colors hover:border-[#FFFFFF]/35 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                             >
-                                                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.03]">
+                                                <span className="flex h-9 w-9 items-center justify-center rounded-[2px] border border-white/[0.07] bg-white/[0.03]">
                                                     <Icon
-                                                        className="h-4 w-4 text-violet-300"
+                                                        className="h-4 w-4 text-[#FFFFFF]"
                                                         aria-hidden="true"
                                                     />
                                                 </span>
-                                                <span className="mt-3 text-sm font-semibold text-slate-100 group-hover:text-violet-200">
+                                                <span className="mt-3 text-sm font-semibold text-[#F5F5F4] group-hover:text-[#F5F5F4]">
                                                     {doc.title}
                                                 </span>
-                                                <span className="mt-1 text-xs leading-relaxed text-slate-500">
+                                                <span className="mt-1 text-xs leading-relaxed text-[#969690]">
                                                     {doc.description}
                                                 </span>
                                             </Link>
@@ -708,7 +708,7 @@ export default function Blog() {
                         <div className="mkt-panel relative px-6 py-12 text-center sm:px-12">
                             <div
                                 aria-hidden="true"
-                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-[#FFFFFF]/10"
                             />
                             <div className="relative">
                                 <h2 className="mkt-h3 !text-2xl sm:!text-3xl">

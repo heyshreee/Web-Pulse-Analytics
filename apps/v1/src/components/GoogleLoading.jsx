@@ -2,15 +2,15 @@ import Logo from './Logo';
 
 export default function GoogleLoading() {
     return (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-4">
-            <div className="absolute top-6 left-6">
-                <Logo />
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] p-4 font-sans text-[#F5F5F4]">
+            <div className="absolute left-6 top-6">
+                <Logo className="[&_img]:!invert-0 [&_span]:!text-[#F5F5F4]" />
             </div>
 
             <div className="relative mb-6">
-                <div className="absolute inset-0 rounded-full border border-line border-t-ink animate-spin w-20 h-20 -m-1"></div>
-                <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center relative z-10 border border-line">
-                    <svg className="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div className="absolute -m-1 h-20 w-20 animate-spin rounded-full border border-white/[0.11] border-t-[#FFFFFF]" />
+                <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full border border-white/[0.14] bg-[#0A0A0A]">
+                    <svg className="h-8 w-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -19,14 +19,14 @@ export default function GoogleLoading() {
                 </div>
             </div>
 
-            <h2 className="text-sm font-semibold text-ink mb-1">Connecting Google account...</h2>
-            <p className="text-xs text-ink-muted max-w-xs text-center font-mono">
-                Securely authenticating with Google Workspace.
+            <h2 className="mb-1 text-base font-semibold tracking-tight text-[#FFFFFF]">Connecting Google account...</h2>
+            <p className="max-w-xs text-center font-mono text-xs text-[#969690]">
+                Authenticating your Google session with WebPulse.
             </p>
 
-            <div className="mt-8 flex items-center gap-2 text-[10px] font-mono text-ink-muted uppercase tracking-wider">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                Secure encrypted channel
+            <div className="mt-8 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#969690]">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                Encrypted OAuth handoff
             </div>
         </div>
     );

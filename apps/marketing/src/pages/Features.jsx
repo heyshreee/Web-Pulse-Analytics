@@ -38,7 +38,7 @@ import Reveal from '../components/marketing/Reveal';
 const SEO_TITLE = 'WebPulse Features — Real-Time Website Analytics';
 const SEO_DESCRIPTION =
   'Explore WebPulse features for real-time website analytics, visitor activity, traffic sources, custom events, and developer-friendly integrations.';
-const SEO_URL = 'https://obs-real-time-tracker.vercel.app/features';
+const SEO_URL = 'https://www.webpulseanalytics.tech/features';
 
 const SEO_META = [
   { selector: 'meta[name="description"]', name: 'description', content: SEO_DESCRIPTION },
@@ -123,11 +123,11 @@ const TOP_PAGES = [
 ];
 
 const SOURCES = [
-  { label: 'Direct', value: 38, color: '#8B5CF6' },
-  { label: 'google.com', value: 27, color: '#10B981' },
-  { label: 'x.com', value: 14, color: '#F59E0B' },
-  { label: 'github.com', value: 9, color: '#3B82F6' },
-  { label: 'Other referrers', value: 12, color: '#64748B' },
+  { label: 'Direct', value: 38, color: '#FFFFFF' },
+  { label: 'google.com', value: 27, color: '#D4D4D4' },
+  { label: 'x.com', value: 14, color: '#A3A3A3' },
+  { label: 'github.com', value: 9, color: '#737373' },
+  { label: 'Other referrers', value: 12, color: '#525252' },
 ];
 
 const DEVICES = [
@@ -152,19 +152,19 @@ function HeroPreview() {
     <div className="mkt-panel relative p-2">
       <div
         aria-hidden="true"
-        className="mkt-glow right-[-80px] top-[-100px] h-[240px] w-[240px] bg-violet-600/25"
+        className="mkt-glow right-[-80px] top-[-100px] h-[240px] w-[240px] bg-[#FFFFFF]/15"
       />
-      <div className="relative rounded-2xl border border-white/[0.06] bg-[#0B0F17]/80">
+      <div className="relative rounded-[2px] border border-white/[0.06] bg-[#0A0A0A]/95">
         <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-violet-500/15">
-              <Activity className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
+            <span className="flex h-6 w-6 items-center justify-center rounded-[2px] bg-[#FFFFFF]/12">
+              <Activity className="h-3.5 w-3.5 text-[#FFFFFF]" aria-hidden="true" />
             </span>
-            <p className="text-xs font-semibold text-slate-300">
-              webpulse.io <span aria-hidden="true" className="text-slate-600">/</span> overview
+            <p className="text-xs font-semibold text-[#C8C8C4]">
+              webpulse.io <span aria-hidden="true" className="text-[#8E8E88]">/</span> overview
             </p>
           </div>
-          <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium text-slate-400">
+          <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium text-[#B3B3AF]">
             Last 30 days
           </span>
         </div>
@@ -172,15 +172,15 @@ function HeroPreview() {
         <div className="grid grid-cols-3 divide-x divide-white/[0.06] border-b border-white/[0.06]">
           {HERO_STATS.map((stat) => (
             <div key={stat.label} className="px-3 py-3.5 sm:px-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#969690]">
                 {stat.label}
               </p>
-              <p className="metric-num mt-1.5 flex items-baseline gap-2 font-display text-lg font-bold text-slate-100">
+              <p className="metric-num mt-1.5 flex items-baseline gap-2 font-display text-lg font-bold text-[#F5F5F4]">
                 {stat.value}
                 {stat.live ? (
                   <span className="mkt-live-dot !h-1.5 !w-1.5" aria-hidden="true" />
                 ) : (
-                  <span className="text-[10px] font-semibold text-emerald-300">{stat.delta}</span>
+                  <span className="text-[10px] font-semibold text-[#FFFFFF]">{stat.delta}</span>
                 )}
               </p>
             </div>
@@ -189,17 +189,17 @@ function HeroPreview() {
 
         <div className="px-4 py-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#969690]">
               Page views
             </p>
-            <span className="metric-num text-[10px] text-slate-500">30 days</span>
+            <span className="metric-num text-[10px] text-[#969690]">30 days</span>
           </div>
           <div className="flex h-24 items-end gap-1" aria-hidden="true">
             {TRAFFIC_BARS.map((height, i) => (
               <span
                 key={i}
                 className={`flex-1 rounded-t-sm ${
-                  i >= TRAFFIC_BARS.length - 3 ? 'bg-violet-400/80' : 'bg-violet-500/25'
+                  i >= TRAFFIC_BARS.length - 3 ? 'bg-[#FFFFFF]' : 'bg-[#FFFFFF]/20'
                 }`}
                 style={{ height: `${height}%` }}
               />
@@ -207,7 +207,7 @@ function HeroPreview() {
           </div>
         </div>
       </div>
-      <p className="relative px-3 pb-1 pt-3 text-center text-[10px] text-slate-500">
+      <p className="relative px-3 pb-1 pt-3 text-center text-[10px] text-[#969690]">
         Illustrative sample data — not live production activity.
       </p>
     </div>
@@ -218,16 +218,16 @@ function VisualFrame({ title, meta = 'Sample data', note, children }) {
   return (
     <div className="mkt-card p-5 sm:p-6">
       <div className="mb-5 flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#969690]">
           {title}
         </p>
-        <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-slate-500">
+        <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-[#969690]">
           {meta}
         </span>
       </div>
       {children}
       {note && (
-        <p className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] leading-relaxed text-slate-500">
+        <p className="mt-5 border-t border-white/[0.06] pt-4 text-[11px] leading-relaxed text-[#969690]">
           {note}
         </p>
       )}
@@ -242,34 +242,34 @@ function LiveVisual() {
       note="Active visitors are counted over the last five minutes."
     >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[#FFFFFF]/30 bg-[#FFFFFF]/10 px-2.5 py-1 text-[11px] font-semibold text-[#FFFFFF]">
           <span className="mkt-live-dot !h-1.5 !w-1.5" aria-hidden="true" />
           128 active now
         </span>
-        <span className="text-[11px] text-slate-500">All projects</span>
+        <span className="text-[11px] text-[#969690]">All projects</span>
       </div>
       <ul className="space-y-2.5">
         {LIVE_ROWS.map((row) => (
           <li
             key={row.path}
-            className="flex items-center gap-3 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2.5"
+            className="flex items-center gap-3 rounded-[2px] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/10">
-              <Globe className="h-4 w-4 text-violet-300" aria-hidden="true" />
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[2px] bg-[#FFFFFF]/10">
+              <Globe className="h-4 w-4 text-[#FFFFFF]" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-xs font-semibold text-slate-200">
+              <span className="block truncate text-xs font-semibold text-[#F5F5F4]">
                 {row.title}
               </span>
-              <span className="block truncate font-mono text-[11px] text-slate-500">
+              <span className="block truncate font-mono text-[11px] text-[#969690]">
                 {row.path}
               </span>
             </span>
-            <span className="hidden text-right text-[11px] leading-relaxed text-slate-400 sm:block">
+            <span className="hidden text-right text-[11px] leading-relaxed text-[#B3B3AF] sm:block">
               <span className="block">{row.device}</span>
-              <span className="block text-slate-500">{row.location}</span>
+              <span className="block text-[#969690]">{row.location}</span>
             </span>
-            <span className="metric-num w-10 shrink-0 text-right text-[11px] text-slate-500">
+            <span className="metric-num w-10 shrink-0 text-right text-[11px] text-[#969690]">
               {row.time}
             </span>
           </li>
@@ -286,10 +286,10 @@ function TrafficVisual() {
         {['24h', '7d', '30d'].map((range) => (
           <span
             key={range}
-            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold ${
+            className={`rounded-[2px] px-2.5 py-1 text-[11px] font-semibold ${
               range === '30d'
-                ? 'bg-violet-500/15 text-violet-200 ring-1 ring-inset ring-violet-400/30'
-                : 'text-slate-500'
+                ? 'bg-[#FFFFFF]/12 text-[#F5F5F4] ring-1 ring-inset ring-[#FFFFFF]/40'
+                : 'text-[#969690]'
             }`}
           >
             {range}
@@ -301,29 +301,29 @@ function TrafficVisual() {
           <span
             key={i}
             className={`flex-1 rounded-t-sm ${
-              i >= TRAFFIC_BARS.length - 3 ? 'bg-violet-400/80' : 'bg-violet-500/25'
+              i >= TRAFFIC_BARS.length - 3 ? 'bg-[#FFFFFF]' : 'bg-[#FFFFFF]/20'
             }`}
             style={{ height: `${height}%` }}
           />
         ))}
       </div>
       <div className="mt-5 border-t border-white/[0.06] pt-4">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#969690]">
           Top pages
         </p>
         <ul className="space-y-2.5">
           {TOP_PAGES.slice(0, 3).map((page) => (
             <li key={page.path} className="flex items-center gap-3">
-              <span className="w-36 truncate font-mono text-[11px] text-slate-300 sm:w-44">
+              <span className="w-36 truncate font-mono text-[11px] text-[#C8C8C4] sm:w-44">
                 {page.path}
               </span>
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                 <span
-                  className="block h-full rounded-full bg-violet-500/70"
+                  className="block h-full rounded-full bg-[#FFFFFF]/75"
                   style={{ width: `${page.share}%` }}
                 />
               </span>
-              <span className="metric-num w-14 text-right text-[11px] text-slate-400">
+              <span className="metric-num w-14 text-right text-[11px] text-[#B3B3AF]">
                 {page.views.toLocaleString()}
               </span>
             </li>
@@ -344,7 +344,7 @@ function SourcesVisual() {
         {SOURCES.map((source) => (
           <li key={source.label}>
             <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
-              <span className="flex items-center gap-2 text-slate-300">
+              <span className="flex items-center gap-2 text-[#C8C8C4]">
                 <span
                   className="h-2 w-2 rounded-full"
                   style={{ backgroundColor: source.color }}
@@ -352,7 +352,7 @@ function SourcesVisual() {
                 />
                 {source.label}
               </span>
-              <span className="metric-num font-semibold text-slate-200">{source.value}%</span>
+              <span className="metric-num font-semibold text-[#F5F5F4]">{source.value}%</span>
             </div>
             <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
               <div
@@ -379,32 +379,32 @@ function AudienceVisual() {
           return (
             <div
               key={device.label}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3"
+              className="rounded-[2px] border border-white/[0.06] bg-white/[0.02] p-3"
             >
-              <Icon className="h-4 w-4 text-violet-300" aria-hidden="true" />
-              <p className="metric-num mt-2 text-lg font-bold text-slate-100">{device.value}%</p>
-              <p className="text-[11px] text-slate-500">{device.label}</p>
+              <Icon className="h-4 w-4 text-[#FFFFFF]" aria-hidden="true" />
+              <p className="metric-num mt-2 text-lg font-bold text-[#F5F5F4]">{device.value}%</p>
+              <p className="text-[11px] text-[#969690]">{device.label}</p>
             </div>
           );
         })}
       </div>
-      <p className="mb-3 mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+      <p className="mb-3 mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#969690]">
         Top locations
       </p>
       <ul className="space-y-3">
         {LOCATIONS.map((location) => (
           <li key={location.label} className="flex items-center gap-3 text-xs">
-            <span className="flex w-32 items-center gap-1.5 text-slate-300">
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-500" aria-hidden="true" />
+            <span className="flex w-32 items-center gap-1.5 text-[#C8C8C4]">
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-[#969690]" aria-hidden="true" />
               <span className="truncate">{location.label}</span>
             </span>
             <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
               <span
-                className="block h-full rounded-full bg-violet-400/70"
+                className="block h-full rounded-full bg-[#FFFFFF]/80"
                 style={{ width: `${(location.value / LOCATIONS[0].value) * 100}%` }}
               />
             </span>
-            <span className="metric-num w-9 text-right text-slate-400">{location.value}%</span>
+            <span className="metric-num w-9 text-right text-[#B3B3AF]">{location.value}%</span>
           </li>
         ))}
       </ul>
@@ -567,7 +567,7 @@ const ROADMAP_ITEMS = [
 
 const BADGE_TONES = {
   amber: 'border-amber-400/25 bg-amber-400/10 text-amber-300',
-  violet: 'border-violet-400/25 bg-violet-500/10 text-violet-300',
+  violet: 'border-[#FFFFFF]/30 bg-[#FFFFFF]/10 text-[#FFFFFF]',
 };
 
 function CoreFeature({ index, label, title, body, bullets, visual, flipped }) {
@@ -576,7 +576,7 @@ function CoreFeature({ index, label, title, body, bullets, visual, flipped }) {
     <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
       <Reveal className={flipped ? 'lg:order-2' : ''}>
         <p className="mkt-eyebrow">
-          <span className="metric-num text-slate-500">{index}</span>
+          <span className="metric-num text-[#969690]">{index}</span>
           <span className="h-px w-6 bg-white/15" aria-hidden="true" />
           {label}
         </p>
@@ -584,8 +584,8 @@ function CoreFeature({ index, label, title, body, bullets, visual, flipped }) {
         <p className="mkt-body mt-4 max-w-lg">{body}</p>
         <ul className="mt-6 space-y-2.5">
           {bullets.map((bullet) => (
-            <li key={bullet} className="flex items-start gap-2.5 text-sm text-slate-300">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" aria-hidden="true" />
+            <li key={bullet} className="flex items-start gap-2.5 text-sm text-[#C8C8C4]">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#FFFFFF]" aria-hidden="true" />
               {bullet}
             </li>
           ))}
@@ -603,8 +603,8 @@ function MiniFeature({ icon, label, title, body, points, to, linkLabel, badge, b
   return (
     <article className="mkt-card mkt-card-hover flex h-full flex-col p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-          <Icon className="h-5 w-5 text-violet-300" aria-hidden="true" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+          <Icon className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
         </div>
         {badge && (
           <span
@@ -616,15 +616,15 @@ function MiniFeature({ icon, label, title, body, points, to, linkLabel, badge, b
           </span>
         )}
       </div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-300/90">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#FFFFFF]">
         {label}
       </p>
-      <h3 className="mt-2 text-lg font-semibold tracking-tight text-slate-100">{title}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-slate-400">{body}</p>
+      <h3 className="mt-2 text-lg font-semibold tracking-tight text-[#F5F5F4]">{title}</h3>
+      <p className="mt-3 text-sm leading-relaxed text-[#B3B3AF]">{body}</p>
       <ul className="mt-5 space-y-2">
         {points.map((point) => (
-          <li key={point} className="flex items-start gap-2 text-xs text-slate-400">
-            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-violet-400/80" aria-hidden="true" />
+          <li key={point} className="flex items-start gap-2 text-xs text-[#B3B3AF]">
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#FFFFFF]" aria-hidden="true" />
             {point}
           </li>
         ))}
@@ -646,29 +646,29 @@ function RoadmapCard({ icon, title, status, body }) {
     <article className="mkt-card h-full p-5 sm:p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
+          className={`flex h-10 w-10 items-center justify-center rounded-[2px] border ${
             planned
-              ? 'border-violet-400/20 bg-violet-500/10'
+              ? 'border-white/15 bg-[#FFFFFF]/10'
               : 'border-white/[0.08] bg-white/[0.03]'
           }`}
         >
           <Icon
-            className={`h-5 w-5 ${planned ? 'text-violet-300' : 'text-slate-400'}`}
+            className={`h-5 w-5 ${planned ? 'text-[#FFFFFF]' : 'text-[#B3B3AF]'}`}
             aria-hidden="true"
           />
         </div>
         <span
           className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${
             planned
-              ? 'border-violet-400/25 bg-violet-500/10 text-violet-300'
-              : 'border-white/[0.08] bg-white/[0.03] text-slate-500'
+              ? 'border-[#FFFFFF]/30 bg-[#FFFFFF]/10 text-[#FFFFFF]'
+              : 'border-white/[0.08] bg-white/[0.03] text-[#969690]'
           }`}
         >
           {status}
         </span>
       </div>
-      <h3 className="text-base font-semibold tracking-tight text-slate-100">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-slate-400">{body}</p>
+      <h3 className="text-base font-semibold tracking-tight text-[#F5F5F4]">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-[#B3B3AF]">{body}</p>
     </article>
   );
 }
@@ -702,11 +702,11 @@ export default function Features() {
                   Read the documentation
                 </Link>
               </div>
-              <p className="mt-6 text-xs font-medium text-slate-500">
+              <p className="mt-6 text-xs font-medium text-[#969690]">
                 V1 preview
-                <span aria-hidden="true" className="mx-1.5 text-slate-700">·</span>
+                <span aria-hidden="true" className="mx-1.5 text-[#8E8E88]">·</span>
                 Open source
-                <span aria-hidden="true" className="mx-1.5 text-slate-700">·</span>
+                <span aria-hidden="true" className="mx-1.5 text-[#8E8E88]">·</span>
                 Free plan available
               </p>
             </Reveal>
@@ -758,12 +758,12 @@ export default function Features() {
             <div className="mkt-panel relative overflow-hidden p-7 sm:p-9">
               <div
                 aria-hidden="true"
-                className="mkt-glow right-[-120px] top-[-120px] h-[280px] w-[420px] bg-violet-600/15"
+                className="mkt-glow right-[-120px] top-[-120px] h-[280px] w-[420px] bg-[#FFFFFF]/10"
               />
               <div className="relative grid gap-8 lg:grid-cols-2 lg:items-center">
                 <div className="flex gap-5">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-violet-400/20 bg-violet-500/10">
-                    <Github className="h-6 w-6 text-violet-300" aria-hidden="true" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                    <Github className="h-6 w-6 text-[#FFFFFF]" aria-hidden="true" />
                   </div>
                   <div>
                     <p className="mkt-eyebrow">Open source</p>
@@ -813,9 +813,9 @@ export default function Features() {
             description={
               <>
                 These capabilities are not available today.{' '}
-                <strong className="font-semibold text-slate-300">Planned</strong> items appear in
+                <strong className="font-semibold text-[#C8C8C4]">Planned</strong> items appear in
                 the public roadmap;{' '}
-                <strong className="font-semibold text-slate-300">Not in V1</strong> items are not
+                <strong className="font-semibold text-[#C8C8C4]">Not in V1</strong> items are not
                 currently supported.
               </>
             }
@@ -837,7 +837,7 @@ export default function Features() {
             <div className="mkt-panel relative overflow-hidden px-6 py-14 text-center sm:px-12">
               <div
                 aria-hidden="true"
-                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-[#FFFFFF]/10"
               />
               <div className="relative">
                 <p className="mkt-eyebrow">Get started</p>

@@ -1,23 +1,27 @@
 import MarketingShell from '../components/marketing/MarketingShell';
 import Hero from '../components/landing/Hero';
-import StackBand from '../components/landing/StackBand';
+import ProductPreview from '../components/landing/ProductPreview';
+import PlatformFeatures from '../components/landing/PlatformFeatures';
 import Capabilities from '../components/landing/Capabilities';
-import LiveMap from '../components/landing/LiveMap';
-import Setup from '../components/landing/Setup';
-import Trust from '../components/landing/Trust';
+import Architecture from '../components/landing/Architecture';
+import DeveloperIntegration from '../components/landing/DeveloperIntegration';
+import UseCases from '../components/landing/UseCases';
 import PricingTeaser from '../components/landing/PricingTeaser';
+import LandingFaq from '../components/landing/LandingFaq';
 import FinalCta from '../components/landing/FinalCta';
 
 export default function Landing() {
   return (
-    <MarketingShell tone="hero">
+    <MarketingShell tone="hero" grid>
       <Hero />
-      <StackBand />
+      <ProductPreview />
+      <PlatformFeatures />
       <Capabilities />
-      <LiveMap />
-      <Setup />
-      <Trust />
+      <Architecture />
+      <DeveloperIntegration />
+      <UseCases />
       <PricingTeaser />
+      <LandingFaq />
       <FinalCta />
     </MarketingShell>
   );

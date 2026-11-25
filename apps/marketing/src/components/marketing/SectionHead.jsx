@@ -1,26 +1,28 @@
 import Reveal from './Reveal';
 
 /**
- * Consistent section heading used across the marketing surface.
- * `align="center"` is the default editorial treatment; `align="start"` is used
- * for split two-column sections.
+ * Editorial Noir section heading with optional numeric Swiss section index.
  */
 export default function SectionHead({
   eyebrow,
   title,
   description,
-  align = 'center',
+  align = 'left',
   className = '',
   children,
 }) {
   const centered = align === 'center';
   return (
     <Reveal
-      className={`${centered ? 'mx-auto max-w-3xl text-center' : 'max-w-2xl'} ${className}`.trim()}
+      className={`${centered ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl'} ${className}`.trim()}
     >
-      {eyebrow && <p className="mkt-eyebrow mb-4">{eyebrow}</p>}
+      {eyebrow && (
+        <p className="noir-meta mb-3 text-[#FFFFFF]">
+          {eyebrow}
+        </p>
+      )}
       <h2 className="mkt-h2">{title}</h2>
-      {description && <p className="mkt-lead mt-5">{description}</p>}
+      {description && <p className="mkt-lead mt-4">{description}</p>}
       {children}
     </Reveal>
   );

@@ -107,18 +107,20 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
 
     return (
         <div className="w-full">
-            <div className="text-center mb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl mx-auto mb-4" style={{ background: 'var(--accent)', color: 'var(--primary)' }}>
-                    <Mail className="h-6 w-6" />
+            <div className="mb-6 text-center">
+                <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/[0.14] bg-[#050505]">
+                    <Mail className="h-5 w-5 text-[#F5F5F4]" aria-hidden="true" />
                 </div>
-                <h2 className="auth-title !text-2xl mb-2">Verify your email</h2>
-                <p className="auth-desc">
-                    We sent a code to <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{email}</span>.<br />
-                    Please enter the 6-digit code below to continue.
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#969690]">Verification</p>
+                <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-[#FFFFFF]">Verify your email</h2>
+                <p className="mt-2 text-xs leading-relaxed text-[#969690]">
+                    We sent a 6-digit code to <span className="font-mono text-[#F5F5F4]">{email}</span>.
+                    <br />
+                    Enter the code below to continue.
                 </p>
             </div>
 
-            <form onSubmit={handleVerify} className="space-y-6">
+            <form onSubmit={handleVerify} className="space-y-5">
                 <div className="flex justify-center gap-2">
                     {otp.map((digit, index) => (
                         <input
@@ -127,17 +129,13 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                             type="text"
                             inputMode="numeric"
                             pattern="[0-9]*"
+                            aria-label={`Verification code digit ${index + 1}`}
                             maxLength={1}
                             value={digit}
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             onPaste={handlePaste}
-                            className="w-12 h-14 text-center text-xl font-semibold rounded-xl transition-all"
-                            style={{
-                                background: 'var(--background)',
-                                border: '1px solid var(--border)',
-                                color: 'var(--foreground)'
-                            }}
+                            className="h-12 w-11 rounded-[2px] border border-white/[0.14] bg-[#050505] text-center font-mono text-lg font-semibold text-[#FFFFFF] transition-colors focus:border-[#FFFFFF] focus:outline-none"
                         />
                     ))}
                 </div>
@@ -145,22 +143,20 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <button
                     type="submit"
                     disabled={loading || otp.join('').length !== 6}
-                    className="btn btn--block"
-                    style={{ minHeight: '44px', fontWeight: 600 }}
+                    className="noir-btn noir-btn-primary w-full disabled:opacity-50"
                 >
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
                     {loading ? 'Verifying...' : 'Verify account'}
                 </button>
             </form>
 
-            <div className="mt-6 text-center space-y-3">
-                <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                    Didn't receive the code?{' '}
+            <div className="mt-5 space-y-3 text-center">
+                <p className="text-xs text-[#969690]">
+                    Didn&apos;t receive the code?{' '}
                     <button
                         type="button"
                         onClick={handleResend}
-                        className="font-semibold hover:underline underline-offset-4 transition-colors"
-                        style={{ color: 'var(--primary)' }}
+                        className="font-medium text-[#F5F5F4] underline underline-offset-4 transition-colors hover:text-[#FFFFFF]"
                     >
                         Resend code
                     </button>
@@ -171,9 +167,9 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                         <button
                             type="button"
                             onClick={onBack}
-                            className="btn btn--ghost btn--sm"
+                            className="inline-flex items-center gap-1.5 font-mono text-xs text-[#969690] transition-colors hover:text-[#FFFFFF]"
                         >
-                            <ArrowLeft className="h-4 w-4" />
+                            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
                             Back to login
                         </button>
                     </div>

@@ -101,30 +101,34 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
 
     return (
         <div className="w-full">
-            <div className="text-center mb-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-subtle mx-auto mb-3">
-                    <Mail className="h-5 w-5 text-ink" />
+            <div className="mb-6 text-center">
+                <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/[0.14] bg-[#050505]">
+                    <Mail className="h-5 w-5 text-[#F5F5F4]" aria-hidden="true" />
                 </div>
-                <h2 className="text-lg font-semibold text-ink mb-1">Verify your email</h2>
-                <p className="text-xs text-ink-muted">
-                    We sent a code to <span className="font-mono text-ink">{email}</span>.<br />
-                    Please enter the 6-digit code below to continue.
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#969690]">Verification</p>
+                <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-[#FFFFFF]">Verify your email</h2>
+                <p className="mt-2 text-xs leading-relaxed text-[#969690]">
+                    We sent a 6-digit code to <span className="font-mono text-[#F5F5F4]">{email}</span>.
+                    <br />
+                    Enter the code below to continue.
                 </p>
             </div>
 
             <form onSubmit={handleVerify} className="space-y-5">
-                <div className="flex justify-center gap-1.5">
+                <div className="flex justify-center gap-2">
                     {otp.map((digit, index) => (
                         <input
                             key={index}
                             ref={el => inputRefs.current[index] = el}
                             type="text"
+                            inputMode="numeric"
+                            aria-label={`Verification code digit ${index + 1}`}
                             maxLength={1}
                             value={digit}
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             onPaste={handlePaste}
-                            className="w-10 h-12 bg-black border border-line rounded text-center text-lg font-mono font-semibold text-ink focus:outline-none focus:border-line-strong transition-colors"
+                            className="h-12 w-11 rounded-[2px] border border-white/[0.14] bg-[#050505] text-center font-mono text-lg font-semibold text-[#FFFFFF] transition-colors focus:border-[#FFFFFF] focus:outline-none"
                         />
                     ))}
                 </div>
@@ -132,30 +136,32 @@ export default function OTPVerification({ email, onSuccess, onBack }) {
                 <button
                     type="submit"
                     disabled={loading || otp.join('').length !== 6}
-                    className="mkt-btn mkt-btn-primary w-full h-8 text-xs disabled:opacity-50"
+                    className="mkt-btn mkt-btn-primary mkt-btn-lg w-full disabled:opacity-50"
                 >
-                    {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
                     {loading ? 'Verifying...' : 'Verify account'}
                 </button>
             </form>
 
-            <div className="mt-5 text-center space-y-3">
-                <p className="text-xs text-ink-muted">
-                    Didn't receive code?{' '}
+            <div className="mt-5 space-y-3 text-center">
+                <p className="text-xs text-[#969690]">
+                    Didn&apos;t receive a code?{' '}
                     <button
+                        type="button"
                         onClick={handleResend}
-                        className="text-ink font-medium hover:underline"
+                        className="font-medium text-[#F5F5F4] underline underline-offset-4 hover:text-[#FFFFFF]"
                     >
-                        Resend
+                        Resend code
                     </button>
                 </p>
 
                 {onBack && (
                     <button
+                        type="button"
                         onClick={onBack}
-                        className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted hover:text-ink transition-colors"
+                        className="inline-flex items-center gap-1.5 font-mono text-xs text-[#969690] transition-colors hover:text-[#FFFFFF]"
                     >
-                        <ArrowLeft className="h-3 w-3" />
+                        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
                         Back
                     </button>
                 )}

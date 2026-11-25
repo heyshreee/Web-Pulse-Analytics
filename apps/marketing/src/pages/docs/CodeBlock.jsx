@@ -4,62 +4,57 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export default function CodeBlock({ code, language = 'javascript', title }) {
-    const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(code);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-    return (
-        <div className="mkt-panel">
-            <div className="flex items-center justify-between border-b border-white/[0.07] bg-white/[0.02] px-4 py-3">
-                <div className="flex items-center gap-3">
-                    <div className="flex gap-1.5" aria-hidden="true">
-                        <div className="h-3 w-3 rounded-full bg-red-500/60"></div>
-                        <div className="h-3 w-3 rounded-full bg-amber-500/60"></div>
-                        <div className="h-3 w-3 rounded-full bg-emerald-500/60"></div>
-                    </div>
-                    <span className="ml-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">{title || language}</span>
-                </div>
-                <button
-                    type="button"
-                    onClick={handleCopy}
-                    aria-label="Copy code"
-                    className="inline-flex items-center gap-2 rounded-lg border border-transparent px-3 py-1.5 text-slate-400 transition-all hover:border-white/10 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
-                >
-                    {copied ? (
-                        <>
-                            <Check className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-                            <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400">Copied</span>
-                        </>
-                    ) : (
-                        <>
-                            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-                            <span className="text-[10px] font-semibold uppercase tracking-widest">Copy Code</span>
-                        </>
-                    )}
-                </button>
-            </div>
-            <div className="overflow-x-auto p-6">
-                <SyntaxHighlighter
-                    language={language}
-                    style={atomDark}
-                    customStyle={{
-                        background: 'transparent',
-                        padding: 0,
-                        margin: 0,
-                        fontSize: '14px',
-                        lineHeight: '1.8',
-                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                        fontWeight: '500'
-                    }}
-                    wrapLongLines={true}
-                >
-                    {code}
-                </SyntaxHighlighter>
-            </div>
-        </div>
-    );
+  return (
+    <div className="border border-white/15 bg-[#050505]">
+      <div className="flex items-center justify-between border-b border-white/[0.11] bg-[#0B0B0B] px-4 py-3">
+        <span className="font-mono text-[13px] font-medium text-[#FFFFFF]">
+          {title || language}
+        </span>
+        <button
+          type="button"
+          onClick={handleCopy}
+          aria-label="Copy code"
+          className="inline-flex items-center gap-2 border border-white/15 bg-[#050505] px-3 py-1.5 font-mono text-[13px] text-[#C8C8C4] transition-colors hover:border-white/30 hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]"
+        >
+          {copied ? (
+            <>
+              <Check className="h-3.5 w-3.5 text-[#FFFFFF]" aria-hidden="true" />
+              <span className="text-[#FFFFFF]">Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+      <div className="overflow-x-auto p-5 sm:p-6">
+        <SyntaxHighlighter
+          language={language}
+          style={atomDark}
+          customStyle={{
+            background: 'transparent',
+            padding: 0,
+            margin: 0,
+            fontSize: '13.5px',
+            lineHeight: '1.75',
+            fontFamily: '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+            fontWeight: '400',
+          }}
+          wrapLongLines={true}
+        >
+          {code}
+        </SyntaxHighlighter>
+      </div>
+    </div>
+  );
 }

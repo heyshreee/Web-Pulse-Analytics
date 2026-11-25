@@ -27,7 +27,7 @@ const DEVELOPER_SECURITY_URL = `${REPO_URL}/blob/HEAD/docs/security.md`;
 const SEO_TITLE = 'Security at WebPulse | Authentication, Data Protection & Disclosure';
 const SEO_DESCRIPTION =
     'Learn how WebPulse handles authentication, project isolation, tracking security, data protection, and responsible vulnerability disclosure.';
-const SEO_URL = 'https://obs-real-time-tracker.vercel.app/security';
+const SEO_URL = 'https://www.webpulseanalytics.tech/security';
 
 const SEO_META = [
     { selector: 'meta[name="description"]', name: 'description', content: SEO_DESCRIPTION },
@@ -212,7 +212,7 @@ const DATA_LIFECYCLE = [
 
 function Code({ children }) {
     return (
-        <code className="rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[0.85em] text-violet-300">
+        <code className="rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[0.85em] text-[#FFFFFF]">
             {children}
         </code>
     );
@@ -223,16 +223,16 @@ function SectionCard({ id, icon, kicker, title, summary, children }) {
     return (
         <section id={id} className="scroll-mt-28">
             <div className="mb-4 flex items-start gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                    <Icon className="h-[18px] w-[18px] text-violet-300" aria-hidden="true" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                    <Icon className="h-[18px] w-[18px] text-[#FFFFFF]" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
                     <p className="mkt-eyebrow">{kicker}</p>
-                    <h3 className="mt-1 text-lg font-semibold tracking-tight text-slate-100">{title}</h3>
-                    {summary && <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{summary}</p>}
+                    <h3 className="mt-1 text-lg font-semibold tracking-tight text-[#F5F5F4]">{title}</h3>
+                    {summary && <p className="mt-1.5 text-sm leading-relaxed text-[#B3B3AF]">{summary}</p>}
                 </div>
             </div>
-            <div className="space-y-4 text-sm leading-relaxed text-slate-400">{children}</div>
+            <div className="space-y-4 text-sm leading-relaxed text-[#B3B3AF]">{children}</div>
         </section>
     );
 }
@@ -240,10 +240,10 @@ function SectionCard({ id, icon, kicker, title, summary, children }) {
 function CodeFigure({ caption, lines }) {
     return (
         <figure className="mkt-panel">
-            <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-[#C8C8C4]">
                 {lines}
             </pre>
-            <figcaption className="border-t border-white/[0.07] px-4 py-2.5 text-[11px] text-slate-500">
+            <figcaption className="border-t border-white/[0.07] px-4 py-2.5 text-[11px] text-[#969690]">
                 {caption}
             </figcaption>
         </figure>
@@ -258,10 +258,10 @@ function StatusList({ tone = 'implemented', items }) {
             {items.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                     <Icon
-                        className={`mt-0.5 h-4 w-4 shrink-0 ${isImplemented ? 'text-emerald-400' : 'text-amber-400'}`}
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${isImplemented ? 'text-[#FFFFFF]' : 'text-amber-400'}`}
                         aria-hidden="true"
                     />
-                    <span className="text-slate-300">{item}</span>
+                    <span className="text-[#C8C8C4]">{item}</span>
                 </li>
             ))}
         </ul>
@@ -275,29 +275,29 @@ function Callout({ tone = 'note', title, children }) {
         danger: 'border-red-400/25 bg-red-500/[0.07]',
     };
     const accents = {
-        note: 'text-slate-300',
+        note: 'text-[#C8C8C4]',
         warn: 'text-amber-200',
         danger: 'text-red-200',
     };
     return (
-        <div className={`rounded-xl border p-4 text-sm leading-relaxed ${tones[tone]} ${accents[tone]}`}>
+        <div className={`rounded-[2px] border p-4 text-sm leading-relaxed ${tones[tone]} ${accents[tone]}`}>
             {title && <p className="mb-1.5 font-semibold">{title}</p>}
-            <div className="text-slate-300">{children}</div>
+            <div className="text-[#C8C8C4]">{children}</div>
         </div>
     );
 }
 
 function Disclosure({ summary, children }) {
     return (
-        <details className="group overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.02]">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-slate-200 transition-colors hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 [&::-webkit-details-marker]:hidden">
+        <details className="group overflow-hidden rounded-[2px] border border-white/[0.07] bg-white/[0.02]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-[#F5F5F4] transition-colors hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 [&::-webkit-details-marker]:hidden">
                 {summary}
                 <ChevronRight
-                    className="h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 group-open:rotate-90"
+                    className="h-4 w-4 shrink-0 text-[#969690] transition-transform duration-200 group-open:rotate-90"
                     aria-hidden="true"
                 />
             </summary>
-            <div className="space-y-3 border-t border-white/[0.07] px-4 py-4 text-sm leading-relaxed text-slate-400">
+            <div className="space-y-3 border-t border-white/[0.07] px-4 py-4 text-sm leading-relaxed text-[#B3B3AF]">
                 {children}
             </div>
         </details>
@@ -306,24 +306,24 @@ function Disclosure({ summary, children }) {
 
 function CredentialCard({ name, badge, tone, description, example }) {
     const badges = {
-        public: 'border-emerald-400/25 bg-emerald-500/10 text-emerald-300',
+        public: 'border-[#FFFFFF]/35 bg-[#FFFFFF]/10 text-[#FFFFFF]',
         sensitive: 'border-amber-400/25 bg-amber-500/10 text-amber-300',
-        unavailable: 'border-white/[0.12] bg-white/[0.04] text-slate-400',
+        unavailable: 'border-white/[0.12] bg-white/[0.04] text-[#B3B3AF]',
     };
     return (
-        <div className="flex h-full flex-col rounded-xl border border-white/[0.07] bg-white/[0.02] p-5">
+        <div className="flex h-full flex-col rounded-[2px] border border-white/[0.07] bg-white/[0.02] p-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h4 className="font-mono text-sm font-semibold text-slate-100">{name}</h4>
+                <h4 className="font-mono text-sm font-semibold text-[#F5F5F4]">{name}</h4>
                 <span
                     className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] ${badges[tone]}`}
                 >
                     {badge}
                 </span>
             </div>
-            <p className="flex-1 text-sm leading-relaxed text-slate-400">{description}</p>
+            <p className="flex-1 text-sm leading-relaxed text-[#B3B3AF]">{description}</p>
             {example && (
-                <p className="mt-4 border-t border-white/[0.07] pt-3 text-xs text-slate-500">
-                    {example.label} <span className="mt-1 block font-mono text-[0.8rem] text-slate-300">{example.value}</span>
+                <p className="mt-4 border-t border-white/[0.07] pt-3 text-xs text-[#969690]">
+                    {example.label} <span className="mt-1 block font-mono text-[0.8rem] text-[#C8C8C4]">{example.value}</span>
                 </p>
             )}
         </div>
@@ -334,15 +334,15 @@ function OverviewCard({ icon, title, summary, points }) {
     const Icon = icon;
     return (
         <div className="mkt-card flex h-full flex-col p-6">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/10">
-                <Icon className="h-[18px] w-[18px] text-emerald-300" aria-hidden="true" />
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[2px] border border-[#FFFFFF]/30 bg-[#FFFFFF]/10">
+                <Icon className="h-[18px] w-[18px] text-[#FFFFFF]" aria-hidden="true" />
             </div>
-            <h3 className="text-base font-semibold text-slate-100">{title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400">{summary}</p>
+            <h3 className="text-base font-semibold text-[#F5F5F4]">{title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#B3B3AF]">{summary}</p>
             <ul className="mt-4 space-y-2">
                 {points.map((point) => (
-                    <li key={point} className="flex items-start gap-2 text-xs leading-relaxed text-slate-400">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" aria-hidden="true" />
+                    <li key={point} className="flex items-start gap-2 text-xs leading-relaxed text-[#B3B3AF]">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FFFFFF]" aria-hidden="true" />
                         <span>{point}</span>
                     </li>
                 ))}
@@ -430,10 +430,10 @@ export default function Security() {
                         <div className="mt-8 flex flex-wrap items-center gap-3">
                             <span className="mkt-chip">
                                 <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-                                Last reviewed: <span className="font-medium text-slate-200">October 2026</span>
+                                Last reviewed: <span className="font-medium text-[#F5F5F4]">October 2026</span>
                             </span>
                             <span className="mkt-chip">
-                                Scope: <span className="font-medium text-slate-200">the running service</span>
+                                Scope: <span className="font-medium text-[#F5F5F4]">the running service</span>
                             </span>
                         </div>
                     </Reveal>
@@ -441,7 +441,7 @@ export default function Security() {
                     {/* Mobile section navigator -------------------------------- */}
                     <nav
                         aria-label="Security topics"
-                        className="sticky top-16 z-30 -mx-5 mt-10 border-y border-white/[0.07] bg-[#070A10]/90 px-5 py-2.5 backdrop-blur-xl sm:-mx-8 sm:px-8 lg:hidden"
+                        className="sticky top-16 z-30 -mx-5 mt-10 border-y border-white/[0.07] bg-[#050505]/95 px-5 py-2.5  sm:-mx-8 sm:px-8 lg:hidden"
                     >
                         <ul className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             {ALL_SECTIONS.map((item) => (
@@ -453,10 +453,10 @@ export default function Security() {
                                             scrollTo(item.id);
                                         }}
                                         aria-current={activeId === item.id ? 'true' : undefined}
-                                        className={`inline-block rounded-full border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                        className={`inline-block rounded-full border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                             activeId === item.id
-                                                ? 'border-violet-400/40 bg-violet-500/15 text-violet-200'
-                                                : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-violet-400/30 hover:text-violet-200'
+                                                ? 'border-[#FFFFFF]/45 bg-[#FFFFFF]/12 text-[#F5F5F4]'
+                                                : 'border-white/[0.08] bg-white/[0.03] text-[#B3B3AF] hover:border-[#FFFFFF]/35 hover:text-[#F5F5F4]'
                                         }`}
                                     >
                                         {item.label}
@@ -470,7 +470,7 @@ export default function Security() {
                     <Reveal>
                         <div className="mt-16">
                             <h2 className="mkt-h3">What WebPulse enforces today</h2>
-                            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-400">
+                            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#B3B3AF]">
                                 Three areas carry the security posture. Each one below is checked against the
                                 running service. Anything that is not implemented is listed as such further
                                 down this page rather than implied.
@@ -488,7 +488,7 @@ export default function Security() {
                         {/* Desktop navigator */}
                         <nav aria-label="On this page" className="hidden lg:block">
                             <div className="lg:sticky lg:top-28">
-                                <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                                     On this page
                                 </p>
                                 <div className="space-y-7">
@@ -496,7 +496,7 @@ export default function Security() {
                                         <div key={group.id}>
                                             <p
                                                 className={`mb-2 px-4 text-xs font-semibold transition-colors ${
-                                                    activeGroupId === group.id ? 'text-violet-300' : 'text-slate-500'
+                                                    activeGroupId === group.id ? 'text-[#FFFFFF]' : 'text-[#969690]'
                                                 }`}
                                             >
                                                 {group.label}
@@ -513,10 +513,10 @@ export default function Security() {
                                                                     scrollTo(item.id);
                                                                 }}
                                                                 aria-current={isActive ? 'true' : undefined}
-                                                                className={`block -ml-px border-l-2 py-1 pl-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                                                className={`block -ml-px border-l-2 py-1 pl-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                                                     isActive
-                                                                        ? 'border-violet-400 font-medium text-violet-300'
-                                                                        : 'border-transparent text-slate-400 hover:border-slate-600 hover:text-violet-300'
+                                                                        ? 'border-[#FFFFFF] font-medium text-[#FFFFFF]'
+                                                                        : 'border-transparent text-[#B3B3AF] hover:border-slate-600 hover:text-[#FFFFFF]'
                                                                 }`}
                                                             >
                                                                 {item.label}
@@ -538,7 +538,7 @@ export default function Security() {
                                     <h2 id={NAV_GROUPS[0].id} className="mkt-h3 scroll-mt-28">
                                         {NAV_GROUPS[0].label}
                                     </h2>
-                                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#969690]">
                                         {NAV_GROUPS[0].blurb}
                                     </p>
 
@@ -627,14 +627,14 @@ Console + protected API  (secret)
                                                 <Disclosure summary="How sessions work today">
                                                     <dl className="space-y-3">
                                                         <div>
-                                                            <dt className="font-semibold text-slate-200">Token lifetime</dt>
+                                                            <dt className="font-semibold text-[#F5F5F4]">Token lifetime</dt>
                                                             <dd>
                                                                 7 days from issue. There is no refresh flow — when the token
                                                                 expires you sign in again.
                                                             </dd>
                                                         </div>
                                                         <div>
-                                                            <dt className="font-semibold text-slate-200">Delivery</dt>
+                                                            <dt className="font-semibold text-[#F5F5F4]">Delivery</dt>
                                                             <dd>
                                                                 Set as an <Code>HttpOnly</Code> cookie named <Code>token</Code>.
                                                                 The token is never returned in a response body and is never
@@ -642,7 +642,7 @@ Console + protected API  (secret)
                                                             </dd>
                                                         </div>
                                                         <div>
-                                                            <dt className="font-semibold text-slate-200">Cookie flags</dt>
+                                                            <dt className="font-semibold text-[#F5F5F4]">Cookie flags</dt>
                                                             <dd>
                                                                 <Code>HttpOnly</Code> always; <Code>Secure</Code> and{' '}
                                                                 <Code>SameSite=None</Code> in production, <Code>SameSite=Lax</Code> in
@@ -650,14 +650,14 @@ Console + protected API  (secret)
                                                             </dd>
                                                         </div>
                                                         <div>
-                                                            <dt className="font-semibold text-slate-200">Sign-out</dt>
+                                                            <dt className="font-semibold text-[#F5F5F4]">Sign-out</dt>
                                                             <dd>
                                                                 Revokes the session on the server, so the token stops working
                                                                 even if it was copied out of the browser beforehand.
                                                             </dd>
                                                         </div>
                                                         <div>
-                                                            <dt className="font-semibold text-slate-200">Revoking a session</dt>
+                                                            <dt className="font-semibold text-[#F5F5F4]">Revoking a session</dt>
                                                             <dd>
                                                                 The Active Sessions panel in Account Settings lists the
                                                                 devices signed in to your account and lets you revoke any
@@ -671,7 +671,7 @@ Console + protected API  (secret)
                                                     planned one.
                                                 </Callout>
                                                 <p>Recommended practices for you:</p>
-                                                <ul className="list-inside list-disc space-y-2.5 text-slate-300">
+                                                <ul className="list-inside list-disc space-y-2.5 text-[#C8C8C4]">
                                                     <li>Use a strong, unique password and never share it</li>
                                                     <li>Sign out on shared devices, and change your password if you think someone else has used it</li>
                                                     <li>Treat password reset emails as sensitive — request a new one if one arrives unexpectedly</li>
@@ -708,7 +708,7 @@ Console + protected API  (secret)
 
 Every query is scoped server-side:  WHERE user_id = <session user>`}
                                                 />
-                                                <h4 className="text-sm font-semibold text-slate-200">Share links</h4>
+                                                <h4 className="text-sm font-semibold text-[#F5F5F4]">Share links</h4>
                                                 <p>
                                                     A project can publish a read-only report link. The link opens one
                                                     project&apos;s report — the last 30 days of traffic, top referrers,
@@ -735,7 +735,7 @@ Every query is scoped server-side:  WHERE user_id = <session user>`}
                                 <h2 id={NAV_GROUPS[1].id} className="mkt-h3 scroll-mt-28">
                                     {NAV_GROUPS[1].label}
                                 </h2>
-                                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#969690]">
                                     {NAV_GROUPS[1].blurb}
                                 </p>
 
@@ -849,12 +849,12 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                                 IP-derived location, page URLs, and user-agent details. Storage-level
                                                 protections are provided by the hosting provider, not asserted here.
                                             </p>
-                                            <h4 className="text-sm font-semibold text-slate-200">Data lifecycle</h4>
+                                            <h4 className="text-sm font-semibold text-[#F5F5F4]">Data lifecycle</h4>
                                             <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-[11rem_1fr]">
                                                 {DATA_LIFECYCLE.map((row) => (
                                                     <div key={row.term} className="contents">
-                                                        <dt className="text-sm font-semibold text-slate-200">{row.term}</dt>
-                                                        <dd className="text-sm leading-relaxed text-slate-400">{row.detail}</dd>
+                                                        <dt className="text-sm font-semibold text-[#F5F5F4]">{row.term}</dt>
+                                                        <dd className="text-sm leading-relaxed text-[#B3B3AF]">{row.detail}</dd>
                                                     </div>
                                                 ))}
                                             </dl>
@@ -874,7 +874,7 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                 <h2 id={NAV_GROUPS[2].id} className="mkt-h3 scroll-mt-28">
                                     {NAV_GROUPS[2].label}
                                 </h2>
-                                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#969690]">
                                     {NAV_GROUPS[2].blurb}
                                 </p>
 
@@ -937,7 +937,7 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                             title="Responsible disclosure"
                                             summary="A private channel for vulnerabilities, and what to send."
                                         >
-                                            <h4 className="text-sm font-semibold text-slate-200">
+                                            <h4 className="text-sm font-semibold text-[#F5F5F4]">
                                                 Found a potential security vulnerability?
                                             </h4>
                                             <p>
@@ -947,8 +947,8 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                                 Please do not include vulnerability details, exploit code, credentials,
                                                 tracking identifiers, or real visitor data in a public issue.
                                             </Callout>
-                                            <h4 className="text-sm font-semibold text-slate-200">How to report</h4>
-                                            <ul className="list-inside list-disc space-y-2.5 text-slate-300">
+                                            <h4 className="text-sm font-semibold text-[#F5F5F4]">How to report</h4>
+                                            <ul className="list-inside list-disc space-y-2.5 text-[#C8C8C4]">
                                                 <li>
                                                     Use GitHub private vulnerability reporting —{' '}
                                                     <a
@@ -986,8 +986,8 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                                 after a report and the response timelines. Check it before you send
                                                 anything.
                                             </p>
-                                            <h4 className="text-sm font-semibold text-slate-200">What to include</h4>
-                                            <ul className="list-inside list-disc space-y-2.5 text-slate-300">
+                                            <h4 className="text-sm font-semibold text-[#F5F5F4]">What to include</h4>
+                                            <ul className="list-inside list-disc space-y-2.5 text-[#C8C8C4]">
                                                 <li>The affected feature or endpoint</li>
                                                 <li>The potential impact</li>
                                                 <li>Safe, reproducible steps where possible</li>
@@ -1023,10 +1023,10 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                                 {CHECKLIST.map((item) => (
                                                     <li key={item} className="flex items-start gap-2.5">
                                                         <CheckCircle2
-                                                            className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400"
+                                                            className="mt-0.5 h-4 w-4 shrink-0 text-[#FFFFFF]"
                                                             aria-hidden="true"
                                                         />
-                                                        <span className="text-slate-300">{item}</span>
+                                                        <span className="text-[#C8C8C4]">{item}</span>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -1046,7 +1046,7 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                         <div className="mkt-panel relative mt-20 overflow-hidden px-6 py-12 text-center sm:px-12">
                             <div
                                 aria-hidden="true"
-                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-[#FFFFFF]/10"
                             />
                             <div className="relative">
                                 <h2 className="mkt-h3 !text-2xl sm:!text-3xl">Build with confidence.</h2>
@@ -1063,20 +1063,20 @@ Missing CSRF header  ->  403 on state-changing API routes`}
                                     </Link>
                                 </div>
                                 <div className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2">
-                                    <Link to="/privacy" className="rounded text-xs text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60">
+                                    <Link to="/privacy" className="rounded text-xs text-[#969690] transition-colors hover:text-[#C8C8C4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60">
                                         Privacy
                                     </Link>
-                                    <Link to="/terms" className="rounded text-xs text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60">
+                                    <Link to="/terms" className="rounded text-xs text-[#969690] transition-colors hover:text-[#C8C8C4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60">
                                         Terms
                                     </Link>
-                                    <Link to="/cookies" className="rounded text-xs text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60">
+                                    <Link to="/cookies" className="rounded text-xs text-[#969690] transition-colors hover:text-[#C8C8C4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60">
                                         Cookies
                                     </Link>
                                     <a
                                         href={DEVELOPER_SECURITY_URL}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="rounded text-xs text-slate-500 transition-colors hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                        className="rounded text-xs text-[#969690] transition-colors hover:text-[#C8C8C4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                     >
                                         Security policy
                                     </a>

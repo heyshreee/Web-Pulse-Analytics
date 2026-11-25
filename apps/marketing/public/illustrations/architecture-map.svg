@@ -3,7 +3,7 @@
 
   <defs>
     <marker id="amArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 10 5 0 10z" fill="#A78BFA" fill-opacity="0.75"/>
+      <path d="M0 0 10 5 0 10z" fill="#E5E5E5" fill-opacity="0.75"/>
     </marker>
     <pattern id="amDots" width="24" height="24" patternUnits="userSpaceOnUse">
       <circle cx="1.5" cy="1.5" r="1.2" fill="#94A3B8" fill-opacity="0.10"/>
@@ -47,13 +47,13 @@
 
   <!-- 1 — your site, inside its allowed-origins boundary -->
   <g class="am-fade am-s1">
-    <rect x="28" y="98" width="284" height="164" rx="22" stroke="#8B5CF6" stroke-opacity="0.34" stroke-dasharray="4 7"/>
-    <rect x="40" y="84" width="146" height="22" rx="11" fill="#0C111C" stroke="#8B5CF6" stroke-opacity="0.34"/>
-    <text x="52" y="99" font-size="9" font-weight="600" letter-spacing="1.6" fill="#A78BFA">ALLOWED ORIGINS</text>
+    <rect x="28" y="98" width="284" height="164" rx="22" stroke="#FFFFFF" stroke-opacity="0.34" stroke-dasharray="4 7"/>
+    <rect x="40" y="84" width="146" height="22" rx="11" fill="#0C111C" stroke="#FFFFFF" stroke-opacity="0.34"/>
+    <text x="52" y="99" font-size="9" font-weight="600" letter-spacing="1.6" fill="#E5E5E5">ALLOWED ORIGINS</text>
 
     <rect x="40" y="110" width="260" height="140" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <rect x="64" y="128" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(76,140) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="64" y="128" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(76,140) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <rect x="2" y="4" width="20" height="16" rx="3"/>
       <path d="M2 9h20"/>
       <path d="M6 6.5h.01M9.5 6.5h.01"/>
@@ -66,8 +66,8 @@
   <!-- 2 — WebPulse API -->
   <g class="am-fade am-s2">
     <rect x="352" y="110" width="250" height="140" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <rect x="376" y="128" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(388,140) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="376" y="128" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(388,140) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <rect x="2" y="4" width="20" height="7" rx="2"/>
       <rect x="2" y="13" width="20" height="7" rx="2"/>
       <path d="M6 7.5h.01M6 16.5h.01"/>
@@ -75,14 +75,14 @@
     <text x="436" y="146" font-size="13" font-weight="600" fill="#E2E8F0">WebPulse API</text>
     <text x="436" y="168" font-size="10.5" fill="#64748B">checks tracking ID</text>
     <text x="436" y="186" font-size="10.5" fill="#64748B">and allowed origin</text>
-    <circle cx="586" cy="124" r="4.5" fill="#48E6A1" class="am-pulse"/>
+    <circle cx="586" cy="124" r="4.5" fill="#FFFFFF" class="am-pulse"/>
   </g>
 
   <!-- 3 — project database -->
   <g class="am-fade am-s3">
     <rect x="654" y="110" width="262" height="140" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <rect x="678" y="128" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(690,140) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="678" y="128" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(690,140) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <ellipse cx="12" cy="6" rx="8" ry="3"/>
       <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/>
       <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>
@@ -102,8 +102,8 @@
   <!-- 4 — dashboard -->
   <g class="am-fade am-s4">
     <rect x="968" y="110" width="188" height="140" rx="18" fill="#0C111C" stroke="#94A3B8" stroke-opacity="0.16"/>
-    <rect x="1040" y="124" width="44" height="44" rx="12" fill="#8B5CF6" fill-opacity="0.14" stroke="#8B5CF6" stroke-opacity="0.32"/>
-    <g transform="translate(1052,136) scale(0.8)" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="1040" y="124" width="44" height="44" rx="12" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.32"/>
+    <g transform="translate(1052,136) scale(0.8)" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <path d="M3 20h18"/>
       <path d="M6 20V10M12 20V4M18 20v-7"/>
     </g>
@@ -112,12 +112,12 @@
   </g>
 
   <!-- Arrows -->
-  <g stroke="#A78BFA" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#amArrow)">
+  <g stroke="#E5E5E5" stroke-opacity="0.5" stroke-width="1.5" marker-end="url(#amArrow)">
     <line x1="300" y1="180" x2="346" y2="180" class="am-march"/>
     <line x1="602" y1="180" x2="648" y2="180" class="am-march"/>
     <line x1="916" y1="180" x2="962" y2="180" class="am-march"/>
   </g>
-  <g fill="#48E6A1">
+  <g fill="#FFFFFF">
     <circle class="am-travel am-d1" cx="306" cy="180" r="3.2"/>
     <circle class="am-travel am-d2" cx="608" cy="180" r="3.2"/>
     <circle class="am-travel am-d3" cx="922" cy="180" r="3.2"/>

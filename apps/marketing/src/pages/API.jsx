@@ -24,7 +24,7 @@ const navItems = [
 /** Inline `code` chip used inside running copy. */
 function InlineCode({ children }) {
     return (
-        <code className="rounded-md border border-white/[0.08] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[13px] text-violet-300">
+        <code className="rounded-md border border-white/[0.08] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[13px] text-[#FFFFFF]">
             {children}
         </code>
     );
@@ -49,23 +49,19 @@ function CodePanel({ code, language = 'javascript', title }) {
         <div className="mkt-panel">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.07] bg-white/[0.02] px-4 py-2.5">
                 <span className="flex items-center gap-2.5">
-                    <span className="flex gap-1.5" aria-hidden="true">
-                        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                    </span>
-                    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    <span className="font-mono text-[13px] text-[#FFFFFF]" aria-hidden="true">api/v1</span>
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                         {title || language}
                     </span>
                 </span>
                 <button
                     type="button"
                     onClick={handleCopy}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                    className="inline-flex items-center gap-1.5 rounded-[2px] border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#B3B3AF] transition-colors hover:bg-white/[0.06] hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                 >
                     {copied ? (
                         <>
-                            <Check className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
+                            <Check className="h-3.5 w-3.5 text-[#FFFFFF]" aria-hidden="true" />
                             Copied
                         </>
                     ) : (
@@ -87,8 +83,8 @@ function Section({ id, title, icon, children }) {
         <Reveal as="section" id={id} className="scroll-mt-24">
             <div className="mb-8 flex items-center gap-4">
                 {Icon && (
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                        <Icon className="h-5 w-5 text-violet-300" aria-hidden="true" />
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                        <Icon className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
                     </div>
                 )}
                 <h2 className="mkt-h3">{title}</h2>
@@ -102,7 +98,7 @@ function Section({ id, title, icon, children }) {
 
 function FlowBox({ label }) {
     return (
-        <div className="w-full rounded-lg border border-violet-400/20 bg-violet-500/10 px-4 py-2 text-center text-xs font-semibold text-violet-200">
+        <div className="w-full rounded-[2px] border border-white/15 bg-[#FFFFFF]/10 px-4 py-2 text-center text-xs font-semibold text-[#F5F5F4]">
             {label}
         </div>
     );
@@ -112,16 +108,16 @@ function FlowArrow({ label }) {
     return (
         <div className="my-1 flex items-center justify-center gap-2">
             {label && (
-                <span className="text-[10px] uppercase tracking-widest text-slate-500">{label}</span>
+                <span className="text-[10px] uppercase tracking-widest text-[#969690]">{label}</span>
             )}
-            <ArrowDown className="h-4 w-4 text-slate-600" aria-hidden="true" />
+            <ArrowDown className="h-4 w-4 text-[#8E8E88]" aria-hidden="true" />
         </div>
     );
 }
 
 function MethodBadge({ method }) {
     return (
-        <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-emerald-300">
+        <span className="rounded-full border border-[#FFFFFF]/35 bg-[#FFFFFF]/10 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-[#FFFFFF]">
             {method}
         </span>
     );
@@ -131,7 +127,7 @@ function MethodBadge({ method }) {
 function Step({ number, title, children }) {
     return (
         <div className="flex gap-5">
-            <span className="metric-num flex h-10 w-10 flex-none items-center justify-center rounded-full border border-violet-400/20 bg-violet-500/10 text-sm font-semibold text-violet-300">
+            <span className="metric-num flex h-10 w-10 flex-none items-center justify-center rounded-full border border-white/15 bg-[#FFFFFF]/10 text-sm font-semibold text-[#FFFFFF]">
                 {number}
             </span>
             <div className="min-w-0 flex-1">
@@ -194,7 +190,7 @@ export default function API() {
                         {/* Section navigation */}
                         <aside className="hidden lg:block">
                             <div className="sticky top-24">
-                                <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                                     On this page
                                 </p>
                                 <nav
@@ -205,7 +201,7 @@ export default function API() {
                                     {indicator && (
                                         <span
                                             aria-hidden="true"
-                                            className="pointer-events-none absolute inset-x-0 rounded-lg bg-violet-600/90 transition-all duration-300 ease-out"
+                                            className="pointer-events-none absolute inset-x-0 rounded-[2px] bg-[#FFFFFF]/12 border-l-2 border-[#FFFFFF] transition-colors duration-300 ease-out"
                                             style={{ top: indicator.top, height: indicator.height }}
                                         />
                                     )}
@@ -220,14 +216,14 @@ export default function API() {
                                                 ref={(el) => { itemRefs.current[item.id] = el; }}
                                                 onClick={() => scrollTo(item.id)}
                                                 aria-current={isActive ? 'true' : undefined}
-                                                className={`relative z-10 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                                className={`relative z-10 flex w-full items-center gap-2.5 rounded-[2px] px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                                     item.nested ? 'ml-4 text-[13px]' : ''
                                                 } ${
                                                     isActive
                                                         ? 'text-white'
                                                         : isGroupActive
-                                                            ? 'font-semibold text-violet-300'
-                                                            : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200'
+                                                            ? 'font-semibold text-[#FFFFFF]'
+                                                            : 'text-[#B3B3AF] hover:bg-white/[0.04] hover:text-[#F5F5F4]'
                                                 }`}
                                             >
                                                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -240,17 +236,17 @@ export default function API() {
                                 <div className="mt-6 space-y-1 border-t border-white/[0.07] pt-6">
                                     <Link
                                         to="/docs/api"
-                                        className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/[0.04] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                        className="group flex items-center gap-2.5 rounded-[2px] px-3 py-2 text-sm font-medium text-[#B3B3AF] transition-colors hover:bg-white/[0.04] hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                     >
-                                        <BookOpen className="h-4 w-4 text-slate-500 transition-colors group-hover:text-violet-300" aria-hidden="true" />
+                                        <BookOpen className="h-4 w-4 text-[#969690] transition-colors group-hover:text-[#FFFFFF]" aria-hidden="true" />
                                         Read the API docs
-                                        <ChevronRight className="ml-auto h-3.5 w-3.5 text-slate-600" aria-hidden="true" />
+                                        <ChevronRight className="ml-auto h-3.5 w-3.5 text-[#8E8E88]" aria-hidden="true" />
                                     </Link>
                                     <Link
                                         to="/docs/getting-started"
-                                        className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/[0.04] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                        className="group flex items-center gap-2.5 rounded-[2px] px-3 py-2 text-sm font-medium text-[#B3B3AF] transition-colors hover:bg-white/[0.04] hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                     >
-                                        <Zap className="h-4 w-4 text-slate-500 transition-colors group-hover:text-violet-300" aria-hidden="true" />
+                                        <Zap className="h-4 w-4 text-[#969690] transition-colors group-hover:text-[#FFFFFF]" aria-hidden="true" />
                                         Getting started guide
                                     </Link>
                                 </div>
@@ -262,7 +258,7 @@ export default function API() {
                             <Reveal>
                                 <div className="flex flex-wrap items-center gap-3">
                                     <p className="mkt-eyebrow">WebPulse API</p>
-                                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
+                                    <span className="inline-flex items-center gap-2 rounded-full border border-[#FFFFFF]/35 bg-[#FFFFFF]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#FFFFFF]">
                                         <span className="mkt-live-dot !h-1.5 !w-1.5" aria-hidden="true" />
                                         API Operational
                                     </span>
@@ -283,7 +279,7 @@ export default function API() {
 
                             {/* Compact section navigation on small screens */}
                             <div className="mt-12 lg:hidden">
-                                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                                     On this page
                                 </p>
                                 <nav
@@ -298,10 +294,10 @@ export default function API() {
                                                 type="button"
                                                 onClick={() => scrollTo(item.id)}
                                                 aria-current={isActive ? 'true' : undefined}
-                                                className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${
+                                                className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${
                                                     isActive
-                                                        ? 'border-violet-400/40 bg-violet-600 text-white'
-                                                        : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:text-slate-100'
+                                                        ? 'border-[#FFFFFF] bg-[#FFFFFF] text-[#050505]'
+                                                        : 'border-white/[0.08] bg-white/[0.03] text-[#B3B3AF] hover:text-[#F5F5F4]'
                                                 }`}
                                             >
                                                 {item.label}
@@ -313,12 +309,12 @@ export default function API() {
 
                             <div className="mt-16 space-y-20 divide-y divide-white/[0.06] lg:mt-20">
                                 <Section id="overview" title="Analytics you can build on." icon={BookOpen}>
-                                    <p className="text-lg leading-relaxed text-slate-300">
+                                    <p className="text-lg leading-relaxed text-[#C8C8C4]">
                                         WebPulse provides APIs for collecting website activity and accessing analytics data from your projects.
                                     </p>
 
                                     <div className="mkt-card p-6">
-                                        <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                        <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#B3B3AF]">
                                             Use the API to:
                                         </h3>
                                         <ul className="mt-5 space-y-3">
@@ -330,9 +326,9 @@ export default function API() {
                                                 'Build internal analytics tools',
                                                 'Connect WebPulse with your existing backend'
                                             ].map((item) => (
-                                                <li key={item} className="flex items-center gap-2.5 text-sm text-slate-300">
-                                                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
-                                                        <Check className="h-3 w-3 text-emerald-300" aria-hidden="true" />
+                                                <li key={item} className="flex items-center gap-2.5 text-sm text-[#C8C8C4]">
+                                                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#FFFFFF]/30 bg-[#FFFFFF]/10">
+                                                        <Check className="h-3 w-3 text-[#FFFFFF]" aria-hidden="true" />
                                                     </span>
                                                     {item}
                                                 </li>
@@ -352,11 +348,11 @@ export default function API() {
                                     </div>
                                     <div className="flex justify-center gap-4">
                                         <div className="flex w-40 flex-col items-center gap-1">
-                                            <ArrowDown className="h-4 w-4 text-slate-600" aria-hidden="true" />
+                                            <ArrowDown className="h-4 w-4 text-[#8E8E88]" aria-hidden="true" />
                                             <FlowBox label="Dashboard" />
                                         </div>
                                         <div className="flex w-40 flex-col items-center gap-1">
-                                            <ArrowDown className="h-4 w-4 text-slate-600" aria-hidden="true" />
+                                            <ArrowDown className="h-4 w-4 text-[#8E8E88]" aria-hidden="true" />
                                             <FlowBox label="REST API" />
                                         </div>
                                     </div>
@@ -384,9 +380,9 @@ export default function API() {
                                                     title="Tracking Snippet"
                                                     code={`<script src="${API_DOMAIN}/api/v1/track/script.js"></script>\n<script>\n  tracker('init', 'YOUR_TRACKING_ID');\n  tracker('track', 'page_view');\n</script>`}
                                                 />
-                                                <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] p-4">
+                                                <div className="flex items-start gap-3 rounded-[2px] border border-amber-500/20 bg-amber-500/[0.07] p-4">
                                                     <Terminal className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden="true" />
-                                                    <p className="text-sm leading-relaxed text-slate-300">
+                                                    <p className="text-sm leading-relaxed text-[#C8C8C4]">
                                                         Replace <InlineCode>{API_DOMAIN}</InlineCode> with your actual deployed API/CDN URL.
                                                     </p>
                                                 </div>
@@ -406,8 +402,8 @@ export default function API() {
                                 </Section>
 
                                 <Section id="auth" title="Protect your API credentials." icon={Lock}>
-                                    <p className="text-base leading-relaxed text-slate-300">
-                                        Sending tracking events and querying view counts use your project's <strong className="text-slate-100">tracking ID</strong>, sent in the <InlineCode>x-api-key</InlineCode> header.
+                                    <p className="text-base leading-relaxed text-[#C8C8C4]">
+                                        Sending tracking events and querying view counts use your project's <strong className="text-[#F5F5F4]">tracking ID</strong>, sent in the <InlineCode>x-api-key</InlineCode> header.
                                     </p>
 
                                     <CodePanel
@@ -416,13 +412,13 @@ export default function API() {
                                         code={`GET ${API_DOMAIN}/api/v1/analytics/count\nx-api-key: YOUR_TRACKING_ID`}
                                     />
 
-                                    <div className="flex items-start gap-4 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] p-6">
+                                    <div className="flex items-start gap-4 rounded-[2px] border border-amber-500/20 bg-amber-500/[0.07] p-6">
                                         <Lock className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" aria-hidden="true" />
                                         <div>
                                             <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
                                                 Security warning
                                             </h3>
-                                            <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                                            <p className="mt-2 text-sm leading-relaxed text-[#C8C8C4]">
                                                 Never expose console credentials in browser-side JavaScript, public repositories, or client applications.
                                                 For browser tracking, use the tracking ID / public tracking mechanism intended for the client-side tracker.
                                                 Keep console and server credentials on your server.
@@ -465,9 +461,9 @@ export default function API() {
                                                             </caption>
                                                             <thead>
                                                                 <tr className="border-b border-white/[0.07]">
-                                                                    <th scope="col" className="py-2.5 pr-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Parameter</th>
-                                                                    <th scope="col" className="py-2.5 pr-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Type</th>
-                                                                    <th scope="col" className="py-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Description</th>
+                                                                    <th scope="col" className="py-2.5 pr-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#969690]">Parameter</th>
+                                                                    <th scope="col" className="py-2.5 pr-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#969690]">Type</th>
+                                                                    <th scope="col" className="py-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#969690]">Description</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody className="divide-y divide-white/[0.05]">
@@ -478,15 +474,15 @@ export default function API() {
                                                                     ['title', 'string', 'Page title']
                                                                 ].map(([param, type, desc]) => (
                                                                     <tr key={param}>
-                                                                        <th scope="row" className="py-3 pr-6 font-mono text-sm font-medium text-slate-200">{param}</th>
-                                                                        <td className="py-3 pr-6 text-sm text-slate-400">{type}</td>
-                                                                        <td className="py-3 text-sm leading-snug text-slate-400">{desc}</td>
+                                                                        <th scope="row" className="py-3 pr-6 font-mono text-sm font-medium text-[#F5F5F4]">{param}</th>
+                                                                        <td className="py-3 pr-6 text-sm text-[#B3B3AF]">{type}</td>
+                                                                        <td className="py-3 text-sm leading-snug text-[#B3B3AF]">{desc}</td>
                                                                     </tr>
                                                                 ))}
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                    <p className="mt-4 text-xs leading-relaxed text-slate-500">
+                                                    <p className="mt-4 text-xs leading-relaxed text-[#969690]">
                                                         Fields beyond these are accepted but not persisted — only the documented fields are stored.
                                                     </p>
                                                 </div>
@@ -523,15 +519,15 @@ export default function API() {
                                 </Section>
 
                                 <Section id="tracker" title="Lightweight website tracking" icon={Code2}>
-                                    <p className="text-base leading-relaxed text-slate-300">
+                                    <p className="text-base leading-relaxed text-[#C8C8C4]">
                                         The WebPulse tracker provides a simple client-side interface for initializing a project and sending events.
                                         It sends events with <InlineCode>navigator.sendBeacon</InlineCode> when available and falls back to <InlineCode>fetch</InlineCode>.
                                     </p>
 
                                     <div className="space-y-6">
                                         <div className="mkt-card p-6">
-                                            <h3 className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-violet-400" aria-hidden="true" />
+                                            <h3 className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#C8C8C4]">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-[#FFFFFF]" aria-hidden="true" />
                                                 Method: init
                                             </h3>
                                             <p className="mkt-body mt-3">
@@ -546,8 +542,8 @@ export default function API() {
                                         </div>
 
                                         <div className="mkt-card p-6">
-                                            <h3 className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-violet-400" aria-hidden="true" />
+                                            <h3 className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#C8C8C4]">
+                                                <span className="h-1.5 w-1.5 rounded-full bg-[#FFFFFF]" aria-hidden="true" />
                                                 Method: track
                                             </h3>
                                             <p className="mkt-body mt-3">
@@ -572,28 +568,28 @@ export default function API() {
 
                                 <Section id="security" title="Keep your analytics integration secure." icon={Shield}>
                                     <div className="mkt-card p-6">
-                                        <h3 className="flex items-center gap-2.5 text-sm font-semibold text-slate-100">
-                                            <KeyRound className="h-5 w-5 text-violet-300" aria-hidden="true" />
+                                        <h3 className="flex items-center gap-2.5 text-sm font-semibold text-[#F5F5F4]">
+                                            <KeyRound className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
                                             Use the correct credential
                                         </h3>
                                         <div className="mt-6 grid gap-6 sm:grid-cols-2">
                                             <div>
-                                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">Tracking ID</p>
+                                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#FFFFFF]">Tracking ID</p>
                                                 <p className="mkt-body mt-2 !text-sm">
                                                     Designed for client-side tracking in the browser.
                                                 </p>
-                                                <p className="mt-3 flex items-center gap-2 text-sm text-slate-300">
-                                                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                                                <p className="mt-3 flex items-center gap-2 text-sm text-[#C8C8C4]">
+                                                    <ArrowRight className="h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                                                     Client-side tracking
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">Console credentials</p>
+                                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#FFFFFF]">Console credentials</p>
                                                 <p className="mkt-body mt-2 !text-sm">
                                                     For protected server/API requests from your backend.
                                                 </p>
-                                                <p className="mt-3 flex items-center gap-2 text-sm text-slate-300">
-                                                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                                                <p className="mt-3 flex items-center gap-2 text-sm text-[#C8C8C4]">
+                                                    <ArrowRight className="h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                                                     Protected server/API requests
                                                 </p>
                                             </div>
@@ -601,12 +597,12 @@ export default function API() {
                                     </div>
 
                                     <div className="mkt-card p-6">
-                                        <h3 className="text-sm font-semibold text-slate-100">
+                                        <h3 className="text-sm font-semibold text-[#F5F5F4]">
                                             Never put console credentials inside:
                                         </h3>
                                         <div className="mt-5 grid gap-3 sm:grid-cols-2">
                                             {['React source', 'Browser JavaScript', 'GitHub repository', 'Public HTML', 'localStorage'].map((item) => (
-                                                <p key={item} className="flex items-center gap-2.5 text-sm text-slate-300">
+                                                <p key={item} className="flex items-center gap-2.5 text-sm text-[#C8C8C4]">
                                                     <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-rose-400/20 bg-rose-500/10">
                                                         <X className="h-3 w-3 text-rose-400" aria-hidden="true" />
                                                     </span>
@@ -618,10 +614,10 @@ export default function API() {
 
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         <div className="mkt-card p-6">
-                                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/10">
-                                                <Shield className="h-5 w-5 text-emerald-300" aria-hidden="true" />
+                                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[2px] border border-[#FFFFFF]/30 bg-[#FFFFFF]/10">
+                                                <Shield className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
                                             </div>
-                                            <h3 className="text-sm font-semibold text-slate-100">Restrict allowed origins</h3>
+                                            <h3 className="text-sm font-semibold text-[#F5F5F4]">Restrict allowed origins</h3>
                                             <p className="mkt-body mt-2">
                                                 Restrict browser-based tracking to approved domains to reduce unauthorized use of your tracking configuration.
                                             </p>
@@ -630,10 +626,10 @@ export default function API() {
                                             </p>
                                         </div>
                                         <div className="mkt-card p-6">
-                                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                                                <Terminal className="h-5 w-5 text-violet-300" aria-hidden="true" />
+                                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                                                <Terminal className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
                                             </div>
-                                            <h3 className="text-sm font-semibold text-slate-100">Use HTTPS & keep secrets server-side</h3>
+                                            <h3 className="text-sm font-semibold text-[#F5F5F4]">Use HTTPS & keep secrets server-side</h3>
                                             <p className="mkt-body mt-2">
                                                 Production API requests and tracking traffic should use HTTPS.
                                             </p>
