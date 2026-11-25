@@ -37,9 +37,9 @@ const PAGE_CHANNELS = {
 };
 
 const inputClass =
-    'w-full rounded-lg border border-white/[0.09] bg-white/[0.03] px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition-colors focus:border-violet-400/50 focus:outline-none focus:ring-2 focus:ring-violet-500/40';
+    'w-full rounded-[2px] border border-white/[0.09] bg-white/[0.03] px-3 py-2 text-sm text-[#F5F5F4] placeholder:text-[#969690] transition-colors focus:border-[#FFFFFF]/50 focus:outline-none focus:ring-2 focus:ring-[#FFFFFF]/50';
 
-const labelClass = 'mb-1.5 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500';
+const labelClass = 'mb-1.5 block text-xs font-semibold uppercase tracking-[0.12em] text-[#969690]';
 
 /**
  * Private contact channel for the legal pages.
@@ -109,23 +109,23 @@ export default function LegalContact({ kind = 'support', meta }) {
                     <Lock className="h-3.5 w-3.5" aria-hidden="true" />
                     Private channel
                 </p>
-                <p className="text-sm leading-relaxed text-slate-400">
+                <p className="text-sm leading-relaxed text-[#B3B3AF]">
                     This form goes straight to a monitored mailbox. Nothing you write here is posted to a
                     public issue tracker.
                 </p>
             </div>
 
             {status === 'sent' ? (
-                <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/[0.06] p-4 text-sm leading-relaxed text-emerald-200">
+                <div className="rounded-[2px] border border-[#FFFFFF]/30 bg-[#FFFFFF]/[0.06] p-4 text-sm leading-relaxed text-[#F5F5F4]">
                     <p className="font-semibold">Message sent.</p>
-                    <p className="mt-1 text-emerald-200/80">
+                    <p className="mt-1 text-[#C8C8C4]">
                         We have it, and we will reply to the address you gave us. If your request is urgent,
                         use the direct mailbox below.
                     </p>
                     <button
                         type="button"
                         onClick={() => setStatus('idle')}
-                        className="mt-3 text-sm font-semibold text-emerald-200 underline underline-offset-4 hover:text-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60"
+                        className="mt-3 text-sm font-semibold text-[#F5F5F4] underline underline-offset-4 hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         Send another message
                     </button>
@@ -149,7 +149,7 @@ export default function LegalContact({ kind = 'support', meta }) {
                                     </option>
                                 ))}
                             </select>
-                            <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{active.description}</p>
+                            <p className="mt-1.5 text-xs leading-relaxed text-[#969690]">{active.description}</p>
                         </div>
                     )}
 
@@ -197,7 +197,7 @@ export default function LegalContact({ kind = 'support', meta }) {
                                 placeholder="The address your WebPulse account uses"
                                 className={inputClass}
                             />
-                            <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                            <p className="mt-1.5 text-xs leading-relaxed text-[#969690]">
                                 Include this so we can find your account and verify the request.
                             </p>
                         </div>
@@ -238,7 +238,7 @@ export default function LegalContact({ kind = 'support', meta }) {
                         <p
                             id={`contact-error-${kind}`}
                             role="alert"
-                            className="rounded-lg border border-amber-400/20 bg-amber-500/[0.06] px-3 py-2 text-sm leading-relaxed text-amber-200"
+                            className="rounded-[2px] border border-amber-400/20 bg-amber-500/[0.06] px-3 py-2 text-sm leading-relaxed text-amber-200"
                         >
                             {error}
                         </p>
@@ -247,7 +247,7 @@ export default function LegalContact({ kind = 'support', meta }) {
                     <button
                         type="submit"
                         disabled={status === 'sending'}
-                        className="mkt-btn mkt-btn-primary mkt-btn-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="mkt-btn mkt-btn-primary mkt-btn-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         {status === 'sending' ? 'Sending\u2026' : 'Send message'}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -257,13 +257,13 @@ export default function LegalContact({ kind = 'support', meta }) {
 
             <div className="space-y-3 border-t border-white/[0.07] pt-5">
                 {mailbox && (
-                    <p className="flex items-start gap-2 text-sm leading-relaxed text-slate-400">
-                        <Mail className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                    <p className="flex items-start gap-2 text-sm leading-relaxed text-[#B3B3AF]">
+                        <Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                         <span>
                             Prefer email? Write to{' '}
                             <a
                                 href={`mailto:${mailbox}`}
-                                className="mkt-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                className="mkt-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                             >
                                 {mailbox}
                             </a>
@@ -273,15 +273,15 @@ export default function LegalContact({ kind = 'support', meta }) {
                 )}
 
                 {advisoriesUrl && (
-                    <p className="flex items-start gap-2 text-sm leading-relaxed text-slate-400">
-                        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                    <p className="flex items-start gap-2 text-sm leading-relaxed text-[#B3B3AF]">
+                        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                         <span>
                             Found a security problem? Do not post it publicly — use the{' '}
                             <a
                                 href={advisoriesUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mkt-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                className="mkt-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                             >
                                 private advisory channel
                                 <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
@@ -292,15 +292,15 @@ export default function LegalContact({ kind = 'support', meta }) {
                 )}
 
                 {issuesUrl && (
-                    <p className="flex items-start gap-2 text-sm leading-relaxed text-slate-400">
-                        <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+                    <p className="flex items-start gap-2 text-sm leading-relaxed text-[#B3B3AF]">
+                        <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-[#969690]" aria-hidden="true" />
                         <span>
                             Reporting a public bug or asking for a feature?{' '}
                             <a
                                 href={issuesUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mkt-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                className="mkt-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                             >
                                 Open a GitHub issue
                                 <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />

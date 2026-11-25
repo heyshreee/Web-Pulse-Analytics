@@ -49,8 +49,8 @@ const CONTRIBUTORS_API = 'https://api.github.com/repos/heyshreee/Web-Pulse-Analy
 
 const SEO_TITLE = 'WebPulse Community — Build WebPulse With Us';
 const SEO_DESCRIPTION =
-    'Join the WebPulse open-source community. Share ideas, report bugs, contribute code or documentation, and help shape the future of real-time web analytics.';
-const SEO_URL = 'https://obs-real-time-tracker.vercel.app/community';
+    'Join the WebPulse open-source community. Share ideas, report bugs, contribute code or documentation, and collaborate on real-time web analytics.';
+const SEO_URL = 'https://www.webpulseanalytics.tech/community';
 
 const SEO_META = [
     { selector: 'meta[name="description"]', name: 'description', content: SEO_DESCRIPTION },
@@ -222,10 +222,10 @@ const CONTRIBUTION_CELLS = CONTRIBUTION_COLUMNS.flat();
 
 const CONTRIBUTION_TONES = [
     'bg-white/[0.05]',
-    'bg-violet-500/20',
-    'bg-violet-500/40',
-    'bg-violet-400/65',
-    'bg-violet-300/90',
+    'bg-[#FFFFFF]/20',
+    'bg-[#FFFFFF]/40',
+    'bg-[#FFFFFF]/65',
+    'bg-[#FFFFFF]/90',
 ];
 
 const CONTRIBUTION_WAYS = [
@@ -270,9 +270,9 @@ const ROADMAP = [
         ],
         itemIcon: CircleCheck,
         tone: {
-            icon: 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300',
-            chip: 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300',
-            marker: 'text-emerald-300',
+            icon: 'border-[#FFFFFF]/30 bg-[#FFFFFF]/10 text-[#FFFFFF]',
+            chip: 'border-[#FFFFFF]/35 bg-[#FFFFFF]/10 text-[#FFFFFF]',
+            marker: 'text-[#FFFFFF]',
         },
     },
     {
@@ -288,9 +288,9 @@ const ROADMAP = [
         ],
         itemIcon: CircleDot,
         tone: {
-            icon: 'border-violet-400/20 bg-violet-500/10 text-violet-300',
-            chip: 'border-violet-400/25 bg-violet-500/10 text-violet-300',
-            marker: 'text-violet-300',
+            icon: 'border-white/15 bg-[#FFFFFF]/10 text-[#FFFFFF]',
+            chip: 'border-[#FFFFFF]/30 bg-[#FFFFFF]/10 text-[#FFFFFF]',
+            marker: 'text-[#FFFFFF]',
         },
     },
     {
@@ -307,9 +307,9 @@ const ROADMAP = [
         ],
         itemIcon: Sparkles,
         tone: {
-            icon: 'border-white/[0.08] bg-white/[0.03] text-slate-300',
-            chip: 'border-white/[0.08] bg-white/[0.03] text-slate-400',
-            marker: 'text-slate-500',
+            icon: 'border-white/[0.08] bg-white/[0.03] text-[#C8C8C4]',
+            chip: 'border-white/[0.08] bg-white/[0.03] text-[#B3B3AF]',
+            marker: 'text-[#969690]',
         },
     },
 ];
@@ -364,10 +364,10 @@ const START_STEPS = [
 
 const CARD_TONES = {
     violet: {
-        iconBox: 'border-violet-400/20 bg-violet-500/10',
-        icon: 'text-violet-300',
-        link: 'text-violet-300 group-hover:text-violet-200',
-        bullet: 'bg-violet-400/80',
+        iconBox: 'border-white/15 bg-[#FFFFFF]/10',
+        icon: 'text-[#FFFFFF]',
+        link: 'text-[#FFFFFF] group-hover:text-[#F5F5F4]',
+        bullet: 'bg-[#FFFFFF]',
     },
     amber: {
         iconBox: 'border-amber-400/20 bg-amber-400/10',
@@ -376,15 +376,15 @@ const CARD_TONES = {
         bullet: 'bg-amber-400/80',
     },
     emerald: {
-        iconBox: 'border-emerald-400/20 bg-emerald-400/10',
-        icon: 'text-emerald-300',
-        link: 'text-emerald-300 group-hover:text-emerald-200',
-        bullet: 'bg-emerald-400/80',
+        iconBox: 'border-[#FFFFFF]/30 bg-[#FFFFFF]/10',
+        icon: 'text-[#FFFFFF]',
+        link: 'text-[#FFFFFF] group-hover:text-[#F5F5F4]',
+        bullet: 'bg-[#FFFFFF]',
     },
     slate: {
         iconBox: 'border-white/[0.1] bg-white/[0.04]',
-        icon: 'text-slate-100',
-        link: 'text-violet-300 group-hover:text-violet-200',
+        icon: 'text-[#F5F5F4]',
+        link: 'text-[#FFFFFF] group-hover:text-[#F5F5F4]',
         bullet: 'bg-slate-500',
     },
 };
@@ -411,44 +411,44 @@ function HeroRepoPreview() {
         <div className="mkt-panel relative p-2">
             <div
                 aria-hidden="true"
-                className="mkt-glow right-[-70px] top-[-90px] h-[240px] w-[240px] bg-violet-600/25"
+                className="mkt-glow right-[-70px] top-[-90px] h-[240px] w-[240px] bg-[#FFFFFF]/15"
             />
-            <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0B0F17]/80">
+            <div className="relative overflow-hidden rounded-[2px] border border-white/[0.06] bg-[#0A0A0A]/95">
                 <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3.5">
                     <a
                         href={REPO_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="group flex min-w-0 items-center gap-2.5 rounded-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
-                            <Github className="h-4 w-4 text-slate-200" aria-hidden="true" />
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[2px] border border-white/[0.08] bg-white/[0.03]">
+                            <Github className="h-4 w-4 text-[#F5F5F4]" aria-hidden="true" />
                         </span>
                         <span className="min-w-0">
-                            <span className="block truncate text-xs font-semibold text-slate-200 transition-colors group-hover:text-violet-200">
+                            <span className="block truncate text-xs font-semibold text-[#F5F5F4] transition-colors group-hover:text-[#F5F5F4]">
                                 heyshreee / Web-Pulse-Analytics
                             </span>
-                            <span className="block text-[10px] text-slate-500">
+                            <span className="block text-[10px] text-[#969690]">
                                 Public repository
                             </span>
                         </span>
                     </a>
-                    <span className="shrink-0 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-300">
+                    <span className="shrink-0 rounded-full border border-[#FFFFFF]/35 bg-[#FFFFFF]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#FFFFFF]">
                         Open source
                     </span>
                 </div>
 
                 <div className="px-5 py-5">
                     <div className="flex items-center justify-between gap-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#969690]">
                             Contribution activity
                         </p>
-                        <span className="text-[10px] text-slate-600">Illustrative</span>
+                        <span className="text-[10px] text-[#8E8E88]">Illustrative</span>
                     </div>
                     <div className="mt-4 flex justify-center sm:justify-start">
                         <ContributionMosaic />
                     </div>
-                    <div className="mt-3 flex items-center justify-between gap-3 text-[10px] text-slate-500">
+                    <div className="mt-3 flex items-center justify-between gap-3 text-[10px] text-[#969690]">
                         <span>Every contribution counts.</span>
                         <span className="flex items-center gap-1" aria-hidden="true">
                             Less
@@ -463,15 +463,15 @@ function HeroRepoPreview() {
 
                     <div className="mt-5 flex flex-wrap gap-2">
                         <span className="mkt-chip !py-1 !text-[10px]">
-                            <ShieldCheck className="h-3 w-3 text-emerald-300" aria-hidden="true" />
+                            <ShieldCheck className="h-3 w-3 text-[#FFFFFF]" aria-hidden="true" />
                             MIT licensed
                         </span>
                         <span className="mkt-chip !py-1 !text-[10px]">
-                            <Radio className="h-3 w-3 text-violet-300" aria-hidden="true" />
+                            <Radio className="h-3 w-3 text-[#FFFFFF]" aria-hidden="true" />
                             V1 preview
                         </span>
                         <span className="mkt-chip !py-1 !text-[10px]">
-                            <Users className="h-3 w-3 text-slate-300" aria-hidden="true" />
+                            <Users className="h-3 w-3 text-[#C8C8C4]" aria-hidden="true" />
                             Contributions welcome
                         </span>
                     </div>
@@ -482,7 +482,7 @@ function HeroRepoPreview() {
                         href={CONTRIBUTING_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-[11px] font-medium text-slate-400 transition-colors hover:bg-white/[0.04] hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="flex items-center justify-between gap-2 rounded-[2px] px-2.5 py-2 text-[11px] font-medium text-[#B3B3AF] transition-colors hover:bg-white/[0.04] hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         Contribution guidelines
                         <ArrowUpRight className="h-3 w-3 shrink-0" aria-hidden="true" />
@@ -491,14 +491,14 @@ function HeroRepoPreview() {
                         href={ISSUES_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-[11px] font-medium text-slate-400 transition-colors hover:bg-white/[0.04] hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="flex items-center justify-between gap-2 rounded-[2px] px-2.5 py-2 text-[11px] font-medium text-[#B3B3AF] transition-colors hover:bg-white/[0.04] hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         Open issues
                         <ArrowUpRight className="h-3 w-3 shrink-0" aria-hidden="true" />
                     </a>
                 </div>
             </div>
-            <p className="relative px-3 pb-1 pt-3 text-center text-[10px] text-slate-500">
+            <p className="relative px-3 pb-1 pt-3 text-center text-[10px] text-[#969690]">
                 Illustrative contribution activity. Live repository data is on GitHub.
             </p>
         </div>
@@ -528,13 +528,13 @@ function InvolvedCard({
             {featured && (
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-violet-600/15 blur-3xl"
+                    className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#FFFFFF]/10 blur-3xl"
                 />
             )}
             <div className="relative">
                 <div className="flex items-start justify-between gap-3">
                     <span
-                        className={`flex h-11 w-11 items-center justify-center rounded-xl border ${styles.iconBox}`}
+                        className={`flex h-11 w-11 items-center justify-center rounded-[2px] border ${styles.iconBox}`}
                     >
                         <Icon
                             className={`h-5 w-5 transition-transform duration-200 group-hover:scale-110 ${styles.icon}`}
@@ -542,24 +542,24 @@ function InvolvedCard({
                         />
                     </span>
                     {featured && (
-                        <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                        <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#969690]">
                             Open source
                         </span>
                     )}
                 </div>
 
-                <h3 className="mt-5 text-lg font-semibold tracking-tight text-slate-100">
+                <h3 className="mt-5 text-lg font-semibold tracking-tight text-[#F5F5F4]">
                     {title}
                 </h3>
-                <p className="mt-1 text-sm font-medium text-slate-300">{subtitle}</p>
-                <p className="mt-3 text-sm leading-relaxed text-slate-400">{body}</p>
+                <p className="mt-1 text-sm font-medium text-[#C8C8C4]">{subtitle}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#B3B3AF]">{body}</p>
 
                 {items && items.length > 0 && (
                     <ul className="mt-5 space-y-2">
                         {items.map((item) => (
                             <li
                                 key={item}
-                                className="flex items-start gap-2 text-sm text-slate-400"
+                                className="flex items-start gap-2 text-sm text-[#B3B3AF]"
                             >
                                 <span
                                     className={`mt-[0.45rem] h-1 w-1 shrink-0 rounded-full ${styles.bullet}`}
@@ -579,7 +579,7 @@ function InvolvedCard({
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-1.5 rounded text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 ${styles.link}`}
+                    className={`inline-flex items-center gap-1.5 rounded text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60 ${styles.link}`}
                 >
                     {linkLabel}
                     <ArrowRight
@@ -600,16 +600,16 @@ function ContributorsCard() {
         <article className="mkt-card flex h-full flex-col p-6 sm:p-7">
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h3 className="text-lg font-semibold tracking-tight text-slate-100">
+                    <h3 className="text-lg font-semibold tracking-tight text-[#F5F5F4]">
                         Meet the contributors
                     </h3>
-                    <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-400">
+                    <p className="mt-2 max-w-md text-sm leading-relaxed text-[#B3B3AF]">
                         WebPulse contributions can come from developers, testers, designers,
                         technical writers, and analytics enthusiasts.
                     </p>
                 </div>
-                <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10 sm:flex">
-                    <Users className="h-5 w-5 text-violet-300" aria-hidden="true" />
+                <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10 sm:flex">
+                    <Users className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
                 </span>
             </div>
 
@@ -620,7 +620,7 @@ function ContributorsCard() {
                             {[0, 1, 2, 3].map((item) => (
                                 <div
                                     key={item}
-                                    className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
+                                    className="flex items-center gap-3 rounded-[2px] border border-white/[0.06] bg-white/[0.02] p-2.5"
                                 >
                                     <span className="skeleton h-10 w-10 shrink-0 rounded-full bg-white/[0.06]" />
                                     <span className="min-w-0 flex-1">
@@ -645,7 +645,7 @@ function ContributorsCard() {
                                     href={contributor.html_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 transition-colors hover:border-violet-400/25 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                    className="group flex items-center gap-3 rounded-[2px] border border-white/[0.06] bg-white/[0.02] p-2.5 transition-colors hover:border-[#FFFFFF]/30 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                 >
                                     {avatarsAllowed && contributor.avatar_url ? (
                                         <img
@@ -659,16 +659,16 @@ function ContributorsCard() {
                                     ) : (
                                         <span
                                             aria-hidden="true"
-                                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500/35 to-violet-500/10 text-xs font-semibold text-violet-200 ring-2 ring-white/10"
+                                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFFFFF]/30 to-[#FFFFFF]/5 text-xs font-semibold text-[#F5F5F4] ring-2 ring-white/10"
                                         >
                                             {initials(contributor.login)}
                                         </span>
                                     )}
                                     <span className="min-w-0">
-                                        <span className="block truncate text-sm font-semibold text-slate-200 transition-colors group-hover:text-violet-200">
+                                        <span className="block truncate text-sm font-semibold text-[#F5F5F4] transition-colors group-hover:text-[#F5F5F4]">
                                             {contributor.login}
                                         </span>
-                                        <span className="metric-num block text-[11px] text-slate-500">
+                                        <span className="metric-num block text-[11px] text-[#969690]">
                                             {contributor.contributions}{' '}
                                             {contributor.contributions === 1
                                                 ? 'contribution'
@@ -693,8 +693,8 @@ function ContributorsCard() {
                 )}
 
                 {status === 'loaded' && contributors.length === 0 && (
-                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5">
-                        <p className="text-sm leading-relaxed text-slate-400">
+                    <div className="rounded-[2px] border border-white/[0.07] bg-white/[0.02] p-5">
+                        <p className="text-sm leading-relaxed text-[#B3B3AF]">
                             Contributor details aren&apos;t listed yet. The GitHub contributors
                             page remains the source of truth for the current list.
                         </p>
@@ -702,21 +702,21 @@ function ContributorsCard() {
                 )}
 
                 {(status === 'unavailable' || status === 'error') && (
-                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5">
+                    <div className="rounded-[2px] border border-white/[0.07] bg-white/[0.02] p-5">
                         <div className="flex items-start gap-3">
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[2px] border border-white/[0.08] bg-white/[0.03]">
                                 <Github
-                                    className="h-4 w-4 text-slate-300"
+                                    className="h-4 w-4 text-[#C8C8C4]"
                                     aria-hidden="true"
                                 />
                             </span>
                             <div>
-                                <p className="text-sm font-medium text-slate-200">
+                                <p className="text-sm font-medium text-[#F5F5F4]">
                                     {status === 'unavailable'
                                         ? 'Contributor details are available on GitHub.'
                                         : "Contributor details couldn't be loaded right now."}
                                 </p>
-                                <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                                <p className="mt-1 text-sm leading-relaxed text-[#B3B3AF]">
                                     The GitHub contributors page remains the source of truth for
                                     current contributors and their work.
                                 </p>
@@ -734,7 +734,7 @@ function ContributorsCard() {
                                     href={item.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-[11px] font-medium text-slate-400 transition-colors hover:border-violet-400/25 hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                    className="flex items-center justify-between gap-2 rounded-[2px] border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-[11px] font-medium text-[#B3B3AF] transition-colors hover:border-[#FFFFFF]/30 hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                 >
                                     {item.label}
                                     <ArrowUpRight
@@ -749,7 +749,7 @@ function ContributorsCard() {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 border-t border-white/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[11px] leading-relaxed text-slate-500">
+                <p className="text-[11px] leading-relaxed text-[#969690]">
                     Contributor information is sourced from the project&apos;s GitHub repository
                     when available.
                 </p>
@@ -813,7 +813,7 @@ export default function Community() {
                                 </a>
                             </div>
 
-                            <p className="mt-6 max-w-md text-xs leading-relaxed text-slate-500">
+                            <p className="mt-6 max-w-md text-xs leading-relaxed text-[#969690]">
                                 No contribution is too small. Start with a question, an issue, or
                                 your first pull request.
                             </p>
@@ -854,10 +854,10 @@ export default function Community() {
                                 linkLabel="Explore the repository"
                                 extra={
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <span className="text-[11px] font-medium text-slate-500">
+                                        <span className="text-[11px] font-medium text-[#969690]">
                                             Repository
                                         </span>
-                                        <code className="rounded-lg border border-white/[0.07] bg-white/[0.03] px-2 py-1 font-mono text-[11px] text-slate-300">
+                                        <code className="rounded-[2px] border border-white/[0.07] bg-white/[0.03] px-2 py-1 font-mono text-[11px] text-[#C8C8C4]">
                                             github.com/heyshreee/Web-Pulse-Analytics
                                         </code>
                                     </div>
@@ -900,7 +900,7 @@ export default function Community() {
                                 href={NEW_BUG_URL}
                                 linkLabel="Report a bug"
                                 extra={
-                                    <div className="flex items-start gap-2.5 rounded-xl border border-amber-400/15 bg-amber-400/[0.06] p-3.5">
+                                    <div className="flex items-start gap-2.5 rounded-[2px] border border-amber-400/15 bg-amber-400/[0.06] p-3.5">
                                         <ShieldAlert
                                             className="mt-0.5 h-4 w-4 shrink-0 text-amber-300"
                                             aria-hidden="true"
@@ -924,8 +924,8 @@ export default function Community() {
                                 href={ISSUES_URL}
                                 linkLabel="Visit GitHub"
                                 extra={
-                                    <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.06] p-4">
-                                        <p className="text-xs leading-relaxed text-emerald-100/80">
+                                    <div className="rounded-[2px] border border-[#FFFFFF]/25 bg-[#FFFFFF]/[0.06] p-4">
+                                        <p className="text-xs leading-relaxed text-[#C8C8C4]">
                                             GitHub Issues is the current place to report problems
                                             and propose improvements. General questions and
                                             community discussions should use GitHub Discussions
@@ -965,16 +965,16 @@ export default function Community() {
                             return (
                                 <Reveal key={way.title} delay={(index % 5) * 60} className="h-full">
                                     <article className="mkt-card mkt-card-hover h-full p-5">
-                                        <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-violet-400/20 bg-violet-500/10">
+                                        <span className="flex h-9 w-9 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
                                             <Icon
-                                                className="h-4 w-4 text-violet-300"
+                                                className="h-4 w-4 text-[#FFFFFF]"
                                                 aria-hidden="true"
                                             />
                                         </span>
-                                        <h3 className="mt-4 text-sm font-semibold text-slate-100">
+                                        <h3 className="mt-4 text-sm font-semibold text-[#F5F5F4]">
                                             {way.title}
                                         </h3>
-                                        <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                                        <p className="mt-1.5 text-xs leading-relaxed text-[#B3B3AF]">
                                             {way.body}
                                         </p>
                                     </article>
@@ -987,23 +987,23 @@ export default function Community() {
                         <Reveal className="lg:col-span-5">
                             <article className="mkt-card flex h-full flex-col p-6 sm:p-7">
                                 <div className="flex items-start justify-between gap-3">
-                                    <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
+                                    <span className="flex h-11 w-11 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
                                         <Compass
-                                            className="h-5 w-5 text-violet-300"
+                                            className="h-5 w-5 text-[#FFFFFF]"
                                             aria-hidden="true"
                                         />
                                     </span>
-                                    <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                                    <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#969690]">
                                         3 steps
                                     </span>
                                 </div>
-                                <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-300/90">
+                                <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#FFFFFF]">
                                     New to open source?
                                 </p>
-                                <h3 className="mt-2 text-lg font-semibold tracking-tight text-slate-100">
+                                <h3 className="mt-2 text-lg font-semibold tracking-tight text-[#F5F5F4]">
                                     Start small. Take your time.
                                 </h3>
-                                <p className="mt-3 text-sm leading-relaxed text-slate-400">
+                                <p className="mt-3 text-sm leading-relaxed text-[#B3B3AF]">
                                     Read the contribution guidelines, check existing issues, and
                                     ask questions before beginning a large change.
                                 </p>
@@ -1011,14 +1011,14 @@ export default function Community() {
                                 <ol className="mt-6 space-y-4">
                                     {START_STEPS.map((step, index) => (
                                         <li key={step.title} className="flex gap-3">
-                                            <span className="metric-num flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-[10px] font-semibold text-violet-300">
+                                            <span className="metric-num flex h-7 w-7 shrink-0 items-center justify-center rounded-[2px] border border-white/[0.08] bg-white/[0.03] text-[10px] font-semibold text-[#FFFFFF]">
                                                 {String(index + 1).padStart(2, '0')}
                                             </span>
                                             <span>
-                                                <span className="block text-sm font-medium text-slate-200">
+                                                <span className="block text-sm font-medium text-[#F5F5F4]">
                                                     {step.title}
                                                 </span>
-                                                <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">
+                                                <span className="mt-0.5 block text-xs leading-relaxed text-[#969690]">
                                                     {step.body}
                                                 </span>
                                             </span>
@@ -1090,7 +1090,7 @@ export default function Community() {
                                             >
                                                 <div className="flex items-start justify-between gap-3">
                                                     <span
-                                                        className={`flex h-10 w-10 items-center justify-center rounded-xl border ${phase.tone.icon}`}
+                                                        className={`flex h-10 w-10 items-center justify-center rounded-[2px] border ${phase.tone.icon}`}
                                                     >
                                                         <Icon
                                                             className="h-5 w-5"
@@ -1103,17 +1103,17 @@ export default function Community() {
                                                         {phase.status}
                                                     </span>
                                                 </div>
-                                                <h3 className="mt-5 text-lg font-semibold tracking-tight text-slate-100">
+                                                <h3 className="mt-5 text-lg font-semibold tracking-tight text-[#F5F5F4]">
                                                     {phase.title}
                                                 </h3>
-                                                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                                                <p className="mt-2 text-sm leading-relaxed text-[#B3B3AF]">
                                                     {phase.description}
                                                 </p>
                                                 <ul className="mt-6 space-y-3 border-t border-white/[0.06] pt-5">
                                                     {phase.items.map((item) => (
                                                         <li
                                                             key={item}
-                                                            className="flex items-start gap-2.5 text-sm text-slate-300"
+                                                            className="flex items-start gap-2.5 text-sm text-[#C8C8C4]"
                                                         >
                                                             <ItemIcon
                                                                 className={`mt-0.5 h-4 w-4 shrink-0 ${phase.tone.marker}`}
@@ -1129,14 +1129,14 @@ export default function Community() {
                                 </div>
                             </div>
                         </Reveal>
-                        <p className="mt-4 text-xs leading-relaxed text-slate-500">
+                        <p className="mt-4 text-xs leading-relaxed text-[#969690]">
                             Roadmap labels reflect the project&apos;s current direction. Refer to
                             the repository and{' '}
                             <a
                                 href={RELEASES_URL}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="rounded font-medium text-slate-300 transition-colors hover:text-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                className="rounded font-medium text-[#C8C8C4] transition-colors hover:text-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                             >
                                 release notes
                             </a>{' '}
@@ -1166,20 +1166,20 @@ export default function Community() {
                                 >
                                     <article className="mkt-card mkt-card-hover h-full p-6">
                                         <div className="flex items-start justify-between gap-3">
-                                            <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
+                                            <span className="flex h-10 w-10 items-center justify-center rounded-[2px] border border-white/[0.08] bg-white/[0.03]">
                                                 <Icon
-                                                    className="h-5 w-5 text-violet-300"
+                                                    className="h-5 w-5 text-[#FFFFFF]"
                                                     aria-hidden="true"
                                                 />
                                             </span>
-                                            <span className="metric-num text-[10px] font-semibold text-slate-600">
+                                            <span className="metric-num text-[10px] font-semibold text-[#8E8E88]">
                                                 {String(index + 1).padStart(2, '0')}
                                             </span>
                                         </div>
-                                        <h3 className="mt-5 text-base font-semibold tracking-tight text-slate-100">
+                                        <h3 className="mt-5 text-base font-semibold tracking-tight text-[#F5F5F4]">
                                             {guideline.title}
                                         </h3>
-                                        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                                        <p className="mt-2 text-sm leading-relaxed text-[#B3B3AF]">
                                             {guideline.body}
                                         </p>
                                     </article>
@@ -1189,8 +1189,8 @@ export default function Community() {
                     </div>
 
                     <Reveal className="mt-6">
-                        <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5 sm:flex-row sm:items-center sm:p-6">
-                            <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
+                        <div className="flex flex-col items-start justify-between gap-4 rounded-[2px] border border-white/[0.07] bg-white/[0.02] p-5 sm:flex-row sm:items-center sm:p-6">
+                            <p className="max-w-2xl text-sm leading-relaxed text-[#B3B3AF]">
                                 By participating, you agree to follow the project&apos;s
                                 contribution guidelines and code of conduct.
                             </p>
@@ -1226,7 +1226,7 @@ export default function Community() {
                         <div className="mkt-panel relative overflow-hidden px-6 py-12 text-center sm:px-12">
                             <div
                                 aria-hidden="true"
-                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-violet-600/20"
+                                className="mkt-glow left-1/2 top-[-160px] h-[320px] w-[560px] max-w-[110vw] -translate-x-1/2 bg-[#FFFFFF]/10"
                             />
                             <div className="relative">
                                 <p className="mkt-eyebrow justify-center">Ready to contribute?</p>
@@ -1236,7 +1236,7 @@ export default function Community() {
                                     improvement, or simply a question, the best place to begin is
                                     the project&apos;s GitHub repository.
                                 </p>
-                                <p className="mt-3 text-sm text-slate-500">
+                                <p className="mt-3 text-sm text-[#969690]">
                                     Explore the code. Share feedback. Make your first contribution.
                                 </p>
                                 <div className="mt-8 flex flex-wrap justify-center gap-3">

@@ -1217,7 +1217,7 @@ function Inline({ text }) {
     return parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
             return (
-                <strong key={index} className="font-semibold text-slate-100">
+                <strong key={index} className="font-semibold text-[#F5F5F4]">
                     {part.slice(2, -2)}
                 </strong>
             );
@@ -1227,7 +1227,7 @@ function Inline({ text }) {
             return (
                 <code
                     key={index}
-                    className="rounded-md border border-white/[0.06] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[0.85em] text-violet-300"
+                    className="rounded-md border border-white/[0.06] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[0.85em] text-[#FFFFFF]"
                 >
                     {part.slice(1, -1)}
                 </code>
@@ -1257,7 +1257,7 @@ function HighlightText({ text, tokens }) {
             if (!part) return null;
             const isMatch = lowerTokens.some((token) => part.toLowerCase().startsWith(token));
             return isMatch ? (
-                <mark key={index} className="rounded bg-violet-500/25 px-0.5 text-violet-100">
+                <mark key={index} className="rounded bg-[#FFFFFF]/20 px-0.5 text-[#F5F5F4]">
                     {part}
                 </mark>
             ) : (
@@ -1275,21 +1275,21 @@ function Callout({ note }) {
     return (
         <div
             role="note"
-            className={`flex items-start gap-3 rounded-xl border p-4 ${
+            className={`flex items-start gap-3 rounded-[2px] border p-4 ${
                 warning
                     ? 'border-amber-400/20 bg-amber-400/[0.06]'
-                    : 'border-violet-400/20 bg-violet-500/[0.06]'
+                    : 'border-white/15 bg-[#FFFFFF]/[0.05]'
             }`}
         >
             <Icon
-                className={`mt-0.5 h-4 w-4 shrink-0 ${warning ? 'text-amber-300' : 'text-violet-300'}`}
+                className={`mt-0.5 h-4 w-4 shrink-0 ${warning ? 'text-amber-300' : 'text-[#FFFFFF]'}`}
                 aria-hidden="true"
             />
             <div className="min-w-0">
                 {note.title && (
-                    <p className="mb-1 text-sm font-semibold text-slate-100">{note.title}</p>
+                    <p className="mb-1 text-sm font-semibold text-[#F5F5F4]">{note.title}</p>
                 )}
-                <p className="text-sm leading-relaxed text-slate-300">
+                <p className="text-sm leading-relaxed text-[#C8C8C4]">
                     <Inline text={note.text} />
                 </p>
             </div>
@@ -1302,18 +1302,18 @@ function DataTable({ table }) {
 
     return (
         <div className="mkt-panel">
-            <p className="border-b border-white/[0.06] px-4 py-2 text-[11px] text-slate-500 sm:hidden">
+            <p className="border-b border-white/[0.06] px-4 py-2 text-[11px] text-[#969690] sm:hidden">
                 Swipe or scroll horizontally to see all columns
             </p>
             <div
-                className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500/60"
+                className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#FFFFFF]/60"
                 tabIndex={0}
                 role="region"
                 aria-label={table.headers.join(', ')}
             >
                 <table className="w-full min-w-[34rem] text-left text-sm">
                     <thead>
-                        <tr className="border-b border-white/[0.07] text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        <tr className="border-b border-white/[0.07] text-[10px] font-semibold uppercase tracking-[0.14em] text-[#969690]">
                             {table.headers.map((header) => (
                                 <th key={header} scope="col" className="bg-white/[0.02] px-4 py-3">
                                     {header}
@@ -1327,7 +1327,7 @@ function DataTable({ table }) {
                                 {row.map((cell, cellIndex) => (
                                     <td
                                         key={cellIndex}
-                                        className="px-4 py-3 align-top leading-relaxed text-slate-300"
+                                        className="px-4 py-3 align-top leading-relaxed text-[#C8C8C4]"
                                     >
                                         <Inline text={cell} />
                                     </td>
@@ -1353,7 +1353,7 @@ function AnswerLinks({ links }) {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mkt-link !text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="mkt-link !text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         {link.label} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                     </a>
@@ -1361,7 +1361,7 @@ function AnswerLinks({ links }) {
                     <Link
                         key={link.to}
                         to={link.to}
-                        className="mkt-link !text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                        className="mkt-link !text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                     >
                         {link.label} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </Link>
@@ -1377,9 +1377,9 @@ function AnswerBody({ item, onOpenFaq }) {
         .filter(Boolean);
 
     return (
-        <div className="space-y-4 border-l-2 border-violet-400/30 pl-4 sm:pl-5">
+        <div className="space-y-4 border-l-2 border-[#FFFFFF]/35 pl-4 sm:pl-5">
             {item.summary && (
-                <p className="text-sm leading-relaxed text-slate-300">
+                <p className="text-sm leading-relaxed text-[#C8C8C4]">
                     <Inline text={item.summary} />
                 </p>
             )}
@@ -1389,11 +1389,11 @@ function AnswerBody({ item, onOpenFaq }) {
                     {item.bullets.map((bullet, index) => (
                         <li
                             key={index}
-                            className="flex items-start gap-2.5 text-sm leading-relaxed text-slate-300"
+                            className="flex items-start gap-2.5 text-sm leading-relaxed text-[#C8C8C4]"
                         >
                             <span
                                 aria-hidden="true"
-                                className="mt-2 h-1 w-1 shrink-0 rounded-full bg-violet-400"
+                                className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#FFFFFF]"
                             />
                             <span>
                                 <Inline text={bullet} />
@@ -1408,9 +1408,9 @@ function AnswerBody({ item, onOpenFaq }) {
                     {item.steps.map((step, index) => (
                         <li
                             key={index}
-                            className="flex items-start gap-3 text-sm leading-relaxed text-slate-300"
+                            className="flex items-start gap-3 text-sm leading-relaxed text-[#C8C8C4]"
                         >
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-violet-400/20 bg-violet-500/10 text-[10px] font-semibold text-violet-300">
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/15 bg-[#FFFFFF]/10 text-[10px] font-semibold text-[#FFFFFF]">
                                 {index + 1}
                             </span>
                             <span>
@@ -1424,7 +1424,7 @@ function AnswerBody({ item, onOpenFaq }) {
             {item.code && (
                 <div className="mkt-panel">
                     <div className="border-b border-white/[0.06] px-4 py-2.5">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                             Example
                         </span>
                     </div>
@@ -1438,7 +1438,7 @@ function AnswerBody({ item, onOpenFaq }) {
 
             {related.length > 0 && (
                 <div className="space-y-2 pt-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                         Related answers
                     </p>
                     <div className="flex flex-col gap-1.5">
@@ -1447,7 +1447,7 @@ function AnswerBody({ item, onOpenFaq }) {
                                 key={entry.key}
                                 type="button"
                                 onClick={() => onOpenFaq(entry.key)}
-                                className="group inline-flex items-start gap-2 text-left text-sm font-medium text-violet-300 transition-colors hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                className="group inline-flex items-start gap-2 text-left text-sm font-medium text-[#FFFFFF] transition-colors hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                             >
                                 <ArrowRight
                                     className="mt-1 h-3.5 w-3.5 shrink-0 transition-transform group-hover:translate-x-0.5"
@@ -1466,21 +1466,21 @@ function AnswerBody({ item, onOpenFaq }) {
 function ActionCard({ action }) {
     const Icon = action.icon;
     const className =
-        'group mkt-card mkt-card-hover flex h-full w-full items-start gap-3.5 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60';
+        'group mkt-card mkt-card-hover flex h-full w-full items-start gap-3.5 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60';
 
     const content = (
         <>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                <Icon className="h-4 w-4 text-violet-300" aria-hidden="true" />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                <Icon className="h-4 w-4 text-[#FFFFFF]" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100">{action.title}</span>
-                <span className="mt-1 block text-xs leading-relaxed text-slate-500">
+                <span className="block text-sm font-semibold text-[#F5F5F4]">{action.title}</span>
+                <span className="mt-1 block text-xs leading-relaxed text-[#969690]">
                     {action.description}
                 </span>
             </span>
             <ArrowRight
-                className="mt-1 h-4 w-4 shrink-0 text-slate-600 transition-transform group-hover:translate-x-0.5 group-hover:text-violet-300"
+                className="mt-1 h-4 w-4 shrink-0 text-[#8E8E88] transition-transform group-hover:translate-x-0.5 group-hover:text-[#FFFFFF]"
                 aria-hidden="true"
             />
         </>
@@ -1511,7 +1511,7 @@ function SectionHeading({ eyebrow, title, description, id }) {
                 </h2>
             </div>
             {description && (
-                <p className="max-w-sm text-sm leading-relaxed text-slate-500">{description}</p>
+                <p className="max-w-sm text-sm leading-relaxed text-[#969690]">{description}</p>
             )}
         </div>
     );
@@ -1536,7 +1536,7 @@ function SearchResultCard({
         <div
             className={`mkt-card overflow-hidden transition-colors ${
                 isActive
-                    ? 'border-violet-400/40 bg-violet-500/[0.035]'
+                    ? 'border-[#FFFFFF]/45 bg-[#FFFFFF]/[0.05]'
                     : 'hover:border-white/[0.18]'
             }`}
         >
@@ -1549,33 +1549,33 @@ function SearchResultCard({
                     onKeyDown={onKeyDown}
                     aria-expanded={isOpen}
                     aria-controls={answerId}
-                    className="group flex w-full items-start justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500/60"
+                    className="group flex w-full items-start justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#FFFFFF]/60"
                 >
                     <span className="min-w-0 flex-1">
                         <span className="mb-2 flex flex-wrap items-center gap-2">
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#B3B3AF]">
                                 <Icon className="h-3 w-3" aria-hidden="true" />
                                 {entry.category.title}
                             </span>
                             {index === 0 && (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/20 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-300">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-[#FFFFFF]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#FFFFFF]">
                                     <Sparkles className="h-3 w-3" aria-hidden="true" />
                                     Best match
                                 </span>
                             )}
                         </span>
-                        <span className="block text-sm font-semibold leading-relaxed text-slate-100 transition-colors group-hover:text-violet-100">
+                        <span className="block text-sm font-semibold leading-relaxed text-[#F5F5F4] transition-colors group-hover:text-[#F5F5F4]">
                             <HighlightText text={entry.item.q} tokens={tokens} />
                         </span>
                         {!isOpen && (
-                            <span className="mt-1.5 line-clamp-2 block text-sm leading-relaxed text-slate-500">
+                            <span className="mt-1.5 line-clamp-2 block text-sm leading-relaxed text-[#969690]">
                                 <Inline text={entry.item.summary} />
                             </span>
                         )}
                     </span>
                     <ChevronDown
                         className={`mt-1 h-4 w-4 shrink-0 transition-transform duration-200 ${
-                            isOpen ? 'rotate-180 text-violet-300' : 'text-slate-600'
+                            isOpen ? 'rotate-180 text-[#FFFFFF]' : 'text-[#8E8E88]'
                         }`}
                         aria-hidden="true"
                     />
@@ -1604,17 +1604,17 @@ function CategoryCard({ category, openKey, onToggle, onOpenFaq }) {
             className="mkt-card scroll-mt-28 overflow-hidden"
         >
             <div className="flex items-start gap-3 border-b border-white/[0.06] px-5 py-5 sm:px-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                    <Icon className="h-4 w-4 text-violet-300" aria-hidden="true" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                    <Icon className="h-4 w-4 text-[#FFFFFF]" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 flex-1">
                     <h3
                         id={`${category.id}-title`}
-                        className="text-base font-semibold tracking-tight text-slate-100"
+                        className="text-base font-semibold tracking-tight text-[#F5F5F4]"
                     >
                         {category.title}
                     </h3>
-                    <p className="mt-0.5 text-xs text-slate-500">{category.subtitle}</p>
+                    <p className="mt-0.5 text-xs text-[#969690]">{category.subtitle}</p>
                 </div>
                 <span className="mkt-chip hidden shrink-0 !text-[11px] sm:inline-flex">
                     {category.items.length} answers
@@ -1632,7 +1632,7 @@ function CategoryCard({ category, openKey, onToggle, onOpenFaq }) {
                         <div
                             key={key}
                             id={`faq-${key}`}
-                            className={`scroll-mt-28 ${isOpen ? 'bg-violet-500/[0.025]' : ''}`}
+                            className={`scroll-mt-28 ${isOpen ? 'bg-[#FFFFFF]/[0.05]' : ''}`}
                         >
                             <h4>
                                 <button
@@ -1641,20 +1641,20 @@ function CategoryCard({ category, openKey, onToggle, onOpenFaq }) {
                                     onClick={() => onToggle(key)}
                                     aria-expanded={isOpen}
                                     aria-controls={answerId}
-                                    className="group flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500/60 sm:px-6"
+                                    className="group flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#FFFFFF]/60 sm:px-6"
                                 >
                                     <span
                                         className={`text-sm leading-relaxed transition-colors ${
                                             isOpen
-                                                ? 'font-medium text-violet-200'
-                                                : 'text-slate-300 group-hover:text-violet-200'
+                                                ? 'font-medium text-[#F5F5F4]'
+                                                : 'text-[#C8C8C4] group-hover:text-[#F5F5F4]'
                                         }`}
                                     >
                                         {item.q}
                                     </span>
                                     <ChevronDown
                                         className={`h-4 w-4 shrink-0 transition-transform duration-200 ${
-                                            isOpen ? 'rotate-180 text-violet-300' : 'text-slate-600'
+                                            isOpen ? 'rotate-180 text-[#FFFFFF]' : 'text-[#8E8E88]'
                                         }`}
                                         aria-hidden="true"
                                     />
@@ -1684,21 +1684,21 @@ function CategoryTile({ category, onSelect }) {
         <button
             type="button"
             onClick={() => onSelect(category.id)}
-            className="group mkt-card mkt-card-hover flex items-center gap-3 p-3.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+            className="group mkt-card mkt-card-hover flex items-center gap-3 p-3.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
         >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-violet-400/20 bg-violet-500/10">
-                <Icon className="h-4 w-4 text-violet-300" aria-hidden="true" />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                <Icon className="h-4 w-4 text-[#FFFFFF]" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold leading-snug text-slate-200">
+                <span className="block text-sm font-semibold leading-snug text-[#F5F5F4]">
                     {category.title}
                 </span>
-                <span className="mt-0.5 block text-[11px] text-slate-500">
+                <span className="mt-0.5 block text-[11px] text-[#969690]">
                     {category.items.length} answers
                 </span>
             </span>
             <ArrowRight
-                className="h-3.5 w-3.5 shrink-0 text-slate-600 transition-transform group-hover:translate-x-0.5 group-hover:text-violet-300"
+                className="h-3.5 w-3.5 shrink-0 text-[#8E8E88] transition-transform group-hover:translate-x-0.5 group-hover:text-[#FFFFFF]"
                 aria-hidden="true"
             />
         </button>
@@ -1708,16 +1708,16 @@ function CategoryTile({ category, onSelect }) {
 function EmptySearch({ query, onClear, onSuggestion }) {
     return (
         <div className="mkt-card px-6 py-10 text-center sm:py-12">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
-                <SearchX className="h-5 w-5 text-violet-300" aria-hidden="true" />
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                <SearchX className="h-5 w-5 text-[#FFFFFF]" aria-hidden="true" />
             </div>
             <h3 className="mkt-h3 mt-5 !text-xl">No answers for “{query}”</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-400">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#B3B3AF]">
                 Try a broader phrase, check the spelling, or browse the documentation.
             </p>
 
             <div className="mt-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#969690]">
                     Try one of these
                 </p>
                 <div className="mt-2.5 flex flex-wrap justify-center gap-2">
@@ -1726,7 +1726,7 @@ function EmptySearch({ query, onClear, onSuggestion }) {
                             key={suggestion}
                             type="button"
                             onClick={() => onSuggestion(suggestion)}
-                            className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-violet-400/30 hover:bg-violet-500/10 hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                            className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-[#C8C8C4] transition-colors hover:border-[#FFFFFF]/35 hover:bg-[#FFFFFF]/10 hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                         >
                             {suggestion}
                         </button>
@@ -1752,19 +1752,19 @@ function DocCard({ doc }) {
     return (
         <Link
             to={doc.to}
-            className="group mkt-card mkt-card-hover flex items-start gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+            className="group mkt-card mkt-card-hover flex items-start gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
         >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-violet-400/20 bg-violet-500/10">
-                <Icon className="h-4 w-4 text-violet-300" aria-hidden="true" />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
+                <Icon className="h-4 w-4 text-[#FFFFFF]" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100">{doc.title}</span>
-                <span className="mt-1 block text-xs leading-relaxed text-slate-500">
+                <span className="block text-sm font-semibold text-[#F5F5F4]">{doc.title}</span>
+                <span className="mt-1 block text-xs leading-relaxed text-[#969690]">
                     {doc.description}
                 </span>
             </span>
             <ArrowRight
-                className="mt-1 h-4 w-4 shrink-0 text-slate-600 transition-transform group-hover:translate-x-0.5 group-hover:text-violet-300"
+                className="mt-1 h-4 w-4 shrink-0 text-[#8E8E88] transition-transform group-hover:translate-x-0.5 group-hover:text-[#FFFFFF]"
                 aria-hidden="true"
             />
         </Link>
@@ -1932,7 +1932,7 @@ export default function HelpCenter() {
             <section className="relative overflow-hidden pb-6 pt-14 sm:pt-20">
                 <div
                     aria-hidden="true"
-                    className="mkt-glow left-1/2 top-[-220px] h-[420px] w-[780px] max-w-[120vw] -translate-x-1/2 bg-violet-600/25"
+                    className="mkt-glow left-1/2 top-[-220px] h-[420px] w-[780px] max-w-[120vw] -translate-x-1/2 bg-[#FFFFFF]/15"
                 />
 
                 <div className="mkt-container relative">
@@ -1945,7 +1945,7 @@ export default function HelpCenter() {
                             Find clear answers about tracking, analytics, the API, and billing.
                             Search {TOTAL_ANSWERS} answers or browse by topic.
                         </p>
-                        <p className="mt-3 text-xs text-slate-500">
+                        <p className="mt-3 text-xs text-[#969690]">
                             Every answer reflects how WebPulse V1 behaves today.
                         </p>
 
@@ -1955,7 +1955,7 @@ export default function HelpCenter() {
                             </label>
                             <div className="relative">
                                 <Search
-                                    className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                                    className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#969690]"
                                     aria-hidden="true"
                                 />
                                 <input
@@ -1972,7 +1972,7 @@ export default function HelpCenter() {
                                     aria-describedby="help-search-hint"
                                     aria-controls="help-search-results"
                                     aria-keyshortcuts="/"
-                                    className={`mkt-field !border-violet-400/20 !bg-[#070A10]/80 !py-4 !pl-12 !text-base shadow-[0_18px_50px_-30px_rgba(139,92,246,0.65)] ${
+                                    className={`mkt-field !border-white/15 !bg-[#050505]/95 !py-4 !pl-12 !text-base ${
                                         query ? '!pr-14' : '!pr-16'
                                     }`}
                                 />
@@ -1981,17 +1981,17 @@ export default function HelpCenter() {
                                         type="button"
                                         onClick={clearSearch}
                                         aria-label="Clear search"
-                                        className="absolute right-2.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/[0.06] hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                        className="absolute right-2.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[2px] text-[#969690] transition-colors hover:bg-white/[0.06] hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                     >
                                         <X className="h-4 w-4" aria-hidden="true" />
                                     </button>
                                 ) : (
-                                    <kbd className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-md border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-slate-500 sm:block">
+                                    <kbd className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-md border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-[#969690] sm:block">
                                         /
                                     </kbd>
                                 )}
                             </div>
-                            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-left text-xs text-slate-500">
+                            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-left text-xs text-[#969690]">
                                 <p id="help-search-hint">
                                     {TOTAL_ANSWERS} answers across {categories.length} categories
                                 </p>
@@ -2029,11 +2029,11 @@ export default function HelpCenter() {
                                             ? `${results.length} ${resultLabel} found`
                                             : 'No answers found'}
                                     </h2>
-                                    <p className="mt-1 break-words text-sm text-slate-500">
+                                    <p className="mt-1 break-words text-sm text-[#969690]">
                                         for “{displayQuery}”
                                     </p>
                                     {results.length > 0 && (
-                                        <p className="mt-3 text-xs text-slate-500">
+                                        <p className="mt-3 text-xs text-[#969690]">
                                             Use ↑ ↓ to browse, Enter to jump, and Esc to clear.
                                         </p>
                                     )}
@@ -2075,15 +2075,15 @@ export default function HelpCenter() {
                                         ))}
                                     </ol>
 
-                                    <div className="mt-6 flex flex-col gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between">
-                                        <p className="text-sm text-slate-400">
+                                    <div className="mt-6 flex flex-col gap-3 rounded-[2px] border border-white/[0.07] bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between">
+                                        <p className="text-sm text-[#B3B3AF]">
                                             Not finding what you need?
                                         </p>
                                         <div className="flex flex-wrap items-center gap-4">
                                             <button
                                                 type="button"
                                                 onClick={clearSearch}
-                                                className="text-sm font-semibold text-slate-300 transition-colors hover:text-violet-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                                className="text-sm font-semibold text-[#C8C8C4] transition-colors hover:text-[#F5F5F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                             >
                                                 Browse all topics
                                             </button>
@@ -2123,21 +2123,21 @@ export default function HelpCenter() {
                                                 key={key}
                                                 type="button"
                                                 onClick={() => openFaq(key)}
-                                                className="group mkt-card mkt-card-hover flex items-start gap-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60"
+                                                className="group mkt-card mkt-card-hover flex items-start gap-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]/60"
                                             >
-                                                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-violet-400/20 bg-violet-500/10 font-mono text-[10px] font-semibold text-violet-300">
+                                                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/15 bg-[#FFFFFF]/10 font-mono text-[10px] font-semibold text-[#FFFFFF]">
                                                     {String(index + 1).padStart(2, '0')}
                                                 </span>
                                                 <span className="min-w-0 flex-1">
-                                                    <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                                                    <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#969690]">
                                                         {entry.category.title}
                                                     </span>
-                                                    <span className="mt-1 block text-sm font-medium leading-relaxed text-slate-200 transition-colors group-hover:text-violet-200">
+                                                    <span className="mt-1 block text-sm font-medium leading-relaxed text-[#F5F5F4] transition-colors group-hover:text-[#F5F5F4]">
                                                         {entry.item.q}
                                                     </span>
                                                 </span>
                                                 <ArrowUpRight
-                                                    className="mt-0.5 h-4 w-4 shrink-0 text-slate-600 transition-colors group-hover:text-violet-300"
+                                                    className="mt-0.5 h-4 w-4 shrink-0 text-[#8E8E88] transition-colors group-hover:text-[#FFFFFF]"
                                                     aria-hidden="true"
                                                 />
                                             </button>
@@ -2220,14 +2220,14 @@ export default function HelpCenter() {
                                 <div className="mkt-panel relative overflow-hidden p-6 sm:p-8">
                                     <div
                                         aria-hidden="true"
-                                        className="mkt-glow right-[-120px] top-[-120px] h-[280px] w-[420px] bg-violet-600/20"
+                                        className="mkt-glow right-[-120px] top-[-120px] h-[280px] w-[420px] bg-[#FFFFFF]/10"
                                     />
                                     <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                                         <div className="max-w-xl">
                                             <div className="flex items-center gap-3">
-                                                <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/10">
+                                                <span className="flex h-10 w-10 items-center justify-center rounded-[2px] border border-white/15 bg-[#FFFFFF]/10">
                                                     <LifeBuoy
-                                                        className="h-5 w-5 text-violet-300"
+                                                        className="h-5 w-5 text-[#FFFFFF]"
                                                         aria-hidden="true"
                                                     />
                                                 </span>
@@ -2239,7 +2239,7 @@ export default function HelpCenter() {
                                                 the community, or open a GitHub issue with what you
                                                 tried.
                                             </p>
-                                            <p className="mt-3 text-xs text-slate-500">
+                                            <p className="mt-3 text-xs text-[#969690]">
                                                 Help content reflects the V1 implementation and may
                                                 change as WebPulse evolves.
                                             </p>
