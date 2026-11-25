@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, Zap, Globe, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { setSession, isAuthenticated, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
-import Logo from '../components/Logo';
 import OTPVerification from '../components/OTPVerification';
-import { Button } from '../components/ui/Button';
-import { LiveChip } from '../components/ui/Display';
+import AuthShell, { AuthTabs } from '../components/auth/AuthShell';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -24,6 +22,7 @@ export default function Login() {
     const location = useLocation();
 
     const returnUrl = getSafeReturnUrl(searchParams.get('returnUrl') || location.state?.from?.pathname);
+    const selectedPlan = searchParams.get('plan');
 
     useEffect(() => {
         let isMounted = true;
@@ -104,211 +103,146 @@ export default function Login() {
         return <GoogleLoading />;
     }
 
-    const defaultMarketing = typeof window !== 'undefined' &&
-        (window.location.hostname === 'webpulseanalytics.tech' || window.location.hostname.endsWith('.webpulseanalytics.tech'))
-        ? 'https://webpulseanalytics.tech'
-        : 'http://localhost:5174';
-    const marketingUrl = import.meta.env.VITE_MARKETING_URL || defaultMarketing;
-
     return (
-        <div className="auth-layout">
-            <div className="auth-panel">
-                <div className="auth-inner">
-                    <div className="mb-6 flex items-center justify-between">
-                        <Logo href={marketingUrl} />
-                        <a
-                            href={marketingUrl}
-                            className="text-xs font-semibold hover:underline"
-                            style={{ color: 'var(--muted-foreground)' }}
-                        >
-                            Back to site
-                        </a>
-                    </div>
+        <AuthShell
+            showGlobe
+            eyebrow="01 // V2 BETA SIGN IN"
+            headline="Understand your traffic, not your users."
+            description="Real-time web analytics in one lightweight script. Sign in to inspect active visitors, referrers, and event logs."
+        >
+            {!showVerification && <AuthTabs active="login" />}
 
-                    {!showVerification && (
-                        <div className="segmented mb-6" role="tablist">
-                            <button
-                                type="button"
-                                className="segmented-btn is-active"
-                                role="tab"
-                                aria-selected="true"
-                            >
-                                Sign in
-                            </button>
-                            <Link
-                                to="/register"
-                                className="segmented-btn"
-                                role="tab"
-                                aria-selected="false"
-                            >
-                                Register
-                            </Link>
-                        </div>
-                    )}
-
-                    {showVerification ? (
-                        <OTPVerification
-                            email={email}
-                            onSuccess={() => navigate(returnUrl, { replace: true })}
-                            onBack={() => setShowVerification(false)}
-                        />
-                    ) : (
-                        <>
-                            <div className="mb-6">
-                                <h1 className="auth-title">Welcome back</h1>
-                                <p className="auth-desc">Enter your credentials to access your analytics dashboard.</p>
+            <div className="noir-panel p-6 sm:p-8">
+                {showVerification ? (
+                    <OTPVerification
+                        email={email}
+                        onSuccess={() => navigate(returnUrl, { replace: true })}
+                        onBack={() => setShowVerification(false)}
+                    />
+                ) : (
+                    <>
+                        {selectedPlan && (
+                            <div className="mb-5 flex items-center justify-between rounded-[2px] border border-white/20 bg-[#141414] px-3 py-2 font-mono text-[11px]">
+                                <span className="uppercase tracking-[0.12em] text-[#969690]">Selected plan</span>
+                                <span className="font-semibold uppercase tracking-[0.12em] text-[#FFFFFF]">
+                                    {selectedPlan}
+                                </span>
                             </div>
+                        )}
 
-                            <form onSubmit={handleSubmit} className="stack-4">
-                                <div className="field">
-                                    <label className="field-label" htmlFor="login-email">Email Address</label>
+                        <div className="mb-6">
+                            <h1 className="text-2xl font-semibold tracking-[-0.025em] text-[#FFFFFF]">
+                                Welcome back
+                            </h1>
+                            <p className="mt-1.5 text-sm text-[#969690]">
+                                Enter your credentials for your V2 Beta workspace.
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="noir-label" htmlFor="login-email">Email address</label>
                                     <div className="relative">
-                                        <Mail
-                                            className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none"
-                                            style={{ color: 'var(--muted-foreground)' }}
-                                        />
                                         <input
                                             id="login-email"
                                             type="email"
                                             required
+                                            autoComplete="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="input pl-10"
+                                            className="noir-field peer !pl-10"
                                             placeholder="name@company.com"
+                                        />
+                                        <Mail
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#969690] transition-colors peer-focus:text-[#FFFFFF]"
+                                            aria-hidden="true"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="field">
-                                    <div className="flex items-center justify-between mb-1.5">
-                                        <label className="field-label !mb-0" htmlFor="login-password">Password</label>
+                                <div>
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <label className="noir-label !mb-0" htmlFor="login-password">Password</label>
                                         <Link
                                             to="/forgot-password"
-                                            className="text-xs font-semibold hover:underline"
-                                            style={{ color: 'var(--primary)' }}
+                                            className="font-mono text-xs text-[#C8C8C4] underline-offset-4 transition-colors hover:text-[#FFFFFF] hover:underline"
                                         >
                                             Forgot password?
                                         </Link>
                                     </div>
                                     <div className="relative">
-                                        <Lock
-                                            className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none"
-                                            style={{ color: 'var(--muted-foreground)' }}
-                                        />
                                         <input
                                             id="login-password"
                                             type={showPassword ? 'text' : 'password'}
                                             required
+                                            autoComplete="current-password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            className="input pl-10 pr-10"
+                                            className="noir-field peer !pl-10 !pr-11"
                                             placeholder="••••••••"
+                                        />
+                                        <Lock
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#969690] transition-colors peer-focus:text-[#FFFFFF]"
+                                            aria-hidden="true"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded hover:opacity-75 transition-opacity"
-                                            style={{ color: 'var(--muted-foreground)' }}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-[2px] p-1 text-[#969690] transition-colors hover:text-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFFFFF]"
                                         >
                                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
                                     </div>
                                 </div>
+                            </div>
 
-                                <Button
-                                    type="submit"
-                                    size="lg"
-                                    block
-                                    loading={loading}
-                                >
-                                    Sign in
-                                </Button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="noir-btn noir-btn-primary w-full"
+                            >
+                                {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : 'Sign in'}
+                            </button>
 
-                                <div className="divider-text">Or continue with</div>
+                            <div className="flex items-center gap-3">
+                                <span className="h-px flex-1 bg-white/[0.11]" aria-hidden="true" />
+                                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#969690]">
+                                    Or continue with
+                                </span>
+                                <span className="h-px flex-1 bg-white/[0.11]" aria-hidden="true" />
+                            </div>
 
-                                <Button
-                                    type="button"
-                                    kind="outline"
-                                    size="lg"
-                                    block
-                                    onClick={handleGoogleLogin}
-                                >
-                                    <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                        <path
-                                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                            fill="#4285F4"
-                                        />
-                                        <path
-                                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                            fill="#34A853"
-                                        />
-                                        <path
-                                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                            fill="#FBBC05"
-                                        />
-                                        <path
-                                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                            fill="#EA4335"
-                                        />
-                                    </svg>
-                                    Continue with Google
-                                </Button>
-                            </form>
-
-                            <p className="mt-8 text-center text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                                By signing in, you agree to our{' '}
-                                <Link to="/terms" className="hover:underline" style={{ color: 'var(--foreground)' }}>Terms</Link>{' '}
-                                and{' '}
-                                <Link to="/privacy" className="hover:underline" style={{ color: 'var(--foreground)' }}>Privacy Policy</Link>.
-                            </p>
-                        </>
-                    )}
-                </div>
+                            <button
+                                type="button"
+                                onClick={handleGoogleLogin}
+                                className="noir-btn noir-btn-secondary w-full"
+                            >
+                                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path
+                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                        fill="#4285F4"
+                                    />
+                                    <path
+                                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                        fill="#34A853"
+                                    />
+                                    <path
+                                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                        fill="#FBBC05"
+                                    />
+                                    <path
+                                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                        fill="#EA4335"
+                                    />
+                                </svg>
+                                Continue with Google
+                            </button>
+                        </form>
+                    </>
+                )}
             </div>
-
-            <div className="auth-aside">
-                <div style={{ maxWidth: 440 }}>
-                    <div className="mb-4">
-                        <LiveChip label="Live Telemetry Engine" />
-                    </div>
-                    <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.2, color: 'var(--foreground)' }}>
-                        Real-time visitor intelligence, without the privacy headache.
-                    </h2>
-                    <p className="mt-3" style={{ color: 'var(--muted-foreground)', fontSize: 'var(--text-base)', lineHeight: 'var(--leading-relaxed)' }}>
-                        Lightweight tracking snippet, sub-second WebSocket updates, session replays, and GDPR-compliant metrics.
-                    </p>
-
-                    <div className="mt-8 p-5 rounded-2xl border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                        <div className="flex items-start gap-3">
-                            <div className="p-2 rounded-xl" style={{ background: 'var(--accent)', color: 'var(--primary)' }}>
-                                <Sparkles className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <h3 className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Built for modern high-performance web apps</h3>
-                                <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
-                                    &lt;1 KB script size, zero third-party cookies, and instant dashboard synchronization across all your web projects.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="mt-5 pt-4 border-t grid grid-cols-3 gap-3 text-center" style={{ borderColor: 'var(--border)' }}>
-                            <div>
-                                <div className="text-lg font-bold tnum" style={{ color: 'var(--foreground)' }}>&lt;50ms</div>
-                                <div className="text-2xs" style={{ color: 'var(--muted-foreground)' }}>Event latency</div>
-                            </div>
-                            <div>
-                                <div className="text-lg font-bold tnum" style={{ color: 'var(--foreground)' }}>99.98%</div>
-                                <div className="text-2xs" style={{ color: 'var(--muted-foreground)' }}>Uptime SLA</div>
-                            </div>
-                            <div>
-                                <div className="text-lg font-bold tnum" style={{ color: 'var(--foreground)' }}>100%</div>
-                                <div className="text-2xs" style={{ color: 'var(--muted-foreground)' }}>Cookie-free</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </AuthShell>
     );
 }
