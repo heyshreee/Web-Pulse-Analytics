@@ -33,7 +33,11 @@ export default function Notifications() {
         };
 
         window.addEventListener('notification_received', handleNewNotification);
-        const interval = setInterval(loadNotifications, 60000);
+        const interval = setInterval(() => {
+            if (typeof document === 'undefined' || !document.hidden) {
+                loadNotifications();
+            }
+        }, 60000);
 
         return () => {
             clearInterval(interval);
