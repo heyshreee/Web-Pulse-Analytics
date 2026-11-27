@@ -9,7 +9,7 @@ import { ThemeSync } from './context/ThemeContext';
 import { ProjectProvider } from './context/ProjectContext';
 import GoogleAuth from './components/GoogleAuth';
 import ExternalRedirect from './components/ExternalRedirect';
-import { isAuthenticated, setSession, clearSession } from './utils/auth';
+import { isAuthenticated, setSession, clearSession, SESSION_FLAG } from './utils/auth';
 import { apiRequest } from './utils/api';
 
 const ShareReport = lazy(() => import('./pages/ShareReport'));
@@ -44,6 +44,17 @@ function PrivateRoute({ children }) {
   const [authed, setAuthed] = useState(isAuthenticated());
 
   useEffect(() => {
+    const handleStorage = (e) => {
+      if ((e.key === SESSION_FLAG && e.newValue !== '1') || e.key === null) {
+        setAuthed(false);
+        setChecking(false);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
     if (authed) {
       setChecking(false);
@@ -61,9 +72,11 @@ function PrivateRoute({ children }) {
           setAuthed(false);
         }
       })
-      .catch(() => {
+      .catch((err) => {
         if (isMounted) {
-          clearSession();
+          if (err?.status !== 503) {
+            clearSession();
+          }
           setAuthed(false);
         }
       })

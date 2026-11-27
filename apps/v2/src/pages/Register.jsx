@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
-import { setSession, isAuthenticated, getSafeReturnUrl } from '../utils/auth';
+import { setSession, clearSession, wasJustLoggedOut, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -26,13 +26,13 @@ export default function Register() {
     const selectedPlan = searchParams.get('plan');
 
     useEffect(() => {
-        let isMounted = true;
-        if (isAuthenticated()) {
-            navigate(returnUrl, { replace: true });
+        if (location.state?.loggedOut || wasJustLoggedOut()) {
+            clearSession();
             return;
         }
 
-        // If user is already authenticated via cookie (e.g. logged in on V1), skip registration screen
+        let isMounted = true;
+        // Verify active HttpOnly session with backend rather than trusting localStorage alone.
         apiRequest('/auth/me')
             .then((userData) => {
                 if (isMounted && userData && userData.id) {
@@ -40,14 +40,16 @@ export default function Register() {
                     navigate(returnUrl, { replace: true });
                 }
             })
-            .catch(() => {
-                // Not authenticated
+            .catch((err) => {
+                if (isMounted && err?.status !== 503) {
+                    clearSession();
+                }
             });
 
         return () => {
             isMounted = false;
         };
-    }, [navigate, returnUrl]);
+    }, [location.state, navigate, returnUrl]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 import { apiRequest } from '../utils/api';
+import { setSession } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import AuthShell from '../components/auth/AuthShell';
 
@@ -81,6 +82,7 @@ export default function VerifyEmail() {
                 body: JSON.stringify({ code, email })
             });
 
+            setSession();
             showToast('Email verified successfully!', 'success');
             navigate('/dashboard');
         } catch (error) {

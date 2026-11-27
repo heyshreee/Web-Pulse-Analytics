@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { apiRequest } from '../utils/api';
+import { isAuthenticated, SESSION_EVENT, SESSION_FLAG } from '../utils/auth';
 
 const ProjectContext = createContext(null);
 
@@ -44,7 +45,28 @@ export function ProjectProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    refreshProjects();
+    const syncProjects = () => {
+      if (isAuthenticated()) {
+        refreshProjects();
+      } else {
+        setProjects([]);
+        setLoadingProjects(false);
+      }
+    };
+
+    syncProjects();
+
+    const handleStorage = (e) => {
+      if (e.key === SESSION_FLAG || e.key === null) {
+        syncProjects();
+      }
+    };
+    window.addEventListener(SESSION_EVENT, syncProjects);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener(SESSION_EVENT, syncProjects);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, [refreshProjects]);
 
   const currentProject = useMemo(() => {
