@@ -2,12 +2,12 @@ import { verifyToken, TOKEN_PURPOSE } from '../utils/jwt.js';
 import { isSessionActive, touchSession } from '../services/session.service.js';
 import supabase from '../config/supabase.js';
 
-export default async (req, res, next) => {
+export async function resolveSession(req) {
     try {
         const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({ error: 'Authentication required' });
+            return { authenticated: false, status: 401, error: 'Authentication required' };
         }
 
         const decoded = verifyToken(token);
@@ -15,17 +15,17 @@ export default async (req, res, next) => {
         // Only session tokens authenticate requests. A password-reset token
         // is never accepted here.
         if (decoded.purpose && decoded.purpose !== TOKEN_PURPOSE.SESSION) {
-            return res.status(401).json({ error: 'Invalid token' });
+            return { authenticated: false, status: 401, error: 'Invalid token' };
         }
 
-        req.tokenId = decoded.jti || null;
+        const tokenId = decoded.jti || null;
 
         // Server-side revocation check. `null` means the session store could
         // not answer (missing migration, transient failure) — the request is
         // allowed through so an infrastructure fault never locks users out.
-        const active = await isSessionActive(req.tokenId);
+        const active = await isSessionActive(tokenId);
         if (active === false) {
-            return res.status(401).json({ error: 'Session has been revoked' });
+            return { authenticated: false, status: 401, error: 'Session has been revoked' };
         }
 
         const { data: user, error } = await supabase
@@ -38,22 +38,31 @@ export default async (req, res, next) => {
         // lookup itself failed (network blip, rate limit, upstream 5xx) —
         // signal a transient failure so clients don't hard-logout on it.
         if (error && error.code !== 'PGRST116') {
-            return res.status(503).json({ error: 'Authentication service temporarily unavailable' });
+            return { authenticated: false, status: 503, error: 'Authentication service temporarily unavailable' };
         }
 
         if (!user) {
-            return res.status(401).json({ error: 'User not found' });
+            return { authenticated: false, status: 401, error: 'User not found' };
         }
-
-        req.user = user;
 
         // Best-effort update of last_seen_at
-        if (req.tokenId) {
-            touchSession(req.tokenId).catch(() => {});
+        if (tokenId) {
+            touchSession(tokenId).catch(() => {});
         }
 
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: 'Invalid token' });
+        return { authenticated: true, tokenId, user };
+    } catch {
+        return { authenticated: false, status: 401, error: 'Invalid token' };
     }
+}
+
+export default async (req, res, next) => {
+    const result = await resolveSession(req);
+    if (!result.authenticated) {
+        return res.status(result.status).json({ error: result.error });
+    }
+
+    req.tokenId = result.tokenId;
+    req.user = result.user;
+    next();
 };

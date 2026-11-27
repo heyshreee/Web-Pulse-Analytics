@@ -12,6 +12,7 @@ import { authLimiter, credentialLimiter, verificationLimiter } from '../../middl
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, credentialLimiter, authController.login);
 router.post('/logout', auth, authController.logout);
+router.get('/session', authController.getSession);
 router.get('/me', auth, authController.getMe);
 router.post('/verify-email', verificationLimiter, authController.verifyEmail);
 router.post('/resend-verification', verificationLimiter, authController.resendVerification);

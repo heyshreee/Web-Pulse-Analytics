@@ -10,7 +10,7 @@ import { ProjectProvider } from './context/ProjectContext';
 import GoogleAuth from './components/GoogleAuth';
 import ExternalRedirect from './components/ExternalRedirect';
 import { isAuthenticated, setSession, clearSession, SESSION_FLAG } from './utils/auth';
-import { apiRequest } from './utils/api';
+import { probeSession } from './utils/api';
 
 const ShareReport = lazy(() => import('./pages/ShareReport'));
 const Login = lazy(() => import('./pages/Login'));
@@ -62,9 +62,9 @@ function PrivateRoute({ children }) {
     }
 
     // Seamless SSO session restoration: check if HttpOnly cookie session exists (e.g. from V1)
-    apiRequest('/auth/me')
-      .then((user) => {
-        if (isMounted && user && user.id) {
+    probeSession()
+      .then((data) => {
+        if (isMounted && data?.authenticated && data?.user?.id) {
           setSession();
           setAuthed(true);
         } else if (isMounted) {
@@ -95,7 +95,13 @@ function PrivateRoute({ children }) {
 
   if (!authed) {
     const returnUrl = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
+    return (
+      <Navigate
+        to={`/login?returnUrl=${returnUrl}`}
+        state={{ from: location, sessionChecked: true }}
+        replace
+      />
+    );
   }
   return children;
 }
@@ -145,167 +151,33 @@ function App() {
                   />
 
                   {/* Protected Routes wrapped in App Shell Layout */}
-                  <Route element={<Layout />}>
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <PrivateRoute>
-                          <Dashboard />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/visitors"
-                      element={
-                        <PrivateRoute>
-                          <Visitors />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/sessions"
-                      element={
-                        <PrivateRoute>
-                          <Sessions />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/pages"
-                      element={
-                        <PrivateRoute>
-                          <Pages />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/events"
-                      element={
-                        <PrivateRoute>
-                          <Events />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/events/:name"
-                      element={
-                        <PrivateRoute>
-                          <EventDetail />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/sources"
-                      element={
-                        <PrivateRoute>
-                          <Sources />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/geography"
-                      element={
-                        <PrivateRoute>
-                          <Geography />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/live"
-                      element={
-                        <PrivateRoute>
-                          <LiveActivity />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/alerts"
-                      element={
-                        <PrivateRoute>
-                          <Alerts />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/projects"
-                      element={
-                        <PrivateRoute>
-                          <Projects />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/projects/:idOrName/:tab?"
-                      element={
-                        <PrivateRoute>
-                          <ProjectDetail />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/projects/:idOrName/activity"
-                      element={
-                        <PrivateRoute>
-                          <ProjectActivity />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/activity"
-                      element={
-                        <PrivateRoute>
-                          <ProjectActivity />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/api-key"
-                      element={
-                        <PrivateRoute>
-                          <APIKeys />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/api-keys"
-                      element={
-                        <PrivateRoute>
-                          <APIKeys />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/billing"
-                      element={
-                        <PrivateRoute>
-                          <Billing />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/settings"
-                      element={
-                        <PrivateRoute>
-                          <Settings />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/settings/:tab"
-                      element={
-                        <PrivateRoute>
-                          <Settings />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/integrations"
-                      element={
-                        <PrivateRoute>
-                          <Integrations />
-                        </PrivateRoute>
-                      }
-                    />
+                  <Route
+                    element={
+                      <PrivateRoute>
+                        <Layout />
+                      </PrivateRoute>
+                    }
+                  >
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/dashboard/visitors" element={<Visitors />} />
+                    <Route path="/dashboard/sessions" element={<Sessions />} />
+                    <Route path="/dashboard/pages" element={<Pages />} />
+                    <Route path="/dashboard/events" element={<Events />} />
+                    <Route path="/dashboard/events/:name" element={<EventDetail />} />
+                    <Route path="/dashboard/sources" element={<Sources />} />
+                    <Route path="/dashboard/geography" element={<Geography />} />
+                    <Route path="/dashboard/live" element={<LiveActivity />} />
+                    <Route path="/dashboard/alerts" element={<Alerts />} />
+                    <Route path="/dashboard/projects" element={<Projects />} />
+                    <Route path="/dashboard/projects/:idOrName/:tab?" element={<ProjectDetail />} />
+                    <Route path="/dashboard/projects/:idOrName/activity" element={<ProjectActivity />} />
+                    <Route path="/dashboard/activity" element={<ProjectActivity />} />
+                    <Route path="/dashboard/api-key" element={<APIKeys />} />
+                    <Route path="/dashboard/api-keys" element={<APIKeys />} />
+                    <Route path="/dashboard/billing" element={<Billing />} />
+                    <Route path="/dashboard/settings" element={<Settings />} />
+                    <Route path="/dashboard/settings/:tab" element={<Settings />} />
+                    <Route path="/dashboard/integrations" element={<Integrations />} />
                   </Route>
 
                   {/* Internal Aliases */}
