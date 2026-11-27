@@ -88,10 +88,19 @@ export function TrafficChart({
     [seriesLabel, compare],
   );
 
+  const fallbackHeight = typeof height === 'number' && height > 0 ? height : 200;
+
   return (
     <>
-      <div className="chart" style={{ height }} role="img" aria-label={ariaLabel || seriesLabel}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="chart min-w-0" style={{ height }} role="img" aria-label={ariaLabel || seriesLabel}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={fallbackHeight}
+          initialDimension={{ width: 640, height: fallbackHeight }}
+          debounce={50}
+        >
           <RAreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="wpAreaFill" x1="0" y1="0" x2="0" y2="1">
@@ -141,9 +150,17 @@ export function TrafficChart({
 /** Bar chart for hourly/daily distributions. */
 export function DistributionChart({ data = [], dataKey = 'views', height = 200, colors, ariaLabel }) {
   const palette = colors || ['var(--chart-1)'];
+  const fallbackHeight = typeof height === 'number' && height > 0 ? height : 200;
   return (
-    <div className="chart" style={{ height }} role="img" aria-label={ariaLabel || 'Distribution'}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="chart min-w-0" style={{ height }} role="img" aria-label={ariaLabel || 'Distribution'}>
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        minWidth={0}
+        minHeight={fallbackHeight}
+        initialDimension={{ width: 640, height: fallbackHeight }}
+        debounce={50}
+      >
         <RBarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
           <XAxis dataKey="name" {...AXIS} minTickGap={16} />
@@ -166,9 +183,17 @@ export function DistributionChart({ data = [], dataKey = 'views', height = 200, 
 
 /** Main + comparison lines without a filled area — used on secondary cards. */
 export function TrendChart({ data = [], dataKey = 'views', compareKey, height = 200, ariaLabel }) {
+  const fallbackHeight = typeof height === 'number' && height > 0 ? height : 200;
   return (
-    <div className="chart" style={{ height }} role="img" aria-label={ariaLabel || 'Trend'}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="chart min-w-0" style={{ height }} role="img" aria-label={ariaLabel || 'Trend'}>
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        minWidth={0}
+        minHeight={fallbackHeight}
+        initialDimension={{ width: 640, height: fallbackHeight }}
+        debounce={50}
+      >
         <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
           <XAxis dataKey="name" {...AXIS} minTickGap={20} />

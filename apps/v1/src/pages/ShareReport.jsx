@@ -142,7 +142,14 @@ export default function ShareReport() {
                             </div>
                         </div>
                         <div className="wp-studio-canvas p-4 h-[300px] w-full min-w-0">
-                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={280} debounce={50}>
+                            <ResponsiveContainer
+                                width="100%"
+                                height="100%"
+                                minWidth={0}
+                                minHeight={280}
+                                initialDimension={{ width: 640, height: 280 }}
+                                debounce={50}
+                            >
                                 <AreaChart data={stats.trafficData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                                     <defs>
                                         <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
