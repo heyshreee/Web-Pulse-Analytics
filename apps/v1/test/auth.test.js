@@ -1,0 +1,121 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import {
+  setSession,
+  clearSession,
+  isAuthenticated,
+  markLoggedOut,
+  wasJustLoggedOut,
+  setLoggingOut,
+  isLoggingOut,
+  clearLoggedOut,
+  SESSION_FLAG,
+} from '../src/utils/auth.js';
+import { apiRequest } from '../src/utils/api.js';
+
+function createMemoryStorage() {
+  const store = new Map();
+  return {
+    getItem: (k) => (store.has(k) ? store.get(k) : null),
+    setItem: (k, v) => store.set(k, String(v)),
+    removeItem: (k) => store.delete(k),
+    clear: () => store.clear(),
+  };
+}
+
+describe('V1 Session & Logout Guards', () => {
+  const origWindow = globalThis.window;
+  const origLocalStorage = globalThis.localStorage;
+  const origSessionStorage = globalThis.sessionStorage;
+  const origFetch = globalThis.fetch;
+  let assignMock;
+
+  beforeEach(() => {
+    const local = createMemoryStorage();
+    const session = createMemoryStorage();
+    assignMock = vi.fn();
+
+    globalThis.localStorage = local;
+    globalThis.sessionStorage = session;
+    globalThis.window = {
+      location: {
+        hostname: 'localhost',
+        origin: 'http://localhost:5173',
+        pathname: '/dashboard',
+        search: '',
+        assign: assignMock,
+      },
+      dispatchEvent: vi.fn(),
+    };
+    globalThis.Event = class Event {
+      constructor(type) {
+        this.type = type;
+      }
+    };
+  });
+
+  afterEach(() => {
+    setLoggingOut(false);
+    clearLoggedOut();
+    globalThis.window = origWindow;
+    globalThis.localStorage = origLocalStorage;
+    globalThis.sessionStorage = origSessionStorage;
+    globalThis.fetch = origFetch;
+  });
+
+  it('tracks login, logout guard, and clears logout guard on setSession()', () => {
+    expect(isAuthenticated()).toBe(false);
+    setSession();
+    expect(isAuthenticated()).toBe(true);
+    expect(globalThis.localStorage.getItem(SESSION_FLAG)).toBe('1');
+    expect(wasJustLoggedOut()).toBe(false);
+
+    markLoggedOut();
+    expect(isAuthenticated()).toBe(false);
+    expect(wasJustLoggedOut()).toBe(true);
+
+    setSession();
+    expect(isAuthenticated()).toBe(true);
+    expect(wasJustLoggedOut()).toBe(false);
+  });
+
+  it('suppresses returnUrl redirect during logout and after markLoggedOut()', async () => {
+    globalThis.fetch = vi.fn(async () => ({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: 'Session revoked' }),
+    }));
+
+    setSession();
+    setLoggingOut(true);
+    expect(isLoggingOut()).toBe(true);
+    await expect(apiRequest('/projects')).rejects.toThrow('Session revoked');
+    expect(isAuthenticated()).toBe(false);
+    expect(assignMock).not.toHaveBeenCalled();
+
+    setLoggingOut(false);
+    markLoggedOut();
+    await expect(apiRequest('/analytics/overview')).rejects.toThrow('Session revoked');
+    expect(assignMock).not.toHaveBeenCalled();
+
+    clearLoggedOut();
+    setSession();
+    await expect(apiRequest('/projects')).rejects.toThrow('Session revoked');
+    expect(clearSession).toBeDefined();
+    expect(isAuthenticated()).toBe(false);
+    expect(assignMock).toHaveBeenCalledWith('/login?returnUrl=%2Fdashboard');
+  });
+
+  it('does not redirect on 401 when already on auth or share paths', async () => {
+    globalThis.fetch = vi.fn(async () => ({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: 'Authentication required' }),
+    }));
+
+    for (const pathname of ['/login', '/register', '/share/abc123']) {
+      globalThis.window.location.pathname = pathname;
+      await expect(apiRequest('/projects')).rejects.toThrow('Authentication required');
+      expect(assignMock).not.toHaveBeenCalled();
+    }
+  });
+});
