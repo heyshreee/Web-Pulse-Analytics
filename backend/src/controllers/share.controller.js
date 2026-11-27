@@ -1,38 +1,16 @@
-import supabase from '../config/supabase.js';
-import { isUuid } from '../utils/uuid.js';
+import { resolveAuthorizedProject } from '../utils/projectAuth.js';
 import shareService from '../services/share.service.js';
 import usageService from '../services/usage.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import AppError from '../errors/AppError.js';
-
-async function resolveOwnedProject(idOrName, userId) {
-  let query = supabase
-    .from('projects')
-    .select('id, name, user_id, timezone, created_at')
-    .eq('user_id', userId);
-
-  if (isUuid(idOrName)) {
-    query = query.eq('id', idOrName);
-  } else if (String(idOrName).startsWith('trk_')) {
-    query = query.eq('tracking_id', idOrName);
-  } else {
-    query = query.eq('name', idOrName);
-  }
-
-  const { data: project, error } = await query.maybeSingle();
-  if (error) throw error;
-  if (!project) throw AppError.notFound('Project not found');
-  return project;
-}
 
 export const listSharedReports = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'viewer');
   const result = await shareService.listProjectSharedReports(project.id, req.user);
   res.json(result);
 });
 
 export const createSharedReport = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'admin');
   const created = await shareService.createSharedReport({
     project,
     user: req.user,
@@ -48,10 +26,10 @@ export const createSharedReport = asyncHandler(async (req, res) => {
 });
 
 export const revokeSharedReport = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'admin');
   const result = await shareService.revokeSharedReport({
     projectId: project.id,
-    userId: req.user.id,
+    userId: project.owner_id || project.user_id,
     reportId: req.params.reportId || null,
   });
 

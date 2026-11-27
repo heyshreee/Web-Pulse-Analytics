@@ -1324,6 +1324,16 @@ CREATE POLICY "Users can update own notifications"
 --   * public.shared_reports (SHA-256 token_hash, anonymized snapshot_data, 7-day expiry, revocation)
 --   * RPCs: consume_monthly_event_quota, check_shared_report_quota, cleanup_expired_analytics
 
+-- ----------------------------------------------------------------------------
+-- 10. Lite Plan Entitlements, Team Invitations, Archiving & Filter Indexes
+--    (See supabase/migrations/20261129000001_lite_plan_entitlements.sql)
+-- ----------------------------------------------------------------------------
+-- Adds:
+--   * public.plans update for 'lite' (10 origins, 3 team members, 30s refresh, 60/min API, 30/s + 60 burst, 10 shared reports/mo, pdf_export, advanced_filters, advanced_geo_analytics, team_collaboration)
+--   * public.projects.archived_at
+--   * public.project_invitations (token_hash, role, status, expires_at, RLS)
+--   * Composite filter indexes on public.visitors and public.page_views
+
 -- ============================================================================
 -- End of Consolidated Schema Definition
 -- ============================================================================

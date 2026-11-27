@@ -24,6 +24,7 @@ router.delete('/:id', projectController.deleteProject);
 router.get('/:id/settings', projectController.getProjectSettings);
 router.put('/:id/settings', projectController.updateProjectSettings);
 router.put('/:id/pin', projectController.togglePin);
+router.patch('/:id/archive', projectController.archiveProject);
 router.post('/:id/regenerate-token', projectController.regenerateShareToken);
 router.get('/:id/verify', projectController.verifyProjectInstallation);
 
@@ -34,10 +35,14 @@ router.post('/:id/origins/:originId/verify', originController.verifyProjectOrigi
 router.patch('/:id/origins/:originId/block', originController.toggleBlockProjectOrigin);
 router.delete('/:id/origins/:originId', originController.deleteProjectOrigin);
 
-// Team membership (max 1 owner on Nano)
+// Team membership (max 1 owner on Nano, max 3 on Lite)
 router.get('/:id/members', teamController.getProjectMembers);
 router.post('/:id/members', teamController.inviteProjectMember);
+router.post('/:id/members/invite', teamController.inviteProjectMember);
 router.delete('/:id/members/:memberId', teamController.removeProjectMember);
+router.delete('/:id/invitations/:invitationId', teamController.revokeProjectInvitation);
+router.post('/invitations/:token/accept', teamController.acceptProjectInvitation);
+router.post('/invitations/:token/reject', teamController.rejectProjectInvitation);
 
 // Shared reports (1/month, 7-day expiry snapshot on Nano)
 router.get('/:id/share-reports', shareController.listSharedReports);

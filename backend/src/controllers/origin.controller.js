@@ -1,42 +1,21 @@
-import supabase from '../config/supabase.js';
-import { isUuid } from '../utils/uuid.js';
+import { resolveAuthorizedProject } from '../utils/projectAuth.js';
 import originService from '../services/origin.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
-async function resolveOwnedProject(idOrName, userId) {
-  let query = supabase
-    .from('projects')
-    .select('id, name, user_id')
-    .eq('user_id', userId);
-
-  if (isUuid(idOrName)) {
-    query = query.eq('id', idOrName);
-  } else if (String(idOrName).startsWith('trk_')) {
-    query = query.eq('tracking_id', idOrName);
-  } else {
-    query = query.eq('name', idOrName);
-  }
-
-  const { data: project, error } = await query.maybeSingle();
-  if (error) throw error;
-  if (!project) throw AppError.notFound('Project not found');
-  return project;
-}
-
 export const getProjectOrigins = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'viewer');
   const origins = await originService.listOrigins(project.id);
   res.json(origins);
 });
 
 export const addProjectOrigin = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'admin');
   const { origin, verificationMethod } = req.body || {};
 
   const created = await originService.registerOrigin({
     projectId: project.id,
-    userId: req.user.id,
+    userId: project.owner_id || project.user_id,
     rawOrigin: origin,
     verificationMethod,
   });
@@ -45,13 +24,13 @@ export const addProjectOrigin = asyncHandler(async (req, res) => {
 });
 
 export const verifyProjectOrigin = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'admin');
   const { method } = req.body || {};
 
   const verified = await originService.verifyOrigin({
     projectId: project.id,
     originId: req.params.originId,
-    userId: req.user.id,
+    userId: project.owner_id || project.user_id,
     method,
   });
 
@@ -59,7 +38,7 @@ export const verifyProjectOrigin = asyncHandler(async (req, res) => {
 });
 
 export const toggleBlockProjectOrigin = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'admin');
   const { blocked } = req.body || {};
 
   if (typeof blocked !== 'boolean') {
@@ -69,7 +48,7 @@ export const toggleBlockProjectOrigin = asyncHandler(async (req, res) => {
   const updated = await originService.setOriginBlocked({
     projectId: project.id,
     originId: req.params.originId,
-    userId: req.user.id,
+    userId: project.owner_id || project.user_id,
     blocked,
   });
 
@@ -77,11 +56,11 @@ export const toggleBlockProjectOrigin = asyncHandler(async (req, res) => {
 });
 
 export const deleteProjectOrigin = asyncHandler(async (req, res) => {
-  const project = await resolveOwnedProject(req.params.id, req.user.id);
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'admin');
   const result = await originService.removeOrigin({
     projectId: project.id,
     originId: req.params.originId,
-    userId: req.user.id,
+    userId: project.owner_id || project.user_id,
   });
   res.json(result);
 });

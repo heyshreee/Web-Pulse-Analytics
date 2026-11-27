@@ -19,9 +19,17 @@ test('getPlanLimits returns correct limits for canonical 5 tiers', () => {
     const lite = getPlanLimits('lite');
     assert.equal(lite.monthlyViews, 100000);
     assert.equal(lite.projectLimit, 3);
-    assert.equal(lite.allowedOriginsLimit, 3);
+    assert.equal(lite.allowedOriginsLimit, 10);
     assert.equal(lite.retentionDays, 30);
-    assert.equal(lite.refreshRate, 15);
+    assert.equal(lite.refreshRate, 30);
+    assert.equal(lite.share_report, 10);
+    assert.equal(lite.limits.team_members, 3);
+    assert.equal(lite.features.globe_analyze, true);
+    assert.equal(lite.features.advanced_filters, true);
+    assert.equal(lite.features.csv_export, true);
+    assert.equal(lite.features.pdf_export, true);
+    assert.equal(lite.features.team_collaboration, true);
+    assert.equal(lite.access.v2_beta, false);
     assert.equal(lite.amount, 199);
 
     const pro = getPlanLimits('pro');

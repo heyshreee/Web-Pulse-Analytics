@@ -958,12 +958,45 @@ export const updateProjectSettings = asyncHandler(async (req, res) => {
     res.json(data);
 });
 
+export const archiveProject = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const archived = req.body?.archived !== undefined ? Boolean(req.body.archived) : true;
+
+    const project = await resolveOwnedProject(id, userId);
+
+    const { data, error } = await supabase
+        .from('projects')
+        .update({
+            archived_at: archived ? new Date().toISOString() : null,
+            is_active: !archived
+        })
+        .eq('id', project.id)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+    if (error) throw error;
+
+    await ActivityLogService.log(
+        project.id,
+        userId,
+        archived ? 'project.archived' : 'project.unarchived',
+        `Project "${project.name}" was ${archived ? 'archived' : 'restored'}`,
+        'success',
+        req.ip
+    );
+
+    res.json(data);
+});
+
 export default {
     createProject,
     getProjects,
     getProject,
     deleteProject,
     updateProject,
+    archiveProject,
     getShareReport,
     regenerateShareToken,
     revokeShareToken,
