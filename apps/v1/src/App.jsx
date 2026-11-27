@@ -5,7 +5,7 @@ import Layout from './components/Layout';
 import Spinner from './components/Spinner';
 import ScrollToTop from './components/ScrollToTop';
 import ExternalRedirect from './components/ExternalRedirect';
-import { apiRequest } from './utils/api';
+import { probeSession } from './utils/api';
 import { isAuthenticated, setSession, clearSession, SESSION_FLAG } from './utils/auth';
 
 const ShareReport = lazy(() => import('./pages/ShareReport'));
@@ -52,9 +52,9 @@ function PrivateRoute({ children }) {
         }
 
         // Seamless SSO session restoration: check if HttpOnly cookie session exists (e.g. from V2)
-        apiRequest('/auth/me')
-            .then((user) => {
-                if (isMounted && user && user.id) {
+        probeSession()
+            .then((data) => {
+                if (isMounted && data?.authenticated && data?.user?.id) {
                     setSession();
                     setAuthed(true);
                 } else if (isMounted) {
@@ -89,7 +89,13 @@ function PrivateRoute({ children }) {
 
     if (!authed) {
         const returnUrl = encodeURIComponent(location.pathname + location.search);
-        return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
+        return (
+            <Navigate
+                to={`/login?returnUrl=${returnUrl}`}
+                state={{ from: location, sessionChecked: true }}
+                replace
+            />
+        );
     }
     return children;
 }
@@ -117,71 +123,21 @@ function App() {
                                 <Route path="/auth/google/callback" element={<GoogleAuth><GoogleCallback /></GoogleAuth>} />
 
                                 {/* Protected V1 Dashboard Routes */}
-                                <Route element={<Layout />}>
-                                    <Route
-                                        path="/dashboard"
-                                        element={
-                                            <PrivateRoute>
-                                                <Dashboard />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/projects"
-                                        element={
-                                            <PrivateRoute>
-                                                <Projects />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/projects/:idOrName/:tab?"
-                                        element={
-                                            <PrivateRoute>
-                                                <ProjectDetail />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/api-key"
-                                        element={
-                                            <PrivateRoute>
-                                                <APIKeys />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/billing"
-                                        element={
-                                            <PrivateRoute>
-                                                <Billing />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/settings/:tab?"
-                                        element={
-                                            <PrivateRoute>
-                                                <Settings />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/projects/:idOrName/activity"
-                                        element={
-                                            <PrivateRoute>
-                                                <ProjectActivity />
-                                            </PrivateRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/dashboard/activity"
-                                        element={
-                                            <PrivateRoute>
-                                                <ProjectActivity />
-                                            </PrivateRoute>
-                                        }
-                                    />
+                                <Route
+                                    element={
+                                        <PrivateRoute>
+                                            <Layout />
+                                        </PrivateRoute>
+                                    }
+                                >
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/dashboard/projects" element={<Projects />} />
+                                    <Route path="/dashboard/projects/:idOrName/:tab?" element={<ProjectDetail />} />
+                                    <Route path="/dashboard/api-key" element={<APIKeys />} />
+                                    <Route path="/dashboard/billing" element={<Billing />} />
+                                    <Route path="/dashboard/settings/:tab?" element={<Settings />} />
+                                    <Route path="/dashboard/projects/:idOrName/activity" element={<ProjectActivity />} />
+                                    <Route path="/dashboard/activity" element={<ProjectActivity />} />
                                 </Route>
 
                                 {/* Public Marketing Redirects to Canonical Marketing Site */}

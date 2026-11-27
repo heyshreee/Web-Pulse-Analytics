@@ -678,3 +678,29 @@ test('production Content-Security-Policy excludes localhost entries', async () =
     process.env.NODE_ENV = originalEnv;
   }
 });
+
+test('GET /api/v1/auth/session returns 200 without 401 noise when unauthenticated while /auth/me remains 401', async (t) => {
+  const base = await startServer(t);
+
+  const sessionRes = await fetch(`${base}/api/v1/auth/session`, {
+    headers: { Origin: 'https://app.example.com' },
+  });
+  assert.equal(sessionRes.status, 200);
+  assert.equal(sessionRes.headers.get('cache-control'), 'no-store');
+  const sessionBody = await sessionRes.json();
+  assert.deepEqual(sessionBody, { authenticated: false, user: null });
+
+  const invalidRes = await fetch(`${base}/api/v1/auth/session`, {
+    headers: {
+      Origin: 'https://app.example.com',
+      Cookie: 'token=invalid.jwt.token',
+    },
+  });
+  assert.equal(invalidRes.status, 200);
+  assert.deepEqual(await invalidRes.json(), { authenticated: false, user: null });
+
+  const meRes = await fetch(`${base}/api/v1/auth/me`, {
+    headers: { Origin: 'https://app.example.com' },
+  });
+  assert.equal(meRes.status, 401);
+});

@@ -570,7 +570,14 @@ export default function Dashboard() {
           <div className="wp-studio-canvas flex-1 min-h-[380px] p-2.5 sm:p-3 flex flex-col justify-between min-w-0">
             {trafficData && trafficData.length > 0 ? (
               <div className="w-full h-full min-h-[360px] min-w-0 flex-1 relative" style={{ minHeight: 360 }}>
-                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={340} debounce={50}>
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  minWidth={0}
+                  minHeight={340}
+                  initialDimension={{ width: 640, height: 340 }}
+                  debounce={50}
+                >
                   <AreaChart data={trafficData} margin={{ top: 12, right: 12, left: -10, bottom: 4 }}>
                     <defs>
                       <linearGradient id="studioTrafficGrad" x1="0" y1="0" x2="0" y2="1">

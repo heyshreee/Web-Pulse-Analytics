@@ -567,13 +567,15 @@ const NetworkGlobe = ({
     // -------------------------------------------------------------
     let raf = 0;
     let last = performance.now();
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
+    timer.connect(document);
 
     const animate = () => {
       raf = requestAnimationFrame(animate);
       const now = performance.now();
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
+      timer.update(now);
 
       // throttle extra effects when tab is hidden
       if (document.hidden) {
@@ -583,7 +585,7 @@ const NetworkGlobe = ({
       }
 
       const s = stateRef.current;
-      const t = clock.getElapsedTime();
+      const t = timer.getElapsed();
 
       // ambient particles subtle drift
       if (s.ambientPts) {
@@ -646,6 +648,7 @@ const NetworkGlobe = ({
     return () => {
       cancelAnimationFrame(raf);
       cancelled = true;
+      timer.dispose();
       clearTimeout(rotateResumeTimer);
       controls.removeEventListener('start', pauseRotate);
       controls.removeEventListener('end', resumeRotate);

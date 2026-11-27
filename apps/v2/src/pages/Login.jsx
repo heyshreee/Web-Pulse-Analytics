@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { apiRequest } from '../utils/api';
-import { setSession, clearSession, wasJustLoggedOut, getSafeReturnUrl } from '../utils/auth';
+import { apiRequest, probeSession } from '../utils/api';
+import { setSession, clearSession, isAuthenticated, wasJustLoggedOut, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -29,14 +29,19 @@ export default function Login() {
             clearSession();
             return;
         }
+        if (location.state?.sessionChecked && !isAuthenticated()) {
+            return;
+        }
 
         let isMounted = true;
         // Verify active HttpOnly session with backend rather than trusting localStorage alone.
-        apiRequest('/auth/me')
-            .then((userData) => {
-                if (isMounted && userData && userData.id) {
+        probeSession()
+            .then((data) => {
+                if (isMounted && data?.authenticated && data?.user?.id) {
                     setSession();
                     navigate(returnUrl, { replace: true });
+                } else if (isMounted) {
+                    clearSession();
                 }
             })
             .catch((err) => {
@@ -97,6 +102,9 @@ export default function Login() {
         },
         onError: () => {
             showToast('Google login failed', 'error');
+            setIsGoogleLoading(false);
+        },
+        onNonOAuthError: () => {
             setIsGoogleLoading(false);
         }
     });

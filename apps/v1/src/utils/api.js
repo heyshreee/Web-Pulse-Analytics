@@ -107,3 +107,19 @@ export async function apiRequest(endpoint, options = {}) {
 
   return response.json();
 }
+
+let inFlightSessionProbe = null;
+
+/**
+ * Checks whether an active server cookie session exists without triggering HTTP 401
+ * noise in the browser console. Concurrent mounts (including React StrictMode) share
+ * a single in-flight request.
+ */
+export function probeSession() {
+  if (!inFlightSessionProbe) {
+    inFlightSessionProbe = apiRequest('/auth/session').finally(() => {
+      inFlightSessionProbe = null;
+    });
+  }
+  return inFlightSessionProbe;
+}

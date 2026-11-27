@@ -12,6 +12,7 @@ import { getClientIp } from '../utils/ip.js';
 import { randomUUID } from 'crypto';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
+import { resolveSession } from '../middlewares/auth.js';
 
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days (matches JWT TTL)
 
@@ -208,6 +209,18 @@ export const logout = asyncHandler(async (req, res) => {
 
 export const getMe = async (req, res) => {
     res.json(req.user);
+};
+
+export const getSession = async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const result = await resolveSession(req);
+    if (result.status === 503) {
+        return res.status(503).json({ error: result.error });
+    }
+    if (!result.authenticated) {
+        return res.json({ authenticated: false, user: null });
+    }
+    return res.json({ authenticated: true, user: result.user });
 };
 
 export const verifyEmail = asyncHandler(async (req, res) => {
@@ -576,4 +589,4 @@ export const googleLogin = asyncHandler(async (req, res) => {
     res.json({ token: jwtToken, user: publicUser(user) });
 });
 
-export default { register, login, logout, getMe, verifyEmail, resendVerification, forgotPassword, resetPassword, googleLogin };
+export default { register, login, logout, getMe, getSession, verifyEmail, resendVerification, forgotPassword, resetPassword, googleLogin };

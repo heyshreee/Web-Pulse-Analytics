@@ -3,8 +3,8 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars -- `motion` is only used as a JSX member expression
 import { motion, useReducedMotion } from 'framer-motion';
 import { Mail, Lock, Loader2, User, Eye, EyeOff } from 'lucide-react';
-import { apiRequest } from '../utils/api';
-import { setSession, clearSession, wasJustLoggedOut, getSafeReturnUrl } from '../utils/auth';
+import { apiRequest, probeSession } from '../utils/api';
+import { setSession, clearSession, isAuthenticated, wasJustLoggedOut, getSafeReturnUrl } from '../utils/auth';
 import { useToast } from '../context/ToastContext';
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleLoading from '../components/GoogleLoading';
@@ -32,14 +32,19 @@ export default function Register() {
             clearSession();
             return;
         }
+        if (location.state?.sessionChecked && !isAuthenticated()) {
+            return;
+        }
 
         let isMounted = true;
         // Verify active HttpOnly session with backend rather than trusting localStorage alone.
-        apiRequest('/auth/me')
-            .then((userData) => {
-                if (isMounted && userData && userData.id) {
+        probeSession()
+            .then((data) => {
+                if (isMounted && data?.authenticated && data?.user?.id) {
                     setSession();
                     navigate(returnUrl, { replace: true });
+                } else if (isMounted) {
+                    clearSession();
                 }
             })
             .catch((err) => {
@@ -109,6 +114,9 @@ export default function Register() {
         },
         onError: () => {
             showToast('Google login failed', 'error');
+            setIsGoogleLoading(false);
+        },
+        onNonOAuthError: () => {
             setIsGoogleLoading(false);
         }
     });

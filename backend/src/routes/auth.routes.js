@@ -12,6 +12,7 @@ router.post('/resend-verification', authLimiter, authController.resendVerificati
 router.post('/forgot-password', authLimiter, authController.forgotPassword);
 router.post('/reset-password', authLimiter, authController.resetPassword);
 router.post('/google-login', authLimiter, authController.googleLogin);
+router.get('/session', authController.getSession);
 router.get('/me', auth, authController.getMe);
 
 export default router;

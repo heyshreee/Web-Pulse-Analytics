@@ -9,7 +9,7 @@ import {
   clearLoggedOut,
   SESSION_FLAG,
 } from '../src/utils/auth.js';
-import { apiRequest } from '../src/utils/api.js';
+import { apiRequest, probeSession } from '../src/utils/api.js';
 
 function createMemoryStorage() {
   const store = new Map();
@@ -101,5 +101,23 @@ describe('V2 Session & Logout Guards', () => {
     await expect(apiRequest('/projects')).rejects.toThrow('Session revoked');
     expect(isAuthenticated()).toBe(false);
     expect(assignMock).toHaveBeenCalledWith('/login?returnUrl=%2Fdashboard');
+  });
+
+  it('coalesces concurrent probeSession() calls into a single /auth/session request', async () => {
+    let calls = 0;
+    globalThis.fetch = vi.fn(async (url) => {
+      calls += 1;
+      expect(url).toContain('/auth/session');
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ authenticated: false, user: null }),
+      };
+    });
+
+    const [a, b] = await Promise.all([probeSession(), probeSession()]);
+    expect(calls).toBe(1);
+    expect(a).toEqual({ authenticated: false, user: null });
+    expect(b).toEqual({ authenticated: false, user: null });
   });
 });
