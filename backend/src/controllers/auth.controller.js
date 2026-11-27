@@ -35,16 +35,27 @@ const issueSession = async (user, req) => {
     return token;
 };
 
-const getCookieOptions = () => ({
+const getBaseCookieOptions = () => ({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
+    path: '/',
+});
+
+const getCookieOptions = () => ({
+    ...getBaseCookieOptions(),
     maxAge: SESSION_MAX_AGE_MS,
     ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {})
 });
 
 const setSessionCookie = (res, token) => {
-    res.cookie('token', token, getCookieOptions());
+    const options = getCookieOptions();
+    // Evict any prior host-only cookie when COOKIE_DOMAIN is configured so the
+    // browser does not keep two `token` cookies across subdomains.
+    if (options.domain) {
+        res.clearCookie('token', getBaseCookieOptions());
+    }
+    res.cookie('token', token, options);
 };
 
 const publicUser = (user) => ({
@@ -188,6 +199,9 @@ export const logout = asyncHandler(async (req, res) => {
         await sessionService.revokeSessionByTokenId(req.user.id, req.tokenId);
     }
     const { maxAge: _discard, ...clearOptions } = getCookieOptions();
+    if (clearOptions.domain) {
+        res.clearCookie('token', getBaseCookieOptions());
+    }
     res.clearCookie('token', clearOptions);
     res.json({ message: 'Logged out successfully' });
 });

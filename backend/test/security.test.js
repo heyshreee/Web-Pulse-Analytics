@@ -392,6 +392,29 @@ test('Session cookie configuration enforces HttpOnly and SameSite=Lax', async ()
   assert.equal(clearedCookie.name, 'token');
   assert.equal(clearedCookie.options.httpOnly, true);
   assert.equal(clearedCookie.options.sameSite, 'lax');
+  assert.equal(clearedCookie.options.path, '/');
+
+  // Verify logout clears both host-only and domain-scoped cookies when COOKIE_DOMAIN is set
+  const prevDomain = process.env.COOKIE_DOMAIN;
+  process.env.COOKIE_DOMAIN = '.example.com';
+  const clearedCalls = [];
+  try {
+    await authController.logout(
+      mockReq,
+      {
+        clearCookie: (name, options) => clearedCalls.push({ name, options }),
+        json: () => {},
+      },
+      mockNext
+    );
+  } finally {
+    if (prevDomain === undefined) delete process.env.COOKIE_DOMAIN;
+    else process.env.COOKIE_DOMAIN = prevDomain;
+  }
+  assert.equal(clearedCalls.length, 2);
+  assert.equal(clearedCalls[0].options.domain, undefined);
+  assert.equal(clearedCalls[1].options.domain, '.example.com');
+  assert.equal(clearedCalls[1].options.path, '/');
 });
 
 test('Safe return URL validation blocks open redirects and allows trusted domains', () => {
