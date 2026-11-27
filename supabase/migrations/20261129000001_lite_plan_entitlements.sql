@@ -1,7 +1,7 @@
 -- ============================================================================
 -- WebPulse Analytics — Lite Plan Entitlements, Invitations, Archiving & Filter Indexes
 -- Migration: 20261129000001_lite_plan_entitlements.sql
--- Idempotent & non-destructive: preserves existing Nano/Pro/Max customer data.
+-- Idempotent & non-destructive: matched to live Supabase schema.
 -- ============================================================================
 
 -- 1. Update Lite row in public.plans to match canonical Lite limits & entitlements
@@ -20,7 +20,7 @@ SET
     'shared_reports_per_month', 10,
     'share_link_expiry_days', 30
   ),
-  features = jsonb_build_object(
+  entitlements = jsonb_build_object(
     'basic_analytics', true,
     'visitor_analytics', true,
     'traffic_sources', true,
@@ -52,11 +52,17 @@ SET
     'v2_beta', false,
     'alpha', false
   ),
+  allowed_origins = 10,
+  team_members_limit = 3,
+  refresh_rate = 30,
+  share_report = 10,
+  share_reports_limit = 10,
+  share_link_expiry_days = 30,
   api_requests_per_minute = 60,
   ingestion_events_per_second = 30,
   ingestion_burst = 60,
   updated_at = now()
-WHERE id = 'lite' OR plan_id = 'lite';
+WHERE id = 'lite';
 
 -- 2. Project archiving support (non-destructive)
 ALTER TABLE public.projects
@@ -111,12 +117,12 @@ CREATE POLICY "Project owners can manage invitations"
     )
   );
 
--- 4. Advanced analytics filter indexes (country, region, device, browser, OS, UTM)
+-- 4. Advanced analytics filter indexes (matched to live columns on visitors, sessions, page_views)
 CREATE INDEX IF NOT EXISTS visitors_project_country_device_idx
   ON public.visitors(project_id, country, device_type, last_seen DESC);
 CREATE INDEX IF NOT EXISTS visitors_project_browser_os_idx
   ON public.visitors(project_id, browser, os);
-CREATE INDEX IF NOT EXISTS visitors_project_utm_idx
-  ON public.visitors(project_id, utm_source, utm_medium, utm_campaign);
+CREATE INDEX IF NOT EXISTS sessions_project_utm_idx
+  ON public.sessions(project_id, utm_source, utm_medium, utm_campaign);
 CREATE INDEX IF NOT EXISTS page_views_project_path_time_idx
   ON public.page_views(project_id, path, created_at DESC);
