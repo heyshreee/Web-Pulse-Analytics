@@ -103,6 +103,8 @@ export default function Dashboard() {
   const [showSnippetOverlay, setShowSnippetOverlay] = useState(true);
   const inFlightRef = useRef(false);
   const overviewCacheRef = useRef(new Map());
+  const loadUserRef = useRef(loadUser);
+  loadUserRef.current = loadUser;
 
   const refreshIntervalMs = Math.max(
     5000,
@@ -183,7 +185,7 @@ export default function Dashboard() {
 
     if (socket) {
       const handleVisitorUpdate = () => loadData(false);
-      const handleUsageUpdate = () => loadUser();
+      const handleUsageUpdate = () => loadUserRef.current?.();
 
       socket.on('visitor_update', handleVisitorUpdate);
       socket.on('usage_update', handleUsageUpdate);
@@ -204,7 +206,7 @@ export default function Dashboard() {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       }
     };
-  }, [user?.id, refreshIntervalMs, socket, loadData, loadUser]);
+  }, [user?.id, refreshIntervalMs, socket, loadData]);
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
