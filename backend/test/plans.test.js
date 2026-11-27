@@ -7,9 +7,13 @@ test('getPlanLimits returns correct limits for canonical 5 tiers', () => {
     const nano = getPlanLimits('nano');
     assert.equal(nano.monthlyViews, 10000);
     assert.equal(nano.projectLimit, 1);
-    assert.equal(nano.allowedOriginsLimit, 1);
+    assert.equal(nano.allowedOriginsLimit, 3);
     assert.equal(nano.retentionDays, 7);
     assert.equal(nano.refreshRate, 60);
+    assert.equal(nano.share_report, 1);
+    assert.equal(nano.limits.team_members, 1);
+    assert.equal(nano.features.globe_analyze, false);
+    assert.equal(nano.access.v2_beta, false);
     assert.equal(nano.amount, 0);
 
     const lite = getPlanLimits('lite');

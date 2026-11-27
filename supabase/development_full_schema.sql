@@ -1313,6 +1313,17 @@ CREATE POLICY "Users can update own notifications"
   USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
 
+-- ----------------------------------------------------------------------------
+-- 9. Nano Plan Entitlements, Verified Origins, Idempotency & Shared Reports
+--    (See supabase/migrations/20261128000001_nano_plan_entitlements.sql)
+-- ----------------------------------------------------------------------------
+-- Adds:
+--   * public.plans.limits / features / access / rate-limit columns (Nano: 3 origins, 1 share/mo, 7d retention, globe_analyze=false)
+--   * public.project_origins (DNS TXT & .well-known file verification, exact origin matching, block toggle)
+--   * public.ingested_events (per-project event_id idempotency)
+--   * public.shared_reports (SHA-256 token_hash, anonymized snapshot_data, 7-day expiry, revocation)
+--   * RPCs: consume_monthly_event_quota, check_shared_report_quota, cleanup_expired_analytics
+
 -- ============================================================================
 -- End of Consolidated Schema Definition
 -- ============================================================================

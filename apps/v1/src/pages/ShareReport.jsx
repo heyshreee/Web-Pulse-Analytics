@@ -136,9 +136,14 @@ export default function ShareReport() {
                                 <TrendingUp className="h-4 w-4 text-ink-muted" />
                                 <span className="wp-title-card">Traffic Momentum</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-xs font-mono text-ink-secondary">
+                            <div className="flex items-center gap-2 text-xs font-mono text-ink-secondary">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                <span>Live Telemetry</span>
+                                <span>Read-only Snapshot</span>
+                                {data?.expires_at && (
+                                    <span className="text-ink-muted">
+                                        · Expires {new Date(data.expires_at).toLocaleDateString()}
+                                    </span>
+                                )}
                             </div>
                         </div>
                         <div className="wp-studio-canvas p-4 h-[300px] w-full min-w-0">

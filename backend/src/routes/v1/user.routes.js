@@ -3,9 +3,13 @@ const router = express.Router();
 import userController from '../../controllers/user.controller.js';
 import linkedAccountsController from '../../controllers/linked-accounts.controller.js';
 import authenticate from '../../middlewares/auth.js';
+import { apiPlanLimiter } from '../../middlewares/rateLimiter.js';
+import { requireSurfaceAccess } from '../../middlewares/entitlements.js';
 import upload from '../../middlewares/upload.js';
 
 router.use(authenticate);
+router.use(apiPlanLimiter);
+router.use(requireSurfaceAccess());
 
 router.put('/profile', userController.updateProfile);
 router.put('/avatar', upload.single('avatar'), userController.updateAvatar);

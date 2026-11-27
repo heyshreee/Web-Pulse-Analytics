@@ -160,9 +160,11 @@ export default function Layout() {
     };
   }, [navigate]);
 
-  // Usage + Sockets connection (strictly gated on verified user)
+  // Usage + Sockets connection (strictly gated on verified user & v2_beta surface access)
+  const hasV2BetaAccess = user?.entitlements?.access?.v2_beta !== false;
+
   useEffect(() => {
-    if (!user || isLoggingOut) return;
+    if (!user || isLoggingOut || !hasV2BetaAccess) return;
 
     loadUsage();
 
@@ -268,6 +270,47 @@ export default function Layout() {
         label="Authenticating workspace…"
         subLabel="Connecting to WebPulse secure telemetry"
       />
+    );
+  }
+
+  if (!hasV2BetaAccess) {
+    const planLabel = String(user?.normalized_plan || user?.plan || 'nano').toUpperCase();
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-black text-white">
+        <div className="max-w-md w-full rounded-xl border border-zinc-800 bg-zinc-950 p-6 space-y-4 text-center">
+          <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            V2 Beta Restricted · {planLabel} Plan
+          </div>
+          <h1 className="text-lg font-semibold tracking-tight">
+            V2 Beta requires Pro or higher
+          </h1>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            Your {planLabel} subscription includes full access to the V1 Stable production dashboard at{' '}
+            <span className="font-mono text-zinc-200">app.webpulseanalytics.tech</span>. Upgrade to Pro or Max to unlock the V2 Beta workspace.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <a
+              href="https://app.webpulseanalytics.tech/dashboard"
+              className="flex-1 inline-flex items-center justify-center h-9 px-4 rounded-lg bg-white text-black text-xs font-medium hover:bg-zinc-200 transition-colors"
+            >
+              Open V1 Stable
+            </a>
+            <a
+              href="https://app.webpulseanalytics.tech/dashboard/billing"
+              className="flex-1 inline-flex items-center justify-center h-9 px-4 rounded-lg border border-zinc-700 text-zinc-200 text-xs font-medium hover:bg-zinc-900 transition-colors"
+            >
+              Upgrade Plan
+            </a>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-xs font-mono text-zinc-500 hover:text-zinc-300 underline pt-1"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
     );
   }
 

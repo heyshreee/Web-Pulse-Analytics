@@ -1,364 +1,491 @@
 import supabase from '../config/supabase.js';
 import NotificationService from './notification.service.js';
 import ActivityLogService from './activity.service.js';
+import {
+  PLAN_ALIASES,
+  PLANS,
+  getPlanConfig,
+  getPlanLimits,
+  normalizePlanId,
+} from '../config/plans.js';
 
-const PLAN_ALIASES = {
-    free: 'nano',
-    basic: 'lite',
-    business: 'max'
-};
+export { PLAN_ALIASES, PLANS, getPlanLimits, getPlanConfig, normalizePlanId };
 
-const PLAN_LIMITS = {
-    nano: {
-        monthlyViews: 10000,
-        storageLimit: 1 * 1024 * 1024 * 1024, // 1GB
-        projectLimit: 1,
-        liveLogs: false,
-        emailIntegrity: false,
-        allowedOriginsLimit: 1,
-        share_report: 0,
-        retentionDays: 7,
-        refreshRate: 60,
-        amount: 0,
-        price_inr: 0,
-        price_usd: 0
-    },
-    lite: {
-        monthlyViews: 100000,
-        storageLimit: 5 * 1024 * 1024 * 1024, // 5GB
-        projectLimit: 3,
-        liveLogs: false,
-        emailIntegrity: false,
-        allowedOriginsLimit: 3,
-        share_report: 1,
-        retentionDays: 30,
-        refreshRate: 15,
-        amount: 199,
-        price_inr: 199,
-        price_usd: 2.49
-    },
-    pro: {
-        monthlyViews: 1000000,
-        storageLimit: 20 * 1024 * 1024 * 1024, // 20GB
-        projectLimit: 10,
-        liveLogs: true,
-        emailIntegrity: true,
-        allowedOriginsLimit: 10,
-        share_report: 5,
-        retentionDays: 90,
-        refreshRate: 5,
-        amount: 699,
-        price_inr: 699,
-        price_usd: 8.99
-    },
-    max: {
-        monthlyViews: 5000000,
-        storageLimit: 100 * 1024 * 1024 * 1024, // 100GB
-        projectLimit: 50,
-        liveLogs: true,
-        emailIntegrity: true,
-        allowedOriginsLimit: 25,
-        share_report: 100,
-        retentionDays: 365,
-        refreshRate: 1,
-        amount: 1999,
-        price_inr: 1999,
-        price_usd: 24.99
-    },
-    enterprise: {
-        monthlyViews: 50000000,
-        storageLimit: 500 * 1024 * 1024 * 1024, // 500GB
-        projectLimit: 500,
-        liveLogs: true,
-        emailIntegrity: true,
-        allowedOriginsLimit: 100,
-        share_report: 500,
-        retentionDays: 730,
-        refreshRate: 1,
-        amount: 'custom',
-        price_inr: null,
-        price_usd: null
-    }
-};
+// Per-user in-process async mutex for environments where DB RPC is absent (e.g., tests or un-migrated DB)
+const userQuotaQueues = new Map();
+const sentMonthlyAlerts = new Map();
+
+function getUtcMonthKey(date = new Date()) {
+  return date.toISOString().slice(0, 7);
+}
+
+export function getNextUtcMonthResetDate(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  return new Date(Date.UTC(year, month + 1, 1, 0, 0, 0, 0)).toISOString();
+}
+
+function enqueueForUser(key, task) {
+  const prev = userQuotaQueues.get(key) || Promise.resolve();
+  const next = prev.then(task, task);
+  userQuotaQueues.set(key, next.catch(() => {}));
+  return next;
+}
+
+async function emitQuotaThresholdNotification(userId, totalViews, monthlyLimit, resetDate) {
+  if (!userId || !monthlyLimit || monthlyLimit <= 0) return null;
+
+  const monthKey = getUtcMonthKey();
+  const pct = (totalViews / monthlyLimit) * 100;
+  let level = null;
+  let title = null;
+  let message = null;
+  let type = 'info';
+
+  if (totalViews >= monthlyLimit) {
+    level = '100';
+    type = 'error';
+    title = 'Usage Alert: Monthly Limit Reached';
+    message = `You have reached 100% of your monthly tracking limit (${monthlyLimit.toLocaleString()} events). Additional billable events are paused until ${resetDate.slice(0, 10)} UTC. Upgrade your plan for higher capacity.`;
+  } else if (pct >= 90) {
+    level = '90';
+    type = 'warning';
+    title = 'Usage Warning: 90% Quota Used';
+    message = `You have used ${totalViews.toLocaleString()} of ${monthlyLimit.toLocaleString()} monthly events (90%+). Upgrade soon to avoid tracking interruption.`;
+  } else if (pct >= 80) {
+    level = '80';
+    type = 'info';
+    title = 'Usage Notice: 80% Quota Used';
+    message = `You have used ${totalViews.toLocaleString()} of ${monthlyLimit.toLocaleString()} monthly events (80%+). Quotas reset on ${resetDate.slice(0, 10)} UTC.`;
+  }
+
+  if (!level) return null;
+
+  const dedupKey = `${userId}:${monthKey}:${level}`;
+  if (sentMonthlyAlerts.has(dedupKey)) return level;
+  sentMonthlyAlerts.set(dedupKey, true);
+
+  await NotificationService.create(userId, title, message, type);
+  return level;
+}
 
 /**
- * Get limits for a specific plan
- */
-export const getPlanLimits = (plan = 'nano') => {
-    const normalized = PLAN_ALIASES[plan] || plan;
-    return PLAN_LIMITS[normalized] || PLAN_LIMITS.nano;
-};
-
-/**
- * Calculate current usage for a user
+ * Calculate current usage, plan entitlements, and billing-cycle status for a user.
  */
 export const calculateUsage = async (userId) => {
-    const currentMonth = new Date().toISOString().slice(0, 7);
+  const now = new Date();
+  const currentMonth = getUtcMonthKey(now);
+  const resetDate = getNextUtcMonthResetDate(now);
 
-    // 1. Get user plan
-    const { data: user } = await supabase
-        .from('users')
-        .select('plan')
-        .eq('id', userId)
-        .single();
+  const { data: user } = await supabase
+    .from('users')
+    .select('plan')
+    .eq('id', userId)
+    .single();
 
-    const plan = user?.plan || 'free';
-    const limits = getPlanLimits(plan);
+  const rawPlan = user?.plan || 'nano';
+  const plan = normalizePlanId(rawPlan);
+  const cfg = getPlanConfig(plan);
+  const limits = getPlanLimits(plan);
 
-    // 2. Calculate Views (Current Month)
-    const { data: projects } = await supabase
-        .from('projects')
-        .select('id')
-        .eq('user_id', userId);
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('user_id', userId);
 
-    let totalViews = 0;
-    if (projects && projects.length > 0) {
-        const projectIds = projects.map(p => p.id);
-        const { data: usages } = await supabase
-            .from('usages')
-            .select('views')
-            .in('project_id', projectIds)
-            .eq('month', currentMonth);
+  let totalViews = 0;
+  if (projects && projects.length > 0) {
+    const projectIds = projects.map((p) => p.id);
+    const { data: usages } = await supabase
+      .from('usages')
+      .select('views, count')
+      .in('project_id', projectIds)
+      .eq('month', currentMonth);
 
-        if (usages) {
-            totalViews = usages.reduce((acc, curr) => acc + curr.views, 0);
-        }
+    if (usages) {
+      totalViews = usages.reduce((acc, curr) => acc + (curr.views ?? curr.count ?? 0), 0);
     }
+  }
 
-    // 3. Calculate Storage (Estimated)
-    const [{ count: visitorCount }, { count: viewCount }] = await Promise.all([
-        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('user_id', userId),
-        supabase.from('page_views').select('*', { count: 'exact', head: true }).eq('user_id', userId)
-    ]);
+  const [{ count: visitorCount }, { count: viewCount }] = await Promise.all([
+    supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+    supabase.from('page_views').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+  ]);
 
-    // Estimate: ~1.35MB per visitor row, ~1.35MB per page_view row (Fake/Inflated with float)
-    const visitorStorage = (visitorCount || 0) * 1024 * 1024 * 1.35;
-    const viewStorage = (viewCount || 0) * 1024 * 1024 * 1.35;
-    const storageUsed = visitorStorage + viewStorage;
+  // Realistic metadata footprint (~2 KB per visitor/view row)
+  const visitorStorage = (visitorCount || 0) * 2048;
+  const viewStorage = (viewCount || 0) * 2048;
+  const storageUsed = visitorStorage + viewStorage;
 
-    // Update storage_used in users table (as requested)
-    // We do this asynchronously and don't block the return
-    supabase.from('users')
-        .update({
-            storage_used: Math.round(storageUsed),
-            storage_limit: Math.round(limits.storageLimit)
-        })
-        .eq('id', userId)
-        .then(({ error }) => {
-            if (error) {
-                // Determine if it is a transient connection error
-                const isTimeout = error.message?.includes('fetch failed') || error.code === 'UND_ERR_CONNECT_TIMEOUT';
-                if (isTimeout) {
-                    console.warn(`[UsageService] Background updated for userId ${userId} timed out. Will retry next session.`);
-                } else {
-                    console.error('Failed to update storage stats in supabase:', error);
-                }
-            }
-        })
-        .catch(err => {
-            const isTimeout = err.message?.includes('fetch failed') || err.code === 'UND_ERR_CONNECT_TIMEOUT';
-            if (!isTimeout) {
-                console.error(`[UsageService] Unexpected error updating stats for userId ${userId}:`, err.message);
-            } else {
-                console.warn(`[UsageService] Connectivity timeout updating stats for userId ${userId}`);
-            }
-        });
-    // 4. Calculate Share Reports (Projects with share_token)
-    const { count: shareReportCount } = await supabase
+  // Non-blocking background sync of cached user storage columns
+  supabase
+    .from('users')
+    .update({
+      storage_used: Math.round(storageUsed),
+      storage_limit: Math.round(limits.storageLimit),
+    })
+    .eq('id', userId)
+    .then(({ error }) => {
+      if (error && !error.message?.includes('fetch failed') && error.code !== 'UND_ERR_CONNECT_TIMEOUT') {
+        console.error('Failed to update storage stats in supabase:', error);
+      }
+    })
+    .catch(() => {});
+
+  // Count shared reports created during the current UTC billing month
+  let shareReportCount = 0;
+  try {
+    const { count, error: srErr } = await supabase
+      .from('shared_reports')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('month', currentMonth);
+
+    if (!srErr && count !== null && count !== undefined) {
+      shareReportCount = count;
+    } else {
+      const { count: legacyCount } = await supabase
         .from('projects')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .not('share_token', 'is', null);
+      shareReportCount = legacyCount || 0;
+    }
+  } catch {
+    shareReportCount = 0;
+  }
 
-    return {
-        totalViews,
-        monthlyLimit: limits.monthlyViews,
-        monthlyViews: limits.monthlyViews,
-        storageUsed,
-        storageLimit: limits.storageLimit,
-        storageBreakdown: {
-            visitors: visitorStorage,
-            pageViews: viewStorage
-        },
-        plan,
-        projectLimit: limits.projectLimit,
-        liveLogs: limits.liveLogs,
-        emailIntegrity: limits.emailIntegrity,
-        allowedOriginsLimit: limits.allowedOriginsLimit,
-        share_report: {
-            used: shareReportCount || 0,
-            limit: limits.share_report
-        },
-        projectCount: projects?.length || 0
-    };
+  const shareLimit = limits.share_report || 0;
+  const usagePercent =
+    limits.monthlyViews > 0
+      ? Math.min(100, Math.round((totalViews / limits.monthlyViews) * 1000) / 10)
+      : 0;
+
+  return {
+    totalViews,
+    monthlyLimit: limits.monthlyViews,
+    monthlyViews: limits.monthlyViews,
+    usagePercent,
+    quotaExceeded: totalViews >= limits.monthlyViews,
+    billingMonth: currentMonth,
+    resetDate,
+    storageUsed,
+    storageLimit: limits.storageLimit,
+    storageBreakdown: {
+      visitors: visitorStorage,
+      pageViews: viewStorage,
+    },
+    plan,
+    projectLimit: limits.projectLimit,
+    liveLogs: limits.liveLogs,
+    emailIntegrity: limits.emailIntegrity,
+    allowedOriginsLimit: limits.allowedOriginsLimit,
+    teamMembersLimit: limits.teamMembersLimit,
+    retentionDays: limits.retentionDays,
+    refreshRate: limits.refreshRate,
+    apiRequestsPerMinute: limits.apiRequestsPerMinute,
+    ingestionEventsPerSecond: limits.ingestionEventsPerSecond,
+    ingestionBurst: limits.ingestionBurst,
+    share_report: {
+      used: shareReportCount,
+      limit: shareLimit,
+      remaining: Math.max(0, shareLimit - shareReportCount),
+      expiryDays: limits.shareLinkExpiryDays,
+    },
+    limits: { ...cfg.limits },
+    features: { ...cfg.features },
+    access: { ...cfg.access },
+    projectCount: projects?.length || 0,
+  };
 };
 
 /**
  * Calculate storage and stats for a specific project
  */
 export const calculateProjectUsage = async (projectId) => {
-    const [{ count: visitorCount }, { count: viewCount }] = await Promise.all([
-        supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', projectId),
-        supabase.from('page_views').select('*', { count: 'exact', head: true }).eq('project_id', projectId)
-    ]);
+  const [{ count: visitorCount }, { count: viewCount }] = await Promise.all([
+    supabase.from('visitors').select('*', { count: 'exact', head: true }).eq('project_id', projectId),
+    supabase.from('page_views').select('*', { count: 'exact', head: true }).eq('project_id', projectId),
+  ]);
 
-    const visitorStorage = (visitorCount || 0) * 1024 * 1024 * 1.35;
-    const viewStorage = (viewCount || 0) * 1024 * 1024 * 1.35;
-    const storageUsed = visitorStorage + viewStorage;
+  const visitorStorage = (visitorCount || 0) * 2048;
+  const viewStorage = (viewCount || 0) * 2048;
+  const storageUsed = visitorStorage + viewStorage;
 
-    // Calculate sessions per user for this project
-    const { data: sessions } = await supabase
-        .from('visitors')
-        .select('session_id')
-        .eq('project_id', projectId);
+  const { data: sessions } = await supabase
+    .from('visitors')
+    .select('session_id')
+    .eq('project_id', projectId);
 
-    const uniqueSessions = new Set(sessions?.map(s => s.session_id)).size;
+  const uniqueSessions = new Set(sessions?.map((s) => s.session_id)).size;
 
-    return {
-        storageUsed,
-        storageBreakdown: {
-            visitors: visitorStorage,
-            pageViews: viewStorage
-        },
-        visitorCount: visitorCount || 0,
-        viewCount: viewCount || 0,
-        sessionCount: uniqueSessions
-    };
+  return {
+    storageUsed,
+    storageBreakdown: {
+      visitors: visitorStorage,
+      pageViews: viewStorage,
+    },
+    visitorCount: visitorCount || 0,
+    viewCount: viewCount || 0,
+    sessionCount: uniqueSessions,
+  };
 };
 
 /**
- * Check if a user can still track data
+ * Atomically checks and consumes 1 billable event from the owner's monthly quota.
+ * Duplicate eventIds return `{ allowed: true, duplicate: true }` without consuming quota.
+ */
+export const consumeEventQuota = async (userId, projectId, eventId = null) => {
+  const now = new Date();
+  const currentMonth = getUtcMonthKey(now);
+  const resetDate = getNextUtcMonthResetDate(now);
+
+  const { data: user } = await supabase
+    .from('users')
+    .select('plan')
+    .eq('id', userId)
+    .single();
+
+  const plan = normalizePlanId(user?.plan || 'nano');
+  const limits = getPlanLimits(plan);
+  const monthlyLimit = limits.monthlyViews;
+
+  const cleanEventId = eventId ? String(eventId).trim().slice(0, 128) : null;
+
+  // Try database-level advisory-locked RPC first
+  const { data: rpcResult, error: rpcError } = await supabase.rpc('consume_monthly_event_quota', {
+    p_user_id: userId,
+    p_project_id: projectId,
+    p_month: currentMonth,
+    p_limit: monthlyLimit,
+    p_event_id: cleanEventId,
+  });
+
+  if (!rpcError && rpcResult && typeof rpcResult.allowed === 'boolean') {
+    const total = Number(rpcResult.current_total ?? 0);
+    await emitQuotaThresholdNotification(userId, total, monthlyLimit, resetDate);
+
+    return {
+      allowed: rpcResult.allowed,
+      duplicate: Boolean(rpcResult.duplicate),
+      currentTotal: total,
+      monthlyLimit,
+      plan,
+      resetDate,
+      reason: rpcResult.allowed
+        ? null
+        : `Monthly event limit reached on ${plan} plan (${total.toLocaleString()}/${monthlyLimit.toLocaleString()}). Upgrade to continue tracking.`,
+    };
+  }
+
+  // Serialized per-user fallback when RPC is unavailable (local un-migrated schema or unit tests)
+  return enqueueForUser(`${userId}:${currentMonth}`, async () => {
+    if (cleanEventId) {
+      const { data: existingDedup } = await supabase
+        .from('ingested_events')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('event_id', cleanEventId)
+        .maybeSingle();
+
+      if (existingDedup) {
+        const usage = await calculateUsage(userId);
+        return {
+          allowed: true,
+          duplicate: true,
+          currentTotal: usage.totalViews,
+          monthlyLimit,
+          plan,
+          resetDate,
+          reason: null,
+        };
+      }
+    }
+
+    const usage = await calculateUsage(userId);
+    if (usage.totalViews >= monthlyLimit) {
+      await emitQuotaThresholdNotification(userId, usage.totalViews, monthlyLimit, resetDate);
+      return {
+        allowed: false,
+        duplicate: false,
+        currentTotal: usage.totalViews,
+        monthlyLimit,
+        plan,
+        resetDate,
+        reason: `Monthly event limit reached on ${plan} plan (${usage.totalViews.toLocaleString()}/${monthlyLimit.toLocaleString()}). Upgrade to continue tracking.`,
+      };
+    }
+
+    if (cleanEventId) {
+      const { error: dedupErr } = await supabase.from('ingested_events').insert({
+        project_id: projectId,
+        event_id: cleanEventId,
+        month: currentMonth,
+      });
+
+      if (dedupErr && dedupErr.code === '23505') {
+        return {
+          allowed: true,
+          duplicate: true,
+          currentTotal: usage.totalViews,
+          monthlyLimit,
+          plan,
+          resetDate,
+          reason: null,
+        };
+      }
+    }
+
+    const { data: existingRow } = await supabase
+      .from('usages')
+      .select('views, count')
+      .eq('project_id', projectId)
+      .eq('month', currentMonth)
+      .maybeSingle();
+
+    if (existingRow) {
+      const nextViews = (existingRow.views ?? existingRow.count ?? 0) + 1;
+      await supabase
+        .from('usages')
+        .update({ views: nextViews, count: nextViews, updated_at: new Date().toISOString() })
+        .eq('project_id', projectId)
+        .eq('month', currentMonth);
+    } else {
+      await supabase.from('usages').insert({
+        user_id: userId,
+        project_id: projectId,
+        event_type: 'event',
+        count: 1,
+        period: currentMonth,
+        month: currentMonth,
+        views: 1,
+      });
+    }
+
+    const newTotal = usage.totalViews + 1;
+    await emitQuotaThresholdNotification(userId, newTotal, monthlyLimit, resetDate);
+
+    return {
+      allowed: true,
+      duplicate: false,
+      currentTotal: newTotal,
+      monthlyLimit,
+      plan,
+      resetDate,
+      reason: null,
+    };
+  });
+};
+
+/**
+ * Check if a user can perform an action (create_project, share_report, track).
  */
 export const checkLimit = async (userId, type = 'track') => {
-    const usage = await calculateUsage(userId);
+  const usage = await calculateUsage(userId);
 
-    if (type === 'create_project') {
-        const { count } = await supabase
-            .from('projects')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', userId);
+  if (type === 'create_project') {
+    const { count } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
 
-        const projectsOk = (count || 0) < usage.projectLimit;
+    const projectsOk = (count || 0) < usage.projectLimit;
 
-        if (!projectsOk) {
-            await NotificationService.create(
-                userId,
-                'Plan Limit Reached',
-                `You have reached the maximum number of projects for your plan. Upgrade to create more.`,
-                'warning'
-            );
+    if (!projectsOk) {
+      await NotificationService.create(
+        userId,
+        'Plan Limit Reached',
+        `You have reached the maximum number of projects (${usage.projectLimit}) for your ${usage.plan} plan. Upgrade to create more.`,
+        'warning'
+      );
 
-            // Log to activity logs
-            const { data: projects } = await supabase
-                .from('projects')
-                .select('id')
-                .eq('user_id', userId)
-                .limit(1);
+      const { data: projects } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('user_id', userId)
+        .limit(1);
 
-            if (projects && projects.length > 0) {
-                await ActivityLogService.log(
-                    projects[0].id,
-                    userId,
-                    'Plan Limit Reached',
-                    `Project creation blocked: ${usage.plan} plan limit of ${usage.projectLimit} projects reached`,
-                    'warning',
-                    null,
-                    {
-                        event_type: 'system.limit',
-                        plan: usage.plan
-                    }
-                );
-            }
-        }
-
-        return {
-            canTrack: projectsOk,
-            reason: !projectsOk ? `Project limit reached (${count || 0}/${usage.projectLimit} on ${usage.plan} plan). Upgrade your plan to create more projects.` : null,
-            usage
-        };
-    }
-
-    if (type === 'share_report') {
-        const limit = usage.share_report.limit || 0;
-        const used = usage.share_report.used || 0;
-        const shareReportOk = used < limit;
-
-        if (!shareReportOk) {
-            const reason = limit === 0
-                ? 'Your current plan does not include public share reports. Upgrade to a paid plan to share.'
-                : `You have reached the maximum of ${limit} share report(s) for your plan. Upgrade to share more.`;
-            await NotificationService.create(
-                userId,
-                'Plan Limit Reached',
-                reason,
-                'warning'
-            );
-        }
-
-        return {
-            canTrack: shareReportOk,
-            reason: !shareReportOk
-                ? (limit === 0
-                    ? 'Share reports are not included in your current plan. Upgrade to a paid plan.'
-                    : `Share report limit reached (${used}/${limit}). Upgrade your plan to share more.`)
-                : null,
-            usage
-        };
-    }
-
-    const viewsOk = usage.totalViews < usage.monthlyLimit;
-    const storageOk = usage.storageUsed < usage.storageLimit;
-
-    // Check for 80% usage warning
-    if (usage.totalViews > usage.monthlyLimit * 0.8 && usage.totalViews < usage.monthlyLimit) {
-        await NotificationService.create(
-            userId,
-            'Usage Alert: Near Limit',
-            `You have reached 80% of your monthly tracking limit (${usage.totalViews.toLocaleString()} of ${usage.monthlyLimit.toLocaleString()} events). Upgrade soon to avoid data gaps.`,
-            'system'
+      if (projects && projects.length > 0) {
+        await ActivityLogService.log(
+          projects[0].id,
+          userId,
+          'Plan Limit Reached',
+          `Project creation blocked: ${usage.plan} plan limit of ${usage.projectLimit} project(s) reached`,
+          'warning',
+          null,
+          {
+            event_type: 'system.limit',
+            plan: usage.plan,
+          }
         );
-    }
-
-    // Check for 100% usage
-    if (usage.totalViews >= usage.monthlyLimit && viewsOk === false) {
-        await NotificationService.create(
-            userId,
-            'Usage Alert: Limit Reached',
-            `You have reached 100% of your monthly tracking limit (${usage.monthlyLimit.toLocaleString()} events). Tracking is now blocked. Upgrade your plan.`,
-            'error'
-        );
-    }
-
-    if (usage.storageUsed >= usage.storageLimit && storageOk === false) {
-        await NotificationService.create(
-            userId,
-            'Storage Alert: Full',
-            `You have reached your storage limit. Tracking is now blocked. Upgrade your plan or clear old data.`,
-            'error'
-        );
-    }
-
-    if (!viewsOk || !storageOk) {
-        let reason;
-        if (!viewsOk && !storageOk) {
-            reason = `Plan limits reached on ${usage.plan}: monthly events (${usage.totalViews.toLocaleString()}/${usage.monthlyLimit.toLocaleString()}) and storage (${(usage.storageUsed / 1024 / 1024 / 1024).toFixed(2)}GB/${(usage.storageLimit / 1024 / 1024 / 1024).toFixed(2)}GB). Upgrade to continue tracking.`;
-        } else if (!viewsOk) {
-            reason = `Monthly event limit reached on ${usage.plan} plan (${usage.totalViews.toLocaleString()}/${usage.monthlyLimit.toLocaleString()}). Upgrade to continue tracking.`;
-        } else {
-            reason = `Storage limit reached on ${usage.plan} plan (${(usage.storageUsed / 1024 / 1024 / 1024).toFixed(2)}GB/${(usage.storageLimit / 1024 / 1024 / 1024).toFixed(2)}GB). Upgrade or clear old data.`;
-        }
-        return {
-            canTrack: false,
-            reason,
-            usage
-        };
+      }
     }
 
     return {
-        canTrack: true,
-        reason: null,
-        usage
+      canTrack: projectsOk,
+      reason: !projectsOk
+        ? `Project limit reached (${count || 0}/${usage.projectLimit} on ${usage.plan} plan). Upgrade your plan to create more projects.`
+        : null,
+      usage,
     };
+  }
+
+  if (type === 'share_report') {
+    const limit = usage.share_report.limit || 0;
+    const used = usage.share_report.used || 0;
+    const shareReportOk = used < limit;
+
+    if (!shareReportOk) {
+      const reason =
+        limit === 0
+          ? 'Your current plan does not include public share reports. Upgrade to a paid plan to share.'
+          : `You have reached the monthly allowance of ${limit} shared report(s) on your ${usage.plan} plan. Upgrade to share more.`;
+      await NotificationService.create(userId, 'Plan Limit Reached', reason, 'warning');
+    }
+
+    return {
+      canTrack: shareReportOk,
+      reason: !shareReportOk
+        ? limit === 0
+          ? 'Share reports are not included in your current plan. Upgrade to a paid plan.'
+          : `Monthly shared report limit reached (${used}/${limit}). Upgrade your plan to share more.`
+        : null,
+      usage,
+    };
+  }
+
+  const viewsOk = usage.totalViews < usage.monthlyLimit;
+  await emitQuotaThresholdNotification(userId, usage.totalViews, usage.monthlyLimit, usage.resetDate);
+
+  if (!viewsOk) {
+    return {
+      canTrack: false,
+      reason: `Monthly event limit reached on ${usage.plan} plan (${usage.totalViews.toLocaleString()}/${usage.monthlyLimit.toLocaleString()}). Resets on ${usage.resetDate.slice(0, 10)} UTC.`,
+      usage,
+    };
+  }
+
+  return {
+    canTrack: true,
+    reason: null,
+    usage,
+  };
 };
 
-export default { getPlanLimits, calculateUsage, calculateProjectUsage, checkLimit };
+export const __resetAlertCacheForTests = () => {
+  sentMonthlyAlerts.clear();
+  userQuotaQueues.clear();
+};
+
+export default {
+  PLAN_ALIASES,
+  PLANS,
+  normalizePlanId,
+  getPlanConfig,
+  getPlanLimits,
+  calculateUsage,
+  calculateProjectUsage,
+  consumeEventQuota,
+  checkLimit,
+  getNextUtcMonthResetDate,
+};

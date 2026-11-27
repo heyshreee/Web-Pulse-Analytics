@@ -130,7 +130,13 @@ export default function ProjectActivity() {
         );
     };
 
+    const canExportCsv = user?.entitlements?.features?.csv_export ?? (user?.plan && !['nano', 'free'].includes(String(user.plan).toLowerCase()));
+
     const handleExport = () => {
+        if (!canExportCsv) {
+            showToast('CSV export requires Lite or higher plan.', 'error');
+            return;
+        }
         const headers = ['Timestamp', 'Event Type', 'User', 'Details', 'Status', 'IP Address'];
         const csvContent = [
             headers.join(','),
@@ -272,11 +278,12 @@ export default function ProjectActivity() {
 
                     <button
                         onClick={handleExport}
-                        className="wp-btn wp-btn-secondary h-7 text-xs px-2 gap-1.5"
-                        title="Export as CSV"
+                        disabled={!canExportCsv}
+                        className="wp-btn wp-btn-secondary h-7 text-xs px-2 gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={canExportCsv ? 'Export as CSV' : 'CSV export requires Lite or higher'}
                     >
-                        <Download className="h-3 w-3" />
-                        <span>Export</span>
+                        {canExportCsv ? <Download className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                        <span>{canExportCsv ? 'Export' : 'CSV (Lite+)'}</span>
                     </button>
 
                     <button

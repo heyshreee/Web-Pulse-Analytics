@@ -141,6 +141,19 @@ export default function SettingsTab({
         </div>
       </div>
 
+      {/* Team Members (1/1 Owner on Nano) */}
+      <div className="wp-panel bg-[var(--wp-bg-surface)]">
+        <div className="wp-panel-header">
+          <span className="wp-title-card">Team Access</span>
+          <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">1 / 1 Owner Seat</span>
+        </div>
+        <div className="p-3.5 sm:p-4 space-y-2 text-xs">
+          <p className="text-[var(--wp-text-secondary)]">
+            Nano includes 1 owner seat. Team invitations and role-based access control require Pro or higher.
+          </p>
+        </div>
+      </div>
+
       {/* Danger Zone */}
       <div className="wp-panel border-rose-500/20 overflow-hidden bg-[var(--wp-bg-surface)]">
         <div className="wp-panel-header bg-rose-500/5 border-b border-rose-500/20">

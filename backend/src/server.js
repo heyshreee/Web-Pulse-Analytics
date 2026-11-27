@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import createApp from './app.js';
 import setupVisitorSocket from './socket/visitorSocket.js';
 import NotificationService from './services/notification.service.js';
+import RetentionService from './services/retention.service.js';
 import { env } from './config/env.js';
 import { isAllowedOrigin } from './config/origins.js';
 
@@ -44,8 +45,11 @@ const PORT = env.port;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 
-  // Cleanup old notifications every hour
+  // Cleanup old notifications and expired analytics data every hour (UTC)
   setInterval(() => {
     NotificationService.cleanup();
+    RetentionService.cleanupExpiredData().catch((err) => {
+      console.error('[Retention] Scheduled cleanup failed:', err);
+    });
   }, 60 * 60 * 1000);
 });

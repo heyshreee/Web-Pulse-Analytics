@@ -1,8 +1,11 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
   AlertTriangle, Settings, Plus, Trash2,
-  CheckCircle, Loader2, Globe, Binary, Cpu, BookOpen
+  CheckCircle, Loader2, Globe, Binary, Cpu, BookOpen, Shield, ShieldOff, RefreshCw
 } from 'lucide-react';
+import { apiRequest } from '../../../utils/api';
+import { useToast } from '../../../context/ToastContext';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import CopyButton from '../../CopyButton';
@@ -13,6 +16,98 @@ export default function IntegrationTab({
   allowedOrigins, setAllowedOrigins, editingSecurity, setEditingSecurity,
   saving, usageStats, onSaveSecurity
 }) {
+  const { idOrName } = useParams();
+  const { showToast } = useToast();
+  const [verifiedOrigins, setVerifiedOrigins] = useState([]);
+  const [newOrigin, setNewOrigin] = useState('');
+  const [verifyMethod, setVerifyMethod] = useState('dns_txt');
+  const [originsLoading, setOriginsLoading] = useState(false);
+  const [originActionId, setOriginActionId] = useState(null);
+
+  const originLimit = usageStats?.limits?.origins_per_project ?? usageStats?.allowedOriginsLimit ?? 3;
+
+  const loadVerifiedOrigins = useCallback(async () => {
+    if (!idOrName) return;
+    setOriginsLoading(true);
+    try {
+      const data = await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins`);
+      setVerifiedOrigins(Array.isArray(data?.origins) ? data.origins : []);
+    } catch {
+      // ignore if project not resolved yet
+    } finally {
+      setOriginsLoading(false);
+    }
+  }, [idOrName]);
+
+  useEffect(() => {
+    loadVerifiedOrigins();
+  }, [loadVerifiedOrigins]);
+
+  const handleAddVerifiedOrigin = async (e) => {
+    e.preventDefault();
+    if (!newOrigin.trim() || !idOrName) return;
+    setOriginActionId('add');
+    try {
+      await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins`, {
+        method: 'POST',
+        body: JSON.stringify({ origin: newOrigin.trim(), verification_method: verifyMethod })
+      });
+      setNewOrigin('');
+      showToast('Origin registered. Complete DNS TXT or file verification.', 'success');
+      await loadVerifiedOrigins();
+    } catch (err) {
+      showToast(err.message || 'Failed to add origin', 'error');
+    } finally {
+      setOriginActionId(null);
+    }
+  };
+
+  const handleVerifyOrigin = async (originId, method) => {
+    setOriginActionId(originId);
+    try {
+      await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins/${originId}/verify`, {
+        method: 'POST',
+        body: JSON.stringify({ method })
+      });
+      showToast('Origin verified successfully!', 'success');
+      await loadVerifiedOrigins();
+    } catch (err) {
+      showToast(err.message || 'Verification failed', 'error');
+    } finally {
+      setOriginActionId(null);
+    }
+  };
+
+  const handleToggleBlockOrigin = async (originId, blocked) => {
+    setOriginActionId(originId);
+    try {
+      await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins/${originId}/block`, {
+        method: 'PATCH',
+        body: JSON.stringify({ blocked })
+      });
+      showToast(blocked ? 'Origin blocked' : 'Origin unblocked', 'success');
+      await loadVerifiedOrigins();
+    } catch (err) {
+      showToast(err.message || 'Failed to update origin', 'error');
+    } finally {
+      setOriginActionId(null);
+    }
+  };
+
+  const handleDeleteVerifiedOrigin = async (originId) => {
+    setOriginActionId(originId);
+    try {
+      await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins/${originId}`, {
+        method: 'DELETE'
+      });
+      showToast('Origin removed', 'success');
+      await loadVerifiedOrigins();
+    } catch (err) {
+      showToast(err.message || 'Failed to remove origin', 'error');
+    } finally {
+      setOriginActionId(null);
+    }
+  };
   return (
     <div className="space-y-3 font-sans">
       {/* Integration Panel */}
@@ -253,9 +348,127 @@ export default function IntegrationTab({
             <p>
               {allowedOrigins.some(o => o.trim() !== '')
                 ? "Security active. Tracking is restricted to your specified domains."
-                : "No origins restricted. Tracking will accept requests from any domain."}
+                : "No origins restricted. Configure verified origins below for strict ingestion protection."}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Verified Origins Management (DNS TXT & File Verification) */}
+      <div className="wp-panel p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-sm font-medium text-ink mb-1">
+              Verified Origins ({verifiedOrigins.length} / {originLimit})
+            </h2>
+            <p className="text-xs text-ink-muted">
+              Only exact, verified origins can ingest events. Subdomains are not automatically trusted.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={loadVerifiedOrigins}
+            disabled={originsLoading}
+            className="btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1.5 self-start"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${originsLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
+
+        <form onSubmit={handleAddVerifiedOrigin} className="flex flex-col sm:flex-row gap-2 mb-4">
+          <input
+            type="url"
+            value={newOrigin}
+            onChange={(e) => setNewOrigin(e.target.value)}
+            placeholder="https://example.com"
+            disabled={verifiedOrigins.length >= originLimit}
+            className="input font-mono text-xs h-8 flex-1"
+            required
+          />
+          <select
+            value={verifyMethod}
+            onChange={(e) => setVerifyMethod(e.target.value)}
+            className="input font-mono text-xs h-8 sm:w-36"
+          >
+            <option value="dns_txt">DNS TXT</option>
+            <option value="file">Verification File</option>
+          </select>
+          <button
+            type="submit"
+            disabled={originActionId === 'add' || verifiedOrigins.length >= originLimit}
+            className="btn-primary h-8 px-3 text-xs inline-flex items-center gap-1.5 disabled:opacity-50"
+          >
+            {originActionId === 'add' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            Add Origin
+          </button>
+        </form>
+
+        <div className="space-y-2.5">
+          {verifiedOrigins.map((item) => (
+            <div key={item.id} className="p-3 rounded border border-line bg-subtle space-y-2 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 font-mono">
+                  <span className="text-ink font-medium">{item.origin}</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[10px] uppercase border ${
+                      item.status === 'verified'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        : item.status === 'blocked'
+                          ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                          : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                    }`}
+                  >
+                    {item.status}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {item.status === 'pending' && (
+                    <button
+                      type="button"
+                      onClick={() => handleVerifyOrigin(item.id, item.verification_method || 'dns_txt')}
+                      disabled={originActionId === item.id}
+                      className="btn-primary h-6 px-2 text-[11px]"
+                    >
+                      {originActionId === item.id ? 'Verifying…' : 'Verify'}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleBlockOrigin(item.id, item.status !== 'blocked')}
+                    disabled={originActionId === item.id}
+                    className="btn-secondary h-6 px-2 text-[11px] inline-flex items-center gap-1"
+                  >
+                    {item.status === 'blocked' ? <Shield className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
+                    {item.status === 'blocked' ? 'Unblock' : 'Block'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteVerifiedOrigin(item.id)}
+                    disabled={originActionId === item.id}
+                    className="p-1 text-ink-muted hover:text-rose-400"
+                    title="Remove origin"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+              {item.status === 'pending' && item.verification_token && (
+                <div className="text-[11px] font-mono text-ink-muted bg-black/30 p-2 rounded border border-line/60 space-y-1">
+                  <div>
+                    DNS TXT: <span className="text-ink-secondary">_webpulse-verify.{item.hostname}</span> →{' '}
+                    <span className="text-emerald-400">webpulse-verification={item.verification_token}</span>
+                  </div>
+                  <div>
+                    OR File: <span className="text-ink-secondary">{item.origin}/.well-known/webpulse-verify-{item.verification_token}.txt</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+          {verifiedOrigins.length === 0 && !originsLoading && (
+            <p className="text-xs font-mono text-ink-muted">No origins registered yet.</p>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
-import { Plus, ArrowUpRight, Loader2, Copy, X } from 'lucide-react';
+import { Plus, ArrowUpRight, Loader2, Copy, X, Lock, AlertTriangle } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -101,32 +101,23 @@ export default function Dashboard() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [showSnippetOverlay, setShowSnippetOverlay] = useState(true);
+  const inFlightRef = useRef(false);
+  const overviewCacheRef = useRef(new Map());
 
-  useEffect(() => {
-    if (!user?.id) return;
-    loadData();
+  const refreshIntervalMs = Math.max(
+    5000,
+    Number(usageStats?.limits?.dashboard_refresh_seconds || 60) * 1000
+  );
 
-    const interval = setInterval(() => loadData(false), 10000); // Poll every 10s as fallback
+  const loadData = useCallback(async (showLoading = true) => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
 
-    if (socket) {
-      const handleVisitorUpdate = () => loadData(false);
-      const handleUsageUpdate = () => loadUser(); // Refresh usage stats via loadUser
-
-      socket.on('visitor_update', handleVisitorUpdate);
-      socket.on('usage_update', handleUsageUpdate);
-
-      return () => {
-        clearInterval(interval);
-        socket.off('visitor_update', handleVisitorUpdate);
-        socket.off('usage_update', handleUsageUpdate);
-      };
+    const cached = overviewCacheRef.current.get(timeRange);
+    if (cached && showLoading) {
+      setDashboardStats(cached);
     }
-
-    return () => clearInterval(interval);
-  }, [user?.id, timeRange, socket]);
-
-  const loadData = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+    if (showLoading && !cached) setLoading(true);
     try {
       const [projectsData, statsData] = await Promise.all([
         apiRequest('/projects'),
@@ -137,6 +128,7 @@ export default function Dashboard() {
       setProjects(projectsData);
 
       if (statsData) {
+        overviewCacheRef.current.set(timeRange, statsData);
         setDashboardStats(statsData);
       }
 
@@ -162,12 +154,57 @@ export default function Dashboard() {
       if (showLoading) showToast(err.message, 'error');
       console.error(err);
     } finally {
+      inFlightRef.current = false;
       if (showLoading) {
         setLoading(false);
         setIsPageLoading?.(false);
       }
     }
-  };
+  }, [timeRange, showToast, setIsPageLoading]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    loadData();
+
+    const interval = setInterval(() => {
+      if (typeof document === 'undefined' || !document.hidden) {
+        loadData(false);
+      }
+    }, refreshIntervalMs);
+
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        loadData(false);
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    if (socket) {
+      const handleVisitorUpdate = () => loadData(false);
+      const handleUsageUpdate = () => loadUser();
+
+      socket.on('visitor_update', handleVisitorUpdate);
+      socket.on('usage_update', handleUsageUpdate);
+
+      return () => {
+        clearInterval(interval);
+        if (typeof document !== 'undefined') {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
+        socket.off('visitor_update', handleVisitorUpdate);
+        socket.off('usage_update', handleUsageUpdate);
+      };
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+    };
+  }, [user?.id, refreshIntervalMs, socket, loadData, loadUser]);
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
@@ -468,6 +505,47 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Quota Warning / Limit Banner (80%, 90%, 100%) */}
+      {viewLimit > 0 && quotaUsed / viewLimit >= 0.8 && (
+        <div
+          className={`wp-panel p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs ${
+            quotaUsed >= viewLimit
+              ? 'border-rose-500/40 bg-rose-500/10 text-rose-200'
+              : quotaUsed / viewLimit >= 0.9
+                ? 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+                : 'border-blue-500/40 bg-blue-500/10 text-blue-200'
+          }`}
+        >
+          <div className="flex items-start sm:items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 sm:mt-0" />
+            <div>
+              <span className="font-semibold">
+                {quotaUsed >= viewLimit
+                  ? 'Monthly event quota reached (100%): '
+                  : quotaUsed / viewLimit >= 0.9
+                    ? 'Warning — 90%+ monthly quota used: '
+                    : 'Heads up — 80%+ monthly quota used: '}
+              </span>
+              <span>
+                {quotaUsed.toLocaleString()} / {viewLimit.toLocaleString()} events used.
+                {quotaUsed >= viewLimit
+                  ? ' New billable events are paused while your dashboard remains accessible.'
+                  : ''}
+                {usageStats?.resetDate
+                  ? ` Resets ${new Date(usageStats.resetDate).toUTCString().slice(0, 16)} UTC.`
+                  : ''}
+              </span>
+            </div>
+          </div>
+          <Link
+            to="/dashboard/billing"
+            className="wp-btn wp-btn-primary h-7 px-3 text-xs shrink-0 self-start sm:self-auto"
+          >
+            Upgrade Plan
+          </Link>
+        </div>
+      )}
+
       {/* 2. Unified 4-Column KPI Bar */}
       <div className="wp-panel grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
         {/* Col 1: Live Visitors */}
@@ -637,6 +715,47 @@ export default function Dashboard() {
           </div>
 
           <div className="wp-studio-canvas flex-1 min-h-[380px] relative flex flex-col items-center justify-center p-0 overflow-hidden">
+            {usageStats?.features?.globe_analyze === false ? (
+              <div className="w-full h-full min-h-[380px] p-4 flex flex-col justify-between bg-[var(--wp-bg-surface)]">
+                <div className="border border-dashed border-[var(--wp-border-strong)] rounded-lg p-4 text-center space-y-2 bg-[var(--wp-bg-subtle)]">
+                  <div className="mx-auto w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                    <Lock className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <p className="text-xs font-semibold text-[var(--wp-text-primary)]">
+                    Globe Analyze is excluded from Nano
+                  </p>
+                  <p className="text-[11px] text-[var(--wp-text-muted)]">
+                    Upgrade to Lite or higher to unlock the interactive 3D globe and regional heatmaps. Basic country statistics remain available below.
+                  </p>
+                  <Link
+                    to="/dashboard/billing"
+                    className="wp-btn wp-btn-primary h-7 px-3 text-[11px] inline-flex items-center"
+                  >
+                    Upgrade to unlock Globe Analyze
+                  </Link>
+                </div>
+
+                <div className="mt-3 border border-[var(--wp-border-subtle)] rounded-md p-3 bg-[var(--wp-bg-canvas)]">
+                  <div className="text-[10.5px] font-mono uppercase text-[var(--wp-text-muted)] mb-2">
+                    Top Countries (Basic Geo)
+                  </div>
+                  {dashboardStats?.countryStats?.length > 0 ? (
+                    <div className="space-y-1.5 text-xs">
+                      {dashboardStats.countryStats.slice(0, 5).map((c) => (
+                        <div key={c.country || c.name} className="flex items-center justify-between font-mono">
+                          <span className="text-[var(--wp-text-primary)] truncate">{c.country || c.name || 'Unknown'}</span>
+                          <span className="text-[var(--wp-text-muted)]">{(c.visitors || c.count || 0).toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] font-mono text-[var(--wp-text-muted)]">
+                      No country telemetry recorded yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
             <div className="w-full h-full relative min-h-[380px]">
               <ErrorBoundary scoped title="Live globe temporarily unavailable" message="Real-time map telemetry could not be loaded.">
                 <NetworkGlobe
@@ -720,6 +839,7 @@ export default function Dashboard() {
                 )
               )}
             </div>
+            )}
           </div>
         </div>
       </div>

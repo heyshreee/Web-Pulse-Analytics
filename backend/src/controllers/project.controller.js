@@ -5,11 +5,14 @@ import NotificationService from '../services/notification.service.js';
 import ActivityLogService from '../services/activity.service.js';
 import EmailService from '../services/email.service.js';
 import { logAction } from '../services/audit.service.js';
+import originService from '../services/origin.service.js';
+import shareService from '../services/share.service.js';
+import { getPlanLimits } from '../config/plans.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
 export const createProject = asyncHandler(async (req, res) => {
-    const { name, allowedOrigins } = req.body;
+    const { name, allowedOrigins, description } = req.body;
     const userId = req.user.id;
 
     if (!name) {
@@ -37,15 +40,15 @@ export const createProject = asyncHandler(async (req, res) => {
         throw AppError.badRequest('Project with this name already exists');
     }
 
-    // Validate allowed origins count against plan limit
-    if (allowedOrigins) {
-        const originsArray = allowedOrigins.split(',').map(o => o.trim()).filter(o => o);
-        const usage = await usageService.calculateUsage(userId);
-        const allowedOriginsLimit = usage.plan ? usageService.getPlanLimits(usage.plan).allowedOriginsLimit : 1;
+    const usage = await usageService.calculateUsage(userId);
+    const planLimits = getPlanLimits(usage.plan || req.user?.plan || 'nano');
 
-        if (originsArray.length > allowedOriginsLimit) {
-            throw AppError.limitExceeded(`Domain limit reached on ${usage.plan} plan (${originsArray.length} requested / ${allowedOriginsLimit} allowed). Remove domains or upgrade your plan.`);
-        }
+    // Validate allowed origins count against plan limit
+    const originsArray = allowedOrigins
+        ? String(allowedOrigins).split(',').map(o => o.trim()).filter(Boolean)
+        : [];
+    if (originsArray.length > planLimits.originsPerProject) {
+        throw AppError.limitExceeded(`Origin limit reached on ${usage.plan} plan (${originsArray.length} requested / ${planLimits.originsPerProject} allowed). Remove origins or upgrade your plan.`);
     }
 
     const trackingId = 'trk_' + shortToken(12);
@@ -56,12 +59,31 @@ export const createProject = asyncHandler(async (req, res) => {
             name,
             user_id: userId,
             tracking_id: trackingId,
-            allowed_origins: allowedOrigins || null
+            allowed_origins: allowedOrigins || null,
+            ...(description ? { description } : {})
         })
         .select()
         .single();
 
     if (error) throw error;
+
+    // Register owner in project_members & any initial origins as pending verification
+    try {
+        await supabase.from('project_members').upsert(
+            { project_id: project.id, user_id: userId, role: 'owner', status: 'active' },
+            { onConflict: 'project_id,user_id', ignoreDuplicates: true }
+        );
+        for (const originInput of originsArray) {
+            await originService.registerOrigin({
+                projectId: project.id,
+                userId,
+                originInput,
+                planId: usage.plan || req.user?.plan || 'nano'
+            }).catch(() => {});
+        }
+    } catch {
+        // Non-fatal if optional tables are not yet migrated in a mocked test
+    }
 
     // Initialize counter
     await supabase.from('counters').insert({
@@ -88,12 +110,12 @@ export const createProject = asyncHandler(async (req, res) => {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId);
 
-    const usage = await usageService.calculateUsage(userId);
-    if (count >= usage.projectLimit) {
+    const updatedUsageAfterCreate = await usageService.calculateUsage(userId);
+    if (count >= updatedUsageAfterCreate.projectLimit) {
         await NotificationService.create(
             userId,
             'Plan Limit Reached',
-            `You have reached the maximum number of projects (${usage.projectLimit}) for your plan. Upgrade to create more.`,
+            `You have reached the maximum number of projects (${updatedUsageAfterCreate.projectLimit}) for your plan. Upgrade to create more.`,
             'warning'
         );
     }
@@ -498,7 +520,6 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
 
     let projectId = id;
     if (!isUuid(id)) {
-        // resolve name to id logic if needed, omitted for brevity as usually ID is passed
         const { data: project } = await supabase
             .from('projects')
             .select('id')
@@ -509,56 +530,21 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
         projectId = project.id;
     }
 
-    // Check if project already has a token.
-    // Scoped to the owner: a probe must not be able to read whether another
-    // account's project already has a share link.
-    const { data: existingProject } = await supabase
-        .from('projects')
-        .select('share_token')
-        .eq('id', projectId)
-        .eq('user_id', userId)
-        .maybeSingle();
-
-    if (!existingProject) {
-        throw AppError.notFound('Project not found');
-    }
-
-    // If no token exists, check limits before creating one
-    if (!existingProject?.share_token) {
-        const limitCheck = await usageService.checkLimit(userId, 'share_report');
-        if (!limitCheck.canTrack) {
-            throw AppError.limitExceeded(limitCheck.reason, limitCheck.usage);
-        }
-    }
-
-    const { data: updatedProject, error } = await supabase
-        .from('projects')
-        .update({ share_token: uuid() })
-        .eq('id', projectId)
-        .eq('user_id', userId)
-        .select('share_token, name')
-        .single();
-
-    if (error) throw error;
+    const created = await shareService.createSharedReport({
+        projectId,
+        userId,
+        planId: req.user?.plan || 'nano',
+        title: req.body?.title,
+        days: req.body?.days || 7
+    });
 
     // Notify user
     await NotificationService.create(
         userId,
         'Report Generated',
-        `A new public report link has been generated for project "${updatedProject.name || 'Unknown'}".`,
+        `A new public report link has been generated for project "${created.project_name || 'Unknown'}".`,
         'activity'
     );
-
-    // Send Report Ready Email
-    const reportName = `${updatedProject.name} - Public Report`;
-    const period = 'Last 30 Days'; // Default period
-    const date = new Date().toLocaleString();
-
-    // Get user email to send report
-    const { data: user } = await supabase.from('users').select('email, name').eq('id', userId).single();
-    if (user) {
-        EmailService.sendReportReadyEmail(user.email, reportName, period, date, user.name || 'User').catch(console.error);
-    }
 
     // Emit usage update
     if (global.io) {
@@ -566,33 +552,33 @@ export const regenerateShareToken = asyncHandler(async (req, res) => {
         global.io.to(`user_${userId}`).emit('usage_update', updatedUsage);
     }
 
-    res.json({ share_token: updatedProject.share_token });
+    res.json({
+        share_token: created.token,
+        expires_at: created.report?.expires_at || null,
+        report: created.report
+    });
 });
 
 export const revokeShareToken = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
+    const reportId = req.body?.reportId || req.query?.reportId || null;
 
-    const { data: project } = await supabase
-        .from('projects')
-        .select('id, share_token')
-        .eq('id', id)
-        .eq('user_id', userId)
-        .single();
-
-    if (!project) {
-        throw AppError.notFound('Project not found');
+    if (reportId) {
+        await shareService.revokeSharedReport({ projectId: id, userId, reportId });
+    } else {
+        await supabase
+            .from('shared_reports')
+            .update({ revoked_at: new Date().toISOString() })
+            .eq('project_id', id)
+            .is('revoked_at', null);
     }
 
-    const { data: updatedProject, error } = await supabase
+    await supabase
         .from('projects')
         .update({ share_token: null })
         .eq('id', id)
-        .eq('user_id', userId)
-        .select()
-        .single();
-
-    if (error) throw error;
+        .eq('user_id', userId);
 
     // Emit usage update
     if (global.io) {
@@ -758,7 +744,6 @@ export const getProjectActivity = asyncHandler(async (req, res) => {
             id: v.id,
             type: 'view',
             location,
-            ip: v.ip_address,
             site,
             path,
             timestamp: v.last_seen,

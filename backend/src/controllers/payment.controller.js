@@ -2,7 +2,7 @@ import razorpay from '../config/razorpay.js';
 import crypto from 'crypto';
 import supabase from '../config/supabase.js';
 import ActivityLogService from '../services/activity.service.js';
-import { getPlanLimits } from '../services/usage.service.js';
+import { getPlanLimits, listPublicPlans, normalizePlanId } from '../config/plans.js';
 import EmailService from '../services/email.service.js';
 import ReceiptService from '../services/receipt.service.js';
 import PDFDocument from 'pdfkit';
@@ -10,105 +10,13 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
 export const getPlans = asyncHandler(async (req, res) => {
-    const plans = [
-        {
-            id: 'nano',
-            name: 'Nano',
-            price: 0,
-            price_usd: 0,
-            price_inr: 0,
-            interval: 'month',
-            description: 'Entry-level analytics for personal websites and testing.',
-            features: ['1 Project', '1 Allowed Origin', '10,000 events/mo', '7-day data retention', '60 sec refresh', 'Basic API access'],
-            buttonText: 'Start Free',
-            limits: {
-                monthlyViews: 10000,
-                projectLimit: 1,
-                allowedOriginsLimit: 1,
-                retentionDays: 7,
-                refreshRate: 60
-            }
-        },
-        {
-            id: 'lite',
-            name: 'Lite',
-            price: 199,
-            price_usd: 2.49,
-            price_inr: 199,
-            interval: 'month',
-            description: 'Affordable analytics for individual developers and small websites.',
-            features: ['3 Projects', '3 Allowed Origins', '100,000 events/mo', '30-day data retention', '15 sec refresh', 'Basic API access', 'Limited CSV export'],
-            buttonText: 'Choose Lite',
-            limits: {
-                monthlyViews: 100000,
-                projectLimit: 3,
-                allowedOriginsLimit: 3,
-                retentionDays: 30,
-                refreshRate: 15
-            }
-        },
-        {
-            id: 'pro',
-            name: 'Pro',
-            price: 699,
-            price_usd: 8.99,
-            price_inr: 699,
-            interval: 'month',
-            description: 'Advanced analytics, API access and V2 beta access.',
-            features: ['10 Projects', '10 Allowed Origins', '1,000,000 events/mo', '90-day data retention', '5 sec refresh', '3 Team members', 'Live event logs', 'Full Analytics API', 'Advanced exports', 'V2 Beta access'],
-            buttonText: 'Choose Pro',
-            popular: true,
-            limits: {
-                monthlyViews: 1000000,
-                projectLimit: 10,
-                allowedOriginsLimit: 10,
-                retentionDays: 90,
-                refreshRate: 5
-            }
-        },
-        {
-            id: 'max',
-            name: 'Max',
-            price: 1999,
-            price_usd: 24.99,
-            price_inr: 1999,
-            interval: 'month',
-            description: 'Full analytics capabilities, beta and invitation-only alpha access.',
-            features: ['50 Projects', '25 Allowed Origins', '5,000,000 events/mo', '12-month data retention', '1 sec refresh', '10 Team members', 'Unlimited saved reports', 'Live event logs', 'Full Analytics API', 'V2 Beta & Alpha access'],
-            buttonText: 'Choose Max',
-            limits: {
-                monthlyViews: 5000000,
-                projectLimit: 50,
-                allowedOriginsLimit: 25,
-                retentionDays: 365,
-                refreshRate: 1
-            }
-        },
-        {
-            id: 'enterprise',
-            name: 'Enterprise',
-            price: 'custom',
-            price_usd: 'custom',
-            price_inr: 'custom',
-            interval: 'month',
-            description: 'For companies requiring custom capacity, security and support.',
-            features: ['Negotiated event capacity', 'Custom projects & domains', 'Custom data retention', 'Dedicated dashboard refresh', 'Role-based access & SSO', 'Priority support & SLA'],
-            buttonText: 'Contact Sales',
-            limits: {
-                monthlyViews: 'custom',
-                projectLimit: 'custom',
-                allowedOriginsLimit: 'custom',
-                retentionDays: 'custom',
-                refreshRate: 1
-            }
-        }
-    ];
-
+    const plans = listPublicPlans();
     res.json(plans);
 });
 
 export const createOrder = asyncHandler(async (req, res) => {
-    const { planId } = req.body;
+    const rawPlanId = req.body?.planId;
+    const planId = normalizePlanId(rawPlanId);
     const userId = req.user.id;
 
     const planLimits = getPlanLimits(planId);
