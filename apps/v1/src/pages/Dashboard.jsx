@@ -103,6 +103,7 @@ export default function Dashboard() {
   const [showSnippetOverlay, setShowSnippetOverlay] = useState(true);
 
   useEffect(() => {
+    if (!user?.id) return;
     loadData();
 
     const interval = setInterval(() => loadData(false), 10000); // Poll every 10s as fallback
