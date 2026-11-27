@@ -124,10 +124,10 @@ export const apiPlanLimiter = (req, res, next) => {
     const key = userId ? `user:${userId}` : `ip:${ipKey(req)}`;
     const plan = normalizePlanId(req.user?.plan || 'nano');
     const configuredLimit = getPlanConfig(plan).limits.api_requests_per_minute;
-    const maxPerMinute =
-        process.env.NODE_ENV === 'development'
-            ? Math.max(configuredLimit, configuredLimit * 4)
-            : configuredLimit;
+    const isStrictEnv = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test';
+    const maxPerMinute = isStrictEnv
+        ? configuredLimit
+        : Math.max(configuredLimit, configuredLimit * 4);
 
     const now = Date.now();
     const windowMs = 60 * 1000;
