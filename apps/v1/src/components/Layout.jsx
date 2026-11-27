@@ -142,7 +142,15 @@ export default function Layout() {
             });
         }
 
-        const interval = setInterval(() => loadSidebarData(), 5000); // Poll every 5s
+        const sidebarIntervalMs = Math.max(
+            30000,
+            Number(usageStats?.limits?.dashboard_refresh_seconds || 60) * 1000
+        );
+        const interval = setInterval(() => {
+            if (typeof document === 'undefined' || !document.hidden) {
+                loadSidebarData();
+            }
+        }, sidebarIntervalMs);
 
         return () => {
             clearInterval(interval);
@@ -157,7 +165,7 @@ export default function Layout() {
                 }
             }
         };
-    }, [user, isLoggingOut]);
+    }, [user?.id, isLoggingOut]);
 
     const loadUser = async () => {
         try {
@@ -196,9 +204,10 @@ export default function Layout() {
             setPinnedProjects(projects.filter(p => p.is_pinned));
             setUsageStats(usage);
 
-            // Sync user plan if it changed
-            if (usage.plan && user && usage.plan !== user.plan) {
-                setUser(prev => ({ ...prev, plan: usage.plan }));
+            // Sync user plan only when normalized plan actually changed
+            const currentNorm = user?.normalized_plan || user?.plan;
+            if (usage.plan && currentNorm && usage.plan !== currentNorm) {
+                setUser(prev => (prev ? { ...prev, plan: usage.plan, normalized_plan: usage.plan } : prev));
             }
         } catch (error) {
             console.error('Failed to load sidebar data', error);

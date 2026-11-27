@@ -172,18 +172,24 @@ export default function Billing() {
             }
 
             // 1. Create Order
-            const { order } = await apiRequest('/payment/order', {
+            const { order, keyId } = await apiRequest('/payment/order', {
                 method: 'POST',
                 body: JSON.stringify({ planId })
             });
 
+            const razorpayKey = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKey) {
+                showToast('Razorpay public key is not configured.', 'error');
+                return;
+            }
+
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                key: razorpayKey,
                 amount: order.amount,
                 currency: order.currency,
                 name: "WebPulse",
                 description: "Subscription payment for WebPulse services",
-                image: typeof window !== 'undefined' ? `${window.location.origin}/logo-512.png` : undefined,
+                image: typeof window !== 'undefined' && window.location.protocol === 'https:' ? `${window.location.origin}/logo-512.png` : undefined,
                 order_id: order.id,
                 handler: async function (response) {
                     try {
@@ -193,16 +199,21 @@ export default function Billing() {
                             body: JSON.stringify({
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature
+                                razorpay_signature: response.razorpay_signature,
+                                planId,
                             })
                         });
 
                         const planName = getPlanById(planId)?.name || planId;
                         showToast(`Successfully upgraded to the ${planName} plan.`, 'success');
-                        loadUsage();
-                        if (loadUser) loadUser();
+                        await Promise.all([
+                            loadUsage(),
+                            loadPaymentHistory(),
+                            loadStats(),
+                            loadUser ? loadUser() : Promise.resolve(),
+                        ]);
                     } catch (error) {
-                        showToast('Payment verification failed', 'error');
+                        showToast(error?.message || 'Payment verification failed', 'error');
                         console.error(error);
                     }
                 },
@@ -228,7 +239,7 @@ export default function Billing() {
 
         } catch (error) {
             console.error('Payment error:', error);
-            showToast('Failed to initiate payment', 'error');
+            showToast(error?.message || 'Failed to initiate payment', 'error');
         } finally {
             setLoading(false);
         }

@@ -1,5 +1,6 @@
 import { verifyToken, TOKEN_PURPOSE } from '../utils/jwt.js';
 import { isSessionActive, touchSession } from '../services/session.service.js';
+import { getPlanConfig, normalizePlanId } from '../config/plans.js';
 import supabase from '../config/supabase.js';
 
 export async function resolveSession(req) {
@@ -50,7 +51,21 @@ export async function resolveSession(req) {
             touchSession(tokenId).catch(() => {});
         }
 
-        return { authenticated: true, tokenId, user };
+        const normalizedPlan = normalizePlanId(user.plan || 'nano');
+        const planConfig = getPlanConfig(normalizedPlan);
+        const enrichedUser = {
+            ...user,
+            normalized_plan: normalizedPlan,
+            entitlements: {
+                plan_id: planConfig.plan_id,
+                name: planConfig.name,
+                limits: { ...planConfig.limits },
+                features: { ...planConfig.features },
+                access: { ...planConfig.access },
+            },
+        };
+
+        return { authenticated: true, tokenId, user: enrichedUser };
     } catch {
         return { authenticated: false, status: 401, error: 'Invalid token' };
     }

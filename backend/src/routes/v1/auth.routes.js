@@ -14,6 +14,7 @@ router.post('/login', authLimiter, credentialLimiter, authController.login);
 router.post('/logout', auth, authController.logout);
 router.get('/session', authController.getSession);
 router.get('/me', auth, authController.getMe);
+router.get('/surface-access', auth, authController.getSurfaceAccess);
 router.post('/verify-email', verificationLimiter, authController.verifyEmail);
 router.post('/resend-verification', verificationLimiter, authController.resendVerification);
 router.post('/forgot-password', authLimiter, credentialLimiter, authController.forgotPassword);

@@ -2,7 +2,7 @@ import razorpay from '../config/razorpay.js';
 import crypto from 'crypto';
 import supabase from '../config/supabase.js';
 import ActivityLogService from '../services/activity.service.js';
-import { getPlanLimits } from '../services/usage.service.js';
+import { getPlanLimits, listPublicPlans, normalizePlanId } from '../config/plans.js';
 import EmailService from '../services/email.service.js';
 import ReceiptService from '../services/receipt.service.js';
 import PDFDocument from 'pdfkit';
@@ -10,105 +10,13 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
 export const getPlans = asyncHandler(async (req, res) => {
-    const plans = [
-        {
-            id: 'nano',
-            name: 'Nano',
-            price: 0,
-            price_usd: 0,
-            price_inr: 0,
-            interval: 'month',
-            description: 'Entry-level analytics for personal websites and testing.',
-            features: ['1 Project', '1 Allowed Origin', '10,000 events/mo', '7-day data retention', '60 sec refresh', 'Basic API access'],
-            buttonText: 'Start Free',
-            limits: {
-                monthlyViews: 10000,
-                projectLimit: 1,
-                allowedOriginsLimit: 1,
-                retentionDays: 7,
-                refreshRate: 60
-            }
-        },
-        {
-            id: 'lite',
-            name: 'Lite',
-            price: 199,
-            price_usd: 2.49,
-            price_inr: 199,
-            interval: 'month',
-            description: 'Affordable analytics for individual developers and small websites.',
-            features: ['3 Projects', '3 Allowed Origins', '100,000 events/mo', '30-day data retention', '15 sec refresh', 'Basic API access', 'Limited CSV export'],
-            buttonText: 'Choose Lite',
-            limits: {
-                monthlyViews: 100000,
-                projectLimit: 3,
-                allowedOriginsLimit: 3,
-                retentionDays: 30,
-                refreshRate: 15
-            }
-        },
-        {
-            id: 'pro',
-            name: 'Pro',
-            price: 699,
-            price_usd: 8.99,
-            price_inr: 699,
-            interval: 'month',
-            description: 'Advanced analytics, API access and V2 beta access.',
-            features: ['10 Projects', '10 Allowed Origins', '1,000,000 events/mo', '90-day data retention', '5 sec refresh', '3 Team members', 'Live event logs', 'Full Analytics API', 'Advanced exports', 'V2 Beta access'],
-            buttonText: 'Choose Pro',
-            popular: true,
-            limits: {
-                monthlyViews: 1000000,
-                projectLimit: 10,
-                allowedOriginsLimit: 10,
-                retentionDays: 90,
-                refreshRate: 5
-            }
-        },
-        {
-            id: 'max',
-            name: 'Max',
-            price: 1999,
-            price_usd: 24.99,
-            price_inr: 1999,
-            interval: 'month',
-            description: 'Full analytics capabilities, beta and invitation-only alpha access.',
-            features: ['50 Projects', '25 Allowed Origins', '5,000,000 events/mo', '12-month data retention', '1 sec refresh', '10 Team members', 'Unlimited saved reports', 'Live event logs', 'Full Analytics API', 'V2 Beta & Alpha access'],
-            buttonText: 'Choose Max',
-            limits: {
-                monthlyViews: 5000000,
-                projectLimit: 50,
-                allowedOriginsLimit: 25,
-                retentionDays: 365,
-                refreshRate: 1
-            }
-        },
-        {
-            id: 'enterprise',
-            name: 'Enterprise',
-            price: 'custom',
-            price_usd: 'custom',
-            price_inr: 'custom',
-            interval: 'month',
-            description: 'For companies requiring custom capacity, security and support.',
-            features: ['Negotiated event capacity', 'Custom projects & domains', 'Custom data retention', 'Dedicated dashboard refresh', 'Role-based access & SSO', 'Priority support & SLA'],
-            buttonText: 'Contact Sales',
-            limits: {
-                monthlyViews: 'custom',
-                projectLimit: 'custom',
-                allowedOriginsLimit: 'custom',
-                retentionDays: 'custom',
-                refreshRate: 1
-            }
-        }
-    ];
-
+    const plans = listPublicPlans();
     res.json(plans);
 });
 
 export const createOrder = asyncHandler(async (req, res) => {
-    const { planId } = req.body;
+    const rawPlanId = req.body?.planId;
+    const planId = normalizePlanId(rawPlanId);
     const userId = req.user.id;
 
     const planLimits = getPlanLimits(planId);
@@ -134,11 +42,18 @@ export const createOrder = asyncHandler(async (req, res) => {
         }
     };
 
-    const order = await razorpay.orders.create(options);
+    let order;
+    try {
+        order = await razorpay.orders.create(options);
+    } catch (rpErr) {
+        const desc = rpErr?.error?.description || rpErr?.message || 'Payment gateway unavailable';
+        throw new AppError(502, `Payment gateway error: ${desc}`, 'PAYMENT_GATEWAY_ERROR');
+    }
 
     res.json({
         success: true,
-        order
+        order,
+        keyId: process.env.RAZORPAY_KEY_ID || null
     });
 });
 
@@ -147,84 +62,108 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-        planId
+        planId: rawPlanId
     } = req.body;
     const userId = req.user.id;
 
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        throw AppError.badRequest('Missing payment verification fields');
+    }
+
+    const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
-        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .createHmac('sha256', keySecret)
         .update(body.toString())
         .digest('hex');
 
-    if (expectedSignature === razorpay_signature) {
-        // Payment verified - Update user plan
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({
-                plan: planId
-            })
-            .eq('id', userId);
-
-        if (updateError) throw updateError;
-
-        // Store payment record
-        const planLimits = getPlanLimits(planId);
-        const amount = planLimits.amount;
-
-        const { error: paymentError } = await supabase
-            .from('payments')
-            .insert({
-                user_id: userId,
-                amount: amount,
-                currency: 'USD', // Or INR based on Razorpay config
-                status: 'paid',
-                method: 'razorpay',
-                plan_id: planId,
-                provider_payment_id: razorpay_payment_id,
-                provider_order_id: razorpay_order_id,
-                metadata: {
-                    plan: planId,
-                    order_id: razorpay_order_id
-                }
-            });
-
-        if (paymentError) console.error('Failed to store payment record:', paymentError);
-
-        // Log activity
-        await ActivityLogService.log(
-            null, // No project ID for user-level action
-            userId,
-            'subscription.upgraded',
-            `Upgraded to ${planId} plan`,
-            'success',
-            req.ip,
-            {
-                plan: planId,
-                payment_id: razorpay_payment_id,
-                order_id: razorpay_order_id
-            }
-        );
-
-        // Send Payment Receipt Email
-        if (req.user && req.user.email) {
-            const planLimits = getPlanLimits(planId);
-            const amount = planLimits.amount;
-
-            await EmailService.sendPaymentSuccessEmail(
-                req.user.email,
-                planId,
-                amount, // Amount is already in currency unit (e.g., 29), not paise
-                razorpay_payment_id,
-                new Date().toLocaleDateString(),
-                req.user.name || 'User'
-            );
-        }
-
-        res.json({ success: true, message: 'Payment verified and plan updated' });
-    } else {
+    if (expectedSignature !== razorpay_signature) {
         throw AppError.badRequest('Invalid signature');
     }
+
+    let order = null;
+    if (razorpay?.orders?.fetch) {
+        try {
+            order = await razorpay.orders.fetch(razorpay_order_id);
+        } catch (err) {
+            console.warn('[Payment] Could not fetch Razorpay order metadata:', err?.message || err);
+        }
+    }
+
+    if (order?.notes?.userId && order.notes.userId !== userId) {
+        throw AppError.forbidden('Order does not belong to the authenticated user');
+    }
+
+    const authoritativePlan = order?.notes?.planId || rawPlanId;
+    if (!authoritativePlan) {
+        throw AppError.badRequest('Unable to determine plan for this payment');
+    }
+    const planId = normalizePlanId(authoritativePlan);
+    const planLimits = getPlanLimits(planId);
+    if (!planLimits || planLimits.amount === 0 || planLimits.amount === 'custom') {
+        throw AppError.badRequest('Invalid paid plan for verification');
+    }
+
+    // Payment verified - Update user plan
+    const { error: updateError } = await supabase
+        .from('users')
+        .update({
+            plan: planId
+        })
+        .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Store payment record
+    const amount = planLimits.amount;
+
+    const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+            user_id: userId,
+            amount: amount,
+            currency: order?.currency || 'INR',
+            status: 'paid',
+            method: 'razorpay',
+            plan_id: planId,
+            provider_payment_id: razorpay_payment_id,
+            provider_order_id: razorpay_order_id,
+            metadata: {
+                plan: planId,
+                order_id: razorpay_order_id
+            }
+        });
+
+    if (paymentError) console.error('Failed to store payment record:', paymentError);
+
+    // Log activity
+    await ActivityLogService.log(
+        null, // No project ID for user-level action
+        userId,
+        'subscription.upgraded',
+        `Upgraded to ${planId} plan`,
+        'success',
+        req.ip,
+        {
+            plan: planId,
+            payment_id: razorpay_payment_id,
+            order_id: razorpay_order_id
+        }
+    );
+
+    // Send Payment Receipt Email
+    if (req.user && req.user.email) {
+        await EmailService.sendPaymentSuccessEmail(
+            req.user.email,
+            planId,
+            amount, // Amount is already in currency unit (e.g., 299), not paise
+            razorpay_payment_id,
+            new Date().toLocaleDateString(),
+            req.user.name || 'User'
+        );
+    }
+
+    res.json({ success: true, message: 'Payment verified and plan updated', plan: planId });
 });
 
 export const getPaymentHistory = asyncHandler(async (req, res) => {

@@ -95,7 +95,7 @@ export const register = asyncHandler(async (req, res) => {
         .insert({
             email,
             password_hash: passwordHash,
-            plan: 'free',
+            plan: 'nano',
             name: name
         })
         .select()
@@ -221,6 +221,27 @@ export const getSession = async (req, res) => {
         return res.json({ authenticated: false, user: null });
     }
     return res.json({ authenticated: true, user: result.user });
+};
+
+export const getSurfaceAccess = async (req, res) => {
+    const surface = String(req.query.surface || req.headers['x-webpulse-app'] || 'v1').toLowerCase();
+    const entitlements = req.user?.entitlements || {};
+    const accessMap = entitlements.access || {
+        marketing: true,
+        v1: true,
+        v2_beta: false,
+        alpha: false
+    };
+    const allowed = Boolean(accessMap[surface]);
+    return res.json({
+        plan: req.user?.normalized_plan || req.user?.plan || 'nano',
+        surface,
+        allowed,
+        access: accessMap,
+        features: entitlements.features || {},
+        limits: entitlements.limits || {},
+        upgradeRequired: !allowed
+    });
 };
 
 export const verifyEmail = asyncHandler(async (req, res) => {
@@ -570,7 +591,7 @@ export const googleLogin = asyncHandler(async (req, res) => {
                 google_id: googleId,
                 avatar_url: avatar,
                 is_verified: true,
-                plan: 'free',
+                plan: 'nano',
                 password_hash: 'google_auth'
             })
             .select()
@@ -589,4 +610,4 @@ export const googleLogin = asyncHandler(async (req, res) => {
     res.json({ token: jwtToken, user: publicUser(user) });
 });
 
-export default { register, login, logout, getMe, getSession, verifyEmail, resendVerification, forgotPassword, resetPassword, googleLogin };
+export default { register, login, logout, getMe, getSession, getSurfaceAccess, verifyEmail, resendVerification, forgotPassword, resetPassword, googleLogin };

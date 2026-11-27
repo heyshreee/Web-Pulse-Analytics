@@ -69,6 +69,7 @@ export async function apiRequest(endpoint, options = {}) {
     'Pragma': 'no-cache',
     'Expires': '0',
     'X-Requested-With': 'XMLHttpRequest', // CSRF Protection
+    'X-WebPulse-App': 'v2_beta',
     ...options.headers,
   };
 

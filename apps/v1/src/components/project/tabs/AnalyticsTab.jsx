@@ -1,21 +1,74 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useParams, useOutletContext } from 'react-router-dom';
 import {
   TrendingUp, RefreshCw, MousePointer,
   ChevronRight, Smartphone, Monitor, Tablet,
-  Search,
+  Search, Download, FileText, Filter, Lock
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer
 } from 'recharts';
 import TrafficTrendsChart from '../../TrafficTrendsChart';
 import { useTheme } from '../../../context/ThemeContext';
+import { useToast } from '../../../context/ToastContext';
+import { apiRequest, getApiUrl } from '../../../utils/api';
 
 export default function AnalyticsTab({
   overviewStats, loadingChart, timeRange, setTimeRange,
   onViewAllPages, onRefresh
 }) {
+  const { idOrName } = useParams();
+  const { usageStats } = useOutletContext() || {};
+  const { showToast } = useToast();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+
+  const [filters, setFilters] = useState({ country: '', device: '', source: '', utm_campaign: '' });
+  const [filteredOverview, setFilteredOverview] = useState(null);
+  const [filtering, setFiltering] = useState(false);
+
+  const canFilter = Boolean(usageStats?.features?.advanced_filters);
+  const canCsv = Boolean(usageStats?.features?.csv_export);
+  const canPdf = Boolean(usageStats?.features?.pdf_export);
+
+  const applyFilters = async (e) => {
+    e.preventDefault();
+    if (!canFilter) {
+      showToast('Advanced analytics filters require Lite or higher.', 'error');
+      return;
+    }
+    setFiltering(true);
+    try {
+      const qs = new URLSearchParams({ range: timeRange });
+      Object.entries(filters).forEach(([k, v]) => {
+        if (v.trim()) qs.set(k, v.trim());
+      });
+      const data = await apiRequest(`/projects/${encodeURIComponent(idOrName)}/analytics/overview?${qs.toString()}`);
+      setFilteredOverview(data);
+    } catch (err) {
+      showToast(err.message || 'Failed to apply filters', 'error');
+    } finally {
+      setFiltering(false);
+    }
+  };
+
+  const handleDownloadExport = (format) => {
+    if (format === 'pdf' && !canPdf) {
+      showToast('PDF export requires Lite or higher.', 'error');
+      return;
+    }
+    if (format === 'csv' && !canCsv) {
+      showToast('CSV export requires Lite or higher.', 'error');
+      return;
+    }
+    const qs = new URLSearchParams({ format, range: timeRange });
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v.trim()) qs.set(k, v.trim());
+    });
+    window.open(`${getApiUrl()}/projects/${encodeURIComponent(idOrName)}/analytics/export?${qs.toString()}`, '_blank', 'noopener');
+  };
+
+  const activeTrafficData = filteredOverview?.dailyTraffic || overviewStats.trafficData;
 
   const deviceData = [
     { name: 'Desktop', value: overviewStats.devices?.desktop || 0, icon: <Monitor className="h-3.5 w-3.5" />, color: isDark ? '#ededed' : '#0a0a0a' },
@@ -27,6 +80,95 @@ export default function AnalyticsTab({
 
   return (
     <div className="space-y-3 font-sans">
+      {/* Advanced Filters & Export Bar (Lite+) */}
+      <form onSubmit={applyFilters} className="wp-panel p-3 bg-[var(--wp-bg-surface)] flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2 flex-1">
+          <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[var(--wp-text-muted)] uppercase">
+            <Filter className="h-3 w-3" />
+            Filters
+          </span>
+          <input
+            type="text"
+            value={filters.country}
+            onChange={(e) => setFilters((f) => ({ ...f, country: e.target.value }))}
+            placeholder="Country"
+            disabled={!canFilter}
+            className="h-7 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] w-28 disabled:opacity-50"
+          />
+          <select
+            value={filters.device}
+            onChange={(e) => setFilters((f) => ({ ...f, device: e.target.value }))}
+            disabled={!canFilter}
+            className="h-7 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] disabled:opacity-50"
+          >
+            <option value="">All devices</option>
+            <option value="desktop">Desktop</option>
+            <option value="mobile">Mobile</option>
+            <option value="tablet">Tablet</option>
+          </select>
+          <select
+            value={filters.source}
+            onChange={(e) => setFilters((f) => ({ ...f, source: e.target.value }))}
+            disabled={!canFilter}
+            className="h-7 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] disabled:opacity-50"
+          >
+            <option value="">All sources</option>
+            <option value="Direct">Direct</option>
+            <option value="Organic Search">Organic Search</option>
+            <option value="Social">Social</option>
+            <option value="Referral">Referral</option>
+          </select>
+          <input
+            type="text"
+            value={filters.utm_campaign}
+            onChange={(e) => setFilters((f) => ({ ...f, utm_campaign: e.target.value }))}
+            placeholder="UTM campaign"
+            disabled={!canFilter}
+            className="h-7 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)] w-28 disabled:opacity-50"
+          />
+          <button
+            type="submit"
+            disabled={!canFilter || filtering}
+            className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1 disabled:opacity-50"
+          >
+            {!canFilter && <Lock className="h-3 w-3" />}
+            {filtering ? 'Filtering…' : 'Apply'}
+          </button>
+          {filteredOverview && (
+            <button
+              type="button"
+              onClick={() => { setFilters({ country: '', device: '', source: '', utm_campaign: '' }); setFilteredOverview(null); }}
+              className="text-[11px] font-mono text-[var(--wp-text-muted)] hover:text-[var(--wp-text-primary)] underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => handleDownloadExport('csv')}
+            disabled={!canCsv}
+            className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1 disabled:opacity-50"
+            title={canCsv ? 'Export CSV' : 'CSV export requires Lite or higher'}
+          >
+            {canCsv ? <Download className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+            CSV
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDownloadExport('pdf')}
+            disabled={!canPdf}
+            className="wp-btn wp-btn-secondary h-7 px-2.5 text-xs inline-flex items-center gap-1 disabled:opacity-50"
+            title={canPdf ? 'Export PDF Report' : 'PDF export requires Lite or higher'}
+          >
+            {canPdf ? <FileText className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+            PDF
+          </button>
+        </div>
+      </form>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Main Telemetry Flow */}
         <div className="lg:col-span-2 wp-panel flex flex-col">
@@ -62,7 +204,7 @@ export default function AnalyticsTab({
           </div>
 
           <div className="wp-studio-canvas p-4 flex-1 min-h-[300px]">
-            <TrafficTrendsChart data={overviewStats.trafficData} loading={loadingChart} />
+            <TrafficTrendsChart data={activeTrafficData} loading={loadingChart} />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
-import { Plus, ArrowUpRight, Loader2, Copy, X } from 'lucide-react';
+import { Plus, ArrowUpRight, Loader2, Copy, X, Lock, AlertTriangle } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import Modal from '../components/Modal';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -29,7 +29,9 @@ function formatRelativeTime(dateInput) {
   return `${Math.floor(diffSec / 86400)}d ago`;
 }
 
-const CustomTrafficTooltip = ({ active, payload, label }) => {
+const PROJECT_OPACITY_STEPS = [1, 0.72, 0.5, 0.36, 0.25, 0.18];
+
+const CustomTrafficTooltip = ({ active, payload, label, isCombined }) => {
   if (!active || !payload || !payload.length) return null;
   const data = payload[0]?.payload || {};
   const dateStr = data.fullDate
@@ -41,6 +43,42 @@ const CustomTrafficTooltip = ({ active, payload, label }) => {
           : { year: 'numeric' })
       })
     : label;
+
+  if (!isCombined && payload.length > 0 && payload[0]?.dataKey !== 'views') {
+    const sortedProjects = [...payload].sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+    return (
+      <div className="bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-md p-2.5 shadow-2xl text-[11px] font-mono space-y-1.5 z-50 min-w-[160px]">
+        <div className="text-[var(--wp-text-muted)] font-medium text-[10px] uppercase border-b border-[var(--wp-border-subtle)] pb-1">
+          {dateStr}
+        </div>
+        {sortedProjects.map((entry) => (
+          <div key={entry.dataKey} className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-1.5 text-[var(--wp-text-secondary)] truncate max-w-[140px]">
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{
+                  backgroundColor: 'var(--wp-chart-1)',
+                  opacity: entry.strokeOpacity ?? 1,
+                }}
+              />
+              <span className="truncate">{entry.name}</span>
+            </span>
+            <span className="font-bold text-[var(--wp-text-primary)] tabular-nums">
+              {(entry.value ?? 0).toLocaleString()}
+            </span>
+          </div>
+        ))}
+        {sortedProjects.length > 1 && (
+          <div className="flex items-center justify-between gap-3 border-t border-[var(--wp-border-subtle)] pt-1 text-[10px]">
+            <span className="text-[var(--wp-text-muted)]">Total</span>
+            <span className="font-semibold text-[var(--wp-text-secondary)] tabular-nums">
+              {sortedProjects.reduce((sum, entry) => sum + (entry.value ?? 0), 0).toLocaleString()}
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-md p-2.5 shadow-2xl text-[11px] font-mono space-y-1.5 z-50 min-w-[130px]">
@@ -97,46 +135,92 @@ export default function Dashboard() {
   });
 
   const [timeRange, setTimeRange] = useState('30d');
+  const [trafficViewMode, setTrafficViewMode] = useState('projects');
+  const [hiddenProjectIds, setHiddenProjectIds] = useState(() => new Set());
   const [globeError, setGlobeError] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [showSnippetOverlay, setShowSnippetOverlay] = useState(true);
+  const [orgSummary, setOrgSummary] = useState(null);
+  const [alphaFeatures, setAlphaFeatures] = useState([]);
+  const [recentAuditLogs, setRecentAuditLogs] = useState([]);
+  const inFlightRef = useRef(false);
+  const overviewCacheRef = useRef(new Map());
+  const loadUserRef = useRef(loadUser);
+  loadUserRef.current = loadUser;
 
-  useEffect(() => {
-    if (!user?.id) return;
-    loadData();
+  const refreshIntervalMs = Math.max(
+    5000,
+    Number(usageStats?.limits?.dashboard_refresh_seconds || 60) * 1000
+  );
 
-    const interval = setInterval(() => loadData(false), 10000); // Poll every 10s as fallback
+  const projectSeries = useMemo(() => {
+    return (projects || []).map((project, index) => ({
+      id: project.id,
+      name: project.name,
+      opacity: PROJECT_OPACITY_STEPS[index] ?? Math.max(0.15, 1 - index * 0.16),
+    }));
+  }, [projects]);
 
-    if (socket) {
-      const handleVisitorUpdate = () => loadData(false);
-      const handleUsageUpdate = () => loadUser(); // Refresh usage stats via loadUser
+  const activeProjectSeries = useMemo(
+    () => projectSeries.filter((p) => !hiddenProjectIds.has(p.id)),
+    [projectSeries, hiddenProjectIds]
+  );
 
-      socket.on('visitor_update', handleVisitorUpdate);
-      socket.on('usage_update', handleUsageUpdate);
+  const multiProjectTrafficData = useMemo(() => {
+    const rawTraffic = dashboardStats?.trafficData;
+    if (!Array.isArray(rawTraffic) || rawTraffic.length === 0) return [];
+    return rawTraffic.map((point) => {
+      const row = { ...point };
+      for (const proj of projectSeries) {
+        row[proj.id] = point.byProject?.[proj.id] ?? 0;
+      }
+      return row;
+    });
+  }, [dashboardStats?.trafficData, projectSeries]);
 
-      return () => {
-        clearInterval(interval);
-        socket.off('visitor_update', handleVisitorUpdate);
-        socket.off('usage_update', handleUsageUpdate);
-      };
+  const toggleProjectSeries = useCallback((projectId) => {
+    setTrafficViewMode('projects');
+    setHiddenProjectIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(projectId)) next.delete(projectId);
+      else next.add(projectId);
+      return next;
+    });
+  }, []);
+
+  const loadData = useCallback(async (showLoading = true) => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+
+    const cached = overviewCacheRef.current.get(timeRange);
+    if (cached && showLoading) {
+      setDashboardStats(cached);
     }
-
-    return () => clearInterval(interval);
-  }, [user?.id, timeRange, socket]);
-
-  const loadData = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+    if (showLoading && !cached) setLoading(true);
     try {
       const [projectsData, statsData] = await Promise.all([
         apiRequest('/projects'),
         apiRequest(`/analytics/overview?range=${timeRange}`).catch(() => null)
       ]);
 
+      if (['max', 'enterprise'].includes(String(usageStats?.plan || user?.normalized_plan || '').toLowerCase())) {
+        Promise.all([
+          apiRequest(`/analytics/organization?range=${timeRange}`).catch(() => null),
+          apiRequest('/alpha/features').catch(() => null),
+          apiRequest('/audit-logs?limit=5').catch(() => null),
+        ]).then(([org, alpha, audit]) => {
+          if (org) setOrgSummary(org);
+          if (alpha?.features) setAlphaFeatures(alpha.features);
+          if (audit?.logs) setRecentAuditLogs(audit.logs);
+        }).catch(() => {});
+      }
+
       setGlobeError(!statsData);
       setProjects(projectsData);
 
       if (statsData) {
+        overviewCacheRef.current.set(timeRange, statsData);
         setDashboardStats(statsData);
       }
 
@@ -162,12 +246,57 @@ export default function Dashboard() {
       if (showLoading) showToast(err.message, 'error');
       console.error(err);
     } finally {
+      inFlightRef.current = false;
       if (showLoading) {
         setLoading(false);
         setIsPageLoading?.(false);
       }
     }
-  };
+  }, [timeRange, showToast, setIsPageLoading]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    loadData();
+
+    const interval = setInterval(() => {
+      if (typeof document === 'undefined' || !document.hidden) {
+        loadData(false);
+      }
+    }, refreshIntervalMs);
+
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        loadData(false);
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    if (socket) {
+      const handleVisitorUpdate = () => loadData(false);
+      const handleUsageUpdate = () => loadUserRef.current?.();
+
+      socket.on('visitor_update', handleVisitorUpdate);
+      socket.on('usage_update', handleUsageUpdate);
+
+      return () => {
+        clearInterval(interval);
+        if (typeof document !== 'undefined') {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
+        socket.off('visitor_update', handleVisitorUpdate);
+        socket.off('usage_update', handleUsageUpdate);
+      };
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+    };
+  }, [user?.id, refreshIntervalMs, socket, loadData]);
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
@@ -297,7 +426,7 @@ export default function Dashboard() {
 
   const totalViewsUsed = stats?.reduce((acc, curr) => acc + (Number(curr.views) || 0), 0) || 0;
   const viewLimit = Number(usageStats?.monthlyLimit) || 1000;
-  const quotaUsed = usageStats?.totalViews !== undefined ? Number(usageStats.totalViews) || 0 : totalViewsUsed;
+  const quotaUsed = Number(usageStats?.totalViews) || totalViewsUsed;
   const viewPercentage = Math.min(Math.max((quotaUsed / viewLimit) * 100, 0), 100);
 
   const projectsUsed = usageStats?.projectCount ?? projects.length;
@@ -340,7 +469,7 @@ export default function Dashboard() {
     }
   };
 
-  const { realTimeVisitors = 0, trafficData = [], liveActivity = [] } = dashboardStats || {};
+  const { realTimeVisitors = 0, liveActivity = [] } = dashboardStats || {};
   const totalSessionsCount = stats?.reduce((acc, curr) => acc + (Number(curr.sessions) || 0), 0) || Number(dashboardStats?.sessions) || totalViewsUsed || 0;
   const rangeLabel = timeRange === 'realtime' ? 'Live' : timeRange;
   const eventsCount = dashboardStats?.viewsTotal !== undefined ? Number(dashboardStats.viewsTotal) || 0 : totalViewsUsed;
@@ -468,6 +597,103 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Quota Warning / Limit Banner (80%, 90%, 100%) */}
+      {viewLimit > 0 && quotaUsed / viewLimit >= 0.8 && (
+        <div
+          className={`wp-panel p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs ${
+            quotaUsed >= viewLimit
+              ? 'border-rose-500/40 bg-rose-500/10 text-rose-200'
+              : quotaUsed / viewLimit >= 0.9
+                ? 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+                : 'border-blue-500/40 bg-blue-500/10 text-blue-200'
+          }`}
+        >
+          <div className="flex items-start sm:items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 sm:mt-0" />
+            <div>
+              <span className="font-semibold">
+                {quotaUsed >= viewLimit
+                  ? 'Monthly event quota reached (100%): '
+                  : quotaUsed / viewLimit >= 0.9
+                    ? 'Warning — 90%+ monthly quota used: '
+                    : 'Heads up — 80%+ monthly quota used: '}
+              </span>
+              <span>
+                {quotaUsed.toLocaleString()} / {viewLimit.toLocaleString()} events used.
+                {quotaUsed >= viewLimit
+                  ? ' New billable events are paused while your dashboard remains accessible.'
+                  : ''}
+                {usageStats?.resetDate
+                  ? ` Resets ${new Date(usageStats.resetDate).toUTCString().slice(0, 16)} UTC.`
+                  : ''}
+              </span>
+            </div>
+          </div>
+          <Link
+            to="/dashboard/billing"
+            className="wp-btn wp-btn-primary h-7 px-3 text-xs shrink-0 self-start sm:self-auto"
+          >
+            Upgrade Plan
+          </Link>
+        </div>
+      )}
+
+      {/* Max Workspace: Organization Analytics, Audit Logs & Alpha Flags */}
+      {['max', 'enterprise'].includes(String(usageStats?.plan || user?.normalized_plan || '').toLowerCase()) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="wp-panel p-3.5 bg-[var(--wp-bg-surface)] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="wp-title-card">Organization Analytics</span>
+              <span className="text-[10px] font-mono text-[var(--wp-text-muted)] uppercase">Max</span>
+            </div>
+            <div className="text-xl font-bold font-mono text-[var(--wp-text-primary)]">
+              {(orgSummary?.accountTotals?.totalEvents || 0).toLocaleString()} events
+            </div>
+            <p className="text-[11px] font-mono text-[var(--wp-text-muted)]">
+              Across {orgSummary?.accountTotals?.activeProjects ?? projects.length} authorized projects
+            </p>
+          </div>
+
+          <div className="wp-panel p-3.5 bg-[var(--wp-bg-surface)] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="wp-title-card">Alpha Experimental</span>
+              <span className="text-[10px] font-mono text-amber-400 uppercase">Unstable</span>
+            </div>
+            <div className="space-y-1 text-[11px] font-mono">
+              {alphaFeatures.length > 0 ? alphaFeatures.map((f) => (
+                <div key={f.key} className="flex items-center justify-between">
+                  <span className="text-[var(--wp-text-secondary)] truncate">{f.name}</span>
+                  <span className={f.enabled ? 'text-emerald-400' : 'text-[var(--wp-text-muted)]'}>
+                    {f.enabled ? 'ON' : 'OFF'}
+                  </span>
+                </div>
+              )) : (
+                <p className="text-[var(--wp-text-muted)]">Eligible on Max accounts</p>
+              )}
+            </div>
+          </div>
+
+          <div className="wp-panel p-3.5 bg-[var(--wp-bg-surface)] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="wp-title-card">Audit Trail</span>
+              <span className="text-[10px] font-mono text-[var(--wp-text-muted)] uppercase">Immutable</span>
+            </div>
+            <div className="space-y-1 text-[11px] font-mono">
+              {recentAuditLogs.length > 0 ? recentAuditLogs.slice(0, 3).map((l) => (
+                <div key={l.id} className="flex items-center justify-between gap-2">
+                  <span className="text-[var(--wp-text-secondary)] truncate">{l.action}</span>
+                  <span className="text-[var(--wp-text-muted)] shrink-0">
+                    {new Date(l.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )) : (
+                <p className="text-[var(--wp-text-muted)]">No audit events recorded yet</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 2. Unified 4-Column KPI Bar */}
       <div className="wp-panel grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-[var(--wp-border-subtle)] bg-[var(--wp-bg-surface)]">
         {/* Col 1: Live Visitors */}
@@ -555,20 +781,71 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-[460px]">
         {/* Col 7: Traffic Momentum */}
         <div className="lg:col-span-7 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
-          <div className="wp-panel-header">
-            <div className="flex items-center gap-2">
+          <div className="wp-panel-header !h-auto min-h-[38px] py-1.5 flex-wrap gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="wp-title-card">Traffic momentum</span>
               <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase">
                 {timeRange}
               </span>
+              {projectSeries.length > 0 && (
+                <div className="flex items-center gap-1 flex-wrap ml-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTrafficViewMode('projects');
+                      setHiddenProjectIds(new Set());
+                    }}
+                    className={`px-2 py-0.5 rounded text-[10.5px] font-mono border transition-colors ${
+                      trafficViewMode === 'projects' && hiddenProjectIds.size === 0
+                        ? 'bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] border-[var(--wp-border-default)]'
+                        : 'text-[var(--wp-text-muted)] border-transparent hover:text-[var(--wp-text-secondary)]'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTrafficViewMode('combined')}
+                    className={`px-2 py-0.5 rounded text-[10.5px] font-mono border transition-colors ${
+                      trafficViewMode === 'combined'
+                        ? 'bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] border-[var(--wp-border-default)]'
+                        : 'text-[var(--wp-text-muted)] border-transparent hover:text-[var(--wp-text-secondary)]'
+                    }`}
+                  >
+                    Combined
+                  </button>
+                  {projectSeries.map((proj) => {
+                    const isActive = trafficViewMode === 'projects' && !hiddenProjectIds.has(proj.id);
+                    return (
+                      <button
+                        key={proj.id}
+                        type="button"
+                        onClick={() => toggleProjectSeries(proj.id)}
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono border transition-colors max-w-[130px] ${
+                          isActive
+                            ? 'bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] border-[var(--wp-border-default)]'
+                            : 'text-[var(--wp-text-muted)] border-[var(--wp-border-subtle)] opacity-55 hover:opacity-85'
+                        }`}
+                        title={`Toggle ${proj.name}`}
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{ backgroundColor: 'var(--wp-chart-1)', opacity: proj.opacity }}
+                        />
+                        <span className="truncate">{proj.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             <div className="text-[11px] font-mono text-[var(--wp-text-muted)]">
-              {trafficData?.length || 0} data points
+              {multiProjectTrafficData?.length || 0} data points
             </div>
           </div>
 
           <div className="wp-studio-canvas flex-1 min-h-[380px] p-2.5 sm:p-3 flex flex-col justify-between min-w-0">
-            {trafficData && trafficData.length > 0 ? (
+            {multiProjectTrafficData && multiProjectTrafficData.length > 0 ? (
               <div className="w-full h-full min-h-[360px] min-w-0 flex-1 relative" style={{ minHeight: 360 }}>
                 <ResponsiveContainer
                   width="100%"
@@ -578,12 +855,18 @@ export default function Dashboard() {
                   initialDimension={{ width: 640, height: 340 }}
                   debounce={50}
                 >
-                  <AreaChart data={trafficData} margin={{ top: 12, right: 12, left: -10, bottom: 4 }}>
+                  <AreaChart data={multiProjectTrafficData} margin={{ top: 12, right: 12, left: -10, bottom: 4 }}>
                     <defs>
                       <linearGradient id="studioTrafficGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="var(--wp-chart-1)" stopOpacity={0.25} />
                         <stop offset="100%" stopColor="var(--wp-chart-1)" stopOpacity={0.0} />
                       </linearGradient>
+                      {activeProjectSeries.map((proj) => (
+                        <linearGradient key={proj.id} id={`trafficGrad-${proj.id}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--wp-chart-1)" stopOpacity={0.22 * proj.opacity} />
+                          <stop offset="100%" stopColor="var(--wp-chart-1)" stopOpacity={0.0} />
+                        </linearGradient>
+                      ))}
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--wp-chart-grid)" vertical={false} />
                     <XAxis
@@ -600,16 +883,38 @@ export default function Dashboard() {
                       allowDecimals={false}
                       domain={[0, (dataMax) => Math.max(dataMax, 5)]}
                     />
-                    <Tooltip content={<CustomTrafficTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey="views"
-                      name="Events"
-                      stroke="var(--wp-chart-1)"
-                      strokeWidth={1.75}
-                      fillOpacity={1}
-                      fill="url(#studioTrafficGrad)"
+                    <Tooltip
+                      content={
+                        <CustomTrafficTooltip
+                          isCombined={trafficViewMode === 'combined' || activeProjectSeries.length === 0}
+                        />
+                      }
                     />
+                    {trafficViewMode === 'projects' && activeProjectSeries.length > 0 ? (
+                      activeProjectSeries.map((proj) => (
+                        <Area
+                          key={proj.id}
+                          type="monotone"
+                          dataKey={proj.id}
+                          name={proj.name}
+                          stroke="var(--wp-chart-1)"
+                          strokeOpacity={proj.opacity}
+                          strokeWidth={1.75}
+                          fillOpacity={1}
+                          fill={`url(#trafficGrad-${proj.id})`}
+                        />
+                      ))
+                    ) : (
+                      <Area
+                        type="monotone"
+                        dataKey="views"
+                        name="Events"
+                        stroke="var(--wp-chart-1)"
+                        strokeWidth={1.75}
+                        fillOpacity={1}
+                        fill="url(#studioTrafficGrad)"
+                      />
+                    )}
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -637,6 +942,47 @@ export default function Dashboard() {
           </div>
 
           <div className="wp-studio-canvas flex-1 min-h-[380px] relative flex flex-col items-center justify-center p-0 overflow-hidden">
+            {usageStats?.features?.globe_analyze === false ? (
+              <div className="w-full h-full min-h-[380px] p-4 flex flex-col justify-between bg-[var(--wp-bg-surface)]">
+                <div className="border border-dashed border-[var(--wp-border-strong)] rounded-lg p-4 text-center space-y-2 bg-[var(--wp-bg-subtle)]">
+                  <div className="mx-auto w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                    <Lock className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <p className="text-xs font-semibold text-[var(--wp-text-primary)]">
+                    Globe Analyze is excluded from Nano
+                  </p>
+                  <p className="text-[11px] text-[var(--wp-text-muted)]">
+                    Upgrade to Lite or higher to unlock the interactive 3D globe and regional heatmaps. Basic country statistics remain available below.
+                  </p>
+                  <Link
+                    to="/dashboard/billing"
+                    className="wp-btn wp-btn-primary h-7 px-3 text-[11px] inline-flex items-center"
+                  >
+                    Upgrade to unlock Globe Analyze
+                  </Link>
+                </div>
+
+                <div className="mt-3 border border-[var(--wp-border-subtle)] rounded-md p-3 bg-[var(--wp-bg-canvas)]">
+                  <div className="text-[10.5px] font-mono uppercase text-[var(--wp-text-muted)] mb-2">
+                    Top Countries (Basic Geo)
+                  </div>
+                  {dashboardStats?.countryStats?.length > 0 ? (
+                    <div className="space-y-1.5 text-xs">
+                      {dashboardStats.countryStats.slice(0, 5).map((c) => (
+                        <div key={c.country || c.name} className="flex items-center justify-between font-mono">
+                          <span className="text-[var(--wp-text-primary)] truncate">{c.country || c.name || 'Unknown'}</span>
+                          <span className="text-[var(--wp-text-muted)]">{(c.visitors || c.count || 0).toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] font-mono text-[var(--wp-text-muted)]">
+                      No country telemetry recorded yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
             <div className="w-full h-full relative min-h-[380px]">
               <ErrorBoundary scoped title="Live globe temporarily unavailable" message="Real-time map telemetry could not be loaded.">
                 <NetworkGlobe
@@ -720,6 +1066,7 @@ export default function Dashboard() {
                 )
               )}
             </div>
+            )}
           </div>
         </div>
       </div>

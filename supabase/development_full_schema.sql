@@ -1313,6 +1313,27 @@ CREATE POLICY "Users can update own notifications"
   USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
 
+-- ----------------------------------------------------------------------------
+-- 9. Nano Plan Entitlements, Verified Origins, Idempotency & Shared Reports
+--    (See supabase/migrations/20261128000001_nano_plan_entitlements.sql)
+-- ----------------------------------------------------------------------------
+-- Adds:
+--   * public.plans.limits / features / access / rate-limit columns (Nano: 3 origins, 1 share/mo, 7d retention, globe_analyze=false)
+--   * public.project_origins (DNS TXT & .well-known file verification, exact origin matching, block toggle)
+--   * public.ingested_events (per-project event_id idempotency)
+--   * public.shared_reports (SHA-256 token_hash, anonymized snapshot_data, 7-day expiry, revocation)
+--   * RPCs: consume_monthly_event_quota, check_shared_report_quota, cleanup_expired_analytics
+
+-- ----------------------------------------------------------------------------
+-- 10. Lite Plan Entitlements, Team Invitations, Archiving & Filter Indexes
+--    (See supabase/migrations/20261129000001_lite_plan_entitlements.sql)
+-- ----------------------------------------------------------------------------
+-- Adds:
+--   * public.plans update for 'lite' (10 origins, 3 team members, 30s refresh, 60/min API, 30/s + 60 burst, 10 shared reports/mo, pdf_export, advanced_filters, advanced_geo_analytics, team_collaboration)
+--   * public.projects.archived_at
+--   * public.project_invitations (token_hash, role, status, expires_at, RLS)
+--   * Composite filter indexes on public.visitors and public.page_views
+
 -- ============================================================================
 -- End of Consolidated Schema Definition
 -- ============================================================================

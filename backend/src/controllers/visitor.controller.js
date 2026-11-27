@@ -7,8 +7,57 @@ import { getClientIp } from '../utils/ip.js';
 import crypto from 'crypto';
 import NotificationService from '../services/notification.service.js';
 import ActivityLogService from '../services/activity.service.js';
+import originService from '../services/origin.service.js';
+import { hasFeature } from '../config/plans.js';
+import { consumeIngestionToken } from '../middlewares/rateLimiter.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
+
+async function enforceIngestionGuards({ project, req, hasSecretApiKey = false }) {
+    const rateResult = consumeIngestionToken({
+        projectId: project.id,
+        planId: project.plan || 'nano'
+    });
+    if (!rateResult.allowed) {
+        throw new AppError(
+            429,
+            'Ingestion rate limit exceeded',
+            'INGESTION_RATE_LIMITED',
+            { retryAfterSeconds: rateResult.retryAfterSeconds }
+        );
+    }
+
+    const originResult = await originService.validateIngestionOrigin({
+        project,
+        req,
+        hasSecretApiKey
+    });
+    if (!originResult.allowed) {
+        throw AppError.forbidden(
+            originResult.code || 'ORIGIN_NOT_ALLOWED',
+            originResult.code || 'ORIGIN_NOT_ALLOWED'
+        );
+    }
+
+    const rawEventId = req.body?.event_id || req.body?.eventId || null;
+    const quotaResult = await usageService.consumeEventQuota(
+        project.user_id,
+        project.id,
+        rawEventId
+    );
+    if (!quotaResult.allowed) {
+        throw AppError.limitExceeded(
+            quotaResult.reason || 'Monthly event quota reached',
+            quotaResult.usage
+        );
+    }
+
+    return {
+        duplicate: Boolean(quotaResult.duplicate),
+        eventId: rawEventId,
+        quotaResult
+    };
+}
 
 /**
  * Fallback coordinates for local testing (localhost / 127.0.0.1)
@@ -404,7 +453,7 @@ const recordAnalyticsHit = async ({
         // Daily rollup update non-blocking
     }
 
-    // 8. Update Project Counters & Monthly Usages
+    // 8. Update Project Lifetime Counter (monthly usage is incremented atomically by usageService.consumeEventQuota)
     try {
         const { error: counterError } = await supabase.rpc('increment_project_counter', {
             p_id: project.id
@@ -428,36 +477,17 @@ const recordAnalyticsHit = async ({
                     .insert({ project_id: project.id, count: 1 });
             }
         }
-
-        const currentMonth = new Date().toISOString().slice(0, 7);
-        const { data: usage } = await supabase
-            .from('usages')
-            .select('views')
-            .eq('project_id', project.id)
-            .eq('month', currentMonth)
-            .single();
-
-        if (usage) {
-            await supabase
-                .from('usages')
-                .update({ views: usage.views + 1, updated_at: new Date() })
-                .eq('project_id', project.id)
-                .eq('month', currentMonth);
-        } else {
-            await supabase
-                .from('usages')
-                .insert({ project_id: project.id, month: currentMonth, views: 1 });
-        }
     } catch (cErr) {
-        console.error('[Analytics] Counter/Usage error:', cErr);
+        console.error('[Analytics] Counter error:', cErr);
     }
 
-    // 9. Realtime WebSocket Broadcast
+    // 9. Realtime WebSocket Broadcast (strip raw IP and gate lat/lng on globe_analyze entitlement)
     if (global.io && project.user_id) {
-        global.io.to(`user_${project.user_id}`).emit('visitor_update', { 
-            ...visitor, 
-            lat,
-            lng,
+        const allowGlobe = hasFeature(project.plan || 'nano', 'globe_analyze');
+        const { ip_address: _omittedIp, ...safeVisitor } = visitor || {};
+        global.io.to(`user_${project.user_id}`).emit('visitor_update', {
+            ...safeVisitor,
+            ...(allowGlobe ? { lat, lng } : {}),
             project_id: project.id,
             title: cleanTitle,
             type
@@ -526,7 +556,7 @@ export const trackVisitor = asyncHandler(async (req, res) => {
 
     const { data: project, error: projectError } = await supabase
         .from('projects')
-        .select('id, user_id, plan, is_active')
+        .select('id, name, user_id, plan, allowed_origins, is_active')
         .eq('tracking_id', trackingCode)
         .maybeSingle();
 
@@ -538,38 +568,9 @@ export const trackVisitor = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    // Origin enforcement for project allowed_origins
-    if (project.allowed_origins && String(project.allowed_origins).trim()) {
-        const origin = req.headers.origin || req.headers.referer;
-        if (origin) {
-            let originHostname = origin;
-            try {
-                originHostname = new URL(origin).hostname;
-            } catch {
-                originHostname = origin.replace(/^https?:\/\//i, '').split('/')[0].split(':')[0];
-            }
-            const allowedList = project.allowed_origins.split(',').map((o) => {
-                const trimmed = o.trim();
-                try {
-                    return trimmed.startsWith('http') ? new URL(trimmed).hostname : trimmed;
-                } catch {
-                    return trimmed;
-                }
-            }).filter(Boolean);
-
-            const isAllowed = allowedList.some((allowed) =>
-                originHostname === allowed || originHostname.endsWith('.' + allowed)
-            );
-            if (!isAllowed) {
-                throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
-            }
-        }
-    }
-
-    // Check limits before proceeding
-    const limitCheck = await usageService.checkLimit(project.user_id);
-    if (!limitCheck.canTrack) {
-        throw AppError.limitExceeded(limitCheck.reason, limitCheck.usage);
+    const guard = await enforceIngestionGuards({ project, req, hasSecretApiKey: false });
+    if (guard.duplicate) {
+        return res.json({ success: true, ignored: 'DUPLICATE_EVENT_ID' });
     }
 
     await recordAnalyticsHit({
@@ -671,7 +672,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .gte('created_at', prevStartStr)
         .lt('created_at', startDateStr);
 
-    const { data: dailyViews } = await scope('page_views', 'created_at, visitor_id, session_id')
+    const { data: dailyViews } = await scope('page_views', 'created_at, visitor_id, session_id, project_id')
         .gte('created_at', startDateStr)
         .limit(50000);
 
@@ -706,7 +707,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         views: 0,
         visitors: new Set(),
         sessions: new Set(),
-        compare: 0
+        compare: 0,
+        byProject: {}
     }));
     const bucketIndex = new Map(trafficKeys.map((k, i) => [k, i]));
 
@@ -717,6 +719,9 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         b.views++;
         if (v.visitor_id) b.visitors.add(v.visitor_id);
         if (v.session_id) b.sessions.add(v.session_id);
+        if (v.project_id) {
+            b.byProject[v.project_id] = (b.byProject[v.project_id] || 0) + 1;
+        }
     });
 
     // Previous-period counts aligned to the same bucket index for the compare series
@@ -737,7 +742,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         visitors: b.visitors.size,
         sessions: b.sessions.size,
         fullDate: b.key,
-        compare: b.compare
+        compare: b.compare,
+        byProject: b.byProject
     }));
 
     const { data: sources } = await scope('visitors', 'referrer')
@@ -762,6 +768,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .order('created_at', { ascending: false })
         .limit(activityLimit);
 
+    const allowGlobe = hasFeature(req.user?.plan || 'nano', 'globe_analyze');
     const liveActivity = await Promise.all((recentActivity || []).map(async v => {
         const visitor = v.visitors || {};
         const city = visitor.city === 'Unknown' ? '' : visitor.city;
@@ -780,7 +787,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
 
         let lat = null;
         let lng = null;
-        if (visitor.ip_address) {
+        if (allowGlobe && visitor.ip_address) {
             const geo = await getHighAccuracyGeo(visitor.ip_address);
             lat = geo.lat;
             lng = geo.lng;
@@ -796,9 +803,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
             id: v.id,
             type: 'view',
             location,
-            ip: visitor.ip_address,
-            lat,
-            lng,
+            ...(allowGlobe ? { lat, lng } : {}),
             site,
             path,
             title: v.title,
@@ -1027,71 +1032,9 @@ export const trackVisitorPublic = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    // Check Allowed Origins
-    const origin = req.headers['origin'] || req.headers['referer'];
-    if (project.allowed_origins && project.allowed_origins.length > 0 && origin) {
-        try {
-            let originHostname;
-            if (origin === 'null') {
-                originHostname = 'null';
-            } else {
-                originHostname = new URL(origin).hostname;
-            }
-            const allowedOriginsArray = project.allowed_origins.split(',').map(o => {
-                try {
-                    // If it's a full URL, extract the hostname
-                    if (o.trim().startsWith('http')) {
-                        return new URL(o.trim()).hostname;
-                    }
-                    return o.trim();
-                } catch (e) {
-                    return o.trim();
-                }
-            });
-            const isAllowed = allowedOriginsArray.some(allowed =>
-                originHostname === allowed || originHostname.endsWith('.' + allowed)
-            );
-
-            if (!isAllowed) {
-                // Notify user about blocked origin
-                await NotificationService.create(
-                    project.user_id,
-                    'Security Alert: Origin Blocked',
-                    `Blocked request from unauthorized origin: ${originHostname} for project "${project.name || 'Unknown'}"`,
-                    'security'
-                );
-
-                // Log security alert as failure
-                if (project.user_id) {
-                    await ActivityLogService.log(
-                        project.id,
-                        project.user_id,
-                        'security.alert',
-                        `Blocked request from unauthorized origin: ${originHostname}`,
-                        'failure',
-                        ip,
-                        {
-                            resource: pageUrl,
-                            http_method: req.method,
-                            http_status: 403,
-                            user_agent: userAgent,
-                            event_type: 'security.alert'
-                        }
-                    );
-                }
-
-                throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
-            }
-        } catch (urlError) {
-            console.error('Origin validation error:', urlError);
-            throw AppError.forbidden('INVALID_ORIGIN', 'INVALID_ORIGIN');
-        }
-    }
-
-    // Check Limits
-    const limitCheck = await usageService.checkLimit(project.user_id);
-    if (!limitCheck.canTrack) {
-        throw AppError.limitExceeded(limitCheck.reason);
+    const guard = await enforceIngestionGuards({ project, req, hasSecretApiKey: false });
+    if (guard.duplicate) {
+        return res.json({ success: true, ignored: 'DUPLICATE_EVENT_ID' });
     }
 
     // 3. Tracking Abuse Prevention (Hashing + Rolling TTL)
@@ -1358,9 +1301,18 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
         const scriptText = `(function () {
   let apiKey = "${trackingId || ''}";
 
+  function createEventId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+    return "evt_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+  }
+
   function sendEvent(eventName, data = {}) {
     const payload = {
       event: eventName,
+      tracking_id: apiKey,
+      event_id: data.event_id || createEventId(),
       url: window.location.href,
       referrer: document.referrer,
       userAgent: navigator.userAgent,
@@ -1446,6 +1398,7 @@ export const trackEvent = asyncHandler(async (req, res) => {
 
     // 2. Fetch Project (Support API keys table, tracking_id, or UUID)
     let project = null;
+    let hasSecretApiKey = false;
     if (apiKey.startsWith('wpk_') || apiKey.length > 30) {
         const prefix = apiKey.substring(0, 8);
         const hash = crypto.createHash('sha256').update(apiKey).digest('hex');
@@ -1459,10 +1412,11 @@ export const trackEvent = asyncHandler(async (req, res) => {
         if (keyRecord && !keyRecord.revoked_at && (!keyRecord.expires_at || new Date(keyRecord.expires_at) > new Date())) {
             const { data: proj } = await supabase
                 .from('projects')
-                .select('id, user_id, allowed_origins, is_active')
+                .select('id, name, user_id, plan, allowed_origins, is_active')
                 .eq('id', keyRecord.project_id)
                 .single();
             project = proj;
+            hasSecretApiKey = Boolean(proj);
             await supabase.from('api_keys').update({ last_used_at: new Date() }).eq('key_hash', hash);
         }
     }
@@ -1471,7 +1425,7 @@ export const trackEvent = asyncHandler(async (req, res) => {
         const isProjectUuid = isUuid(apiKey);
         const { data: proj } = await supabase
             .from('projects')
-            .select('id, user_id, allowed_origins, is_active')
+            .select('id, name, user_id, plan, allowed_origins, is_active')
             .or(`tracking_id.eq.${apiKey}${isProjectUuid ? `,id.eq.${apiKey}` : ''}`)
             .maybeSingle();
         project = proj;
@@ -1485,38 +1439,9 @@ export const trackEvent = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    // Origin enforcement for project allowed_origins
-    if (project.allowed_origins && String(project.allowed_origins).trim()) {
-        const origin = req.headers.origin || req.headers.referer;
-        if (origin) {
-            let originHostname = origin;
-            try {
-                originHostname = new URL(origin).hostname;
-            } catch {
-                originHostname = origin.replace(/^https?:\/\//i, '').split('/')[0].split(':')[0];
-            }
-            const allowedList = project.allowed_origins.split(',').map((o) => {
-                const trimmed = o.trim();
-                try {
-                    return trimmed.startsWith('http') ? new URL(trimmed).hostname : trimmed;
-                } catch {
-                    return trimmed;
-                }
-            }).filter(Boolean);
-
-            const isAllowed = allowedList.some((allowed) =>
-                originHostname === allowed || originHostname.endsWith('.' + allowed)
-            );
-            if (!isAllowed) {
-                throw AppError.forbidden('ORIGIN_NOT_ALLOWED', 'ORIGIN_NOT_ALLOWED');
-            }
-        }
-    }
-
-    // Check limits
-    const limitCheck = await usageService.checkLimit(project.user_id);
-    if (!limitCheck.canTrack) {
-        throw AppError.limitExceeded(limitCheck.reason);
+    const guard = await enforceIngestionGuards({ project, req, hasSecretApiKey });
+    if (guard.duplicate) {
+        return res.json({ success: true, ignored: 'DUPLICATE_EVENT_ID' });
     }
 
     // Deduplication

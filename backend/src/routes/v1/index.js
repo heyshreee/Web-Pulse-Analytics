@@ -13,6 +13,9 @@ import activityRoutes from './activity.routes.js';
 import paymentRoutes from './payment.routes.js';
 import userRoutes from './user.routes.js';
 import metaRoutes from './meta.routes.js';
+import planRoutes from '../plan.routes.js';
+import auditRoutes from './audit.routes.js';
+import alphaRoutes from './alpha.routes.js';
 
 // Apply CSRF protection to all non-GET v1 routes, except public tracking
 router.use((req, res, next) => {
@@ -34,5 +37,8 @@ router.use('/activity', activityRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/user', userRoutes);
 router.use('/meta', metaRoutes);
+router.use('/plans', planRoutes);
+router.use('/audit-logs', auditRoutes);
+router.use('/alpha', alphaRoutes);
 
 export default router;

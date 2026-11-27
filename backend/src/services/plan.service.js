@@ -1,75 +1,78 @@
 import supabase from '../config/supabase.js';
+import {
+  getPlanConfig,
+  getPlanLimits as getCanonicalPlanLimits,
+  listPublicPlans,
+  normalizePlanId,
+} from '../config/plans.js';
 
 let plansCache = null;
 let lastFetchTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+export function invalidatePlansCache() {
+  plansCache = null;
+  lastFetchTime = 0;
+}
+
 /**
- * Fetch all plans from Supabase
- * @returns {Promise<Array>} List of plans
+ * Fetch plans, merging DB metadata over the canonical backend plan config
+ * while ensuring all 5 tiers and entitlements are always present.
  */
 export const getAllPlans = async () => {
-    const now = Date.now();
-    if (plansCache && (now - lastFetchTime < CACHE_DURATION)) {
-        return plansCache;
+  const now = Date.now();
+  if (plansCache && now - lastFetchTime < CACHE_DURATION) {
+    return plansCache;
+  }
+
+  const canonical = listPublicPlans();
+
+  try {
+    const { data, error } = await supabase
+      .from('plans')
+      .select('*')
+      .order('price_usd', { ascending: true });
+
+    if (error || !Array.isArray(data) || data.length === 0) {
+      plansCache = canonical;
+      lastFetchTime = now;
+      return canonical;
     }
 
-    try {
-        const { data, error } = await supabase
-            .from('plans')
-            .select('*')
-            .order('price_usd', { ascending: true }); // Order by price
+    const dbById = new Map(data.map((row) => [normalizePlanId(row.id), row]));
+    const merged = canonical.map((plan) => {
+      const dbRow = dbById.get(plan.id);
+      if (!dbRow) return plan;
+      return {
+        ...plan,
+        name: dbRow.name || plan.name,
+        ...(dbRow.entitlements && typeof dbRow.entitlements === 'object'
+          ? { entitlements: { ...plan.entitlements, ...dbRow.entitlements } }
+          : {}),
+        ...(dbRow.access && typeof dbRow.access === 'object'
+          ? { access: { ...plan.access, ...dbRow.access } }
+          : {}),
+      };
+    });
 
-        if (error) {
-            console.error('Error fetching plans:', error);
-            throw error;
-        }
-
-        plansCache = data;
-        lastFetchTime = now;
-        return data;
-    } catch (error) {
-        console.error('Plan fetch service error:', error);
-        // Return fallback if cache exists, else throw
-        if (plansCache) return plansCache;
-        throw error;
-    }
+    plansCache = merged;
+    lastFetchTime = now;
+    return merged;
+  } catch (error) {
+    console.warn('[PlanService] Falling back to canonical plan config:', error?.message);
+    return plansCache || canonical;
+  }
 };
 
-/**
- * Get limits for a specific plan ID
- * @param {string} planId 
- * @returns {Promise<Object>} Plan limits
- */
-export const getPlanLimits = async (planId) => {
-    const plans = await getAllPlans();
-    const plan = plans.find(p => p.id === planId);
+export const getPlanLimits = async (planId) => getCanonicalPlanLimits(planId);
 
-    if (!plan) {
-        // Fallback to nano (or legacy free) plan if not found
-        return plans.find(p => p.id === 'nano') || plans.find(p => p.id === 'free') || {};
-    }
+export { getPlanConfig, normalizePlanId, listPublicPlans };
 
-    // Map DB columns to internal limit names if necessary, 
-    // or rely on usageservice to map them.
-    // The DB columns: monthly_events, max_projects, storage_limit, allowed_origins, retention_days, refresh_rate, live_logs, email_integrity, share_report
-    // The UsageService expects: monthlyViews, storageLimit, projectLimit, liveLogs, refreshRate, emailIntegrity, allowedOriginsLimit, share_report, retentionDays
-
-    return {
-        monthlyViews: plan.monthly_events,
-        storageLimit: plan.storage_limit,
-        projectLimit: plan.max_projects,
-        liveLogs: plan.live_logs,
-        deviceStats: plan.features ? plan.features.some(f => f.text === 'Live Device Stats' && f.included) : false, // Inspect JSON features for specific flags if not explicit column
-        refreshRate: plan.refresh_rate,
-        emailIntegrity: plan.email_integrity,
-        allowedOriginsLimit: plan.allowed_origins,
-        share_report: plan.share_report,
-        retentionDays: plan.retention_days,
-        price_inr: plan.price_inr,
-        price_usd: plan.price_usd,
-        amount: plan.price_usd // Default to USD for internal compatibility if currency not specified
-    };
+export default {
+  getAllPlans,
+  getPlanLimits,
+  getPlanConfig,
+  normalizePlanId,
+  listPublicPlans,
+  invalidatePlansCache,
 };
-
-export default { getAllPlans, getPlanLimits };
