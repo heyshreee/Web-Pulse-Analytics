@@ -29,8 +29,7 @@ function formatRelativeTime(dateInput) {
   return `${Math.floor(diffSec / 86400)}d ago`;
 }
 
-const DARK_WAVE_PALETTE = ['#ffffff', '#38bdf8', '#34d399', '#f472b6', '#a1a1aa', '#fbbf24', '#a78bfa', '#fb7185'];
-const LIGHT_WAVE_PALETTE = ['#18181b', '#0284c7', '#059669', '#db2777', '#71717a', '#d97706', '#7c3aed', '#e11d48'];
+const PROJECT_OPACITY_STEPS = [1, 0.72, 0.5, 0.36, 0.25, 0.18];
 
 const CustomTrafficTooltip = ({ active, payload, label, isCombined }) => {
   if (!active || !payload || !payload.length) return null;
@@ -57,7 +56,10 @@ const CustomTrafficTooltip = ({ active, payload, label, isCombined }) => {
             <span className="flex items-center gap-1.5 text-[var(--wp-text-secondary)] truncate max-w-[140px]">
               <span
                 className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: entry.color || entry.stroke }}
+                style={{
+                  backgroundColor: 'var(--wp-chart-1)',
+                  opacity: entry.strokeOpacity ?? 1,
+                }}
               />
               <span className="truncate">{entry.name}</span>
             </span>
@@ -153,13 +155,12 @@ export default function Dashboard() {
   );
 
   const projectSeries = useMemo(() => {
-    const palette = isDark ? DARK_WAVE_PALETTE : LIGHT_WAVE_PALETTE;
     return (projects || []).map((project, index) => ({
       id: project.id,
       name: project.name,
-      color: palette[index % palette.length],
+      opacity: PROJECT_OPACITY_STEPS[index] ?? Math.max(0.15, 1 - index * 0.16),
     }));
-  }, [projects, isDark]);
+  }, [projects]);
 
   const activeProjectSeries = useMemo(
     () => projectSeries.filter((p) => !hiddenProjectIds.has(p.id)),
@@ -425,7 +426,7 @@ export default function Dashboard() {
 
   const totalViewsUsed = stats?.reduce((acc, curr) => acc + (Number(curr.views) || 0), 0) || 0;
   const viewLimit = Number(usageStats?.monthlyLimit) || 1000;
-  const quotaUsed = usageStats?.totalViews !== undefined ? Number(usageStats.totalViews) || 0 : totalViewsUsed;
+  const quotaUsed = Number(usageStats?.totalViews) || totalViewsUsed;
   const viewPercentage = Math.min(Math.max((quotaUsed / viewLimit) * 100, 0), 100);
 
   const projectsUsed = usageStats?.projectCount ?? projects.length;
@@ -780,7 +781,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-[460px]">
         {/* Col 7: Traffic Momentum */}
         <div className="lg:col-span-7 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
-          <div className="wp-panel-header flex-wrap gap-2">
+          <div className="wp-panel-header !h-auto min-h-[38px] py-1.5 flex-wrap gap-2">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="wp-title-card">Traffic momentum</span>
               <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase">
@@ -829,7 +830,7 @@ export default function Dashboard() {
                       >
                         <span
                           className="w-1.5 h-1.5 rounded-full shrink-0"
-                          style={{ backgroundColor: proj.color }}
+                          style={{ backgroundColor: 'var(--wp-chart-1)', opacity: proj.opacity }}
                         />
                         <span className="truncate">{proj.name}</span>
                       </button>
@@ -862,8 +863,8 @@ export default function Dashboard() {
                       </linearGradient>
                       {activeProjectSeries.map((proj) => (
                         <linearGradient key={proj.id} id={`trafficGrad-${proj.id}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={proj.color} stopOpacity={0.2} />
-                          <stop offset="100%" stopColor={proj.color} stopOpacity={0.0} />
+                          <stop offset="0%" stopColor="var(--wp-chart-1)" stopOpacity={0.22 * proj.opacity} />
+                          <stop offset="100%" stopColor="var(--wp-chart-1)" stopOpacity={0.0} />
                         </linearGradient>
                       ))}
                     </defs>
@@ -896,7 +897,8 @@ export default function Dashboard() {
                           type="monotone"
                           dataKey={proj.id}
                           name={proj.name}
-                          stroke={proj.color}
+                          stroke="var(--wp-chart-1)"
+                          strokeOpacity={proj.opacity}
                           strokeWidth={1.75}
                           fillOpacity={1}
                           fill={`url(#trafficGrad-${proj.id})`}

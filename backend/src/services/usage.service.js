@@ -105,6 +105,18 @@ export const calculateUsage = async (userId) => {
     if (usages) {
       totalViews = usages.reduce((acc, curr) => acc + (curr.views ?? curr.count ?? 0), 0);
     }
+
+    if (totalViews === 0) {
+      const monthStartIso = `${currentMonth}-01T00:00:00.000Z`;
+      const { count: monthPageViewCount } = await supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .in('project_id', projectIds)
+        .gte('created_at', monthStartIso);
+      if (monthPageViewCount) {
+        totalViews = monthPageViewCount;
+      }
+    }
   }
 
   const [{ count: visitorCount }, { count: viewCount }] = await Promise.all([
