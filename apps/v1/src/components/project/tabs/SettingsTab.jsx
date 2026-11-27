@@ -65,6 +65,22 @@ export default function SettingsTab({
     }
   };
 
+  const handleRoleChange = async (memberUserId, newRole) => {
+    setTeamBusy(true);
+    try {
+      await apiRequest(`/projects/${project.id}/members/${memberUserId}/role`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role: newRole })
+      });
+      showToast('Member role updated', 'success');
+      await loadTeam();
+    } catch (err) {
+      showToast(err.message || 'Failed to update role', 'error');
+    } finally {
+      setTeamBusy(false);
+    }
+  };
+
   const handleRemoveMember = async (memberUserId) => {
     setTeamBusy(true);
     try {
@@ -239,6 +255,9 @@ export default function SettingsTab({
                   className="h-8 px-2 text-xs font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)]"
                 >
                   <option value="viewer">Viewer</option>
+                  {['max', 'enterprise'].includes(teamData.plan) && (
+                    <option value="analyst">Analyst</option>
+                  )}
                   <option value="admin">Admin</option>
                 </select>
                 <button
@@ -259,15 +278,29 @@ export default function SettingsTab({
                       <span className="ml-2 text-[10px] uppercase text-[var(--wp-text-muted)]">({m.role})</span>
                     </div>
                     {m.role !== 'owner' && teamData.currentRole === 'owner' && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveMember(m.user_id)}
-                        disabled={teamBusy}
-                        className="text-[var(--wp-text-muted)] hover:text-rose-400"
-                        title="Remove member"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={m.role}
+                          onChange={(e) => handleRoleChange(m.user_id, e.target.value)}
+                          disabled={teamBusy}
+                          className="h-6 px-1.5 text-[11px] font-mono rounded border border-[var(--wp-border-default)] bg-[var(--wp-bg-canvas)]"
+                        >
+                          <option value="viewer">viewer</option>
+                          {['max', 'enterprise'].includes(teamData.plan) && (
+                            <option value="analyst">analyst</option>
+                          )}
+                          <option value="admin">admin</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveMember(m.user_id)}
+                          disabled={teamBusy}
+                          className="text-[var(--wp-text-muted)] hover:text-rose-400"
+                          title="Remove member"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}

@@ -3,6 +3,7 @@ import supabase from '../config/supabase.js';
 import { resolveAuthorizedProject } from '../utils/projectAuth.js';
 import { classifyReferrerSource } from '../services/share.service.js';
 import { getPlanConfig, hasFeature, normalizePlanId } from '../config/plans.js';
+import usageService from '../services/usage.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
@@ -667,6 +668,140 @@ export const exportProjectAnalytics = asyncHandler(async (req, res) => {
   res.send(lines.join('\n'));
 });
 
+export const getOrganizationAnalytics = asyncHandler(async (req, res) => {
+  const plan = normalizePlanId(req.user?.plan || 'nano');
+  if (!['max', 'enterprise'].includes(plan)) {
+    throw AppError.forbidden(
+      'Organization-wide analytics require the Max plan.',
+      'FEATURE_LOCKED',
+      { feature: 'organization_analytics', plan, upgradeRequired: true }
+    );
+  }
+
+  const window = parseDateWindow(req.query, plan);
+  const filters = parseAnalyticsFilters(req.query, plan);
+
+  // Resolve only projects owned by or shared with req.user.id (no cross-account leakage)
+  const [{ data: ownedProjects }, { data: memberRows }] = await Promise.all([
+    supabase.from('projects').select('id, name, tracking_id, user_id, owner_id').eq('user_id', req.user.id),
+    supabase.from('project_members').select('project_id, status').eq('user_id', req.user.id),
+  ]);
+
+  const memberProjectIds = (memberRows || [])
+    .filter((m) => !m.status || m.status === 'active')
+    .map((m) => m.project_id);
+
+  let sharedProjects = [];
+  if (memberProjectIds.length > 0) {
+    const { data } = await supabase
+      .from('projects')
+      .select('id, name, tracking_id, user_id, owner_id')
+      .in('id', memberProjectIds);
+    sharedProjects = data || [];
+  }
+
+  const projectMap = new Map();
+  [...(ownedProjects || []), ...sharedProjects].forEach((p) => {
+    if (p?.id && !projectMap.has(p.id)) {
+      projectMap.set(p.id, p);
+    }
+  });
+  const authorizedProjects = Array.from(projectMap.values());
+
+  let totalPageViews = 0;
+  let totalSessions = 0;
+  let totalCustomEvents = 0;
+  const orgVisitorSet = new Set();
+  const countryMap = new Map();
+  const deviceTypes = { desktop: 0, mobile: 0, tablet: 0 };
+  const browsers = {};
+  const channels = { Direct: 0, 'Organic Search': 0, Social: 0, Referral: 0 };
+  const eventNames = {};
+  const dayCounts = {};
+  const projectComparison = [];
+
+  for (const proj of authorizedProjects) {
+    const raw = await fetchScopedData(proj.id, window);
+    const visitors = raw.visitors.filter((v) => matchesVisitorFilters(v, filters));
+    const vMap = new Map(visitors.map((v) => [v.id, v]));
+    const views = raw.pageViews.filter((pv) => matchesPageViewFilters(pv, vMap, filters));
+    const evs = filters.event
+      ? raw.events.filter((e) => String(e.event_name || '').toLowerCase() === filters.event.toLowerCase())
+      : raw.events;
+
+    const projVisitors = new Set(visitors.map((v) => `${proj.id}:${v.visitor_hash || v.id}`));
+    projVisitors.forEach((k) => orgVisitorSet.add(k));
+
+    totalPageViews += views.length;
+    totalSessions += raw.sessions.length || projVisitors.size;
+    totalCustomEvents += evs.length;
+
+    projectComparison.push({
+      projectId: proj.id,
+      name: proj.name,
+      pageViews: views.length,
+      uniqueVisitors: projVisitors.size,
+      customEvents: evs.length,
+    });
+
+    views.forEach((v) => {
+      const day = String(v.viewed_at || v.created_at || '').slice(0, 10);
+      if (day) dayCounts[day] = (dayCounts[day] || 0) + 1;
+    });
+
+    visitors.forEach((v) => {
+      const country = v.country_name || v.country || 'Unknown';
+      countryMap.set(country, (countryMap.get(country) || 0) + 1);
+      const dt = String(v.device_type || 'desktop').toLowerCase();
+      const bucket = dt === 'mobile' ? 'mobile' : dt === 'tablet' ? 'tablet' : 'desktop';
+      deviceTypes[bucket] += 1;
+      const br = v.browser || 'Unknown';
+      browsers[br] = (browsers[br] || 0) + 1;
+      const { channel } = classifyReferrerSource(v.referrer);
+      channels[channel] = (channels[channel] || 0) + 1;
+    });
+
+    evs.forEach((e) => {
+      const name = e.event_name || 'custom';
+      eventNames[name] = (eventNames[name] || 0) + 1;
+    });
+  }
+
+  projectComparison.sort((a, b) => b.pageViews - a.pageViews);
+  const usageOverview = await usageService.calculateUsage(req.user.id);
+
+  res.json({
+    scope: 'organization',
+    range: window.range,
+    startDate: window.startIso,
+    endDate: window.endIso,
+    accountTotals: {
+      totalEvents: totalPageViews + totalCustomEvents,
+      totalPageViews,
+      uniqueVisitors: orgVisitorSet.size,
+      totalSessions,
+      customEvents: totalCustomEvents,
+      activeProjects: authorizedProjects.length,
+    },
+    projectComparison,
+    trafficTrends: Object.entries(dayCounts)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, views]) => ({ date, views })),
+    countries: Array.from(countryMap.entries())
+      .map(([country, visitors]) => ({ country, visitors }))
+      .sort((a, b) => b.visitors - a.visitors),
+    devices: Object.entries(deviceTypes).map(([name, count]) => ({ name, count })),
+    browsers: Object.entries(browsers)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count),
+    sources: Object.entries(channels).map(([name, count]) => ({ name, count })),
+    customEventsBreakdown: Object.entries(eventNames)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count),
+    usageOverview,
+  });
+});
+
 export default {
   getOverview,
   getPages,
@@ -675,4 +810,5 @@ export default {
   getDevices,
   getGlobeAnalyze,
   exportProjectAnalytics,
+  getOrganizationAnalytics,
 };

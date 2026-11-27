@@ -608,6 +608,6 @@ test('Lite Cases 21-25: Nano backward compatibility, Lite V2 Beta block, and Pro
   const max = getPlanLimits('max');
   assert.equal(pro.monthlyViews, 1000000);
   assert.equal(pro.access.v2_beta, true);
-  assert.equal(max.monthlyViews, 5000000);
+  assert.equal(max.monthlyViews, 2000000);
   assert.equal(max.access.alpha, true);
 });

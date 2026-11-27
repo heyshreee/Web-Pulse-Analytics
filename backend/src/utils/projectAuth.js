@@ -4,9 +4,10 @@ import AppError from '../errors/AppError.js';
 
 const ROLE_RANK = {
   viewer: 1,
-  editor: 2,
-  admin: 2,
-  owner: 3,
+  analyst: 2,
+  editor: 3,
+  admin: 3,
+  owner: 4,
 };
 
 /**

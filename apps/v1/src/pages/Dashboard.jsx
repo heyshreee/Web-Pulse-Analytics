@@ -101,6 +101,9 @@ export default function Dashboard() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [showSnippetOverlay, setShowSnippetOverlay] = useState(true);
+  const [orgSummary, setOrgSummary] = useState(null);
+  const [alphaFeatures, setAlphaFeatures] = useState([]);
+  const [recentAuditLogs, setRecentAuditLogs] = useState([]);
   const inFlightRef = useRef(false);
   const overviewCacheRef = useRef(new Map());
   const loadUserRef = useRef(loadUser);
@@ -125,6 +128,18 @@ export default function Dashboard() {
         apiRequest('/projects'),
         apiRequest(`/analytics/overview?range=${timeRange}`).catch(() => null)
       ]);
+
+      if (['max', 'enterprise'].includes(String(usageStats?.plan || user?.normalized_plan || '').toLowerCase())) {
+        Promise.all([
+          apiRequest(`/analytics/organization?range=${timeRange}`).catch(() => null),
+          apiRequest('/alpha/features').catch(() => null),
+          apiRequest('/audit-logs?limit=5').catch(() => null),
+        ]).then(([org, alpha, audit]) => {
+          if (org) setOrgSummary(org);
+          if (alpha?.features) setAlphaFeatures(alpha.features);
+          if (audit?.logs) setRecentAuditLogs(audit.logs);
+        }).catch(() => {});
+      }
 
       setGlobeError(!statsData);
       setProjects(projectsData);
@@ -545,6 +560,62 @@ export default function Dashboard() {
           >
             Upgrade Plan
           </Link>
+        </div>
+      )}
+
+      {/* Max Workspace: Organization Analytics, Audit Logs & Alpha Flags */}
+      {['max', 'enterprise'].includes(String(usageStats?.plan || user?.normalized_plan || '').toLowerCase()) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="wp-panel p-3.5 bg-[var(--wp-bg-surface)] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="wp-title-card">Organization Analytics</span>
+              <span className="text-[10px] font-mono text-[var(--wp-text-muted)] uppercase">Max</span>
+            </div>
+            <div className="text-xl font-bold font-mono text-[var(--wp-text-primary)]">
+              {(orgSummary?.accountTotals?.totalEvents || 0).toLocaleString()} events
+            </div>
+            <p className="text-[11px] font-mono text-[var(--wp-text-muted)]">
+              Across {orgSummary?.accountTotals?.activeProjects ?? projects.length} authorized projects
+            </p>
+          </div>
+
+          <div className="wp-panel p-3.5 bg-[var(--wp-bg-surface)] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="wp-title-card">Alpha Experimental</span>
+              <span className="text-[10px] font-mono text-amber-400 uppercase">Unstable</span>
+            </div>
+            <div className="space-y-1 text-[11px] font-mono">
+              {alphaFeatures.length > 0 ? alphaFeatures.map((f) => (
+                <div key={f.key} className="flex items-center justify-between">
+                  <span className="text-[var(--wp-text-secondary)] truncate">{f.name}</span>
+                  <span className={f.enabled ? 'text-emerald-400' : 'text-[var(--wp-text-muted)]'}>
+                    {f.enabled ? 'ON' : 'OFF'}
+                  </span>
+                </div>
+              )) : (
+                <p className="text-[var(--wp-text-muted)]">Eligible on Max accounts</p>
+              )}
+            </div>
+          </div>
+
+          <div className="wp-panel p-3.5 bg-[var(--wp-bg-surface)] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="wp-title-card">Audit Trail</span>
+              <span className="text-[10px] font-mono text-[var(--wp-text-muted)] uppercase">Immutable</span>
+            </div>
+            <div className="space-y-1 text-[11px] font-mono">
+              {recentAuditLogs.length > 0 ? recentAuditLogs.slice(0, 3).map((l) => (
+                <div key={l.id} className="flex items-center justify-between gap-2">
+                  <span className="text-[var(--wp-text-secondary)] truncate">{l.action}</span>
+                  <span className="text-[var(--wp-text-muted)] shrink-0">
+                    {new Date(l.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )) : (
+                <p className="text-[var(--wp-text-muted)]">No audit events recorded yet</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

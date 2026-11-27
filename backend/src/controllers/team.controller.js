@@ -4,6 +4,7 @@ import { getPlanConfig, normalizePlanId } from '../config/plans.js';
 import { resolveAuthorizedProject } from '../utils/projectAuth.js';
 import ActivityLogService from '../services/activity.service.js';
 import NotificationService from '../services/notification.service.js';
+import { logAction } from '../services/audit.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
@@ -92,8 +93,14 @@ export const inviteProjectMember = asyncHandler(async (req, res) => {
   }
 
   // Strictly forbid role escalation to 'owner'
-  if (!['admin', 'viewer'].includes(role)) {
-    throw AppError.badRequest('Role must be admin or viewer (owner role cannot be assigned)', 'INVALID_ROLE');
+  const allowedRoles = ['max', 'enterprise'].includes(plan)
+    ? ['admin', 'analyst', 'viewer']
+    : ['admin', 'viewer'];
+  if (!allowedRoles.includes(role)) {
+    throw AppError.badRequest(
+      `Role must be ${allowedRoles.join(', ')} (owner role cannot be assigned)`,
+      'INVALID_ROLE'
+    );
   }
 
   if (!email || typeof email !== 'string' || !email.includes('@')) {
@@ -252,7 +259,9 @@ export const acceptProjectInvitation = asyncHandler(async (req, res) => {
     throw AppError.limitExceeded(`Project team member limit (${seatLimit}) has been reached.`);
   }
 
-  const assignedRole = ['admin', 'viewer'].includes(invitation.role) ? invitation.role : 'viewer';
+  const assignedRole = ['admin', 'analyst', 'viewer'].includes(invitation.role)
+    ? invitation.role
+    : 'viewer';
 
   const { data: member, error: memErr } = await supabase
     .from('project_members')
@@ -368,7 +377,52 @@ export const removeProjectMember = asyncHandler(async (req, res) => {
     { member_target: targetId }
   );
 
+  await logAction(req.user.id, 'team.member_removed', { projectId: project.id, memberTarget: targetId }, project.id);
+
   res.json({ success: true });
+});
+
+export const updateProjectMemberRole = asyncHandler(async (req, res) => {
+  const project = await resolveAuthorizedProject(req.params.id, req.user.id, 'owner');
+  const targetId = req.params.memberId || req.params.memberUserId;
+  const { role } = req.body || {};
+  const plan = normalizePlanId(req.user.plan || 'nano');
+
+  const allowedRoles = ['max', 'enterprise'].includes(plan)
+    ? ['admin', 'analyst', 'viewer']
+    : ['admin', 'viewer'];
+
+  if (!allowedRoles.includes(role)) {
+    throw AppError.badRequest(
+      `Role must be ${allowedRoles.join(', ')} (privilege escalation to owner is forbidden)`,
+      'INVALID_ROLE'
+    );
+  }
+
+  if (targetId === req.user.id || targetId === project.user_id || targetId === project.owner_id) {
+    throw AppError.forbidden('The project owner role cannot be modified', 'PRIVILEGE_ESCALATION_BLOCKED');
+  }
+
+  const { data: updated, error } = await supabase
+    .from('project_members')
+    .update({ role })
+    .eq('project_id', project.id)
+    .or(`user_id.eq.${targetId},id.eq.${targetId}`)
+    .select('*')
+    .single();
+
+  if (error || !updated) {
+    throw AppError.notFound('Project member not found');
+  }
+
+  await logAction(
+    req.user.id,
+    'team.role_changed',
+    { projectId: project.id, memberTarget: targetId, newRole: role },
+    project.id
+  );
+
+  res.json(updated);
 });
 
 export default {
@@ -378,4 +432,5 @@ export default {
   rejectProjectInvitation,
   revokeProjectInvitation,
   removeProjectMember,
+  updateProjectMemberRole,
 };

@@ -5,6 +5,8 @@ import originController from '../../controllers/origin.controller.js';
 import teamController from '../../controllers/team.controller.js';
 import shareController from '../../controllers/share.controller.js';
 import analyticsController from '../../controllers/analytics.controller.js';
+import apiKeyController from '../../controllers/apiKey.controller.js';
+import webhookController from '../../controllers/webhook.controller.js';
 import auth from '../../middlewares/auth.js';
 import { apiPlanLimiter } from '../../middlewares/rateLimiter.js';
 import { requireFeature, requireSurfaceAccess } from '../../middlewares/entitlements.js';
@@ -39,6 +41,7 @@ router.delete('/:id/origins/:originId', originController.deleteProjectOrigin);
 router.get('/:id/members', teamController.getProjectMembers);
 router.post('/:id/members', teamController.inviteProjectMember);
 router.post('/:id/members/invite', teamController.inviteProjectMember);
+router.patch('/:id/members/:memberId/role', teamController.updateProjectMemberRole);
 router.delete('/:id/members/:memberId', teamController.removeProjectMember);
 router.delete('/:id/invitations/:invitationId', teamController.revokeProjectInvitation);
 router.post('/invitations/:token/accept', teamController.acceptProjectInvitation);
@@ -57,6 +60,20 @@ router.get('/:id/analytics/countries', analyticsController.getCountries);
 router.get('/:id/analytics/devices', analyticsController.getDevices);
 router.get('/:id/analytics/globe', requireFeature('globe_analyze'), analyticsController.getGlobeAnalyze);
 router.get('/:id/analytics/export', analyticsController.exportProjectAnalytics);
+
+// API Key management (admin/owner)
+router.get('/:id/api-keys', apiKeyController.listApiKeys);
+router.post('/:id/api-keys', apiKeyController.createApiKey);
+router.post('/:id/api-keys/:keyId/rotate', apiKeyController.rotateApiKey);
+router.delete('/:id/api-keys/:keyId', apiKeyController.revokeApiKey);
+
+// Webhook management (Pro/Max/Enterprise)
+router.get('/:id/webhooks', requireFeature('webhooks'), webhookController.listWebhooks);
+router.post('/:id/webhooks', requireFeature('webhooks'), webhookController.createWebhook);
+router.post('/:id/webhooks/:webhookId/rotate-secret', requireFeature('webhooks'), webhookController.rotateWebhookSecret);
+router.post('/:id/webhooks/:webhookId/test', requireFeature('webhooks'), webhookController.triggerWebhookTest);
+router.get('/:id/webhooks/:webhookId/deliveries', requireFeature('webhooks'), webhookController.listWebhookDeliveries);
+router.delete('/:id/webhooks/:webhookId', requireFeature('webhooks'), webhookController.deleteWebhook);
 
 // Backward-compatible share-token aliases used by both the V1 and V2 dashboards.
 router.post('/:id/share-token', projectController.regenerateShareToken);

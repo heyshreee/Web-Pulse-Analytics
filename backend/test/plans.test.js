@@ -42,11 +42,14 @@ test('getPlanLimits returns correct limits for canonical 5 tiers', () => {
     assert.equal(pro.liveLogs, true);
 
     const max = getPlanLimits('max');
-    assert.equal(max.monthlyViews, 5000000);
-    assert.equal(max.projectLimit, 50);
-    assert.equal(max.allowedOriginsLimit, 25);
+    assert.equal(max.monthlyViews, 2000000);
+    assert.equal(max.projectLimit, 25);
+    assert.equal(max.allowedOriginsLimit, 50);
     assert.equal(max.retentionDays, 365);
-    assert.equal(max.refreshRate, 1);
+    assert.equal(max.refreshRate, 5);
+    assert.equal(max.share_report, 500);
+    assert.equal(max.limits.team_members, 25);
+    assert.equal(max.apiRequestsPerMinute, 300);
     assert.equal(max.amount, 1999);
     assert.equal(max.liveLogs, true);
 
@@ -59,7 +62,7 @@ test('getPlanLimits returns correct limits for canonical 5 tiers', () => {
 test('getPlanLimits normalizes legacy plan aliases to new tiers', () => {
     assert.equal(getPlanLimits('free').monthlyViews, 10000);
     assert.equal(getPlanLimits('basic').monthlyViews, 100000);
-    assert.equal(getPlanLimits('business').monthlyViews, 5000000);
+    assert.equal(getPlanLimits('business').monthlyViews, 2000000);
     assert.equal(getPlanLimits(null).monthlyViews, 10000);
     assert.equal(getPlanLimits('unknown_plan').monthlyViews, 10000);
 });
@@ -97,8 +100,8 @@ test('getPlans returns 5 canonical plans with correct IDs, pricing, and limits',
     const max = responseData.find(p => p.id === 'max');
     assert.equal(max.price_inr, 1999);
     assert.equal(max.price_usd, 24.99);
-    assert.equal(max.limits.monthlyViews, 5000000);
-    assert.equal(max.limits.projectLimit, 50);
+    assert.equal(max.limits.monthlyViews, 2000000);
+    assert.equal(max.limits.projectLimit, 25);
 
     const enterprise = responseData.find(p => p.id === 'enterprise');
     assert.equal(enterprise.price, 'custom');

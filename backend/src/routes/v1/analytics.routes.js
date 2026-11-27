@@ -17,8 +17,9 @@ router.use(auth);
 router.use(apiPlanLimiter);
 router.use(requireSurfaceAccess());
 
-// Global Analytics
+// Global & Organization Analytics
 router.get('/overview', visitorController.getDashboardStats);
+router.get('/organization', analyticsController.getOrganizationAnalytics);
 router.get('/globe', requireFeature('globe_analyze'), analyticsController.getGlobeAnalyze);
 
 // Project Analytics
