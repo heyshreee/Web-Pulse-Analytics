@@ -42,11 +42,18 @@ export const createOrder = asyncHandler(async (req, res) => {
         }
     };
 
-    const order = await razorpay.orders.create(options);
+    let order;
+    try {
+        order = await razorpay.orders.create(options);
+    } catch (rpErr) {
+        const desc = rpErr?.error?.description || rpErr?.message || 'Payment gateway unavailable';
+        throw new AppError(502, `Payment gateway error: ${desc}`, 'PAYMENT_GATEWAY_ERROR');
+    }
 
     res.json({
         success: true,
-        order
+        order,
+        keyId: process.env.RAZORPAY_KEY_ID || null
     });
 });
 

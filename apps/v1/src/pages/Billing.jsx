@@ -172,13 +172,19 @@ export default function Billing() {
             }
 
             // 1. Create Order
-            const { order } = await apiRequest('/payment/order', {
+            const { order, keyId } = await apiRequest('/payment/order', {
                 method: 'POST',
                 body: JSON.stringify({ planId })
             });
 
+            const razorpayKey = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKey) {
+                showToast('Razorpay public key is not configured.', 'error');
+                return;
+            }
+
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                key: razorpayKey,
                 amount: order.amount,
                 currency: order.currency,
                 name: "WebPulse",
@@ -228,7 +234,7 @@ export default function Billing() {
 
         } catch (error) {
             console.error('Payment error:', error);
-            showToast('Failed to initiate payment', 'error');
+            showToast(error?.message || 'Failed to initiate payment', 'error');
         } finally {
             setLoading(false);
         }
