@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="apps/marketing/public/logo.png" alt="WebPulse Analytics Logo" width="160" />
+  <img src="assets/brand/logo.png" alt="WebPulse Analytics Logo" width="160" />
   <h1>WebPulse Analytics</h1>
   <p>
     <strong>Privacy-first, real-time web analytics &amp; telemetry platform.</strong><br />
@@ -428,6 +428,8 @@ Web-Pulse-Analytics/
 │   │   ├── socket/           # Socket.IO visitor streaming setup
 │   │   └── utils/            # Crypto, validators, IP normalization, formatters
 │   └── package.json
+├── assets/
+│   └── brand/                # Canonical brand logos, SVG marks, and favicons
 ├── supabase/
 │   └── migrations/           # 8 ordered SQL schema, function, RLS, session, and plan migrations
 ├── scripts/                  # Maintenance checks (check-migrations.mjs, check-syntax.mjs)
