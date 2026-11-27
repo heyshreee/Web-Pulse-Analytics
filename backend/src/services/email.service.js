@@ -9,7 +9,7 @@ const sendEmail = async (options) => {
         console.warn('[EmailService] RESEND_API_KEY not configured, skipping email delivery.');
         return { data: { id: 'mock-id' }, error: null };
     }
-    return sendEmail(options);
+    return resend.emails.send(options);
 };
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 const FRONTEND_URL = (

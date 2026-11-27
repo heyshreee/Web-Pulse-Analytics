@@ -62,84 +62,108 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-        planId
+        planId: rawPlanId
     } = req.body;
     const userId = req.user.id;
 
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        throw AppError.badRequest('Missing payment verification fields');
+    }
+
+    const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
-        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .createHmac('sha256', keySecret)
         .update(body.toString())
         .digest('hex');
 
-    if (expectedSignature === razorpay_signature) {
-        // Payment verified - Update user plan
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({
-                plan: planId
-            })
-            .eq('id', userId);
-
-        if (updateError) throw updateError;
-
-        // Store payment record
-        const planLimits = getPlanLimits(planId);
-        const amount = planLimits.amount;
-
-        const { error: paymentError } = await supabase
-            .from('payments')
-            .insert({
-                user_id: userId,
-                amount: amount,
-                currency: 'USD', // Or INR based on Razorpay config
-                status: 'paid',
-                method: 'razorpay',
-                plan_id: planId,
-                provider_payment_id: razorpay_payment_id,
-                provider_order_id: razorpay_order_id,
-                metadata: {
-                    plan: planId,
-                    order_id: razorpay_order_id
-                }
-            });
-
-        if (paymentError) console.error('Failed to store payment record:', paymentError);
-
-        // Log activity
-        await ActivityLogService.log(
-            null, // No project ID for user-level action
-            userId,
-            'subscription.upgraded',
-            `Upgraded to ${planId} plan`,
-            'success',
-            req.ip,
-            {
-                plan: planId,
-                payment_id: razorpay_payment_id,
-                order_id: razorpay_order_id
-            }
-        );
-
-        // Send Payment Receipt Email
-        if (req.user && req.user.email) {
-            const planLimits = getPlanLimits(planId);
-            const amount = planLimits.amount;
-
-            await EmailService.sendPaymentSuccessEmail(
-                req.user.email,
-                planId,
-                amount, // Amount is already in currency unit (e.g., 29), not paise
-                razorpay_payment_id,
-                new Date().toLocaleDateString(),
-                req.user.name || 'User'
-            );
-        }
-
-        res.json({ success: true, message: 'Payment verified and plan updated' });
-    } else {
+    if (expectedSignature !== razorpay_signature) {
         throw AppError.badRequest('Invalid signature');
     }
+
+    let order = null;
+    if (razorpay?.orders?.fetch) {
+        try {
+            order = await razorpay.orders.fetch(razorpay_order_id);
+        } catch (err) {
+            console.warn('[Payment] Could not fetch Razorpay order metadata:', err?.message || err);
+        }
+    }
+
+    if (order?.notes?.userId && order.notes.userId !== userId) {
+        throw AppError.forbidden('Order does not belong to the authenticated user');
+    }
+
+    const authoritativePlan = order?.notes?.planId || rawPlanId;
+    if (!authoritativePlan) {
+        throw AppError.badRequest('Unable to determine plan for this payment');
+    }
+    const planId = normalizePlanId(authoritativePlan);
+    const planLimits = getPlanLimits(planId);
+    if (!planLimits || planLimits.amount === 0 || planLimits.amount === 'custom') {
+        throw AppError.badRequest('Invalid paid plan for verification');
+    }
+
+    // Payment verified - Update user plan
+    const { error: updateError } = await supabase
+        .from('users')
+        .update({
+            plan: planId
+        })
+        .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Store payment record
+    const amount = planLimits.amount;
+
+    const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+            user_id: userId,
+            amount: amount,
+            currency: order?.currency || 'INR',
+            status: 'paid',
+            method: 'razorpay',
+            plan_id: planId,
+            provider_payment_id: razorpay_payment_id,
+            provider_order_id: razorpay_order_id,
+            metadata: {
+                plan: planId,
+                order_id: razorpay_order_id
+            }
+        });
+
+    if (paymentError) console.error('Failed to store payment record:', paymentError);
+
+    // Log activity
+    await ActivityLogService.log(
+        null, // No project ID for user-level action
+        userId,
+        'subscription.upgraded',
+        `Upgraded to ${planId} plan`,
+        'success',
+        req.ip,
+        {
+            plan: planId,
+            payment_id: razorpay_payment_id,
+            order_id: razorpay_order_id
+        }
+    );
+
+    // Send Payment Receipt Email
+    if (req.user && req.user.email) {
+        await EmailService.sendPaymentSuccessEmail(
+            req.user.email,
+            planId,
+            amount, // Amount is already in currency unit (e.g., 299), not paise
+            razorpay_payment_id,
+            new Date().toLocaleDateString(),
+            req.user.name || 'User'
+        );
+    }
+
+    res.json({ success: true, message: 'Payment verified and plan updated', plan: planId });
 });
 
 export const getPaymentHistory = asyncHandler(async (req, res) => {

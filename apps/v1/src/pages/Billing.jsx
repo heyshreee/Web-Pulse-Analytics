@@ -189,7 +189,7 @@ export default function Billing() {
                 currency: order.currency,
                 name: "WebPulse",
                 description: "Subscription payment for WebPulse services",
-                image: typeof window !== 'undefined' ? `${window.location.origin}/logo-512.png` : undefined,
+                image: typeof window !== 'undefined' && window.location.protocol === 'https:' ? `${window.location.origin}/logo-512.png` : undefined,
                 order_id: order.id,
                 handler: async function (response) {
                     try {
@@ -199,16 +199,21 @@ export default function Billing() {
                             body: JSON.stringify({
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature
+                                razorpay_signature: response.razorpay_signature,
+                                planId,
                             })
                         });
 
                         const planName = getPlanById(planId)?.name || planId;
                         showToast(`Successfully upgraded to the ${planName} plan.`, 'success');
-                        loadUsage();
-                        if (loadUser) loadUser();
+                        await Promise.all([
+                            loadUsage(),
+                            loadPaymentHistory(),
+                            loadStats(),
+                            loadUser ? loadUser() : Promise.resolve(),
+                        ]);
                     } catch (error) {
-                        showToast('Payment verification failed', 'error');
+                        showToast(error?.message || 'Payment verification failed', 'error');
                         console.error(error);
                     }
                 },
