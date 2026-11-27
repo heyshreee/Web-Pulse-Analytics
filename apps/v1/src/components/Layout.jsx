@@ -16,7 +16,15 @@ import {
     Sparkles
 } from 'lucide-react';
 import { apiRequest, getSocketUrl, isSocketEnabled } from '../utils/api';
-import { clearSession } from '../utils/auth';
+import {
+    clearSession,
+    setSession,
+    isAuthenticated,
+    markLoggedOut,
+    wasJustLoggedOut,
+    setLoggingOut,
+    SESSION_FLAG
+} from '../utils/auth';
 import { io } from 'socket.io-client';
 import Notifications from './Notifications';
 import ThemeToggle from './ThemeToggle';
@@ -26,6 +34,7 @@ import PageTransition from './PageTransition';
 export default function Layout() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [sidebarLoading, setSidebarLoading] = useState(true);
     const [isPageLoading, setIsPageLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -46,6 +55,7 @@ export default function Layout() {
 
     const [socket, setSocket] = useState(null);
     const socketRef = useRef(null);
+    const loggingOutRef = useRef(false);
 
     useEffect(() => {
         loadUser();
@@ -56,7 +66,40 @@ export default function Layout() {
     }, []);
 
     useEffect(() => {
-        if (!user) return;
+        const handleStorage = (e) => {
+            if ((e.key === SESSION_FLAG && e.newValue !== '1') || e.key === null) {
+                if (socketRef.current) {
+                    try {
+                        socketRef.current.disconnect();
+                    } catch {
+                        // ignore
+                    }
+                    socketRef.current = null;
+                }
+                if (typeof window !== 'undefined' && window.socket) {
+                    window.socket = undefined;
+                }
+                setUser(null);
+                navigate('/login', { replace: true, state: { loggedOut: true } });
+            }
+        };
+        const handlePageShow = (e) => {
+            if (e.persisted && !isAuthenticated()) {
+                clearSession();
+                setUser(null);
+                navigate('/login', { replace: true, state: { loggedOut: true } });
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+        window.addEventListener('pageshow', handlePageShow);
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+            window.removeEventListener('pageshow', handlePageShow);
+        };
+    }, [navigate]);
+
+    useEffect(() => {
+        if (!user || isLoggingOut) return;
 
         loadSidebarData(true);
 
@@ -114,20 +157,36 @@ export default function Layout() {
                 }
             }
         };
-    }, [user]);
+    }, [user, isLoggingOut]);
 
     const loadUser = async () => {
         try {
             const userData = await apiRequest('/auth/me');
+            if (!userData || !userData.id) {
+                clearSession();
+                setUser(null);
+                navigate('/login', { replace: true });
+                return;
+            }
+            setSession();
             setUser(userData);
-        } catch {
-            navigate('/login');
-        } finally {
             setLoading(false);
+        } catch (err) {
+            if (err?.status !== 503) {
+                clearSession();
+            }
+            setUser(null);
+            if (wasJustLoggedOut()) {
+                navigate('/login', { replace: true, state: { loggedOut: true } });
+            } else {
+                const returnUrl = encodeURIComponent(location.pathname + location.search);
+                navigate(`/login?returnUrl=${returnUrl}`, { replace: true });
+            }
         }
     };
 
     const loadSidebarData = async (initial = false) => {
+        if (loggingOutRef.current) return;
         try {
             const [projects, usage] = await Promise.all([
                 apiRequest('/projects'),
@@ -151,12 +210,46 @@ export default function Layout() {
     };
 
     const handleLogout = async () => {
-        // Revoke the session server-side first so the token stops working
-        // even if it was copied out of the browser, then clear the local
-        // session. Logout must never fail or hang on the round-trip.
-        apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
+        if (loggingOutRef.current) return;
+        loggingOutRef.current = true;
+        setIsLoggingOut(true);
+        setLoggingOut(true);
+
+        if (socketRef.current) {
+            try {
+                socketRef.current.disconnect();
+            } catch {
+                // ignore
+            }
+            socketRef.current = null;
+        }
+        if (typeof window !== 'undefined' && window.socket) {
+            window.socket = undefined;
+        }
+
         clearSession();
-        navigate('/login');
+
+        // Await server-side session revocation + cookie clearing before
+        // navigating to /login so /auth/me cannot race and restore the session.
+        try {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timer = controller ? setTimeout(() => controller.abort(), 5000) : null;
+            try {
+                await apiRequest('/auth/logout', {
+                    method: 'POST',
+                    ...(controller ? { signal: controller.signal } : {})
+                });
+            } finally {
+                if (timer) clearTimeout(timer);
+            }
+        } catch {
+            // Proceed with local sign-out even if server call fails or session already expired.
+        } finally {
+            setUser(null);
+            markLoggedOut();
+            setLoggingOut(false);
+            navigate('/login', { replace: true, state: { loggedOut: true } });
+        }
     };
 
     const navItems = [
@@ -183,7 +276,7 @@ export default function Layout() {
 
     const isSettingsPage = location.pathname.startsWith('/dashboard/settings');
 
-    if (loading) {
+    if (loading || isLoggingOut || !user) {
         return (
             <div className={`wp-shell font-sans text-[var(--wp-text-primary)] ${isSettingsPage ? 'wp-shell-full' : ''}`}>
                 {/* Top Studio Bar Skeleton */}

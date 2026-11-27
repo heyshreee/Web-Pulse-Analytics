@@ -43,6 +43,8 @@ web-pulse/
 │   ├── v1/           # Stable V1 dashboard (independent React/Vite app)
 │   └── v2/           # V2 dashboard (independent React/Vite app)
 ├── backend/          # Express 5 API, Socket.IO, services, Supabase access
+├── assets/
+│   └── brand/        # Canonical brand logos, SVG marks, and favicons
 ├── supabase/         # SQL migrations (schema, functions, RLS policies)
 ├── scripts/          # Repository maintenance/check scripts
 ├── docs/             # Project documentation

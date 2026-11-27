@@ -54,7 +54,9 @@ export const getSocketUrl = () => {
 export const isSocketEnabled = () =>
   import.meta.env.VITE_ENABLE_SOCKET !== 'false';
 
-import { clearSession } from './auth';
+import { clearSession, isLoggingOut, wasJustLoggedOut } from './auth';
+
+const AUTH_PATHS = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password', '/auth/', '/share/'];
 
 const API_URL = getApiUrl();
 
@@ -85,11 +87,14 @@ export async function apiRequest(endpoint, options = {}) {
     error.status = response.status;
 
     // The session expired or was revoked server-side. Drop the local flag
-    // and send the visitor back to sign in — unless this is an auth endpoint,
-    // where a 401 simply means incorrect credentials.
+    // and send the visitor back to sign in — unless this is an auth endpoint
+    // or an intentional logout redirect is already in progress.
     if (response.status === 401 && !endpoint.startsWith('/auth/')) {
       clearSession();
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+      const onAuthPage =
+        typeof window !== 'undefined' &&
+        AUTH_PATHS.some((prefix) => window.location.pathname.startsWith(prefix));
+      if (typeof window !== 'undefined' && !onAuthPage && !isLoggingOut() && !wasJustLoggedOut()) {
         const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
         window.location.assign(`/login?returnUrl=${returnUrl}`);
       }

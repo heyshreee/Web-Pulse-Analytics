@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { apiRequest, getSocketUrl, isSocketEnabled } from '../utils/api';
-import { clearSession } from '../utils/auth';
+import {
+  clearSession,
+  setSession,
+  isAuthenticated,
+  markLoggedOut,
+  wasJustLoggedOut,
+  setLoggingOut,
+  SESSION_FLAG
+} from '../utils/auth';
 import Sidebar from './shell/Sidebar';
 import Header from './shell/Header';
 import MobileNav from './shell/MobileNav';
@@ -16,6 +24,7 @@ import { useProject } from '../context/ProjectContext';
 export default function Layout() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [usageStats, setUsageStats] = useState({
     totalViews: 0,
     monthlyLimit: 1000,
@@ -47,8 +56,10 @@ export default function Layout() {
     closeInstallSnippet,
   } = useProject();
 
+  const location = useLocation();
   const navigate = useNavigate();
   const socketRef = useRef(null);
+  const loggingOutRef = useRef(false);
 
   // Viewport resize tracking
   useEffect(() => {
@@ -77,17 +88,33 @@ export default function Layout() {
   const loadUser = useCallback(async () => {
     try {
       const userData = await apiRequest('/auth/me');
+      if (!userData || !userData.id) {
+        clearSession();
+        setUser(null);
+        navigate('/login', { replace: true });
+        return null;
+      }
+      setSession();
       setUser(userData);
-      return userData;
-    } catch {
-      navigate('/login');
-      return null;
-    } finally {
       setLoading(false);
+      return userData;
+    } catch (err) {
+      if (err?.status !== 503) {
+        clearSession();
+      }
+      setUser(null);
+      if (wasJustLoggedOut()) {
+        navigate('/login', { replace: true, state: { loggedOut: true } });
+      } else {
+        const returnUrl = encodeURIComponent(location.pathname + location.search);
+        navigate(`/login?returnUrl=${returnUrl}`, { replace: true });
+      }
+      return null;
     }
-  }, [navigate]);
+  }, [location.pathname, location.search, navigate]);
 
   const loadUsage = useCallback(async () => {
+    if (loggingOutRef.current) return;
     try {
       const usage = await apiRequest('/usage');
       if (usage) setUsageStats(usage);
@@ -98,12 +125,46 @@ export default function Layout() {
 
   useEffect(() => {
     loadUser();
-    loadUsage();
-  }, [loadUser, loadUsage]);
+  }, [loadUser]);
 
-  // Sockets connection
   useEffect(() => {
-    if (!user) return;
+    const handleStorage = (e) => {
+      if ((e.key === SESSION_FLAG && e.newValue !== '1') || e.key === null) {
+        if (socketRef.current) {
+          try {
+            socketRef.current.disconnect();
+          } catch {
+            // ignore
+          }
+          socketRef.current = null;
+        }
+        if (typeof window !== 'undefined' && window.socket) {
+          window.socket = undefined;
+        }
+        setUser(null);
+        navigate('/login', { replace: true, state: { loggedOut: true } });
+      }
+    };
+    const handlePageShow = (e) => {
+      if (e.persisted && !isAuthenticated()) {
+        clearSession();
+        setUser(null);
+        navigate('/login', { replace: true, state: { loggedOut: true } });
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [navigate]);
+
+  // Usage + Sockets connection (strictly gated on verified user)
+  useEffect(() => {
+    if (!user || isLoggingOut) return;
+
+    loadUsage();
 
     if (isSocketEnabled()) {
       const socket = io(getSocketUrl(), {
@@ -140,7 +201,7 @@ export default function Layout() {
         }, 10);
       };
     }
-  }, [user]);
+  }, [user, isLoggingOut, loadUsage]);
 
   const handleToggleNav = () => {
     if (isMobile) {
@@ -159,18 +220,49 @@ export default function Layout() {
   };
 
   const handleLogout = async () => {
-    try {
-      await apiRequest('/auth/logout', { method: 'POST' });
-    } catch {
-      // ignore
+    if (loggingOutRef.current) return;
+    loggingOutRef.current = true;
+    setIsLoggingOut(true);
+    setLoggingOut(true);
+
+    if (socketRef.current) {
+      try {
+        socketRef.current.disconnect();
+      } catch {
+        // ignore
+      }
+      socketRef.current = null;
     }
+    if (typeof window !== 'undefined' && window.socket) {
+      window.socket = undefined;
+    }
+
     clearSession();
-    navigate('/login');
+
+    try {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), 5000) : null;
+      try {
+        await apiRequest('/auth/logout', {
+          method: 'POST',
+          ...(controller ? { signal: controller.signal } : {})
+        });
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    } catch {
+      // Proceed with local sign-out even if server call fails or session already expired
+    } finally {
+      setUser(null);
+      markLoggedOut();
+      setLoggingOut(false);
+      navigate('/login', { replace: true, state: { loggedOut: true } });
+    }
   };
 
   const navState = isMobile ? (mobileDrawerOpen ? 'open' : 'collapsed') : navPreference;
 
-  if (loading) {
+  if (loading || isLoggingOut || !user) {
     return (
       <GlobalLoader
         label="Authenticating workspace…"
