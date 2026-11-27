@@ -7,14 +7,34 @@
  * whether to render the dashboard or the sign-in screen. The API is still the
  * authority: a request without a valid cookie is rejected with 401.
  */
-const SESSION_FLAG = 'webpulse:session';
+export const SESSION_FLAG = 'webpulse:session';
+export const SESSION_EVENT = 'webpulse:session-changed';
+const LOGOUT_GUARD_KEY = 'webpulse:logged_out_at';
+let loggingOut = false;
+
+function emitSessionChange() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(SESSION_EVENT));
+  }
+}
+
+export function clearLoggedOut() {
+  try {
+    sessionStorage.removeItem(LOGOUT_GUARD_KEY);
+  } catch {
+    /* storage unavailable — ignore */
+  }
+}
 
 export function setSession() {
+  loggingOut = false;
+  clearLoggedOut();
   try {
     localStorage.setItem(SESSION_FLAG, '1');
   } catch {
     /* storage unavailable — the API cookie still carries the session */
   }
+  emitSessionChange();
 }
 
 export function clearSession() {
@@ -23,6 +43,39 @@ export function clearSession() {
   } catch {
     /* storage unavailable — ignore */
   }
+  emitSessionChange();
+}
+
+export function markLoggedOut() {
+  clearSession();
+  try {
+    sessionStorage.setItem(LOGOUT_GUARD_KEY, String(Date.now()));
+  } catch {
+    /* storage unavailable — ignore */
+  }
+}
+
+export function wasJustLoggedOut(maxAgeMs = 10000) {
+  try {
+    const raw = sessionStorage.getItem(LOGOUT_GUARD_KEY);
+    if (!raw) return false;
+    const ts = Number(raw);
+    if (!Number.isFinite(ts) || Date.now() - ts > maxAgeMs) {
+      sessionStorage.removeItem(LOGOUT_GUARD_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function setLoggingOut(active) {
+  loggingOut = Boolean(active);
+}
+
+export function isLoggingOut() {
+  return loggingOut;
 }
 
 export function isAuthenticated() {
