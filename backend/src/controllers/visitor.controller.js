@@ -672,7 +672,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .gte('created_at', prevStartStr)
         .lt('created_at', startDateStr);
 
-    const { data: dailyViews } = await scope('page_views', 'created_at, visitor_id, session_id')
+    const { data: dailyViews } = await scope('page_views', 'created_at, visitor_id, session_id, project_id')
         .gte('created_at', startDateStr)
         .limit(50000);
 
@@ -707,7 +707,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         views: 0,
         visitors: new Set(),
         sessions: new Set(),
-        compare: 0
+        compare: 0,
+        byProject: {}
     }));
     const bucketIndex = new Map(trafficKeys.map((k, i) => [k, i]));
 
@@ -718,6 +719,9 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         b.views++;
         if (v.visitor_id) b.visitors.add(v.visitor_id);
         if (v.session_id) b.sessions.add(v.session_id);
+        if (v.project_id) {
+            b.byProject[v.project_id] = (b.byProject[v.project_id] || 0) + 1;
+        }
     });
 
     // Previous-period counts aligned to the same bucket index for the compare series
@@ -738,7 +742,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         visitors: b.visitors.size,
         sessions: b.sessions.size,
         fullDate: b.key,
-        compare: b.compare
+        compare: b.compare,
+        byProject: b.byProject
     }));
 
     const { data: sources } = await scope('visitors', 'referrer')
