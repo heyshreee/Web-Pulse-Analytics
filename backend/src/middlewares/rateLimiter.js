@@ -159,18 +159,19 @@ export const apiPlanLimiter = (req, res, next) => {
  * Enforces plan-configured ingestion events per second and burst capacity
  * (e.g. 10 events/sec, burst 20 on Nano) using a token bucket.
  */
-export function consumeIngestionToken({ bucketKey, planId = 'nano', now = Date.now() }) {
+export function consumeIngestionToken({ bucketKey, projectId, planId = 'nano', now = Date.now() }) {
+    const resolvedKey = bucketKey || (projectId ? `project:${projectId}` : 'global');
     const plan = normalizePlanId(planId);
     const limits = getPlanConfig(plan).limits;
     const rate = Math.max(1, limits.ingestion_events_per_second);
     const burst = Math.max(rate, limits.ingestion_burst);
 
-    const existing = ingestionBuckets.get(bucketKey) || { tokens: burst, lastRefillMs: now };
+    const existing = ingestionBuckets.get(resolvedKey) || { tokens: burst, lastRefillMs: now };
     const elapsedSec = Math.max(0, (now - existing.lastRefillMs) / 1000);
     const refilled = Math.min(burst, existing.tokens + elapsedSec * rate);
 
     if (refilled < 1) {
-        ingestionBuckets.set(bucketKey, { tokens: refilled, lastRefillMs: now });
+        ingestionBuckets.set(resolvedKey, { tokens: refilled, lastRefillMs: now });
         return {
             allowed: false,
             remaining: 0,
@@ -180,7 +181,7 @@ export function consumeIngestionToken({ bucketKey, planId = 'nano', now = Date.n
         };
     }
 
-    ingestionBuckets.set(bucketKey, { tokens: refilled - 1, lastRefillMs: now });
+    ingestionBuckets.set(resolvedKey, { tokens: refilled - 1, lastRefillMs: now });
     return {
         allowed: true,
         remaining: Math.floor(refilled - 1),

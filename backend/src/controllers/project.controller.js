@@ -622,12 +622,26 @@ export const getProjectStats = asyncHandler(async (req, res) => {
         }
     }
 
-    // Get total views from counters
-    const { data: counter } = await supabase
-        .from('counters')
-        .select('count')
-        .eq('project_id', projectId)
-        .single();
+    // Get total views from counters and reconcile against actual page_views + events
+    // if counters is missing or out of sync with persisted telemetry.
+    const [{ data: counter }, { count: pageViewsCount }, { count: eventsCount }] = await Promise.all([
+        supabase
+            .from('counters')
+            .select('count')
+            .eq('project_id', projectId)
+            .single(),
+        supabase
+            .from('page_views')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', projectId),
+        supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', projectId)
+    ]);
+
+    const persistedTotal = (pageViewsCount || 0) + (eventsCount || 0);
+    const totalViews = Math.max(counter?.count || 0, persistedTotal);
 
     // Get current month views from usages
     const currentMonth = new Date().toISOString().slice(0, 7);
@@ -642,8 +656,8 @@ export const getProjectStats = asyncHandler(async (req, res) => {
     const projectUsage = await usageService.calculateProjectUsage(projectId);
 
     res.json({
-        total_views: counter?.count || 0,
-        current_month_views: usage?.views || 0,
+        total_views: totalViews,
+        current_month_views: Math.max(usage?.views || 0, 0),
         ...projectUsage
     });
 });

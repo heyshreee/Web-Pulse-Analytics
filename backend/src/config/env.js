@@ -59,6 +59,8 @@ export const env = {
   cloudinaryApiKey: read('CLOUDINARY_API_KEY'),
   cloudinaryApiSecret: read('CLOUDINARY_API_SECRET'),
   telegramBotToken: read('TELEGRAM_BOT_TOKEN'),
+  strictOriginVerification: process.env.STRICT_ORIGIN_VERIFICATION === 'true',
+  requireApiKeyForAnalytics: process.env.REQUIRE_API_KEY_FOR_ANALYTICS === 'true',
 };
 
 export default env;

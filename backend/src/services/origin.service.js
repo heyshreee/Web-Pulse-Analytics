@@ -3,6 +3,7 @@ import supabase from '../config/supabase.js';
 import NotificationService from './notification.service.js';
 import ActivityLogService from './activity.service.js';
 import { getPlanConfig, normalizePlanId } from '../config/plans.js';
+import { env } from '../config/env.js';
 import { getClientIp } from '../utils/ip.js';
 import {
   extractExactOriginFromHeaders,
@@ -193,6 +194,21 @@ export async function verifyOrigin({
       ? await verifyOriginFile(originRow.origin, originRow.verification_token, fetcher)
       : await verifyOriginDnsTxt(originRow.hostname, originRow.verification_token, dnsResolver);
 
+  const { data: conflictingVerified } = await supabase
+    .from('project_origins')
+    .select('id, project_id')
+    .eq('origin', originRow.origin)
+    .eq('status', 'verified')
+    .neq('project_id', projectId)
+    .maybeSingle();
+
+  if (conflictingVerified) {
+    throw AppError.conflict(
+      `Origin ${originRow.origin} is already verified on another project.`,
+      'ORIGIN_ALREADY_CLAIMED'
+    );
+  }
+
   const nowIso = new Date().toISOString();
 
   if (!checkResult.verified) {
@@ -259,6 +275,21 @@ export async function setOriginBlocked({ projectId, originId, userId, blocked })
   if (error) throw error;
   if (!originRow) {
     throw AppError.notFound('Registered origin not found', 'ORIGIN_NOT_FOUND');
+  }
+
+  const { data: conflictingVerified } = await supabase
+    .from('project_origins')
+    .select('id, project_id')
+    .eq('origin', originRow.origin)
+    .eq('status', 'verified')
+    .neq('project_id', projectId)
+    .maybeSingle();
+
+  if (conflictingVerified) {
+    throw AppError.conflict(
+      `Origin ${originRow.origin} is already verified on another project.`,
+      'ORIGIN_ALREADY_CLAIMED'
+    );
   }
 
   const nowIso = new Date().toISOString();
@@ -378,14 +409,51 @@ async function recordSecurityRejection({ project, req, reasonCode, detailMessage
  * - Never auto-authorizes subdomains.
  * - Rejects pending, blocked, and unregistered origins, logging security alerts.
  */
+const unverifiedFallbackWarnCache = new Map();
+
 export async function validateIngestionOrigin({ project, req, hasSecretApiKey = false }) {
   const origins = await listOrigins(project.id);
   const exactOrigin = extractExactOriginFromHeaders(req);
 
   if (!origins.length) {
-    // Allow legacy projects without configured origins only if authenticated with secret API key
-    // or until the owner registers origins. Once any origin is registered, exact match is mandatory.
-    return { allowed: true, origin: exactOrigin };
+    if (hasSecretApiKey) {
+      return { allowed: true, origin: exactOrigin };
+    }
+
+    if (env.strictOriginVerification || process.env.STRICT_ORIGIN_VERIFICATION === 'true') {
+      await recordSecurityRejection({
+        project,
+        req,
+        reasonCode: 'ORIGIN_VERIFICATION_REQUIRED',
+        detailMessage: `Rejected ingestion for project "${project.name || project.id}" because no verified origins are registered (strict mode).`,
+        exactOrigin,
+      });
+      return {
+        allowed: false,
+        code: 'ORIGIN_VERIFICATION_REQUIRED',
+        message: 'At least one verified origin is required for public tracking ingestion',
+      };
+    }
+
+    // Safe transition for legacy projects with 0 registered origins:
+    // Allow requests during grace period but flag as unverifiedFallback and emit
+    // a throttled warning (max once per hour per project) so owners are alerted.
+    const now = Date.now();
+    const lastWarned = unverifiedFallbackWarnCache.get(project.id) || 0;
+    if (project.user_id && now - lastWarned > 60 * 60 * 1000) {
+      unverifiedFallbackWarnCache.set(project.id, now);
+      await ActivityLogService.log(
+        project.id,
+        project.user_id,
+        'origin.unverified_fallback',
+        `Accepted ingestion without verified origins (${exactOrigin || 'no Origin header'}). Register and verify an origin to enforce origin security.`,
+        'warning',
+        null,
+        { origin: exactOrigin || null, resource: req.originalUrl }
+      ).catch(() => {});
+    }
+
+    return { allowed: true, origin: exactOrigin, unverifiedFallback: true };
   }
 
   if (!exactOrigin) {
@@ -457,6 +525,34 @@ export async function validateIngestionOrigin({ project, req, hasSecretApiKey = 
   return { allowed: true, origin: exactOrigin, originRecord: matched };
 }
 
+/**
+ * Resolves an active project from an exact verified origin in `project_origins`.
+ * Used by automatic installation mode (`data-site="auto"`).
+ * Only `status === 'verified'` origins are eligible; pending, blocked, or
+ * unverified origins never resolve.
+ */
+export async function resolveProjectByVerifiedOrigin(exactOrigin) {
+  if (!exactOrigin) return null;
+
+  const { data: originRow, error } = await supabase
+    .from('project_origins')
+    .select('id, project_id, origin, status')
+    .eq('origin', exactOrigin)
+    .eq('status', 'verified')
+    .maybeSingle();
+
+  if (error || !originRow?.project_id) return null;
+
+  const { data: project, error: projError } = await supabase
+    .from('projects')
+    .select('id, name, user_id, plan, allowed_origins, is_active')
+    .eq('id', originRow.project_id)
+    .maybeSingle();
+
+  if (projError || !project) return null;
+  return project;
+}
+
 export default {
   listOrigins,
   syncLegacyAllowedOrigins,
@@ -465,4 +561,5 @@ export default {
   setOriginBlocked,
   removeOrigin,
   validateIngestionOrigin,
+  resolveProjectByVerifiedOrigin,
 };

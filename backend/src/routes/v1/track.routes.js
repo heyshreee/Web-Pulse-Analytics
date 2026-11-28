@@ -11,8 +11,10 @@ import trackingCors from '../../middlewares/trackingCors.js';
 // can read req.params.trackingId.
 router.options('/events', trackingCors);
 router.options('/script.js', trackingCors);
+router.options('/tracker.js', trackingCors);
 router.post('/events', trackingCors, rateLimiter, visitorController.trackEvent);
 router.get('/script.js', trackingCors, visitorController.getTrackerScript);
+router.get('/tracker.js', trackingCors, visitorController.getTrackerScript);
 
 // Public tracking endpoints (Legacy /:trackingId style)
 router.use('/:trackingId', trackingCors);

@@ -160,6 +160,31 @@ const createApp = () => {
   // Body size cap — a large payload must never be buffered in memory.
   app.use(express.json({ limit: '100kb' }));
 
+  // Parse text/plain JSON payloads on public tracking routes (e.g. navigator.sendBeacon)
+  app.use(
+    ['/api/track', '/api/v1/track'],
+    express.text({ type: 'text/plain', limit: '100kb' }),
+    (req, res, next) => {
+      if (typeof req.body === 'string') {
+        const trimmed = req.body.trim();
+        if (!trimmed) {
+          req.body = {};
+          return next();
+        }
+        try {
+          req.body = JSON.parse(trimmed);
+        } catch {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid JSON payload',
+            code: 'INVALID_JSON',
+          });
+        }
+      }
+      return next();
+    }
+  );
+
   // Routes
   app.use('/api/v1', v1Routes);
   app.use('/api/track', trackRoutes);

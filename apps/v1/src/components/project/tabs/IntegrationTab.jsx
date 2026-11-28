@@ -31,7 +31,7 @@ export default function IntegrationTab({
     setOriginsLoading(true);
     try {
       const data = await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins`);
-      setVerifiedOrigins(Array.isArray(data?.origins) ? data.origins : []);
+      setVerifiedOrigins(Array.isArray(data) ? data : Array.isArray(data?.origins) ? data.origins : []);
     } catch {
       // ignore if project not resolved yet
     } finally {
@@ -50,7 +50,7 @@ export default function IntegrationTab({
     try {
       await apiRequest(`/projects/${encodeURIComponent(idOrName)}/origins`, {
         method: 'POST',
-        body: JSON.stringify({ origin: newOrigin.trim(), verification_method: verifyMethod })
+        body: JSON.stringify({ origin: newOrigin.trim(), verificationMethod: verifyMethod })
       });
       setNewOrigin('');
       showToast('Origin registered. Complete DNS TXT or file verification.', 'success');

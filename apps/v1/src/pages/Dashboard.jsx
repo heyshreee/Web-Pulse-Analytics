@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
 import { Plus, ArrowUpRight, Loader2, Copy, X, Lock, AlertTriangle } from 'lucide-react';
 import { apiRequest } from '../utils/api';
@@ -29,9 +29,7 @@ function formatRelativeTime(dateInput) {
   return `${Math.floor(diffSec / 86400)}d ago`;
 }
 
-const PROJECT_OPACITY_STEPS = [1, 0.72, 0.5, 0.36, 0.25, 0.18];
-
-const CustomTrafficTooltip = ({ active, payload, label, isCombined }) => {
+const CustomTrafficTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
   const data = payload[0]?.payload || {};
   const dateStr = data.fullDate
@@ -43,42 +41,6 @@ const CustomTrafficTooltip = ({ active, payload, label, isCombined }) => {
           : { year: 'numeric' })
       })
     : label;
-
-  if (!isCombined && payload.length > 0 && payload[0]?.dataKey !== 'views') {
-    const sortedProjects = [...payload].sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-    return (
-      <div className="bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-md p-2.5 shadow-2xl text-[11px] font-mono space-y-1.5 z-50 min-w-[160px]">
-        <div className="text-[var(--wp-text-muted)] font-medium text-[10px] uppercase border-b border-[var(--wp-border-subtle)] pb-1">
-          {dateStr}
-        </div>
-        {sortedProjects.map((entry) => (
-          <div key={entry.dataKey} className="flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1.5 text-[var(--wp-text-secondary)] truncate max-w-[140px]">
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{
-                  backgroundColor: 'var(--wp-chart-1)',
-                  opacity: entry.strokeOpacity ?? 1,
-                }}
-              />
-              <span className="truncate">{entry.name}</span>
-            </span>
-            <span className="font-bold text-[var(--wp-text-primary)] tabular-nums">
-              {(entry.value ?? 0).toLocaleString()}
-            </span>
-          </div>
-        ))}
-        {sortedProjects.length > 1 && (
-          <div className="flex items-center justify-between gap-3 border-t border-[var(--wp-border-subtle)] pt-1 text-[10px]">
-            <span className="text-[var(--wp-text-muted)]">Total</span>
-            <span className="font-semibold text-[var(--wp-text-secondary)] tabular-nums">
-              {sortedProjects.reduce((sum, entry) => sum + (entry.value ?? 0), 0).toLocaleString()}
-            </span>
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className="bg-[var(--wp-bg-surface)] border border-[var(--wp-border-default)] rounded-md p-2.5 shadow-2xl text-[11px] font-mono space-y-1.5 z-50 min-w-[130px]">
@@ -135,8 +97,6 @@ export default function Dashboard() {
   });
 
   const [timeRange, setTimeRange] = useState('30d');
-  const [trafficViewMode, setTrafficViewMode] = useState('projects');
-  const [hiddenProjectIds, setHiddenProjectIds] = useState(() => new Set());
   const [globeError, setGlobeError] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
@@ -153,41 +113,6 @@ export default function Dashboard() {
     5000,
     Number(usageStats?.limits?.dashboard_refresh_seconds || 60) * 1000
   );
-
-  const projectSeries = useMemo(() => {
-    return (projects || []).map((project, index) => ({
-      id: project.id,
-      name: project.name,
-      opacity: PROJECT_OPACITY_STEPS[index] ?? Math.max(0.15, 1 - index * 0.16),
-    }));
-  }, [projects]);
-
-  const activeProjectSeries = useMemo(
-    () => projectSeries.filter((p) => !hiddenProjectIds.has(p.id)),
-    [projectSeries, hiddenProjectIds]
-  );
-
-  const multiProjectTrafficData = useMemo(() => {
-    const rawTraffic = dashboardStats?.trafficData;
-    if (!Array.isArray(rawTraffic) || rawTraffic.length === 0) return [];
-    return rawTraffic.map((point) => {
-      const row = { ...point };
-      for (const proj of projectSeries) {
-        row[proj.id] = point.byProject?.[proj.id] ?? 0;
-      }
-      return row;
-    });
-  }, [dashboardStats?.trafficData, projectSeries]);
-
-  const toggleProjectSeries = useCallback((projectId) => {
-    setTrafficViewMode('projects');
-    setHiddenProjectIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(projectId)) next.delete(projectId);
-      else next.add(projectId);
-      return next;
-    });
-  }, []);
 
   const loadData = useCallback(async (showLoading = true) => {
     if (inFlightRef.current) return;
@@ -469,7 +394,7 @@ export default function Dashboard() {
     }
   };
 
-  const { realTimeVisitors = 0, liveActivity = [] } = dashboardStats || {};
+  const { realTimeVisitors = 0, trafficData = [], liveActivity = [] } = dashboardStats || {};
   const totalSessionsCount = stats?.reduce((acc, curr) => acc + (Number(curr.sessions) || 0), 0) || Number(dashboardStats?.sessions) || totalViewsUsed || 0;
   const rangeLabel = timeRange === 'realtime' ? 'Live' : timeRange;
   const eventsCount = dashboardStats?.viewsTotal !== undefined ? Number(dashboardStats.viewsTotal) || 0 : totalViewsUsed;
@@ -781,71 +706,20 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-[460px]">
         {/* Col 7: Traffic Momentum */}
         <div className="lg:col-span-7 wp-panel flex flex-col bg-[var(--wp-bg-surface)]">
-          <div className="wp-panel-header !h-auto min-h-[38px] py-1.5 flex-wrap gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="wp-panel-header">
+            <div className="flex items-center gap-2">
               <span className="wp-title-card">Traffic momentum</span>
               <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)] px-1.5 py-0.5 rounded bg-[var(--wp-bg-subtle)] border border-[var(--wp-border-subtle)] uppercase">
                 {timeRange}
               </span>
-              {projectSeries.length > 0 && (
-                <div className="flex items-center gap-1 flex-wrap ml-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTrafficViewMode('projects');
-                      setHiddenProjectIds(new Set());
-                    }}
-                    className={`px-2 py-0.5 rounded text-[10.5px] font-mono border transition-colors ${
-                      trafficViewMode === 'projects' && hiddenProjectIds.size === 0
-                        ? 'bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] border-[var(--wp-border-default)]'
-                        : 'text-[var(--wp-text-muted)] border-transparent hover:text-[var(--wp-text-secondary)]'
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTrafficViewMode('combined')}
-                    className={`px-2 py-0.5 rounded text-[10.5px] font-mono border transition-colors ${
-                      trafficViewMode === 'combined'
-                        ? 'bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] border-[var(--wp-border-default)]'
-                        : 'text-[var(--wp-text-muted)] border-transparent hover:text-[var(--wp-text-secondary)]'
-                    }`}
-                  >
-                    Combined
-                  </button>
-                  {projectSeries.map((proj) => {
-                    const isActive = trafficViewMode === 'projects' && !hiddenProjectIds.has(proj.id);
-                    return (
-                      <button
-                        key={proj.id}
-                        type="button"
-                        onClick={() => toggleProjectSeries(proj.id)}
-                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10.5px] font-mono border transition-colors max-w-[130px] ${
-                          isActive
-                            ? 'bg-[var(--wp-bg-subtle)] text-[var(--wp-text-primary)] border-[var(--wp-border-default)]'
-                            : 'text-[var(--wp-text-muted)] border-[var(--wp-border-subtle)] opacity-55 hover:opacity-85'
-                        }`}
-                        title={`Toggle ${proj.name}`}
-                      >
-                        <span
-                          className="w-1.5 h-1.5 rounded-full shrink-0"
-                          style={{ backgroundColor: 'var(--wp-chart-1)', opacity: proj.opacity }}
-                        />
-                        <span className="truncate">{proj.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
             <div className="text-[11px] font-mono text-[var(--wp-text-muted)]">
-              {multiProjectTrafficData?.length || 0} data points
+              {trafficData?.length || 0} data points
             </div>
           </div>
 
           <div className="wp-studio-canvas flex-1 min-h-[380px] p-2.5 sm:p-3 flex flex-col justify-between min-w-0">
-            {multiProjectTrafficData && multiProjectTrafficData.length > 0 ? (
+            {trafficData && trafficData.length > 0 ? (
               <div className="w-full h-full min-h-[360px] min-w-0 flex-1 relative" style={{ minHeight: 360 }}>
                 <ResponsiveContainer
                   width="100%"
@@ -855,18 +729,12 @@ export default function Dashboard() {
                   initialDimension={{ width: 640, height: 340 }}
                   debounce={50}
                 >
-                  <AreaChart data={multiProjectTrafficData} margin={{ top: 12, right: 12, left: -10, bottom: 4 }}>
+                  <AreaChart data={trafficData} margin={{ top: 12, right: 12, left: -10, bottom: 4 }}>
                     <defs>
                       <linearGradient id="studioTrafficGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="var(--wp-chart-1)" stopOpacity={0.25} />
                         <stop offset="100%" stopColor="var(--wp-chart-1)" stopOpacity={0.0} />
                       </linearGradient>
-                      {activeProjectSeries.map((proj) => (
-                        <linearGradient key={proj.id} id={`trafficGrad-${proj.id}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="var(--wp-chart-1)" stopOpacity={0.22 * proj.opacity} />
-                          <stop offset="100%" stopColor="var(--wp-chart-1)" stopOpacity={0.0} />
-                        </linearGradient>
-                      ))}
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--wp-chart-grid)" vertical={false} />
                     <XAxis
@@ -883,38 +751,16 @@ export default function Dashboard() {
                       allowDecimals={false}
                       domain={[0, (dataMax) => Math.max(dataMax, 5)]}
                     />
-                    <Tooltip
-                      content={
-                        <CustomTrafficTooltip
-                          isCombined={trafficViewMode === 'combined' || activeProjectSeries.length === 0}
-                        />
-                      }
+                    <Tooltip content={<CustomTrafficTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="views"
+                      name="Events"
+                      stroke="var(--wp-chart-1)"
+                      strokeWidth={1.75}
+                      fillOpacity={1}
+                      fill="url(#studioTrafficGrad)"
                     />
-                    {trafficViewMode === 'projects' && activeProjectSeries.length > 0 ? (
-                      activeProjectSeries.map((proj) => (
-                        <Area
-                          key={proj.id}
-                          type="monotone"
-                          dataKey={proj.id}
-                          name={proj.name}
-                          stroke="var(--wp-chart-1)"
-                          strokeOpacity={proj.opacity}
-                          strokeWidth={1.75}
-                          fillOpacity={1}
-                          fill={`url(#trafficGrad-${proj.id})`}
-                        />
-                      ))
-                    ) : (
-                      <Area
-                        type="monotone"
-                        dataKey="views"
-                        name="Events"
-                        stroke="var(--wp-chart-1)"
-                        strokeWidth={1.75}
-                        fillOpacity={1}
-                        fill="url(#studioTrafficGrad)"
-                      />
-                    )}
                   </AreaChart>
                 </ResponsiveContainer>
               </div>

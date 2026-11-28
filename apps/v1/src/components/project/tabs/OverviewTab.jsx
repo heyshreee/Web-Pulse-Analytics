@@ -64,7 +64,7 @@ export default function OverviewTab({
         <div className="p-3 sm:p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-[11px]">
             <span className="wp-label-section uppercase">Unique visitors</span>
-            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">30d</span>
+            <span className="text-[10.5px] font-mono text-[var(--wp-text-muted)]">{timeRange || '7d'}</span>
           </div>
           <div className="mt-1">
             <span className="wp-kpi-value text-2xl font-bold tracking-tight text-[var(--wp-text-primary)] tabular-nums font-mono">
