@@ -177,7 +177,7 @@ export default function Billing() {
                 body: JSON.stringify({ planId })
             });
 
-            const razorpayKey = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
+            const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || keyId;
             if (!razorpayKey) {
                 showToast('Razorpay public key is not configured.', 'error');
                 return;

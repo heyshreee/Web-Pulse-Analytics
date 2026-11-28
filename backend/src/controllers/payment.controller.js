@@ -1,4 +1,5 @@
 import razorpay from '../config/razorpay.js';
+import { env } from '../config/env.js';
 import crypto from 'crypto';
 import supabase from '../config/supabase.js';
 import ActivityLogService from '../services/activity.service.js';
@@ -42,6 +43,10 @@ export const createOrder = asyncHandler(async (req, res) => {
         }
     };
 
+    if (!razorpay) {
+        throw new AppError(503, 'Razorpay payment gateway is not configured', 'PAYMENT_NOT_CONFIGURED');
+    }
+
     let order;
     try {
         order = await razorpay.orders.create(options);
@@ -53,7 +58,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     res.json({
         success: true,
         order,
-        keyId: process.env.RAZORPAY_KEY_ID || null
+        keyId: (env.razorpayKeyId || process.env.RAZORPAY_KEY_ID || '').trim() || null
     });
 });
 
@@ -70,14 +75,20 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         throw AppError.badRequest('Missing payment verification fields');
     }
 
-    const keySecret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
+    const keySecret = (env.razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || '').trim();
+    if (!keySecret) {
+        throw new AppError(503, 'Razorpay verification is not configured', 'PAYMENT_NOT_CONFIGURED');
+    }
+
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
         .createHmac('sha256', keySecret)
         .update(body.toString())
         .digest('hex');
 
-    if (expectedSignature !== razorpay_signature) {
+    const expectedBuf = Buffer.from(expectedSignature, 'utf8');
+    const actualBuf = Buffer.from(String(razorpay_signature), 'utf8');
+    if (expectedBuf.length !== actualBuf.length || !crypto.timingSafeEqual(expectedBuf, actualBuf)) {
         throw AppError.badRequest('Invalid signature');
     }
 
