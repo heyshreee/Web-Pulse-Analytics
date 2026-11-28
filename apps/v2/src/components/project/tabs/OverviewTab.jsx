@@ -1,6 +1,7 @@
 import { Eye, Users, Database, Activity, Smartphone, Tablet, Monitor, ChevronRight, Search } from 'lucide-react';
 
-export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
+export default function OverviewTab({ stats, overviewStats, timeRange = '7d', onShowActivity }) {
+  const windowLabel = timeRange === '24h' ? 'Last 24 hour window' : timeRange === '30d' ? 'Last 30 day window' : 'Last 7 day window';
   return (
     <div className="space-y-8">
       {/* Stats Cards */}
@@ -32,7 +33,7 @@ export default function OverviewTab({ stats, overviewStats, onShowActivity }) {
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">{overviewStats.uniqueVisitors?.toLocaleString() || 0}</span>
           </div>
-          <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">Last 30 day window</p>
+          <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">{windowLabel}</p>
         </div>
 
         <div className="card card-pad">

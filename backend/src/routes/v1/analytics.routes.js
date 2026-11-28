@@ -5,13 +5,13 @@ import visitorController from '../../controllers/visitor.controller.js';
 import analyticsController from '../../controllers/analytics.controller.js';
 import trackingCors from '../../middlewares/trackingCors.js';
 import auth from '../../middlewares/auth.js';
-import { apiPlanLimiter } from '../../middlewares/rateLimiter.js';
+import rateLimiter, { apiPlanLimiter } from '../../middlewares/rateLimiter.js';
 import { requireFeature, requireSurfaceAccess } from '../../middlewares/entitlements.js';
 
 // Public Analytics (Standard SaaS API). Customer sites call this with an
 // x-api-key header, so it uses the public, non-credentialed CORS policy.
 router.options('/count', trackingCors);
-router.get('/count', trackingCors, visitorController.getEventCount);
+router.get('/count', trackingCors, rateLimiter, visitorController.getEventCount);
 
 router.use(auth);
 router.use(apiPlanLimiter);

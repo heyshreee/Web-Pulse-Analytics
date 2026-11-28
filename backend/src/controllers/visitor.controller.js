@@ -3,7 +3,9 @@ import geoip from 'geoip-lite';
 import { UAParser } from 'ua-parser-js';
 import { uuid, isUuid, shortToken } from '../utils/uuid.js';
 import usageService from '../services/usage.service.js';
-import { getClientIp } from '../utils/ip.js';
+import { getClientIp, anonymizeIp } from '../utils/ip.js';
+import { extractExactOriginFromHeaders } from '../utils/origin.js';
+import { env } from '../config/env.js';
 import crypto from 'crypto';
 import NotificationService from '../services/notification.service.js';
 import ActivityLogService from '../services/activity.service.js';
@@ -13,9 +15,22 @@ import { consumeIngestionToken } from '../middlewares/rateLimiter.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../errors/AppError.js';
 
-async function enforceIngestionGuards({ project, req, hasSecretApiKey = false }) {
+async function isIpAnonymizationEnabled(projectId) {
+    try {
+        const { data } = await supabase
+            .from('project_settings')
+            .select('anonymize_ip')
+            .eq('project_id', projectId)
+            .maybeSingle();
+        return data?.anonymize_ip !== false;
+    } catch {
+        return true;
+    }
+}
+
+async function enforceIngestionGuards({ project, req, res, hasSecretApiKey = false }) {
     const rateResult = consumeIngestionToken({
-        projectId: project.id,
+        bucketKey: `project:${project.id}`,
         planId: project.plan || 'nano'
     });
     if (!rateResult.allowed) {
@@ -37,6 +52,10 @@ async function enforceIngestionGuards({ project, req, hasSecretApiKey = false })
             originResult.code || 'ORIGIN_NOT_ALLOWED',
             originResult.code || 'ORIGIN_NOT_ALLOWED'
         );
+    }
+
+    if (originResult.unverifiedFallback && res && typeof res.setHeader === 'function') {
+        res.setHeader('X-WebPulse-Origin-Warning', 'unverified-fallback');
     }
 
     const rawEventId = req.body?.event_id || req.body?.eventId || null;
@@ -288,6 +307,8 @@ const recordAnalyticsHit = async ({
     const language = req.headers?.['accept-language'] ? req.headers['accept-language'].split(',')[0].trim().slice(0, 10) : null;
 
     // 3. Visitor identity & deduplication (no raw IP stored in visitor_hash)
+    const shouldAnonymizeIp = await isIpAnonymizationEnabled(project.id);
+    const storedIp = shouldAnonymizeIp ? anonymizeIp(ip) : ip;
     const visitorHash = crypto.createHash('sha256')
         .update(`${ip}-${userAgent}-${project.id}`)
         .digest('hex');
@@ -299,7 +320,7 @@ const recordAnalyticsHit = async ({
         project_id: project.id,
         session_id: sessionId,
         visitor_hash: visitorHash,
-        ip_address: ip,
+        ip_address: storedIp,
         user_agent: userAgent,
         country: countryName,
         country_name: countryName,
@@ -395,8 +416,8 @@ const recordAnalyticsHit = async ({
         console.error('[Analytics] Session upsert error:', sErr);
     }
 
-    // 6. Record Page View or Custom Event
-    if (type === 'pageview' || !cleanEventName) {
+    // 6. Record Page View or Custom Event (mutually exclusive unless explicit)
+    if (type === 'pageview') {
         await supabase.from('page_views').insert({
             visitor_id: visitor.id,
             user_id: project.user_id,
@@ -409,9 +430,7 @@ const recordAnalyticsHit = async ({
             referrer: cleanReferrer,
             viewed_at: new Date()
         });
-    }
-
-    if (type === 'event' || cleanEventName) {
+    } else {
         await supabase.from('events').insert({
             project_id: project.id,
             visitor_id: visitor.id,
@@ -437,7 +456,7 @@ const recordAnalyticsHit = async ({
         if (dailyRow) {
             await supabase.from('analytics_daily').update({
                 page_views: type === 'pageview' ? (dailyRow.page_views || 0) + 1 : dailyRow.page_views,
-                events: type === 'event' ? (dailyRow.events || 0) + 1 : (dailyRow.events || 0) + 1
+                events: type === 'event' ? (dailyRow.events || 0) + 1 : dailyRow.events
             }).eq('id', dailyRow.id);
         } else {
             await supabase.from('analytics_daily').insert({
@@ -504,7 +523,7 @@ const recordAnalyticsHit = async ({
             type === 'event' ? 'event.tracked' : 'visitor.new',
             `Page: ${cleanTitle}, Country: ${countryName}`,
             'success',
-            ip,
+            storedIp,
             {
                 session_id: sessionId,
                 resource: path,
@@ -568,7 +587,7 @@ export const trackVisitor = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    const guard = await enforceIngestionGuards({ project, req, hasSecretApiKey: false });
+    const guard = await enforceIngestionGuards({ project, req, res, hasSecretApiKey: false });
     if (guard.duplicate) {
         return res.json({ success: true, ignored: 'DUPLICATE_EVENT_ID' });
     }
@@ -601,7 +620,8 @@ export const getLiveVisitors = asyncHandler(async (req, res) => {
 
     if (error) throw error;
 
-    res.json(visitors);
+    const sanitized = (visitors || []).map(({ ip_address: _omittedIp, ...rest }) => rest);
+    res.json(sanitized);
 });
 
 export const getDashboardStats = asyncHandler(async (req, res) => {
@@ -955,6 +975,8 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         .order('last_seen', { ascending: false })
         .limit(50);
 
+    const sanitizedVisitorsList = (visitorsList || []).map(({ ip_address: _omittedIp, ...rest }) => rest);
+
     res.json({
         realTimeVisitors: realTimeVisitors || 0,
         viewsTotal,
@@ -977,7 +999,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
         topPages,
         eventsSummary,
         sessionsList,
-        visitorsList: visitorsList || [],
+        visitorsList: sanitizedVisitorsList,
         range
     });
 });
@@ -1027,7 +1049,7 @@ export const trackVisitorPublic = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    const guard = await enforceIngestionGuards({ project, req, hasSecretApiKey: false });
+    const guard = await enforceIngestionGuards({ project, req, res, hasSecretApiKey: false });
     if (guard.duplicate) {
         return res.json({ success: true, ignored: 'DUPLICATE_EVENT_ID' });
     }
@@ -1177,11 +1199,13 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
         return { name, views: trafficMap[key], fullDate: key };
     }).sort((a, b) => a.fullDate.localeCompare(b.fullDate));
 
+    const anonymizeProjectIp = await isIpAnonymizationEnabled(project.id);
     const activityLimit = Math.min(parseInt(req.query.limit) || 50, 100);
     const { data: recentActivity } = await supabase
         .from('page_views')
         .select('*, visitors(ip_address, device_type, browser, os, city, country)')
         .eq('project_id', project.id)
+        .gte('created_at', startDateStr)
         .order('created_at', { ascending: false })
         .limit(activityLimit);
 
@@ -1199,7 +1223,20 @@ export const getProjectDetailedStats = asyncHandler(async (req, res) => {
             lng = geo.lng;
         }
 
-        return { id: v.id, type: 'view', location, ip: visitor.ip_address, lat, lng, path, title: v.title, timestamp: v.created_at, device: visitor.device_type, browser: visitor.browser, os: visitor.os };
+        return {
+            id: v.id,
+            type: 'view',
+            location,
+            ...(anonymizeProjectIp ? {} : { ip: visitor.ip_address || null }),
+            lat,
+            lng,
+            path,
+            title: v.title,
+            timestamp: v.created_at,
+            device: visitor.device_type,
+            browser: visitor.browser,
+            os: visitor.os
+        };
     }));
 
     const { data: sources } = await supabase
@@ -1294,7 +1331,10 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
         const apiBaseUrl = `${protocol}://${host}/api/v1`;
 
         const scriptText = `(function () {
-  let apiKey = "${trackingId || ''}";
+  var currentScript = document.currentScript;
+  var attrSite = currentScript && currentScript.getAttribute("data-site");
+  var apiKey = "${trackingId || ''}" || (attrSite ? attrSite.trim() : "");
+  var priorQueue = (typeof window.tracker === "function" && Array.isArray(window.tracker.q)) ? window.tracker.q.slice() : [];
 
   function createEventId() {
     if (window.crypto && typeof window.crypto.randomUUID === "function") {
@@ -1303,49 +1343,86 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
     return "evt_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
   }
 
-  function sendEvent(eventName, data = {}) {
-    const payload = {
-      event: eventName,
-      tracking_id: apiKey,
-      event_id: data.event_id || createEventId(),
-      url: window.location.href,
-      referrer: document.referrer,
-      userAgent: navigator.userAgent,
-      timestamp: Date.now(),
-      ...data
-    };
+  function sendWithBeacon(url, bodyText) {
+    if (navigator.sendBeacon && typeof Blob === "function") {
+      try {
+        var blob = new Blob([bodyText], { type: "application/json" });
+        return navigator.sendBeacon(url, blob);
+      } catch (_err) {
+        return false;
+      }
+    }
+    return false;
+  }
 
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon("${apiBaseUrl}/track/events", JSON.stringify(payload));
-    } else {
-      fetch("${apiBaseUrl}/track/events", {
+  function sendEvent(eventName, data) {
+    if (!apiKey) {
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[WebPulse] tracker('track', ...) called before site ID initialization.");
+      }
+      return;
+    }
+    var meta = (data && typeof data === "object") ? data : {};
+    var normalizedEvent = typeof eventName === "string" ? eventName : "page_view";
+    var isPageView = normalizedEvent === "page_view" || normalizedEvent === "pageview";
+    var payload = Object.assign({
+      event: normalizedEvent,
+      type: isPageView ? "pageview" : "event",
+      tracking_id: apiKey,
+      event_id: meta.event_id || createEventId(),
+      url: window.location.href,
+      title: document.title || "",
+      referrer: document.referrer || "",
+      userAgent: navigator.userAgent,
+      timestamp: Date.now()
+    }, meta);
+
+    var endpoint = "${apiBaseUrl}/track/events";
+    var bodyText = JSON.stringify(payload);
+
+    if (typeof fetch === "function") {
+      fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": apiKey
         },
-        body: JSON.stringify(payload),
+        body: bodyText,
         keepalive: true
-      }).catch(() => {});
+      }).then(function (res) {
+        if (!res.ok && typeof console !== "undefined" && console.warn) {
+          console.warn("[WebPulse] Tracking request failed with status:", res.status);
+        }
+      }).catch(function (err) {
+        if (!sendWithBeacon(endpoint, bodyText) && typeof console !== "undefined" && console.warn) {
+          console.warn("[WebPulse] Tracking request error:", err && err.message ? err.message : err);
+        }
+      });
+    } else {
+      sendWithBeacon(endpoint, bodyText);
     }
   }
 
-  function handleCall(action, ...args) {
-    if (action === "init") {
-      apiKey = args[0];
+  function handleCall(action) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    if (action === "init" && typeof args[0] === "string" && args[0].trim()) {
+      apiKey = args[0].trim();
+      return;
     }
-
     if (action === "track") {
       sendEvent(args[0], args[1] || {});
     }
   }
 
-  window.tracker = function (...args) {
-    handleCall(...args);
+  window.tracker = function () {
+    handleCall.apply(null, arguments);
   };
 
-  // Auto-initialize if trackingId was provided in the URL
-  if (apiKey) {
+  for (var i = 0; i < priorQueue.length; i++) {
+    handleCall.apply(null, priorQueue[i]);
+  }
+
+  if (apiKey && (("${trackingId || ''}" !== "") || Boolean(attrSite))) {
     handleCall("track", "page_view");
   }
 })();`;
@@ -1364,12 +1441,18 @@ export const getTrackerScript = asyncHandler(async (req, res) => {
  * Uses x-api-key header or body tracking_id for authentication.
  */
 export const trackEvent = asyncHandler(async (req, res) => {
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+        throw AppError.badRequest('Request body must be a JSON object', 'INVALID_PAYLOAD');
+    }
+
     const apiKey = req.headers['x-api-key'] || req.body?.tracking_id || req.body?.trackingId || req.body?.apiKey;
-    if (!apiKey) throw AppError.unauthorized('Missing API key or tracking ID');
+    if (!apiKey || typeof apiKey !== 'string') {
+        throw AppError.unauthorized('Missing API key or tracking ID');
+    }
 
     const {
         event,
-        type = 'event',
+        type,
         url,
         pageUrl,
         path: bodyPath,
@@ -1381,20 +1464,40 @@ export const trackEvent = asyncHandler(async (req, res) => {
         category,
         properties,
         ...customData
-    } = req.body || {};
+    } = req.body;
+
+    if (event !== undefined && event !== null && typeof event !== 'string') {
+        throw AppError.badRequest('Field "event" must be a string', 'INVALID_PAYLOAD');
+    }
+    if (url !== undefined && url !== null && typeof url !== 'string') {
+        throw AppError.badRequest('Field "url" must be a string', 'INVALID_PAYLOAD');
+    }
+    if (pageUrl !== undefined && pageUrl !== null && typeof pageUrl !== 'string') {
+        throw AppError.badRequest('Field "pageUrl" must be a string', 'INVALID_PAYLOAD');
+    }
 
     const userAgent = bodyUA || req.headers['user-agent'] || '';
     const ip = getClientIp(req);
+    const isSecretKeyFormat = apiKey.startsWith('wpk_') || apiKey.length > 30;
 
-    // 1. Bot Filtering
-    if (isBot(userAgent, req)) {
+    // 1. Bot Filtering (skip Accept-Language heuristic for authenticated server-side wpk_ calls)
+    if (!isSecretKeyFormat && isBot(userAgent, req)) {
         return res.json({ success: true, bot: true });
     }
 
-    // 2. Fetch Project (Support API keys table, tracking_id, or UUID)
+    // 2. Fetch Project (Support automatic verified-origin mode, API keys table, tracking_id, or UUID)
     let project = null;
     let hasSecretApiKey = false;
-    if (apiKey.startsWith('wpk_') || apiKey.length > 30) {
+    if (apiKey === 'auto') {
+        const exactOrigin = extractExactOriginFromHeaders(req);
+        if (!exactOrigin) {
+            throw AppError.badRequest('Valid Origin header is required for automatic tracking', 'ORIGIN_REQUIRED');
+        }
+        project = await originService.resolveProjectByVerifiedOrigin(exactOrigin);
+        if (!project) {
+            throw AppError.forbidden('Origin is not verified for automatic tracking', 'ORIGIN_NOT_VERIFIED');
+        }
+    } else if (isSecretKeyFormat) {
         const prefix = apiKey.substring(0, 8);
         const hash = crypto.createHash('sha256').update(apiKey).digest('hex');
         const { data: keyRecord } = await supabase
@@ -1434,7 +1537,7 @@ export const trackEvent = asyncHandler(async (req, res) => {
         throw AppError.forbidden('Project is disabled');
     }
 
-    const guard = await enforceIngestionGuards({ project, req, hasSecretApiKey });
+    const guard = await enforceIngestionGuards({ project, req, res, hasSecretApiKey });
     if (guard.duplicate) {
         return res.json({ success: true, ignored: 'DUPLICATE_EVENT_ID' });
     }
@@ -1448,45 +1551,94 @@ export const trackEvent = asyncHandler(async (req, res) => {
     }
     requestCache.set(hitHash, now);
 
-    const hit = await recordAnalyticsHit({
+    const normalizedEvent = typeof event === 'string' ? event.trim() : '';
+    const isPageView =
+        type === 'pageview' ||
+        normalizedEvent.toLowerCase() === 'page_view' ||
+        normalizedEvent.toLowerCase() === 'pageview' ||
+        (!type && !normalizedEvent);
+    const resolvedType = isPageView ? 'pageview' : 'event';
+    const resolvedEventName = isPageView ? null : (normalizedEvent || 'custom_event');
+
+    await recordAnalyticsHit({
         project,
         ip,
         userAgent,
-        type: type || (event ? 'event' : 'pageview'),
+        type: resolvedType,
         pageUrl: url || pageUrl || bodyPath || '/',
-        title: title || (event ? `Event: ${event}` : 'API Event'),
+        title: title || (isPageView ? 'Page View' : `Event: ${resolvedEventName}`),
         referrer,
-        eventName: event,
+        eventName: resolvedEventName,
         eventCategory: category || 'custom',
         properties: properties || customData || {},
         customSessionId: session_id || sessionId || hitHash.substring(0, 20),
         req
     });
 
-    res.json({ success: true, event: event || 'pageview' });
+    res.json({ success: true, event: normalizedEvent || 'pageview', type: resolvedType });
 });
 
 /**
  * Standard SaaS Analytics Count Endpoint (GET /v1/analytics/count)
- * Uses x-api-key header for authentication.
+ * Supports private wpk_* API keys (recommended) and public trk_* IDs (origin-guarded).
  */
 export const getEventCount = asyncHandler(async (req, res) => {
     const apiKey = req.headers['x-api-key'];
     const urlParam = req.query.url;
 
-    if (!apiKey) throw AppError.unauthorized('Missing API key');
+    if (!apiKey || typeof apiKey !== 'string') {
+        throw AppError.unauthorized('Missing API key');
+    }
 
-    const { data: project } = await supabase
-        .from('projects')
-        .select('id')
-        .eq('tracking_id', apiKey)
-        .single();
+    let project = null;
+    let hasSecretApiKey = false;
+
+    if (apiKey.startsWith('wpk_') || apiKey.length > 30) {
+        const prefix = apiKey.substring(0, 8);
+        const hash = crypto.createHash('sha256').update(apiKey).digest('hex');
+        const { data: keyRecord } = await supabase
+            .from('api_keys')
+            .select('project_id, revoked_at, expires_at')
+            .eq('key_prefix', prefix)
+            .eq('key_hash', hash)
+            .maybeSingle();
+
+        if (keyRecord && !keyRecord.revoked_at && (!keyRecord.expires_at || new Date(keyRecord.expires_at) > new Date())) {
+            const { data: proj } = await supabase
+                .from('projects')
+                .select('id, name, user_id, allowed_origins, is_active')
+                .eq('id', keyRecord.project_id)
+                .maybeSingle();
+            project = proj;
+            hasSecretApiKey = Boolean(proj);
+        }
+    }
+
+    if (!project) {
+        if (env.requireApiKeyForAnalytics || process.env.REQUIRE_API_KEY_FOR_ANALYTICS === 'true') {
+            throw AppError.unauthorized('A private wpk_ API key is required for analytics retrieval');
+        }
+        const { data: proj } = await supabase
+            .from('projects')
+            .select('id, name, user_id, allowed_origins, is_active')
+            .eq('tracking_id', apiKey)
+            .maybeSingle();
+        project = proj;
+    }
 
     if (!project) throw AppError.notFound('Invalid API key');
 
+    const originResult = await originService.validateIngestionOrigin({
+        project,
+        req,
+        hasSecretApiKey
+    });
+    if (!originResult.allowed) {
+        throw AppError.forbidden(originResult.code || 'ORIGIN_NOT_ALLOWED', originResult.code || 'ORIGIN_NOT_ALLOWED');
+    }
+
     let count = 0;
     if (urlParam) {
-        // Count views for specific URL
         const { count: pageCount } = await supabase
             .from('page_views')
             .select('*', { count: 'exact', head: true })
@@ -1494,13 +1646,22 @@ export const getEventCount = asyncHandler(async (req, res) => {
             .ilike('page_url', `%${urlParam}%`);
         count = pageCount || 0;
     } else {
-        // Get total count from counter table
-        const { data: counter } = await supabase
-            .from('counters')
-            .select('count')
-            .eq('project_id', project.id)
-            .single();
-        count = counter?.count || 0;
+        const [{ data: counter }, { count: pageViewsCount }, { count: eventsCount }] = await Promise.all([
+            supabase
+                .from('counters')
+                .select('count')
+                .eq('project_id', project.id)
+                .single(),
+            supabase
+                .from('page_views')
+                .select('*', { count: 'exact', head: true })
+                .eq('project_id', project.id),
+            supabase
+                .from('events')
+                .select('*', { count: 'exact', head: true })
+                .eq('project_id', project.id)
+        ]);
+        count = Math.max(counter?.count || 0, (pageViewsCount || 0) + (eventsCount || 0));
     }
 
     res.json({ count });
